@@ -1,0 +1,5980 @@
+[
+  {
+    "iso2": "AF",
+    "iso3": "AFG",
+    "m49": 4,
+    "name": "Afghanistan",
+    "officialName": "Islamic Republic of Afghanistan",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "aliases": [
+      "AF",
+      "Afġānistān",
+      "Islamic Republic of Afghanistan",
+      "Afghanistan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 33,
+    "lng": 65,
+    "currency": "AFN",
+    "languages": [
+      "prs",
+      "pus",
+      "tuk"
+    ]
+  },
+  {
+    "iso2": "AX",
+    "iso3": "ALA",
+    "m49": 248,
+    "name": "Åland Islands",
+    "officialName": "Åland Islands",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "AX",
+      "Aaland",
+      "Aland",
+      "Ahvenanmaa",
+      "Åland Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 60.116667,
+    "lng": 19.9,
+    "currency": "EUR",
+    "languages": [
+      "swe"
+    ]
+  },
+  {
+    "iso2": "AL",
+    "iso3": "ALB",
+    "m49": 8,
+    "name": "Albania",
+    "officialName": "Republic of Albania",
+    "region": "Europe",
+    "subregion": "Southeast Europe",
+    "aliases": [
+      "AL",
+      "Shqipëri",
+      "Shqipëria",
+      "Shqipnia",
+      "Republic of Albania",
+      "Albania",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 41,
+    "lng": 20,
+    "currency": "ALL",
+    "languages": [
+      "sqi"
+    ]
+  },
+  {
+    "iso2": "DZ",
+    "iso3": "DZA",
+    "m49": 12,
+    "name": "Algeria",
+    "officialName": "People's Democratic Republic of Algeria",
+    "region": "Africa",
+    "subregion": "Northern Africa",
+    "aliases": [
+      "DZ",
+      "Dzayer",
+      "Algérie",
+      "People's Democratic Republic of Algeria",
+      "Algeria",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 28,
+    "lng": 3,
+    "currency": "DZD",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "AS",
+    "iso3": "ASM",
+    "m49": 16,
+    "name": "American Samoa",
+    "officialName": "American Samoa",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "AS",
+      "Amerika Sāmoa",
+      "Amelika Sāmoa",
+      "Sāmoa Amelika",
+      "American Samoa",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -14.33333333,
+    "lng": -170,
+    "currency": "USD",
+    "languages": [
+      "eng",
+      "smo"
+    ]
+  },
+  {
+    "iso2": "AD",
+    "iso3": "AND",
+    "m49": 20,
+    "name": "Andorra",
+    "officialName": "Principality of Andorra",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "AD",
+      "Principality of Andorra",
+      "Principat d'Andorra",
+      "Andorra",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 42.5,
+    "lng": 1.5,
+    "currency": "EUR",
+    "languages": [
+      "cat"
+    ]
+  },
+  {
+    "iso2": "AO",
+    "iso3": "AGO",
+    "m49": 24,
+    "name": "Angola",
+    "officialName": "Republic of Angola",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "AO",
+      "República de Angola",
+      "ʁɛpublika de an'ɡɔla",
+      "Republic of Angola",
+      "Angola",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -12.5,
+    "lng": 18.5,
+    "currency": "AOA",
+    "languages": [
+      "por"
+    ]
+  },
+  {
+    "iso2": "AI",
+    "iso3": "AIA",
+    "m49": 660,
+    "name": "Anguilla",
+    "officialName": "Anguilla",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "AI",
+      "Anguilla",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 18.25,
+    "lng": -63.16666666,
+    "currency": "XCD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "AQ",
+    "iso3": "ATA",
+    "m49": 10,
+    "name": "Antarctica",
+    "officialName": "Antarctica",
+    "region": "Antarctic",
+    "aliases": [
+      "AQ",
+      "Antarctica",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -90,
+    "lng": 0,
+    "languages": []
+  },
+  {
+    "iso2": "AG",
+    "iso3": "ATG",
+    "m49": 28,
+    "name": "Antigua and Barbuda",
+    "officialName": "Antigua and Barbuda",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "AG",
+      "Antigua and Barbuda",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 17.05,
+    "lng": -61.8,
+    "currency": "XCD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "AR",
+    "iso3": "ARG",
+    "m49": 32,
+    "name": "Argentina",
+    "officialName": "Argentine Republic",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "AR",
+      "Argentine Republic",
+      "República Argentina",
+      "Argentina",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -34,
+    "lng": -64,
+    "currency": "ARS",
+    "languages": [
+      "grn",
+      "spa"
+    ]
+  },
+  {
+    "iso2": "AM",
+    "iso3": "ARM",
+    "m49": 51,
+    "name": "Armenia",
+    "officialName": "Republic of Armenia",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "AM",
+      "Hayastan",
+      "Republic of Armenia",
+      "Հայաստանի Հանրապետություն",
+      "Armenia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 40,
+    "lng": 45,
+    "currency": "AMD",
+    "languages": [
+      "hye"
+    ]
+  },
+  {
+    "iso2": "AW",
+    "iso3": "ABW",
+    "m49": 533,
+    "name": "Aruba",
+    "officialName": "Aruba",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "AW",
+      "Aruba",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 12.5,
+    "lng": -69.96666666,
+    "currency": "AWG",
+    "languages": [
+      "nld",
+      "pap"
+    ]
+  },
+  {
+    "iso2": "AU",
+    "iso3": "AUS",
+    "m49": 36,
+    "name": "Australia",
+    "officialName": "Commonwealth of Australia",
+    "region": "Oceania",
+    "subregion": "Australia and New Zealand",
+    "aliases": [
+      "AU",
+      "Commonwealth of Australia",
+      "Australia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -27,
+    "lng": 133,
+    "currency": "AUD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "AT",
+    "iso3": "AUT",
+    "m49": 40,
+    "name": "Austria",
+    "officialName": "Republic of Austria",
+    "region": "Europe",
+    "subregion": "Central Europe",
+    "aliases": [
+      "AT",
+      "Osterreich",
+      "Oesterreich",
+      "Republic of Austria",
+      "Austria",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 47.33333333,
+    "lng": 13.33333333,
+    "currency": "EUR",
+    "languages": [
+      "bar"
+    ]
+  },
+  {
+    "iso2": "AZ",
+    "iso3": "AZE",
+    "m49": 31,
+    "name": "Azerbaijan",
+    "officialName": "Republic of Azerbaijan",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "AZ",
+      "Republic of Azerbaijan",
+      "Azərbaycan Respublikası",
+      "Azerbaijan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 40.5,
+    "lng": 47.5,
+    "currency": "AZN",
+    "languages": [
+      "aze",
+      "rus"
+    ]
+  },
+  {
+    "iso2": "BS",
+    "iso3": "BHS",
+    "m49": 44,
+    "name": "Bahamas",
+    "officialName": "Commonwealth of the Bahamas",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "BS",
+      "Commonwealth of the Bahamas",
+      "Bahamas",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 24.25,
+    "lng": -76,
+    "currency": "BSD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "BH",
+    "iso3": "BHR",
+    "m49": 48,
+    "name": "Bahrain",
+    "officialName": "Kingdom of Bahrain",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "BH",
+      "Kingdom of Bahrain",
+      "Mamlakat al-Baḥrayn",
+      "Bahrain",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 26,
+    "lng": 50.55,
+    "currency": "BHD",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "BD",
+    "iso3": "BGD",
+    "m49": 50,
+    "name": "Bangladesh",
+    "officialName": "People's Republic of Bangladesh",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "aliases": [
+      "BD",
+      "People's Republic of Bangladesh",
+      "Gônôprôjatôntri Bangladesh",
+      "Bangladesh",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 24,
+    "lng": 90,
+    "currency": "BDT",
+    "languages": [
+      "ben"
+    ]
+  },
+  {
+    "iso2": "BB",
+    "iso3": "BRB",
+    "m49": 52,
+    "name": "Barbados",
+    "officialName": "Barbados",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "BB",
+      "Barbados",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 13.16666666,
+    "lng": -59.53333333,
+    "currency": "BBD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "BY",
+    "iso3": "BLR",
+    "m49": 112,
+    "name": "Belarus",
+    "officialName": "Republic of Belarus",
+    "region": "Europe",
+    "subregion": "Eastern Europe",
+    "aliases": [
+      "BY",
+      "Bielaruś",
+      "Republic of Belarus",
+      "Белоруссия",
+      "Республика Белоруссия",
+      "Belarus",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 53,
+    "lng": 28,
+    "currency": "BYN",
+    "languages": [
+      "bel",
+      "rus"
+    ]
+  },
+  {
+    "iso2": "BE",
+    "iso3": "BEL",
+    "m49": 56,
+    "name": "Belgium",
+    "officialName": "Kingdom of Belgium",
+    "region": "Europe",
+    "subregion": "Western Europe",
+    "aliases": [
+      "BE",
+      "België",
+      "Belgie",
+      "Belgien",
+      "Belgique",
+      "Kingdom of Belgium",
+      "Koninkrijk België",
+      "Royaume de Belgique",
+      "Königreich Belgien",
+      "Belgium",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 50.83333333,
+    "lng": 4,
+    "currency": "EUR",
+    "languages": [
+      "deu",
+      "fra",
+      "nld"
+    ]
+  },
+  {
+    "iso2": "BZ",
+    "iso3": "BLZ",
+    "m49": 84,
+    "name": "Belize",
+    "officialName": "Belize",
+    "region": "Americas",
+    "subregion": "Central America",
+    "aliases": [
+      "BZ",
+      "Belize",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 17.25,
+    "lng": -88.75,
+    "currency": "BZD",
+    "languages": [
+      "bjz",
+      "eng",
+      "spa"
+    ]
+  },
+  {
+    "iso2": "BJ",
+    "iso3": "BEN",
+    "m49": 204,
+    "name": "Benin",
+    "officialName": "Republic of Benin",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "BJ",
+      "Republic of Benin",
+      "République du Bénin",
+      "Benin",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 9.5,
+    "lng": 2.25,
+    "currency": "XOF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "BM",
+    "iso3": "BMU",
+    "m49": 60,
+    "name": "Bermuda",
+    "officialName": "Bermuda",
+    "region": "Americas",
+    "subregion": "North America",
+    "aliases": [
+      "BM",
+      "The Islands of Bermuda",
+      "The Bermudas",
+      "Somers Isles",
+      "Bermuda",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 32.33333333,
+    "lng": -64.75,
+    "currency": "BMD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "BT",
+    "iso3": "BTN",
+    "m49": 64,
+    "name": "Bhutan",
+    "officialName": "Kingdom of Bhutan",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "aliases": [
+      "BT",
+      "Kingdom of Bhutan",
+      "Bhutan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 27.5,
+    "lng": 90.5,
+    "currency": "BTN",
+    "languages": [
+      "dzo"
+    ]
+  },
+  {
+    "iso2": "BO",
+    "iso3": "BOL",
+    "m49": 68,
+    "name": "Bolivia",
+    "officialName": "Plurinational State of Bolivia",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "BO",
+      "Buliwya",
+      "Wuliwya",
+      "Bolivia, Plurinational State of",
+      "Plurinational State of Bolivia",
+      "Estado Plurinacional de Bolivia",
+      "Buliwya Mamallaqta",
+      "Wuliwya Suyu",
+      "Tetã Volívia",
+      "Bolivia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -17,
+    "lng": -65,
+    "currency": "BOB",
+    "languages": [
+      "aym",
+      "grn",
+      "que",
+      "spa"
+    ]
+  },
+  {
+    "iso2": "BA",
+    "iso3": "BIH",
+    "m49": 70,
+    "name": "Bosnia and Herzegovina",
+    "officialName": "Bosnia and Herzegovina",
+    "region": "Europe",
+    "subregion": "Southeast Europe",
+    "aliases": [
+      "BA",
+      "Bosnia-Herzegovina",
+      "Босна и Херцеговина",
+      "Bosnia and Herzegovina",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 44,
+    "lng": 18,
+    "currency": "BAM",
+    "languages": [
+      "bos",
+      "hrv",
+      "srp"
+    ]
+  },
+  {
+    "iso2": "BW",
+    "iso3": "BWA",
+    "m49": 72,
+    "name": "Botswana",
+    "officialName": "Republic of Botswana",
+    "region": "Africa",
+    "subregion": "Southern Africa",
+    "aliases": [
+      "BW",
+      "Republic of Botswana",
+      "Lefatshe la Botswana",
+      "Botswana",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -22,
+    "lng": 24,
+    "currency": "BWP",
+    "languages": [
+      "eng",
+      "tsn"
+    ]
+  },
+  {
+    "iso2": "BV",
+    "iso3": "BVT",
+    "m49": 74,
+    "name": "Bouvet Island",
+    "officialName": "Bouvet Island",
+    "region": "Antarctic",
+    "aliases": [
+      "BV",
+      "Bouvetøya",
+      "Bouvet-øya",
+      "Bouvet Island",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -54.43333333,
+    "lng": 3.4,
+    "languages": [
+      "nor"
+    ]
+  },
+  {
+    "iso2": "BR",
+    "iso3": "BRA",
+    "m49": 76,
+    "name": "Brazil",
+    "officialName": "Federative Republic of Brazil",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "BR",
+      "Brasil",
+      "Federative Republic of Brazil",
+      "República Federativa do Brasil",
+      "Brazil",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -10,
+    "lng": -55,
+    "currency": "BRL",
+    "languages": [
+      "por"
+    ]
+  },
+  {
+    "iso2": "IO",
+    "iso3": "IOT",
+    "m49": 86,
+    "name": "British Indian Ocean Territory",
+    "officialName": "British Indian Ocean Territory",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "IO",
+      "British Indian Ocean Territory",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -6,
+    "lng": 71.5,
+    "currency": "USD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "VG",
+    "iso3": "VGB",
+    "m49": 92,
+    "name": "British Virgin Islands",
+    "officialName": "Virgin Islands",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "VG",
+      "Virgin Islands, British",
+      "Virgin Islands",
+      "British Virgin Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 18.431383,
+    "lng": -64.62305,
+    "currency": "USD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "BN",
+    "iso3": "BRN",
+    "m49": 96,
+    "name": "Brunei",
+    "officialName": "Nation of Brunei, Abode of Peace",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "BN",
+      "Brunei Darussalam",
+      "Nation of Brunei",
+      "the Abode of Peace",
+      "Nation of Brunei, Abode of Peace",
+      "Brunei",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 4.5,
+    "lng": 114.66666666,
+    "currency": "BND",
+    "languages": [
+      "msa"
+    ]
+  },
+  {
+    "iso2": "BG",
+    "iso3": "BGR",
+    "m49": 100,
+    "name": "Bulgaria",
+    "officialName": "Republic of Bulgaria",
+    "region": "Europe",
+    "subregion": "Southeast Europe",
+    "aliases": [
+      "BG",
+      "Republic of Bulgaria",
+      "Република България",
+      "Bulgaria",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 43,
+    "lng": 25,
+    "currency": "BGN",
+    "languages": [
+      "bul"
+    ]
+  },
+  {
+    "iso2": "BF",
+    "iso3": "BFA",
+    "m49": 854,
+    "name": "Burkina Faso",
+    "officialName": "Burkina Faso",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "BF",
+      "Burkina Faso",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 13,
+    "lng": -2,
+    "currency": "XOF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "BI",
+    "iso3": "BDI",
+    "m49": 108,
+    "name": "Burundi",
+    "officialName": "Republic of Burundi",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "BI",
+      "Republic of Burundi",
+      "Republika y'Uburundi",
+      "République du Burundi",
+      "Burundi",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -3.5,
+    "lng": 30,
+    "currency": "BIF",
+    "languages": [
+      "fra",
+      "run"
+    ]
+  },
+  {
+    "iso2": "KH",
+    "iso3": "KHM",
+    "m49": 116,
+    "name": "Cambodia",
+    "officialName": "Kingdom of Cambodia",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "KH",
+      "Kingdom of Cambodia",
+      "Cambodia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 13,
+    "lng": 105,
+    "currency": "KHR",
+    "languages": [
+      "khm"
+    ]
+  },
+  {
+    "iso2": "CM",
+    "iso3": "CMR",
+    "m49": 120,
+    "name": "Cameroon",
+    "officialName": "Republic of Cameroon",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "CM",
+      "Republic of Cameroon",
+      "République du Cameroun",
+      "Cameroon",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 6,
+    "lng": 12,
+    "currency": "XAF",
+    "languages": [
+      "eng",
+      "fra"
+    ]
+  },
+  {
+    "iso2": "CA",
+    "iso3": "CAN",
+    "m49": 124,
+    "name": "Canada",
+    "officialName": "Canada",
+    "region": "Americas",
+    "subregion": "North America",
+    "aliases": [
+      "CA",
+      "Canada",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 60,
+    "lng": -95,
+    "currency": "CAD",
+    "languages": [
+      "eng",
+      "fra"
+    ]
+  },
+  {
+    "iso2": "CV",
+    "iso3": "CPV",
+    "m49": 132,
+    "name": "Cape Verde",
+    "officialName": "Republic of Cabo Verde",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "CV",
+      "Republic of Cabo Verde",
+      "República de Cabo Verde",
+      "Cape Verde",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 16,
+    "lng": -24,
+    "currency": "CVE",
+    "languages": [
+      "por"
+    ]
+  },
+  {
+    "iso2": "BQ",
+    "iso3": "BES",
+    "m49": 535,
+    "name": "Caribbean Netherlands",
+    "officialName": "Bonaire, Sint Eustatius and Saba",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "BES islands",
+      "Bonaire Sint Eustatius and Saba",
+      "Bonaire, Sint Eustatius and Saba",
+      "Caribbean Netherlands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 12.18,
+    "lng": -68.25,
+    "currency": "USD",
+    "languages": [
+      "eng",
+      "nld",
+      "pap"
+    ]
+  },
+  {
+    "iso2": "KY",
+    "iso3": "CYM",
+    "m49": 136,
+    "name": "Cayman Islands",
+    "officialName": "Cayman Islands",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "KY",
+      "Cayman Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 19.5,
+    "lng": -80.5,
+    "currency": "KYD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "CF",
+    "iso3": "CAF",
+    "m49": 140,
+    "name": "Central African Republic",
+    "officialName": "Central African Republic",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "CF",
+      "Central African Republic",
+      "République centrafricaine",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 7,
+    "lng": 21,
+    "currency": "XAF",
+    "languages": [
+      "fra",
+      "sag"
+    ]
+  },
+  {
+    "iso2": "TD",
+    "iso3": "TCD",
+    "m49": 148,
+    "name": "Chad",
+    "officialName": "Republic of Chad",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "TD",
+      "Tchad",
+      "Republic of Chad",
+      "République du Tchad",
+      "Chad",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 15,
+    "lng": 19,
+    "currency": "XAF",
+    "languages": [
+      "ara",
+      "fra"
+    ]
+  },
+  {
+    "iso2": "CL",
+    "iso3": "CHL",
+    "m49": 152,
+    "name": "Chile",
+    "officialName": "Republic of Chile",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "CL",
+      "Republic of Chile",
+      "República de Chile",
+      "Chile",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -30,
+    "lng": -71,
+    "currency": "CLP",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "CN",
+    "iso3": "CHN",
+    "m49": 156,
+    "name": "China",
+    "officialName": "People's Republic of China",
+    "region": "Asia",
+    "subregion": "Eastern Asia",
+    "aliases": [
+      "CN",
+      "Zhōngguó",
+      "Zhongguo",
+      "Zhonghua",
+      "People's Republic of China",
+      "中华人民共和国",
+      "Zhōnghuá Rénmín Gònghéguó",
+      "China",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 35,
+    "lng": 105,
+    "currency": "CNY",
+    "languages": [
+      "zho"
+    ]
+  },
+  {
+    "iso2": "CX",
+    "iso3": "CXR",
+    "m49": 162,
+    "name": "Christmas Island",
+    "officialName": "Territory of Christmas Island",
+    "region": "Oceania",
+    "subregion": "Australia and New Zealand",
+    "aliases": [
+      "CX",
+      "Territory of Christmas Island",
+      "Christmas Island",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -10.5,
+    "lng": 105.66666666,
+    "currency": "AUD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "CC",
+    "iso3": "CCK",
+    "m49": 166,
+    "name": "Cocos (Keeling) Islands",
+    "officialName": "Territory of the Cocos (Keeling) Islands",
+    "region": "Oceania",
+    "subregion": "Australia and New Zealand",
+    "aliases": [
+      "CC",
+      "Keeling Islands",
+      "Cocos Islands",
+      "Territory of the Cocos (Keeling) Islands",
+      "Cocos (Keeling) Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -12.5,
+    "lng": 96.83333333,
+    "currency": "AUD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "CO",
+    "iso3": "COL",
+    "m49": 170,
+    "name": "Colombia",
+    "officialName": "Republic of Colombia",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "CO",
+      "Republic of Colombia",
+      "República de Colombia",
+      "Colombia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 4,
+    "lng": -72,
+    "currency": "COP",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "KM",
+    "iso3": "COM",
+    "m49": 174,
+    "name": "Comoros",
+    "officialName": "Union of the Comoros",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "KM",
+      "Union of the Comoros",
+      "Union des Comores",
+      "Udzima wa Komori",
+      "al-Ittiḥād al-Qumurī",
+      "Comoros",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -12.16666666,
+    "lng": 44.25,
+    "currency": "KMF",
+    "languages": [
+      "ara",
+      "fra",
+      "zdj"
+    ]
+  },
+  {
+    "iso2": "CK",
+    "iso3": "COK",
+    "m49": 184,
+    "name": "Cook Islands",
+    "officialName": "Cook Islands",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "CK",
+      "Kūki 'Āirani",
+      "Cook Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -21.23333333,
+    "lng": -159.76666666,
+    "currency": "CKD",
+    "languages": [
+      "eng",
+      "rar"
+    ]
+  },
+  {
+    "iso2": "CR",
+    "iso3": "CRI",
+    "m49": 188,
+    "name": "Costa Rica",
+    "officialName": "Republic of Costa Rica",
+    "region": "Americas",
+    "subregion": "Central America",
+    "aliases": [
+      "CR",
+      "Republic of Costa Rica",
+      "República de Costa Rica",
+      "Costa Rica",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 10,
+    "lng": -84,
+    "currency": "CRC",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "HR",
+    "iso3": "HRV",
+    "m49": 191,
+    "name": "Croatia",
+    "officialName": "Republic of Croatia",
+    "region": "Europe",
+    "subregion": "Southeast Europe",
+    "aliases": [
+      "HR",
+      "Hrvatska",
+      "Republic of Croatia",
+      "Republika Hrvatska",
+      "Croatia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 45.16666666,
+    "lng": 15.5,
+    "currency": "EUR",
+    "languages": [
+      "hrv"
+    ]
+  },
+  {
+    "iso2": "CU",
+    "iso3": "CUB",
+    "m49": 192,
+    "name": "Cuba",
+    "officialName": "Republic of Cuba",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "CU",
+      "Republic of Cuba",
+      "República de Cuba",
+      "Cuba",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 21.5,
+    "lng": -80,
+    "currency": "CUC",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "CW",
+    "iso3": "CUW",
+    "m49": 531,
+    "name": "Curaçao",
+    "officialName": "Country of Curaçao",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "CW",
+      "Curacao",
+      "Kòrsou",
+      "Country of Curaçao",
+      "Land Curaçao",
+      "Pais Kòrsou",
+      "Curaçao",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 12.116667,
+    "lng": -68.933333,
+    "currency": "ANG",
+    "languages": [
+      "eng",
+      "nld",
+      "pap"
+    ]
+  },
+  {
+    "iso2": "CY",
+    "iso3": "CYP",
+    "m49": 196,
+    "name": "Cyprus",
+    "officialName": "Republic of Cyprus",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "CY",
+      "Kýpros",
+      "Kıbrıs",
+      "Republic of Cyprus",
+      "Κυπριακή Δημοκρατία",
+      "Kıbrıs Cumhuriyeti",
+      "Cyprus",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 35,
+    "lng": 33,
+    "currency": "EUR",
+    "languages": [
+      "ell",
+      "tur"
+    ]
+  },
+  {
+    "iso2": "CZ",
+    "iso3": "CZE",
+    "m49": 203,
+    "name": "Czechia",
+    "officialName": "Czech Republic",
+    "region": "Europe",
+    "subregion": "Central Europe",
+    "aliases": [
+      "CZ",
+      "Česká republika",
+      "Česko",
+      "Czech Republic",
+      "Czechia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 49.75,
+    "lng": 15.5,
+    "currency": "CZK",
+    "languages": [
+      "ces",
+      "slk"
+    ]
+  },
+  {
+    "iso2": "DK",
+    "iso3": "DNK",
+    "m49": 208,
+    "name": "Denmark",
+    "officialName": "Kingdom of Denmark",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "DK",
+      "Danmark",
+      "Kingdom of Denmark",
+      "Kongeriget Danmark",
+      "Denmark",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 56,
+    "lng": 10,
+    "currency": "DKK",
+    "languages": [
+      "dan"
+    ]
+  },
+  {
+    "iso2": "DJ",
+    "iso3": "DJI",
+    "m49": 262,
+    "name": "Djibouti",
+    "officialName": "Republic of Djibouti",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "DJ",
+      "Jabuuti",
+      "Gabuuti",
+      "Republic of Djibouti",
+      "République de Djibouti",
+      "Gabuutih Ummuuno",
+      "Jamhuuriyadda Jabuuti",
+      "Djibouti",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 11.5,
+    "lng": 43,
+    "currency": "DJF",
+    "languages": [
+      "ara",
+      "fra"
+    ]
+  },
+  {
+    "iso2": "DM",
+    "iso3": "DMA",
+    "m49": 212,
+    "name": "Dominica",
+    "officialName": "Commonwealth of Dominica",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "DM",
+      "Dominique",
+      "Wai‘tu kubuli",
+      "Commonwealth of Dominica",
+      "Dominica",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 15.41666666,
+    "lng": -61.33333333,
+    "currency": "XCD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "DO",
+    "iso3": "DOM",
+    "m49": 214,
+    "name": "Dominican Republic",
+    "officialName": "Dominican Republic",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "DO",
+      "Dominican Republic",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 19,
+    "lng": -70.66666666,
+    "currency": "DOP",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "CD",
+    "iso3": "COD",
+    "m49": 180,
+    "name": "DR Congo",
+    "officialName": "Democratic Republic of the Congo",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "CD",
+      "DR Congo",
+      "Congo-Kinshasa",
+      "Congo, the Democratic Republic of the",
+      "Democratic Republic of Congo",
+      "DRC",
+      "Democratic Republic of the Congo",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 0,
+    "lng": 25,
+    "currency": "CDF",
+    "languages": [
+      "fra",
+      "kon",
+      "lin",
+      "lua",
+      "swa"
+    ]
+  },
+  {
+    "iso2": "EC",
+    "iso3": "ECU",
+    "m49": 218,
+    "name": "Ecuador",
+    "officialName": "Republic of Ecuador",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "EC",
+      "Republic of Ecuador",
+      "República del Ecuador",
+      "Ecuador",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -2,
+    "lng": -77.5,
+    "currency": "USD",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "EG",
+    "iso3": "EGY",
+    "m49": 818,
+    "name": "Egypt",
+    "officialName": "Arab Republic of Egypt",
+    "region": "Africa",
+    "subregion": "Northern Africa",
+    "aliases": [
+      "EG",
+      "Arab Republic of Egypt",
+      "Egypt",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 27,
+    "lng": 30,
+    "currency": "EGP",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "SV",
+    "iso3": "SLV",
+    "m49": 222,
+    "name": "El Salvador",
+    "officialName": "Republic of El Salvador",
+    "region": "Americas",
+    "subregion": "Central America",
+    "aliases": [
+      "SV",
+      "Republic of El Salvador",
+      "República de El Salvador",
+      "El Salvador",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 13.83333333,
+    "lng": -88.91666666,
+    "currency": "USD",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "GQ",
+    "iso3": "GNQ",
+    "m49": 226,
+    "name": "Equatorial Guinea",
+    "officialName": "Republic of Equatorial Guinea",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "GQ",
+      "Republic of Equatorial Guinea",
+      "República de Guinea Ecuatorial",
+      "République de Guinée équatoriale",
+      "República da Guiné Equatorial",
+      "Equatorial Guinea",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 2,
+    "lng": 10,
+    "currency": "XAF",
+    "languages": [
+      "fra",
+      "por",
+      "spa"
+    ]
+  },
+  {
+    "iso2": "ER",
+    "iso3": "ERI",
+    "m49": 232,
+    "name": "Eritrea",
+    "officialName": "State of Eritrea",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "ER",
+      "State of Eritrea",
+      "ሃገረ ኤርትራ",
+      "Dawlat Iritriyá",
+      "ʾErtrā",
+      "Iritriyā",
+      "Eritrea",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 15,
+    "lng": 39,
+    "currency": "ERN",
+    "languages": [
+      "ara",
+      "eng",
+      "tir"
+    ]
+  },
+  {
+    "iso2": "EE",
+    "iso3": "EST",
+    "m49": 233,
+    "name": "Estonia",
+    "officialName": "Republic of Estonia",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "EE",
+      "Eesti",
+      "Republic of Estonia",
+      "Eesti Vabariik",
+      "Estonia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 59,
+    "lng": 26,
+    "currency": "EUR",
+    "languages": [
+      "est"
+    ]
+  },
+  {
+    "iso2": "SZ",
+    "iso3": "SWZ",
+    "m49": 748,
+    "name": "Eswatini",
+    "officialName": "Kingdom of Eswatini",
+    "region": "Africa",
+    "subregion": "Southern Africa",
+    "aliases": [
+      "SZ",
+      "Swaziland",
+      "weSwatini",
+      "Swatini",
+      "Ngwane",
+      "Kingdom of Eswatini",
+      "Umbuso weSwatini",
+      "Eswatini",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -26.5,
+    "lng": 31.5,
+    "currency": "SZL",
+    "languages": [
+      "eng",
+      "ssw"
+    ]
+  },
+  {
+    "iso2": "ET",
+    "iso3": "ETH",
+    "m49": 231,
+    "name": "Ethiopia",
+    "officialName": "Federal Democratic Republic of Ethiopia",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "ET",
+      "ʾĪtyōṗṗyā",
+      "Federal Democratic Republic of Ethiopia",
+      "የኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ",
+      "Ethiopia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 8,
+    "lng": 38,
+    "currency": "ETB",
+    "languages": [
+      "amh"
+    ]
+  },
+  {
+    "iso2": "FK",
+    "iso3": "FLK",
+    "m49": 238,
+    "name": "Falkland Islands",
+    "officialName": "Falkland Islands",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "FK",
+      "Islas Malvinas",
+      "Falkland Islands (Malvinas)",
+      "Falkland Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -51.75,
+    "lng": -59,
+    "currency": "FKP",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "FO",
+    "iso3": "FRO",
+    "m49": 234,
+    "name": "Faroe Islands",
+    "officialName": "Faroe Islands",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "FO",
+      "Føroyar",
+      "Færøerne",
+      "Faeroe Islands",
+      "Faroe Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 62,
+    "lng": -7,
+    "currency": "DKK",
+    "languages": [
+      "dan",
+      "fao"
+    ]
+  },
+  {
+    "iso2": "FJ",
+    "iso3": "FJI",
+    "m49": 242,
+    "name": "Fiji",
+    "officialName": "Republic of Fiji",
+    "region": "Oceania",
+    "subregion": "Melanesia",
+    "aliases": [
+      "FJ",
+      "Viti",
+      "Republic of Fiji",
+      "Matanitu ko Viti",
+      "Fijī Gaṇarājya",
+      "Fiji",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -18,
+    "lng": 175,
+    "currency": "FJD",
+    "languages": [
+      "eng",
+      "fij",
+      "hif"
+    ]
+  },
+  {
+    "iso2": "FI",
+    "iso3": "FIN",
+    "m49": 246,
+    "name": "Finland",
+    "officialName": "Republic of Finland",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "FI",
+      "Suomi",
+      "Republic of Finland",
+      "Suomen tasavalta",
+      "Republiken Finland",
+      "Finland",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 64,
+    "lng": 26,
+    "currency": "EUR",
+    "languages": [
+      "fin",
+      "swe"
+    ]
+  },
+  {
+    "iso2": "FR",
+    "iso3": "FRA",
+    "m49": 250,
+    "name": "France",
+    "officialName": "French Republic",
+    "region": "Europe",
+    "subregion": "Western Europe",
+    "aliases": [
+      "FR",
+      "French Republic",
+      "République française",
+      "France",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 46,
+    "lng": 2,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "GF",
+    "iso3": "GUF",
+    "m49": 254,
+    "name": "French Guiana",
+    "officialName": "Guiana",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "GF",
+      "Guiana",
+      "Guyane",
+      "French Guiana",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 4,
+    "lng": -53,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "PF",
+    "iso3": "PYF",
+    "m49": 258,
+    "name": "French Polynesia",
+    "officialName": "French Polynesia",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "PF",
+      "Polynésie française",
+      "French Polynesia",
+      "Pōrīnetia Farāni",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -15,
+    "lng": -140,
+    "currency": "XPF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "TF",
+    "iso3": "ATF",
+    "m49": 260,
+    "name": "French Southern and Antarctic Lands",
+    "officialName": "Territory of the French Southern and Antarctic Lands",
+    "region": "Antarctic",
+    "aliases": [
+      "TF",
+      "French Southern Territories",
+      "Territory of the French Southern and Antarctic Lands",
+      "French Southern and Antarctic Lands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -49.25,
+    "lng": 69.167,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "GA",
+    "iso3": "GAB",
+    "m49": 266,
+    "name": "Gabon",
+    "officialName": "Gabonese Republic",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "GA",
+      "Gabonese Republic",
+      "République Gabonaise",
+      "Gabon",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -1,
+    "lng": 11.75,
+    "currency": "XAF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "GM",
+    "iso3": "GMB",
+    "m49": 270,
+    "name": "Gambia",
+    "officialName": "Republic of the Gambia",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "GM",
+      "Republic of the Gambia",
+      "Gambia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 13.46666666,
+    "lng": -16.56666666,
+    "currency": "GMD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "GE",
+    "iso3": "GEO",
+    "m49": 268,
+    "name": "Georgia",
+    "officialName": "Georgia",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "GE",
+      "Sakartvelo",
+      "Georgia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 42,
+    "lng": 43.5,
+    "currency": "GEL",
+    "languages": [
+      "kat"
+    ]
+  },
+  {
+    "iso2": "DE",
+    "iso3": "DEU",
+    "m49": 276,
+    "name": "Germany",
+    "officialName": "Federal Republic of Germany",
+    "region": "Europe",
+    "subregion": "Western Europe",
+    "aliases": [
+      "DE",
+      "Federal Republic of Germany",
+      "Bundesrepublik Deutschland",
+      "Germany",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 51,
+    "lng": 9,
+    "currency": "EUR",
+    "languages": [
+      "deu"
+    ]
+  },
+  {
+    "iso2": "GH",
+    "iso3": "GHA",
+    "m49": 288,
+    "name": "Ghana",
+    "officialName": "Republic of Ghana",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "GH",
+      "Republic of Ghana",
+      "Ghana",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 8,
+    "lng": -2,
+    "currency": "GHS",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "GI",
+    "iso3": "GIB",
+    "m49": 292,
+    "name": "Gibraltar",
+    "officialName": "Gibraltar",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "GI",
+      "Gibraltar",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 36.13333333,
+    "lng": -5.35,
+    "currency": "GIP",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "GR",
+    "iso3": "GRC",
+    "m49": 300,
+    "name": "Greece",
+    "officialName": "Hellenic Republic",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "GR",
+      "Elláda",
+      "Hellenic Republic",
+      "Ελληνική Δημοκρατία",
+      "Greece",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 39,
+    "lng": 22,
+    "currency": "EUR",
+    "languages": [
+      "ell"
+    ]
+  },
+  {
+    "iso2": "GL",
+    "iso3": "GRL",
+    "m49": 304,
+    "name": "Greenland",
+    "officialName": "Greenland",
+    "region": "Americas",
+    "subregion": "North America",
+    "aliases": [
+      "GL",
+      "Grønland",
+      "Greenland",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 72,
+    "lng": -40,
+    "currency": "DKK",
+    "languages": [
+      "kal"
+    ]
+  },
+  {
+    "iso2": "GD",
+    "iso3": "GRD",
+    "m49": 308,
+    "name": "Grenada",
+    "officialName": "Grenada",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "GD",
+      "Grenada",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 12.11666666,
+    "lng": -61.66666666,
+    "currency": "XCD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "GP",
+    "iso3": "GLP",
+    "m49": 312,
+    "name": "Guadeloupe",
+    "officialName": "Guadeloupe",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "GP",
+      "Gwadloup",
+      "Guadeloupe",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 16.25,
+    "lng": -61.583333,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "GU",
+    "iso3": "GUM",
+    "m49": 316,
+    "name": "Guam",
+    "officialName": "Guam",
+    "region": "Oceania",
+    "subregion": "Micronesia",
+    "aliases": [
+      "GU",
+      "Guåhån",
+      "Guam",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 13.46666666,
+    "lng": 144.78333333,
+    "currency": "USD",
+    "languages": [
+      "cha",
+      "eng",
+      "spa"
+    ]
+  },
+  {
+    "iso2": "GT",
+    "iso3": "GTM",
+    "m49": 320,
+    "name": "Guatemala",
+    "officialName": "Republic of Guatemala",
+    "region": "Americas",
+    "subregion": "Central America",
+    "aliases": [
+      "GT",
+      "Republic of Guatemala",
+      "Guatemala",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 15.5,
+    "lng": -90.25,
+    "currency": "GTQ",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "GG",
+    "iso3": "GGY",
+    "m49": 831,
+    "name": "Guernsey",
+    "officialName": "Bailiwick of Guernsey",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "GG",
+      "Bailiwick of Guernsey",
+      "Bailliage de Guernesey",
+      "Guernsey",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 49.46666666,
+    "lng": -2.58333333,
+    "currency": "GBP",
+    "languages": [
+      "eng",
+      "fra",
+      "nfr"
+    ]
+  },
+  {
+    "iso2": "GN",
+    "iso3": "GIN",
+    "m49": 324,
+    "name": "Guinea",
+    "officialName": "Republic of Guinea",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "GN",
+      "Republic of Guinea",
+      "République de Guinée",
+      "Guinea",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 11,
+    "lng": -10,
+    "currency": "GNF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "GW",
+    "iso3": "GNB",
+    "m49": 624,
+    "name": "Guinea-Bissau",
+    "officialName": "Republic of Guinea-Bissau",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "GW",
+      "Republic of Guinea-Bissau",
+      "República da Guiné-Bissau",
+      "Guinea-Bissau",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 12,
+    "lng": -15,
+    "currency": "XOF",
+    "languages": [
+      "por",
+      "pov"
+    ]
+  },
+  {
+    "iso2": "GY",
+    "iso3": "GUY",
+    "m49": 328,
+    "name": "Guyana",
+    "officialName": "Co-operative Republic of Guyana",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "GY",
+      "Co-operative Republic of Guyana",
+      "Guyana",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 5,
+    "lng": -59,
+    "currency": "GYD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "HT",
+    "iso3": "HTI",
+    "m49": 332,
+    "name": "Haiti",
+    "officialName": "Republic of Haiti",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "HT",
+      "Republic of Haiti",
+      "République d'Haïti",
+      "Repiblik Ayiti",
+      "Haiti",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 19,
+    "lng": -72.41666666,
+    "currency": "HTG",
+    "languages": [
+      "fra",
+      "hat"
+    ]
+  },
+  {
+    "iso2": "HM",
+    "iso3": "HMD",
+    "m49": 334,
+    "name": "Heard Island and McDonald Islands",
+    "officialName": "Heard Island and McDonald Islands",
+    "region": "Antarctic",
+    "aliases": [
+      "HM",
+      "Heard Island and McDonald Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -53.1,
+    "lng": 72.51666666,
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "HN",
+    "iso3": "HND",
+    "m49": 340,
+    "name": "Honduras",
+    "officialName": "Republic of Honduras",
+    "region": "Americas",
+    "subregion": "Central America",
+    "aliases": [
+      "HN",
+      "Republic of Honduras",
+      "República de Honduras",
+      "Honduras",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 15,
+    "lng": -86.5,
+    "currency": "HNL",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "HK",
+    "iso3": "HKG",
+    "m49": 344,
+    "name": "Hong Kong",
+    "officialName": "Hong Kong Special Administrative Region of the People's Republic of China",
+    "region": "Asia",
+    "subregion": "Eastern Asia",
+    "aliases": [
+      "HK",
+      "Hong Kong Special Administrative Region of the People's Republic of China",
+      "Hong Kong",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 22.267,
+    "lng": 114.188,
+    "currency": "HKD",
+    "languages": [
+      "eng",
+      "zho"
+    ]
+  },
+  {
+    "iso2": "HU",
+    "iso3": "HUN",
+    "m49": 348,
+    "name": "Hungary",
+    "officialName": "Hungary",
+    "region": "Europe",
+    "subregion": "Central Europe",
+    "aliases": [
+      "HU",
+      "Hungary",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 47,
+    "lng": 20,
+    "currency": "HUF",
+    "languages": [
+      "hun"
+    ]
+  },
+  {
+    "iso2": "IS",
+    "iso3": "ISL",
+    "m49": 352,
+    "name": "Iceland",
+    "officialName": "Iceland",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "IS",
+      "Island",
+      "Republic of Iceland",
+      "Lýðveldið Ísland",
+      "Iceland",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 65,
+    "lng": -18,
+    "currency": "ISK",
+    "languages": [
+      "isl"
+    ]
+  },
+  {
+    "iso2": "IN",
+    "iso3": "IND",
+    "m49": 356,
+    "name": "India",
+    "officialName": "Republic of India",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "aliases": [
+      "IN",
+      "Bhārat",
+      "Republic of India",
+      "Bharat Ganrajya",
+      "இந்தியா",
+      "India",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 20,
+    "lng": 77,
+    "currency": "INR",
+    "languages": [
+      "eng",
+      "hin",
+      "tam"
+    ]
+  },
+  {
+    "iso2": "ID",
+    "iso3": "IDN",
+    "m49": 360,
+    "name": "Indonesia",
+    "officialName": "Republic of Indonesia",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "ID",
+      "Republic of Indonesia",
+      "Republik Indonesia",
+      "Indonesia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -5,
+    "lng": 120,
+    "currency": "IDR",
+    "languages": [
+      "ind"
+    ]
+  },
+  {
+    "iso2": "IR",
+    "iso3": "IRN",
+    "m49": 364,
+    "name": "Iran",
+    "officialName": "Islamic Republic of Iran",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "aliases": [
+      "IR",
+      "Islamic Republic of Iran",
+      "Iran, Islamic Republic of",
+      "Jomhuri-ye Eslāmi-ye Irān",
+      "Iran",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 32,
+    "lng": 53,
+    "currency": "IRR",
+    "languages": [
+      "fas"
+    ]
+  },
+  {
+    "iso2": "IQ",
+    "iso3": "IRQ",
+    "m49": 368,
+    "name": "Iraq",
+    "officialName": "Republic of Iraq",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "IQ",
+      "Republic of Iraq",
+      "Jumhūriyyat al-‘Irāq",
+      "Iraq",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 33,
+    "lng": 44,
+    "currency": "IQD",
+    "languages": [
+      "ara",
+      "arc",
+      "ckb"
+    ]
+  },
+  {
+    "iso2": "IE",
+    "iso3": "IRL",
+    "m49": 372,
+    "name": "Ireland",
+    "officialName": "Republic of Ireland",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "IE",
+      "Éire",
+      "Republic of Ireland",
+      "Poblacht na hÉireann",
+      "Ireland",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 53,
+    "lng": -8,
+    "currency": "EUR",
+    "languages": [
+      "eng",
+      "gle"
+    ]
+  },
+  {
+    "iso2": "IM",
+    "iso3": "IMN",
+    "m49": 833,
+    "name": "Isle of Man",
+    "officialName": "Isle of Man",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "IM",
+      "Ellan Vannin",
+      "Mann",
+      "Mannin",
+      "Isle of Man",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 54.25,
+    "lng": -4.5,
+    "currency": "GBP",
+    "languages": [
+      "eng",
+      "glv"
+    ]
+  },
+  {
+    "iso2": "IL",
+    "iso3": "ISR",
+    "m49": 376,
+    "name": "Israel",
+    "officialName": "State of Israel",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "IL",
+      "State of Israel",
+      "Medīnat Yisrā'el",
+      "Israel",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 31.47,
+    "lng": 35.13,
+    "currency": "ILS",
+    "languages": [
+      "ara",
+      "heb"
+    ]
+  },
+  {
+    "iso2": "IT",
+    "iso3": "ITA",
+    "m49": 380,
+    "name": "Italy",
+    "officialName": "Italian Republic",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "IT",
+      "Italian Republic",
+      "Repubblica italiana",
+      "Italy",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 42.83333333,
+    "lng": 12.83333333,
+    "currency": "EUR",
+    "languages": [
+      "ita"
+    ]
+  },
+  {
+    "iso2": "CI",
+    "iso3": "CIV",
+    "m49": 384,
+    "name": "Ivory Coast",
+    "officialName": "Republic of Côte d'Ivoire",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "CI",
+      "Côte d'Ivoire",
+      "Cote d'Ivoire",
+      "Ivory Coast",
+      "Republic of Côte d'Ivoire",
+      "République de Côte d'Ivoire",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 8,
+    "lng": -5,
+    "currency": "XOF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "JM",
+    "iso3": "JAM",
+    "m49": 388,
+    "name": "Jamaica",
+    "officialName": "Jamaica",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "JM",
+      "Jamaica",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 18.25,
+    "lng": -77.5,
+    "currency": "JMD",
+    "languages": [
+      "eng",
+      "jam"
+    ]
+  },
+  {
+    "iso2": "JP",
+    "iso3": "JPN",
+    "m49": 392,
+    "name": "Japan",
+    "officialName": "Japan",
+    "region": "Asia",
+    "subregion": "Eastern Asia",
+    "aliases": [
+      "JP",
+      "Nippon",
+      "Nihon",
+      "Japan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 36,
+    "lng": 138,
+    "currency": "JPY",
+    "languages": [
+      "jpn"
+    ]
+  },
+  {
+    "iso2": "JE",
+    "iso3": "JEY",
+    "m49": 832,
+    "name": "Jersey",
+    "officialName": "Bailiwick of Jersey",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "JE",
+      "Bailiwick of Jersey",
+      "Bailliage de Jersey",
+      "Bailliage dé Jèrri",
+      "Jersey",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 49.25,
+    "lng": -2.16666666,
+    "currency": "GBP",
+    "languages": [
+      "eng",
+      "fra",
+      "nrf"
+    ]
+  },
+  {
+    "iso2": "JO",
+    "iso3": "JOR",
+    "m49": 400,
+    "name": "Jordan",
+    "officialName": "Hashemite Kingdom of Jordan",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "JO",
+      "Hashemite Kingdom of Jordan",
+      "al-Mamlakah al-Urdunīyah al-Hāshimīyah",
+      "Jordan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 31,
+    "lng": 36,
+    "currency": "JOD",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "KZ",
+    "iso3": "KAZ",
+    "m49": 398,
+    "name": "Kazakhstan",
+    "officialName": "Republic of Kazakhstan",
+    "region": "Asia",
+    "subregion": "Central Asia",
+    "aliases": [
+      "KZ",
+      "Qazaqstan",
+      "Казахстан",
+      "Republic of Kazakhstan",
+      "Қазақстан Республикасы",
+      "Qazaqstan Respublïkası",
+      "Республика Казахстан",
+      "Respublika Kazakhstan",
+      "Kazakhstan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 48,
+    "lng": 68,
+    "currency": "KZT",
+    "languages": [
+      "kaz",
+      "rus"
+    ]
+  },
+  {
+    "iso2": "KE",
+    "iso3": "KEN",
+    "m49": 404,
+    "name": "Kenya",
+    "officialName": "Republic of Kenya",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "KE",
+      "Republic of Kenya",
+      "Jamhuri ya Kenya",
+      "Kenya",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 1,
+    "lng": 38,
+    "currency": "KES",
+    "languages": [
+      "eng",
+      "swa"
+    ]
+  },
+  {
+    "iso2": "KI",
+    "iso3": "KIR",
+    "m49": 296,
+    "name": "Kiribati",
+    "officialName": "Independent and Sovereign Republic of Kiribati",
+    "region": "Oceania",
+    "subregion": "Micronesia",
+    "aliases": [
+      "KI",
+      "Republic of Kiribati",
+      "Ribaberiki Kiribati",
+      "Independent and Sovereign Republic of Kiribati",
+      "Kiribati",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 1.41666666,
+    "lng": 173,
+    "currency": "AUD",
+    "languages": [
+      "eng",
+      "gil"
+    ]
+  },
+  {
+    "iso2": "XK",
+    "iso3": "UNK",
+    "m49": 0,
+    "name": "Kosovo",
+    "officialName": "Republic of Kosovo",
+    "region": "Europe",
+    "subregion": "Southeast Europe",
+    "aliases": [
+      "XK",
+      "Република Косово",
+      "Republic of Kosovo",
+      "Kosovo",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 42.666667,
+    "lng": 21.166667,
+    "currency": "EUR",
+    "languages": [
+      "sqi",
+      "srp"
+    ]
+  },
+  {
+    "iso2": "KW",
+    "iso3": "KWT",
+    "m49": 414,
+    "name": "Kuwait",
+    "officialName": "State of Kuwait",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "KW",
+      "State of Kuwait",
+      "Dawlat al-Kuwait",
+      "Kuwait",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 29.5,
+    "lng": 45.75,
+    "currency": "KWD",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "KG",
+    "iso3": "KGZ",
+    "m49": 417,
+    "name": "Kyrgyzstan",
+    "officialName": "Kyrgyz Republic",
+    "region": "Asia",
+    "subregion": "Central Asia",
+    "aliases": [
+      "KG",
+      "Киргизия",
+      "Kyrgyz Republic",
+      "Кыргыз Республикасы",
+      "Kyrgyz Respublikasy",
+      "Kyrgyzstan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 41,
+    "lng": 75,
+    "currency": "KGS",
+    "languages": [
+      "kir",
+      "rus"
+    ]
+  },
+  {
+    "iso2": "LA",
+    "iso3": "LAO",
+    "m49": 418,
+    "name": "Laos",
+    "officialName": "Lao People's Democratic Republic",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "LA",
+      "Lao",
+      "Lao People's Democratic Republic",
+      "Sathalanalat Paxathipatai Paxaxon Lao",
+      "Laos",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 18,
+    "lng": 105,
+    "currency": "LAK",
+    "languages": [
+      "lao"
+    ]
+  },
+  {
+    "iso2": "LV",
+    "iso3": "LVA",
+    "m49": 428,
+    "name": "Latvia",
+    "officialName": "Republic of Latvia",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "LV",
+      "Republic of Latvia",
+      "Latvijas Republika",
+      "Latvia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 57,
+    "lng": 25,
+    "currency": "EUR",
+    "languages": [
+      "lav"
+    ]
+  },
+  {
+    "iso2": "LB",
+    "iso3": "LBN",
+    "m49": 422,
+    "name": "Lebanon",
+    "officialName": "Lebanese Republic",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "LB",
+      "Lebanese Republic",
+      "Al-Jumhūrīyah Al-Libnānīyah",
+      "Lebanon",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 33.83333333,
+    "lng": 35.83333333,
+    "currency": "LBP",
+    "languages": [
+      "ara",
+      "fra"
+    ]
+  },
+  {
+    "iso2": "LS",
+    "iso3": "LSO",
+    "m49": 426,
+    "name": "Lesotho",
+    "officialName": "Kingdom of Lesotho",
+    "region": "Africa",
+    "subregion": "Southern Africa",
+    "aliases": [
+      "LS",
+      "Kingdom of Lesotho",
+      "Muso oa Lesotho",
+      "Lesotho",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -29.5,
+    "lng": 28.5,
+    "currency": "LSL",
+    "languages": [
+      "eng",
+      "sot"
+    ]
+  },
+  {
+    "iso2": "LR",
+    "iso3": "LBR",
+    "m49": 430,
+    "name": "Liberia",
+    "officialName": "Republic of Liberia",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "LR",
+      "Republic of Liberia",
+      "Liberia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 6.5,
+    "lng": -9.5,
+    "currency": "LRD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "LY",
+    "iso3": "LBY",
+    "m49": 434,
+    "name": "Libya",
+    "officialName": "State of Libya",
+    "region": "Africa",
+    "subregion": "Northern Africa",
+    "aliases": [
+      "LY",
+      "State of Libya",
+      "Dawlat Libya",
+      "Libya",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 25,
+    "lng": 17,
+    "currency": "LYD",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "LI",
+    "iso3": "LIE",
+    "m49": 438,
+    "name": "Liechtenstein",
+    "officialName": "Principality of Liechtenstein",
+    "region": "Europe",
+    "subregion": "Western Europe",
+    "aliases": [
+      "LI",
+      "Principality of Liechtenstein",
+      "Fürstentum Liechtenstein",
+      "Liechtenstein",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 47.26666666,
+    "lng": 9.53333333,
+    "currency": "CHF",
+    "languages": [
+      "deu"
+    ]
+  },
+  {
+    "iso2": "LT",
+    "iso3": "LTU",
+    "m49": 440,
+    "name": "Lithuania",
+    "officialName": "Republic of Lithuania",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "LT",
+      "Republic of Lithuania",
+      "Lietuvos Respublika",
+      "Lithuania",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 56,
+    "lng": 24,
+    "currency": "EUR",
+    "languages": [
+      "lit"
+    ]
+  },
+  {
+    "iso2": "LU",
+    "iso3": "LUX",
+    "m49": 442,
+    "name": "Luxembourg",
+    "officialName": "Grand Duchy of Luxembourg",
+    "region": "Europe",
+    "subregion": "Western Europe",
+    "aliases": [
+      "LU",
+      "Grand Duchy of Luxembourg",
+      "Grand-Duché de Luxembourg",
+      "Großherzogtum Luxemburg",
+      "Groussherzogtum Lëtzebuerg",
+      "Luxembourg",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 49.75,
+    "lng": 6.16666666,
+    "currency": "EUR",
+    "languages": [
+      "deu",
+      "fra",
+      "ltz"
+    ]
+  },
+  {
+    "iso2": "MO",
+    "iso3": "MAC",
+    "m49": 446,
+    "name": "Macau",
+    "officialName": "Macao Special Administrative Region of the People's Republic of China",
+    "region": "Asia",
+    "subregion": "Eastern Asia",
+    "aliases": [
+      "MO",
+      "澳门",
+      "Macao",
+      "Macao Special Administrative Region of the People's Republic of China",
+      "中華人民共和國澳門特別行政區",
+      "Região Administrativa Especial de Macau da República Popular da China",
+      "Macau",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 22.16666666,
+    "lng": 113.55,
+    "currency": "MOP",
+    "languages": [
+      "por",
+      "zho"
+    ]
+  },
+  {
+    "iso2": "MG",
+    "iso3": "MDG",
+    "m49": 450,
+    "name": "Madagascar",
+    "officialName": "Republic of Madagascar",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "MG",
+      "Republic of Madagascar",
+      "Repoblikan'i Madagasikara",
+      "République de Madagascar",
+      "Madagascar",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -20,
+    "lng": 47,
+    "currency": "MGA",
+    "languages": [
+      "fra",
+      "mlg"
+    ]
+  },
+  {
+    "iso2": "MW",
+    "iso3": "MWI",
+    "m49": 454,
+    "name": "Malawi",
+    "officialName": "Republic of Malawi",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "MW",
+      "Republic of Malawi",
+      "Malawi",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -13.5,
+    "lng": 34,
+    "currency": "MWK",
+    "languages": [
+      "eng",
+      "nya"
+    ]
+  },
+  {
+    "iso2": "MY",
+    "iso3": "MYS",
+    "m49": 458,
+    "name": "Malaysia",
+    "officialName": "Malaysia",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "MY",
+      "Malaysia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 2.5,
+    "lng": 112.5,
+    "currency": "MYR",
+    "languages": [
+      "eng",
+      "msa"
+    ]
+  },
+  {
+    "iso2": "MV",
+    "iso3": "MDV",
+    "m49": 462,
+    "name": "Maldives",
+    "officialName": "Republic of the Maldives",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "aliases": [
+      "MV",
+      "Maldive Islands",
+      "Republic of the Maldives",
+      "Dhivehi Raajjeyge Jumhooriyya",
+      "Maldives",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 3.25,
+    "lng": 73,
+    "currency": "MVR",
+    "languages": [
+      "div"
+    ]
+  },
+  {
+    "iso2": "ML",
+    "iso3": "MLI",
+    "m49": 466,
+    "name": "Mali",
+    "officialName": "Republic of Mali",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "ML",
+      "Republic of Mali",
+      "République du Mali",
+      "Mali",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 17,
+    "lng": -4,
+    "currency": "XOF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "MT",
+    "iso3": "MLT",
+    "m49": 470,
+    "name": "Malta",
+    "officialName": "Republic of Malta",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "MT",
+      "Republic of Malta",
+      "Repubblika ta' Malta",
+      "Malta",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 35.83333333,
+    "lng": 14.58333333,
+    "currency": "EUR",
+    "languages": [
+      "eng",
+      "mlt"
+    ]
+  },
+  {
+    "iso2": "MH",
+    "iso3": "MHL",
+    "m49": 584,
+    "name": "Marshall Islands",
+    "officialName": "Republic of the Marshall Islands",
+    "region": "Oceania",
+    "subregion": "Micronesia",
+    "aliases": [
+      "MH",
+      "Republic of the Marshall Islands",
+      "Aolepān Aorōkin M̧ajeļ",
+      "Marshall Islands",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 9,
+    "lng": 168,
+    "currency": "USD",
+    "languages": [
+      "eng",
+      "mah"
+    ]
+  },
+  {
+    "iso2": "MQ",
+    "iso3": "MTQ",
+    "m49": 474,
+    "name": "Martinique",
+    "officialName": "Martinique",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "MQ",
+      "Martinique",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 14.666667,
+    "lng": -61,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "MR",
+    "iso3": "MRT",
+    "m49": 478,
+    "name": "Mauritania",
+    "officialName": "Islamic Republic of Mauritania",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "MR",
+      "Islamic Republic of Mauritania",
+      "al-Jumhūriyyah al-ʾIslāmiyyah al-Mūrītāniyyah",
+      "Mauritania",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 20,
+    "lng": -12,
+    "currency": "MRU",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "MU",
+    "iso3": "MUS",
+    "m49": 480,
+    "name": "Mauritius",
+    "officialName": "Republic of Mauritius",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "MU",
+      "Republic of Mauritius",
+      "République de Maurice",
+      "Mauritius",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -20.28333333,
+    "lng": 57.55,
+    "currency": "MUR",
+    "languages": [
+      "eng",
+      "fra",
+      "mfe"
+    ]
+  },
+  {
+    "iso2": "YT",
+    "iso3": "MYT",
+    "m49": 175,
+    "name": "Mayotte",
+    "officialName": "Department of Mayotte",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "YT",
+      "Department of Mayotte",
+      "Département de Mayotte",
+      "Mayotte",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -12.83333333,
+    "lng": 45.16666666,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "MX",
+    "iso3": "MEX",
+    "m49": 484,
+    "name": "Mexico",
+    "officialName": "United Mexican States",
+    "region": "Americas",
+    "subregion": "North America",
+    "aliases": [
+      "MX",
+      "Mexicanos",
+      "United Mexican States",
+      "Estados Unidos Mexicanos",
+      "Mexico",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 23,
+    "lng": -102,
+    "currency": "MXN",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "FM",
+    "iso3": "FSM",
+    "m49": 583,
+    "name": "Micronesia",
+    "officialName": "Federated States of Micronesia",
+    "region": "Oceania",
+    "subregion": "Micronesia",
+    "aliases": [
+      "FM",
+      "Federated States of Micronesia",
+      "Micronesia, Federated States of",
+      "Micronesia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 6.91666666,
+    "lng": 158.25,
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "MD",
+    "iso3": "MDA",
+    "m49": 498,
+    "name": "Moldova",
+    "officialName": "Republic of Moldova",
+    "region": "Europe",
+    "subregion": "Eastern Europe",
+    "aliases": [
+      "MD",
+      "Moldova, Republic of",
+      "Republic of Moldova",
+      "Republica Moldova",
+      "Moldova",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 47,
+    "lng": 29,
+    "currency": "MDL",
+    "languages": [
+      "ron"
+    ]
+  },
+  {
+    "iso2": "MC",
+    "iso3": "MCO",
+    "m49": 492,
+    "name": "Monaco",
+    "officialName": "Principality of Monaco",
+    "region": "Europe",
+    "subregion": "Western Europe",
+    "aliases": [
+      "MC",
+      "Principality of Monaco",
+      "Principauté de Monaco",
+      "Monaco",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 43.73333333,
+    "lng": 7.4,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "MN",
+    "iso3": "MNG",
+    "m49": 496,
+    "name": "Mongolia",
+    "officialName": "Mongolia",
+    "region": "Asia",
+    "subregion": "Eastern Asia",
+    "aliases": [
+      "MN",
+      "Mongolia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 46,
+    "lng": 105,
+    "currency": "MNT",
+    "languages": [
+      "mon"
+    ]
+  },
+  {
+    "iso2": "ME",
+    "iso3": "MNE",
+    "m49": 499,
+    "name": "Montenegro",
+    "officialName": "Montenegro",
+    "region": "Europe",
+    "subregion": "Southeast Europe",
+    "aliases": [
+      "ME",
+      "Crna Gora",
+      "Montenegro",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 42.5,
+    "lng": 19.3,
+    "currency": "EUR",
+    "languages": [
+      "cnr"
+    ]
+  },
+  {
+    "iso2": "MS",
+    "iso3": "MSR",
+    "m49": 500,
+    "name": "Montserrat",
+    "officialName": "Montserrat",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "MS",
+      "Montserrat",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 16.75,
+    "lng": -62.2,
+    "currency": "XCD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "MA",
+    "iso3": "MAR",
+    "m49": 504,
+    "name": "Morocco",
+    "officialName": "Kingdom of Morocco",
+    "region": "Africa",
+    "subregion": "Northern Africa",
+    "aliases": [
+      "MA",
+      "Kingdom of Morocco",
+      "Al-Mamlakah al-Maġribiyah",
+      "Morocco",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 32,
+    "lng": -5,
+    "currency": "MAD",
+    "languages": [
+      "ara",
+      "ber"
+    ]
+  },
+  {
+    "iso2": "MZ",
+    "iso3": "MOZ",
+    "m49": 508,
+    "name": "Mozambique",
+    "officialName": "Republic of Mozambique",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "MZ",
+      "Republic of Mozambique",
+      "República de Moçambique",
+      "Mozambique",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -18.25,
+    "lng": 35,
+    "currency": "MZN",
+    "languages": [
+      "por"
+    ]
+  },
+  {
+    "iso2": "MM",
+    "iso3": "MMR",
+    "m49": 104,
+    "name": "Myanmar",
+    "officialName": "Republic of the Union of Myanmar",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "MM",
+      "Burma",
+      "Republic of the Union of Myanmar",
+      "Pyidaunzu Thanmăda Myăma Nainngandaw",
+      "Myanmar",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 22,
+    "lng": 98,
+    "currency": "MMK",
+    "languages": [
+      "mya"
+    ]
+  },
+  {
+    "iso2": "NA",
+    "iso3": "NAM",
+    "m49": 516,
+    "name": "Namibia",
+    "officialName": "Republic of Namibia",
+    "region": "Africa",
+    "subregion": "Southern Africa",
+    "aliases": [
+      "NA",
+      "Namibië",
+      "Republic of Namibia",
+      "Namibia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -22,
+    "lng": 17,
+    "currency": "NAD",
+    "languages": [
+      "afr",
+      "deu",
+      "eng",
+      "her",
+      "hgm",
+      "kwn",
+      "loz",
+      "ndo",
+      "tsn"
+    ]
+  },
+  {
+    "iso2": "NR",
+    "iso3": "NRU",
+    "m49": 520,
+    "name": "Nauru",
+    "officialName": "Republic of Nauru",
+    "region": "Oceania",
+    "subregion": "Micronesia",
+    "aliases": [
+      "NR",
+      "Naoero",
+      "Pleasant Island",
+      "Republic of Nauru",
+      "Ripublik Naoero",
+      "Nauru",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -0.53333333,
+    "lng": 166.91666666,
+    "currency": "AUD",
+    "languages": [
+      "eng",
+      "nau"
+    ]
+  },
+  {
+    "iso2": "NP",
+    "iso3": "NPL",
+    "m49": 524,
+    "name": "Nepal",
+    "officialName": "Federal Democratic Republic of Nepal",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "aliases": [
+      "NP",
+      "Federal Democratic Republic of Nepal",
+      "Loktāntrik Ganatantra Nepāl",
+      "Nepal",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 28,
+    "lng": 84,
+    "currency": "NPR",
+    "languages": [
+      "nep"
+    ]
+  },
+  {
+    "iso2": "NL",
+    "iso3": "NLD",
+    "m49": 528,
+    "name": "Netherlands",
+    "officialName": "Kingdom of the Netherlands",
+    "region": "Europe",
+    "subregion": "Western Europe",
+    "aliases": [
+      "NL",
+      "Holland",
+      "Nederland",
+      "The Netherlands",
+      "Kingdom of the Netherlands",
+      "Netherlands",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 52.5,
+    "lng": 5.75,
+    "currency": "EUR",
+    "languages": [
+      "nld"
+    ]
+  },
+  {
+    "iso2": "NC",
+    "iso3": "NCL",
+    "m49": 540,
+    "name": "New Caledonia",
+    "officialName": "New Caledonia",
+    "region": "Oceania",
+    "subregion": "Melanesia",
+    "aliases": [
+      "NC",
+      "New Caledonia",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -21.5,
+    "lng": 165.5,
+    "currency": "XPF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "NZ",
+    "iso3": "NZL",
+    "m49": 554,
+    "name": "New Zealand",
+    "officialName": "New Zealand",
+    "region": "Oceania",
+    "subregion": "Australia and New Zealand",
+    "aliases": [
+      "NZ",
+      "Aotearoa",
+      "New Zealand",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -41,
+    "lng": 174,
+    "currency": "NZD",
+    "languages": [
+      "eng",
+      "mri",
+      "nzs"
+    ]
+  },
+  {
+    "iso2": "NI",
+    "iso3": "NIC",
+    "m49": 558,
+    "name": "Nicaragua",
+    "officialName": "Republic of Nicaragua",
+    "region": "Americas",
+    "subregion": "Central America",
+    "aliases": [
+      "NI",
+      "Republic of Nicaragua",
+      "República de Nicaragua",
+      "Nicaragua",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 13,
+    "lng": -85,
+    "currency": "NIO",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "NE",
+    "iso3": "NER",
+    "m49": 562,
+    "name": "Niger",
+    "officialName": "Republic of Niger",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "NE",
+      "Nijar",
+      "Republic of Niger",
+      "Niger",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 16,
+    "lng": 8,
+    "currency": "XOF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "NG",
+    "iso3": "NGA",
+    "m49": 566,
+    "name": "Nigeria",
+    "officialName": "Federal Republic of Nigeria",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "NG",
+      "Nijeriya",
+      "Naíjíríà",
+      "Federal Republic of Nigeria",
+      "Nigeria",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 10,
+    "lng": 8,
+    "currency": "NGN",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "NU",
+    "iso3": "NIU",
+    "m49": 570,
+    "name": "Niue",
+    "officialName": "Niue",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "NU",
+      "Niue",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -19.03333333,
+    "lng": -169.86666666,
+    "currency": "NZD",
+    "languages": [
+      "eng",
+      "niu"
+    ]
+  },
+  {
+    "iso2": "NF",
+    "iso3": "NFK",
+    "m49": 574,
+    "name": "Norfolk Island",
+    "officialName": "Territory of Norfolk Island",
+    "region": "Oceania",
+    "subregion": "Australia and New Zealand",
+    "aliases": [
+      "NF",
+      "Territory of Norfolk Island",
+      "Teratri of Norf'k Ailen",
+      "Norfolk Island",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -29.03333333,
+    "lng": 167.95,
+    "currency": "AUD",
+    "languages": [
+      "eng",
+      "pih"
+    ]
+  },
+  {
+    "iso2": "KP",
+    "iso3": "PRK",
+    "m49": 408,
+    "name": "North Korea",
+    "officialName": "Democratic People's Republic of Korea",
+    "region": "Asia",
+    "subregion": "Eastern Asia",
+    "aliases": [
+      "KP",
+      "Democratic People's Republic of Korea",
+      "DPRK",
+      "조선민주주의인민공화국",
+      "Chosŏn Minjujuŭi Inmin Konghwaguk",
+      "Korea, Democratic People's Republic of",
+      "북한",
+      "북조선",
+      "North Korea",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 40,
+    "lng": 127,
+    "currency": "KPW",
+    "languages": [
+      "kor"
+    ]
+  },
+  {
+    "iso2": "MK",
+    "iso3": "MKD",
+    "m49": 807,
+    "name": "North Macedonia",
+    "officialName": "Republic of North Macedonia",
+    "region": "Europe",
+    "subregion": "Southeast Europe",
+    "aliases": [
+      "MK",
+      "The former Yugoslav Republic of Macedonia",
+      "Republic of North Macedonia",
+      "Macedonia, The Former Yugoslav Republic of",
+      "Република Северна Македонија",
+      "Macedonia",
+      "North Macedonia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 41.83333333,
+    "lng": 22,
+    "currency": "MKD",
+    "languages": [
+      "mkd"
+    ]
+  },
+  {
+    "iso2": "MP",
+    "iso3": "MNP",
+    "m49": 580,
+    "name": "Northern Mariana Islands",
+    "officialName": "Commonwealth of the Northern Mariana Islands",
+    "region": "Oceania",
+    "subregion": "Micronesia",
+    "aliases": [
+      "MP",
+      "Commonwealth of the Northern Mariana Islands",
+      "Sankattan Siha Na Islas Mariånas",
+      "Northern Mariana Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 15.2,
+    "lng": 145.75,
+    "currency": "USD",
+    "languages": [
+      "cal",
+      "cha",
+      "eng"
+    ]
+  },
+  {
+    "iso2": "NO",
+    "iso3": "NOR",
+    "m49": 578,
+    "name": "Norway",
+    "officialName": "Kingdom of Norway",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "NO",
+      "Norge",
+      "Noreg",
+      "Kingdom of Norway",
+      "Kongeriket Norge",
+      "Kongeriket Noreg",
+      "Norway",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 62,
+    "lng": 10,
+    "currency": "NOK",
+    "languages": [
+      "nno",
+      "nob",
+      "smi"
+    ]
+  },
+  {
+    "iso2": "OM",
+    "iso3": "OMN",
+    "m49": 512,
+    "name": "Oman",
+    "officialName": "Sultanate of Oman",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "OM",
+      "Sultanate of Oman",
+      "Salṭanat ʻUmān",
+      "Oman",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 21,
+    "lng": 57,
+    "currency": "OMR",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "PK",
+    "iso3": "PAK",
+    "m49": 586,
+    "name": "Pakistan",
+    "officialName": "Islamic Republic of Pakistan",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "aliases": [
+      "PK",
+      "Pākistān",
+      "Islamic Republic of Pakistan",
+      "Islāmī Jumhūriya'eh Pākistān",
+      "Pakistan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 30,
+    "lng": 70,
+    "currency": "PKR",
+    "languages": [
+      "eng",
+      "urd"
+    ]
+  },
+  {
+    "iso2": "PW",
+    "iso3": "PLW",
+    "m49": 585,
+    "name": "Palau",
+    "officialName": "Republic of Palau",
+    "region": "Oceania",
+    "subregion": "Micronesia",
+    "aliases": [
+      "PW",
+      "Republic of Palau",
+      "Beluu er a Belau",
+      "Palau",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 7.5,
+    "lng": 134.5,
+    "currency": "USD",
+    "languages": [
+      "eng",
+      "pau"
+    ]
+  },
+  {
+    "iso2": "PS",
+    "iso3": "PSE",
+    "m49": 275,
+    "name": "Palestine",
+    "officialName": "State of Palestine",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "PS",
+      "Palestine, State of",
+      "State of Palestine",
+      "Dawlat Filasṭin",
+      "Palestine",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 31.9,
+    "lng": 35.2,
+    "currency": "EGP",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "PA",
+    "iso3": "PAN",
+    "m49": 591,
+    "name": "Panama",
+    "officialName": "Republic of Panama",
+    "region": "Americas",
+    "subregion": "Central America",
+    "aliases": [
+      "PA",
+      "Republic of Panama",
+      "República de Panamá",
+      "Panama",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 9,
+    "lng": -80,
+    "currency": "PAB",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "PG",
+    "iso3": "PNG",
+    "m49": 598,
+    "name": "Papua New Guinea",
+    "officialName": "Independent State of Papua New Guinea",
+    "region": "Oceania",
+    "subregion": "Melanesia",
+    "aliases": [
+      "PG",
+      "Independent State of Papua New Guinea",
+      "Independen Stet bilong Papua Niugini",
+      "Papua New Guinea",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -6,
+    "lng": 147,
+    "currency": "PGK",
+    "languages": [
+      "eng",
+      "hmo",
+      "tpi"
+    ]
+  },
+  {
+    "iso2": "PY",
+    "iso3": "PRY",
+    "m49": 600,
+    "name": "Paraguay",
+    "officialName": "Republic of Paraguay",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "PY",
+      "Republic of Paraguay",
+      "República del Paraguay",
+      "Tetã Paraguái",
+      "Paraguay",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -23,
+    "lng": -58,
+    "currency": "PYG",
+    "languages": [
+      "grn",
+      "spa"
+    ]
+  },
+  {
+    "iso2": "PE",
+    "iso3": "PER",
+    "m49": 604,
+    "name": "Peru",
+    "officialName": "Republic of Peru",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "PE",
+      "Republic of Peru",
+      "República del Perú",
+      "Peru",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -10,
+    "lng": -76,
+    "currency": "PEN",
+    "languages": [
+      "aym",
+      "que",
+      "spa"
+    ]
+  },
+  {
+    "iso2": "PH",
+    "iso3": "PHL",
+    "m49": 608,
+    "name": "Philippines",
+    "officialName": "Republic of the Philippines",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "PH",
+      "Republic of the Philippines",
+      "Repúblika ng Pilipinas",
+      "Philippines",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 13,
+    "lng": 122,
+    "currency": "PHP",
+    "languages": [
+      "eng",
+      "fil"
+    ]
+  },
+  {
+    "iso2": "PN",
+    "iso3": "PCN",
+    "m49": 612,
+    "name": "Pitcairn Islands",
+    "officialName": "Pitcairn Group of Islands",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "PN",
+      "Pitcairn",
+      "Pitcairn Henderson Ducie and Oeno Islands",
+      "Pitcairn Group of Islands",
+      "Pitcairn Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -25.06666666,
+    "lng": -130.1,
+    "currency": "NZD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "PL",
+    "iso3": "POL",
+    "m49": 616,
+    "name": "Poland",
+    "officialName": "Republic of Poland",
+    "region": "Europe",
+    "subregion": "Central Europe",
+    "aliases": [
+      "PL",
+      "Republic of Poland",
+      "Rzeczpospolita Polska",
+      "Poland",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 52,
+    "lng": 20,
+    "currency": "PLN",
+    "languages": [
+      "pol"
+    ]
+  },
+  {
+    "iso2": "PT",
+    "iso3": "PRT",
+    "m49": 620,
+    "name": "Portugal",
+    "officialName": "Portuguese Republic",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "PT",
+      "Portuguesa",
+      "Portuguese Republic",
+      "República Portuguesa",
+      "Portugal",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 39.5,
+    "lng": -8,
+    "currency": "EUR",
+    "languages": [
+      "por"
+    ]
+  },
+  {
+    "iso2": "PR",
+    "iso3": "PRI",
+    "m49": 630,
+    "name": "Puerto Rico",
+    "officialName": "Commonwealth of Puerto Rico",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "PR",
+      "Commonwealth of Puerto Rico",
+      "Estado Libre Asociado de Puerto Rico",
+      "Puerto Rico",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 18.25,
+    "lng": -66.5,
+    "currency": "USD",
+    "languages": [
+      "eng",
+      "spa"
+    ]
+  },
+  {
+    "iso2": "QA",
+    "iso3": "QAT",
+    "m49": 634,
+    "name": "Qatar",
+    "officialName": "State of Qatar",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "QA",
+      "State of Qatar",
+      "Dawlat Qaṭar",
+      "Qatar",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 25.5,
+    "lng": 51.25,
+    "currency": "QAR",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "CG",
+    "iso3": "COG",
+    "m49": 178,
+    "name": "Republic of the Congo",
+    "officialName": "Republic of the Congo",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "CG",
+      "Congo",
+      "Congo-Brazzaville",
+      "Republic of the Congo",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -1,
+    "lng": 15,
+    "currency": "XAF",
+    "languages": [
+      "fra",
+      "kon",
+      "lin"
+    ]
+  },
+  {
+    "iso2": "RE",
+    "iso3": "REU",
+    "m49": 638,
+    "name": "Réunion",
+    "officialName": "Réunion Island",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "RE",
+      "Reunion",
+      "Réunion Island",
+      "Réunion",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -21.15,
+    "lng": 55.5,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "RO",
+    "iso3": "ROU",
+    "m49": 642,
+    "name": "Romania",
+    "officialName": "Romania",
+    "region": "Europe",
+    "subregion": "Southeast Europe",
+    "aliases": [
+      "RO",
+      "Rumania",
+      "Roumania",
+      "România",
+      "Romania",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 46,
+    "lng": 25,
+    "currency": "RON",
+    "languages": [
+      "ron"
+    ]
+  },
+  {
+    "iso2": "RU",
+    "iso3": "RUS",
+    "m49": 643,
+    "name": "Russia",
+    "officialName": "Russian Federation",
+    "region": "Europe",
+    "subregion": "Eastern Europe",
+    "aliases": [
+      "RU",
+      "Russian Federation",
+      "Российская Федерация",
+      "Russia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 60,
+    "lng": 100,
+    "currency": "RUB",
+    "languages": [
+      "rus"
+    ]
+  },
+  {
+    "iso2": "RW",
+    "iso3": "RWA",
+    "m49": 646,
+    "name": "Rwanda",
+    "officialName": "Republic of Rwanda",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "RW",
+      "Republic of Rwanda",
+      "Repubulika y'u Rwanda",
+      "République du Rwanda",
+      "Rwanda",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -2,
+    "lng": 30,
+    "currency": "RWF",
+    "languages": [
+      "eng",
+      "fra",
+      "kin"
+    ]
+  },
+  {
+    "iso2": "BL",
+    "iso3": "BLM",
+    "m49": 652,
+    "name": "Saint Barthélemy",
+    "officialName": "Collectivity of Saint Barthélemy",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "BL",
+      "St. Barthelemy",
+      "Collectivity of Saint Barthélemy",
+      "Collectivité de Saint-Barthélemy",
+      "Saint Barthélemy",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 18.5,
+    "lng": -63.41666666,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "SH",
+    "iso3": "SHN",
+    "m49": 654,
+    "name": "Saint Helena, Ascension and Tristan da Cunha",
+    "officialName": "Saint Helena, Ascension and Tristan da Cunha",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "Saint Helena",
+      "St. Helena, Ascension and Tristan da Cunha",
+      "Saint Helena, Ascension and Tristan da Cunha",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -15.95,
+    "lng": -5.72,
+    "currency": "GBP",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "KN",
+    "iso3": "KNA",
+    "m49": 659,
+    "name": "Saint Kitts and Nevis",
+    "officialName": "Federation of Saint Christopher and Nevis",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "KN",
+      "Federation of Saint Christopher and Nevis",
+      "Saint Kitts and Nevis",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 17.33333333,
+    "lng": -62.75,
+    "currency": "XCD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "LC",
+    "iso3": "LCA",
+    "m49": 662,
+    "name": "Saint Lucia",
+    "officialName": "Saint Lucia",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "LC",
+      "Saint Lucia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 13.88333333,
+    "lng": -60.96666666,
+    "currency": "XCD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "MF",
+    "iso3": "MAF",
+    "m49": 663,
+    "name": "Saint Martin",
+    "officialName": "Saint Martin",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "MF",
+      "Collectivity of Saint Martin",
+      "Collectivité de Saint-Martin",
+      "Saint Martin (French part)",
+      "Saint Martin",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 18.08333333,
+    "lng": -63.95,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "PM",
+    "iso3": "SPM",
+    "m49": 666,
+    "name": "Saint Pierre and Miquelon",
+    "officialName": "Saint Pierre and Miquelon",
+    "region": "Americas",
+    "subregion": "North America",
+    "aliases": [
+      "PM",
+      "Collectivité territoriale de Saint-Pierre-et-Miquelon",
+      "Saint Pierre and Miquelon",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 46.83333333,
+    "lng": -56.33333333,
+    "currency": "EUR",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "VC",
+    "iso3": "VCT",
+    "m49": 670,
+    "name": "Saint Vincent and the Grenadines",
+    "officialName": "Saint Vincent and the Grenadines",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "VC",
+      "Saint Vincent and the Grenadines",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 13.25,
+    "lng": -61.2,
+    "currency": "XCD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "WS",
+    "iso3": "WSM",
+    "m49": 882,
+    "name": "Samoa",
+    "officialName": "Independent State of Samoa",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "WS",
+      "Independent State of Samoa",
+      "Malo Saʻoloto Tutoʻatasi o Sāmoa",
+      "Samoa",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -13.58333333,
+    "lng": -172.33333333,
+    "currency": "WST",
+    "languages": [
+      "eng",
+      "smo"
+    ]
+  },
+  {
+    "iso2": "SM",
+    "iso3": "SMR",
+    "m49": 674,
+    "name": "San Marino",
+    "officialName": "Most Serene Republic of San Marino",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "SM",
+      "Republic of San Marino",
+      "Repubblica di San Marino",
+      "Most Serene Republic of San Marino",
+      "San Marino",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 43.76666666,
+    "lng": 12.41666666,
+    "currency": "EUR",
+    "languages": [
+      "ita"
+    ]
+  },
+  {
+    "iso2": "ST",
+    "iso3": "STP",
+    "m49": 678,
+    "name": "São Tomé and Príncipe",
+    "officialName": "Democratic Republic of São Tomé and Príncipe",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "ST",
+      "Democratic Republic of São Tomé and Príncipe",
+      "Sao Tome and Principe",
+      "República Democrática de São Tomé e Príncipe",
+      "São Tomé and Príncipe",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 1,
+    "lng": 7,
+    "currency": "STN",
+    "languages": [
+      "por"
+    ]
+  },
+  {
+    "iso2": "SA",
+    "iso3": "SAU",
+    "m49": 682,
+    "name": "Saudi Arabia",
+    "officialName": "Kingdom of Saudi Arabia",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "Saudi",
+      "SA",
+      "Kingdom of Saudi Arabia",
+      "Al-Mamlakah al-‘Arabiyyah as-Su‘ūdiyyah",
+      "Saudi Arabia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 25,
+    "lng": 45,
+    "currency": "SAR",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "SN",
+    "iso3": "SEN",
+    "m49": 686,
+    "name": "Senegal",
+    "officialName": "Republic of Senegal",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "SN",
+      "Republic of Senegal",
+      "République du Sénégal",
+      "Senegal",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 14,
+    "lng": -14,
+    "currency": "XOF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "RS",
+    "iso3": "SRB",
+    "m49": 688,
+    "name": "Serbia",
+    "officialName": "Republic of Serbia",
+    "region": "Europe",
+    "subregion": "Southeast Europe",
+    "aliases": [
+      "RS",
+      "Srbija",
+      "Republika Srbija",
+      "Србија",
+      "Република Србија",
+      "Republic of Serbia",
+      "Serbia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 44,
+    "lng": 21,
+    "currency": "RSD",
+    "languages": [
+      "srp"
+    ]
+  },
+  {
+    "iso2": "SC",
+    "iso3": "SYC",
+    "m49": 690,
+    "name": "Seychelles",
+    "officialName": "Republic of Seychelles",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "SC",
+      "Republic of Seychelles",
+      "Repiblik Sesel",
+      "République des Seychelles",
+      "Seychelles",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -4.58333333,
+    "lng": 55.66666666,
+    "currency": "SCR",
+    "languages": [
+      "crs",
+      "eng",
+      "fra"
+    ]
+  },
+  {
+    "iso2": "SL",
+    "iso3": "SLE",
+    "m49": 694,
+    "name": "Sierra Leone",
+    "officialName": "Republic of Sierra Leone",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "SL",
+      "Republic of Sierra Leone",
+      "Sierra Leone",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 8.5,
+    "lng": -11.5,
+    "currency": "SLL",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "SG",
+    "iso3": "SGP",
+    "m49": 702,
+    "name": "Singapore",
+    "officialName": "Republic of Singapore",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "SG",
+      "Singapura",
+      "Republik Singapura",
+      "新加坡共和国",
+      "Republic of Singapore",
+      "Singapore",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 1.36666666,
+    "lng": 103.8,
+    "currency": "SGD",
+    "languages": [
+      "eng",
+      "msa",
+      "tam",
+      "zho"
+    ]
+  },
+  {
+    "iso2": "SX",
+    "iso3": "SXM",
+    "m49": 534,
+    "name": "Sint Maarten",
+    "officialName": "Sint Maarten",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "SX",
+      "Sint Maarten (Dutch part)",
+      "Sint Maarten",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 18.033333,
+    "lng": -63.05,
+    "currency": "ANG",
+    "languages": [
+      "eng",
+      "fra",
+      "nld"
+    ]
+  },
+  {
+    "iso2": "SK",
+    "iso3": "SVK",
+    "m49": 703,
+    "name": "Slovakia",
+    "officialName": "Slovak Republic",
+    "region": "Europe",
+    "subregion": "Central Europe",
+    "aliases": [
+      "SK",
+      "Slovak Republic",
+      "Slovenská republika",
+      "Slovakia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 48.66666666,
+    "lng": 19.5,
+    "currency": "EUR",
+    "languages": [
+      "slk"
+    ]
+  },
+  {
+    "iso2": "SI",
+    "iso3": "SVN",
+    "m49": 705,
+    "name": "Slovenia",
+    "officialName": "Republic of Slovenia",
+    "region": "Europe",
+    "subregion": "Central Europe",
+    "aliases": [
+      "SI",
+      "Republic of Slovenia",
+      "Republika Slovenija",
+      "Slovenia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 46.11666666,
+    "lng": 14.81666666,
+    "currency": "EUR",
+    "languages": [
+      "slv"
+    ]
+  },
+  {
+    "iso2": "SB",
+    "iso3": "SLB",
+    "m49": 90,
+    "name": "Solomon Islands",
+    "officialName": "Solomon Islands",
+    "region": "Oceania",
+    "subregion": "Melanesia",
+    "aliases": [
+      "SB",
+      "Solomon Islands",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -8,
+    "lng": 159,
+    "currency": "SBD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "SO",
+    "iso3": "SOM",
+    "m49": 706,
+    "name": "Somalia",
+    "officialName": "Federal Republic of Somalia",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "SO",
+      "aṣ-Ṣūmāl",
+      "Federal Republic of Somalia",
+      "Jamhuuriyadda Federaalka Soomaaliya",
+      "Jumhūriyyat aṣ-Ṣūmāl al-Fiderāliyya",
+      "Somalia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 10,
+    "lng": 49,
+    "currency": "SOS",
+    "languages": [
+      "ara",
+      "som"
+    ]
+  },
+  {
+    "iso2": "ZA",
+    "iso3": "ZAF",
+    "m49": 710,
+    "name": "South Africa",
+    "officialName": "Republic of South Africa",
+    "region": "Africa",
+    "subregion": "Southern Africa",
+    "aliases": [
+      "ZA",
+      "RSA",
+      "Suid-Afrika",
+      "Republic of South Africa",
+      "South Africa",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -29,
+    "lng": 24,
+    "currency": "ZAR",
+    "languages": [
+      "afr",
+      "eng",
+      "nbl",
+      "nso",
+      "sot",
+      "ssw",
+      "tsn",
+      "tso",
+      "ven",
+      "xho",
+      "zul"
+    ]
+  },
+  {
+    "iso2": "GS",
+    "iso3": "SGS",
+    "m49": 239,
+    "name": "South Georgia",
+    "officialName": "South Georgia and the South Sandwich Islands",
+    "region": "Antarctic",
+    "aliases": [
+      "GS",
+      "South Georgia and the South Sandwich Islands",
+      "South Georgia",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -54.5,
+    "lng": -37,
+    "currency": "SHP",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "KR",
+    "iso3": "KOR",
+    "m49": 410,
+    "name": "South Korea",
+    "officialName": "Republic of Korea",
+    "region": "Asia",
+    "subregion": "Eastern Asia",
+    "aliases": [
+      "KR",
+      "Korea, Republic of",
+      "Republic of Korea",
+      "남한",
+      "남조선",
+      "South Korea",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 37,
+    "lng": 127.5,
+    "currency": "KRW",
+    "languages": [
+      "kor"
+    ]
+  },
+  {
+    "iso2": "SS",
+    "iso3": "SSD",
+    "m49": 728,
+    "name": "South Sudan",
+    "officialName": "Republic of South Sudan",
+    "region": "Africa",
+    "subregion": "Middle Africa",
+    "aliases": [
+      "SS",
+      "Republic of South Sudan",
+      "South Sudan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 7,
+    "lng": 30,
+    "currency": "SSP",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "ES",
+    "iso3": "ESP",
+    "m49": 724,
+    "name": "Spain",
+    "officialName": "Kingdom of Spain",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "ES",
+      "Kingdom of Spain",
+      "Reino de España",
+      "Spain",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 40,
+    "lng": -4,
+    "currency": "EUR",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "LK",
+    "iso3": "LKA",
+    "m49": 144,
+    "name": "Sri Lanka",
+    "officialName": "Democratic Socialist Republic of Sri Lanka",
+    "region": "Asia",
+    "subregion": "Southern Asia",
+    "aliases": [
+      "LK",
+      "ilaṅkai",
+      "Democratic Socialist Republic of Sri Lanka",
+      "Sri Lanka",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 7,
+    "lng": 81,
+    "currency": "LKR",
+    "languages": [
+      "sin",
+      "tam"
+    ]
+  },
+  {
+    "iso2": "SD",
+    "iso3": "SDN",
+    "m49": 729,
+    "name": "Sudan",
+    "officialName": "Republic of the Sudan",
+    "region": "Africa",
+    "subregion": "Northern Africa",
+    "aliases": [
+      "SD",
+      "Republic of the Sudan",
+      "Jumhūrīyat as-Sūdān",
+      "Sudan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 15,
+    "lng": 30,
+    "currency": "SDG",
+    "languages": [
+      "ara",
+      "eng"
+    ]
+  },
+  {
+    "iso2": "SR",
+    "iso3": "SUR",
+    "m49": 740,
+    "name": "Suriname",
+    "officialName": "Republic of Suriname",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "SR",
+      "Sarnam",
+      "Sranangron",
+      "Republic of Suriname",
+      "Republiek Suriname",
+      "Suriname",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 4,
+    "lng": -56,
+    "currency": "SRD",
+    "languages": [
+      "nld"
+    ]
+  },
+  {
+    "iso2": "SJ",
+    "iso3": "SJM",
+    "m49": 744,
+    "name": "Svalbard and Jan Mayen",
+    "officialName": "Svalbard og Jan Mayen",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "SJ",
+      "Svalbard and Jan Mayen Islands",
+      "Svalbard og Jan Mayen",
+      "Svalbard and Jan Mayen",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 78,
+    "lng": 20,
+    "currency": "NOK",
+    "languages": [
+      "nor"
+    ]
+  },
+  {
+    "iso2": "SE",
+    "iso3": "SWE",
+    "m49": 752,
+    "name": "Sweden",
+    "officialName": "Kingdom of Sweden",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "SE",
+      "Kingdom of Sweden",
+      "Konungariket Sverige",
+      "Sweden",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 62,
+    "lng": 15,
+    "currency": "SEK",
+    "languages": [
+      "swe"
+    ]
+  },
+  {
+    "iso2": "CH",
+    "iso3": "CHE",
+    "m49": 756,
+    "name": "Switzerland",
+    "officialName": "Swiss Confederation",
+    "region": "Europe",
+    "subregion": "Western Europe",
+    "aliases": [
+      "CH",
+      "Swiss Confederation",
+      "Schweiz",
+      "Suisse",
+      "Svizzera",
+      "Svizra",
+      "Switzerland",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 47,
+    "lng": 8,
+    "currency": "CHF",
+    "languages": [
+      "fra",
+      "gsw",
+      "ita",
+      "roh"
+    ]
+  },
+  {
+    "iso2": "SY",
+    "iso3": "SYR",
+    "m49": 760,
+    "name": "Syria",
+    "officialName": "Syrian Arab Republic",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "SY",
+      "Syrian Arab Republic",
+      "Al-Jumhūrīyah Al-ʻArabīyah As-Sūrīyah",
+      "Syria",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 35,
+    "lng": 38,
+    "currency": "SYP",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "TW",
+    "iso3": "TWN",
+    "m49": 158,
+    "name": "Taiwan",
+    "officialName": "Republic of China (Taiwan)",
+    "region": "Asia",
+    "subregion": "Eastern Asia",
+    "aliases": [
+      "TW",
+      "Táiwān",
+      "Republic of China",
+      "中華民國",
+      "Zhōnghuá Mínguó",
+      "Chinese Taipei",
+      "Republic of China (Taiwan)",
+      "Taiwan",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 23.5,
+    "lng": 121,
+    "currency": "TWD",
+    "languages": [
+      "zho"
+    ]
+  },
+  {
+    "iso2": "TJ",
+    "iso3": "TJK",
+    "m49": 762,
+    "name": "Tajikistan",
+    "officialName": "Republic of Tajikistan",
+    "region": "Asia",
+    "subregion": "Central Asia",
+    "aliases": [
+      "TJ",
+      "Toçikiston",
+      "Republic of Tajikistan",
+      "Ҷумҳурии Тоҷикистон",
+      "Çumhuriyi Toçikiston",
+      "Tajikistan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 39,
+    "lng": 71,
+    "currency": "TJS",
+    "languages": [
+      "rus",
+      "tgk"
+    ]
+  },
+  {
+    "iso2": "TZ",
+    "iso3": "TZA",
+    "m49": 834,
+    "name": "Tanzania",
+    "officialName": "United Republic of Tanzania",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "TZ",
+      "Tanzania, United Republic of",
+      "United Republic of Tanzania",
+      "Jamhuri ya Muungano wa Tanzania",
+      "Tanzania",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -6,
+    "lng": 35,
+    "currency": "TZS",
+    "languages": [
+      "eng",
+      "swa"
+    ]
+  },
+  {
+    "iso2": "TH",
+    "iso3": "THA",
+    "m49": 764,
+    "name": "Thailand",
+    "officialName": "Kingdom of Thailand",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "TH",
+      "Prathet",
+      "Thai",
+      "Kingdom of Thailand",
+      "ราชอาณาจักรไทย",
+      "Ratcha Anachak Thai",
+      "Thailand",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 15,
+    "lng": 100,
+    "currency": "THB",
+    "languages": [
+      "tha"
+    ]
+  },
+  {
+    "iso2": "TL",
+    "iso3": "TLS",
+    "m49": 626,
+    "name": "Timor-Leste",
+    "officialName": "Democratic Republic of Timor-Leste",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "TL",
+      "East Timor",
+      "Timor",
+      "Democratic Republic of Timor-Leste",
+      "República Democrática de Timor-Leste",
+      "Repúblika Demokrátika Timór-Leste",
+      "Timór Lorosa'e",
+      "Timor Lorosae",
+      "Timor-Leste",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -8.83333333,
+    "lng": 125.91666666,
+    "currency": "USD",
+    "languages": [
+      "por",
+      "tet"
+    ]
+  },
+  {
+    "iso2": "TG",
+    "iso3": "TGO",
+    "m49": 768,
+    "name": "Togo",
+    "officialName": "Togolese Republic",
+    "region": "Africa",
+    "subregion": "Western Africa",
+    "aliases": [
+      "TG",
+      "Togolese",
+      "Togolese Republic",
+      "République Togolaise",
+      "Togo",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 8,
+    "lng": 1.16666666,
+    "currency": "XOF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "TK",
+    "iso3": "TKL",
+    "m49": 772,
+    "name": "Tokelau",
+    "officialName": "Tokelau",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "TK",
+      "Tokelau",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -9,
+    "lng": -172,
+    "currency": "NZD",
+    "languages": [
+      "eng",
+      "smo",
+      "tkl"
+    ]
+  },
+  {
+    "iso2": "TO",
+    "iso3": "TON",
+    "m49": 776,
+    "name": "Tonga",
+    "officialName": "Kingdom of Tonga",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "TO",
+      "Kingdom of Tonga",
+      "Tonga",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -20,
+    "lng": -175,
+    "currency": "TOP",
+    "languages": [
+      "eng",
+      "ton"
+    ]
+  },
+  {
+    "iso2": "TT",
+    "iso3": "TTO",
+    "m49": 780,
+    "name": "Trinidad and Tobago",
+    "officialName": "Republic of Trinidad and Tobago",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "TT",
+      "Republic of Trinidad and Tobago",
+      "Trinidad and Tobago",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 11,
+    "lng": -61,
+    "currency": "TTD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "TN",
+    "iso3": "TUN",
+    "m49": 788,
+    "name": "Tunisia",
+    "officialName": "Tunisian Republic",
+    "region": "Africa",
+    "subregion": "Northern Africa",
+    "aliases": [
+      "TN",
+      "Republic of Tunisia",
+      "al-Jumhūriyyah at-Tūnisiyyah",
+      "Tunisian Republic",
+      "Tunisia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 34,
+    "lng": 9,
+    "currency": "TND",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "TR",
+    "iso3": "TUR",
+    "m49": 792,
+    "name": "Türkiye",
+    "officialName": "Republic of Türkiye",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "TR",
+      "Turkiye",
+      "Republic of Turkey",
+      "Türkiye Cumhuriyeti",
+      "Republic of Türkiye",
+      "Türkiye",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 39,
+    "lng": 35,
+    "currency": "TRY",
+    "languages": [
+      "tur"
+    ]
+  },
+  {
+    "iso2": "TM",
+    "iso3": "TKM",
+    "m49": 795,
+    "name": "Turkmenistan",
+    "officialName": "Turkmenistan",
+    "region": "Asia",
+    "subregion": "Central Asia",
+    "aliases": [
+      "TM",
+      "Turkmenistan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 40,
+    "lng": 60,
+    "currency": "TMT",
+    "languages": [
+      "rus",
+      "tuk"
+    ]
+  },
+  {
+    "iso2": "TC",
+    "iso3": "TCA",
+    "m49": 796,
+    "name": "Turks and Caicos Islands",
+    "officialName": "Turks and Caicos Islands",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "TC",
+      "Turks and Caicos Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 21.75,
+    "lng": -71.58333333,
+    "currency": "USD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "TV",
+    "iso3": "TUV",
+    "m49": 798,
+    "name": "Tuvalu",
+    "officialName": "Tuvalu",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "TV",
+      "Tuvalu",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -8,
+    "lng": 178,
+    "currency": "AUD",
+    "languages": [
+      "eng",
+      "tvl"
+    ]
+  },
+  {
+    "iso2": "UG",
+    "iso3": "UGA",
+    "m49": 800,
+    "name": "Uganda",
+    "officialName": "Republic of Uganda",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "UG",
+      "Republic of Uganda",
+      "Jamhuri ya Uganda",
+      "Uganda",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 1,
+    "lng": 32,
+    "currency": "UGX",
+    "languages": [
+      "eng",
+      "swa"
+    ]
+  },
+  {
+    "iso2": "UA",
+    "iso3": "UKR",
+    "m49": 804,
+    "name": "Ukraine",
+    "officialName": "Ukraine",
+    "region": "Europe",
+    "subregion": "Eastern Europe",
+    "aliases": [
+      "UA",
+      "Ukrayina",
+      "Ukraine",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 49,
+    "lng": 32,
+    "currency": "UAH",
+    "languages": [
+      "ukr"
+    ]
+  },
+  {
+    "iso2": "AE",
+    "iso3": "ARE",
+    "m49": 784,
+    "name": "United Arab Emirates",
+    "officialName": "United Arab Emirates",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "AE",
+      "UAE",
+      "Emirates",
+      "United Arab Emirates",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 24,
+    "lng": 54,
+    "currency": "AED",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "GB",
+    "iso3": "GBR",
+    "m49": 826,
+    "name": "United Kingdom",
+    "officialName": "United Kingdom of Great Britain and Northern Ireland",
+    "region": "Europe",
+    "subregion": "Northern Europe",
+    "aliases": [
+      "GB",
+      "UK",
+      "Great Britain",
+      "United Kingdom of Great Britain and Northern Ireland",
+      "United Kingdom",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 54,
+    "lng": -2,
+    "currency": "GBP",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "US",
+    "iso3": "USA",
+    "m49": 840,
+    "name": "United States",
+    "officialName": "United States of America",
+    "region": "Americas",
+    "subregion": "North America",
+    "aliases": [
+      "US",
+      "USA",
+      "United States of America",
+      "United States",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 38,
+    "lng": -97,
+    "currency": "USD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "UM",
+    "iso3": "UMI",
+    "m49": 581,
+    "name": "United States Minor Outlying Islands",
+    "officialName": "United States Minor Outlying Islands",
+    "region": "Americas",
+    "subregion": "North America",
+    "aliases": [
+      "UM",
+      "United States Minor Outlying Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 19.3,
+    "lng": 166.633333,
+    "currency": "USD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "VI",
+    "iso3": "VIR",
+    "m49": 850,
+    "name": "United States Virgin Islands",
+    "officialName": "Virgin Islands of the United States",
+    "region": "Americas",
+    "subregion": "Caribbean",
+    "aliases": [
+      "VI",
+      "Virgin Islands, U.S.",
+      "Virgin Islands of the United States",
+      "United States Virgin Islands",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 18.35,
+    "lng": -64.933333,
+    "currency": "USD",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "UY",
+    "iso3": "URY",
+    "m49": 858,
+    "name": "Uruguay",
+    "officialName": "Oriental Republic of Uruguay",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "UY",
+      "Oriental Republic of Uruguay",
+      "República Oriental del Uruguay",
+      "Uruguay",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -33,
+    "lng": -56,
+    "currency": "UYU",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "UZ",
+    "iso3": "UZB",
+    "m49": 860,
+    "name": "Uzbekistan",
+    "officialName": "Republic of Uzbekistan",
+    "region": "Asia",
+    "subregion": "Central Asia",
+    "aliases": [
+      "UZ",
+      "Republic of Uzbekistan",
+      "O‘zbekiston Respublikasi",
+      "Ўзбекистон Республикаси",
+      "Uzbekistan",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 41,
+    "lng": 64,
+    "currency": "UZS",
+    "languages": [
+      "rus",
+      "uzb"
+    ]
+  },
+  {
+    "iso2": "VU",
+    "iso3": "VUT",
+    "m49": 548,
+    "name": "Vanuatu",
+    "officialName": "Republic of Vanuatu",
+    "region": "Oceania",
+    "subregion": "Melanesia",
+    "aliases": [
+      "VU",
+      "Republic of Vanuatu",
+      "Ripablik blong Vanuatu",
+      "République de Vanuatu",
+      "Vanuatu",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -16,
+    "lng": 167,
+    "currency": "VUV",
+    "languages": [
+      "bis",
+      "eng",
+      "fra"
+    ]
+  },
+  {
+    "iso2": "VA",
+    "iso3": "VAT",
+    "m49": 336,
+    "name": "Vatican City",
+    "officialName": "Vatican City State",
+    "region": "Europe",
+    "subregion": "Southern Europe",
+    "aliases": [
+      "VA",
+      "Holy See (Vatican City State)",
+      "Vatican City State",
+      "Vatican",
+      "Stato della Città del Vaticano",
+      "Vatican City",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 41.9,
+    "lng": 12.45,
+    "currency": "EUR",
+    "languages": [
+      "ita",
+      "lat"
+    ]
+  },
+  {
+    "iso2": "VE",
+    "iso3": "VEN",
+    "m49": 862,
+    "name": "Venezuela",
+    "officialName": "Bolivarian Republic of Venezuela",
+    "region": "Americas",
+    "subregion": "South America",
+    "aliases": [
+      "VE",
+      "Bolivarian Republic of Venezuela",
+      "Venezuela, Bolivarian Republic of",
+      "República Bolivariana de Venezuela",
+      "Venezuela",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 8,
+    "lng": -66,
+    "currency": "VES",
+    "languages": [
+      "spa"
+    ]
+  },
+  {
+    "iso2": "VN",
+    "iso3": "VNM",
+    "m49": 704,
+    "name": "Vietnam",
+    "officialName": "Socialist Republic of Vietnam",
+    "region": "Asia",
+    "subregion": "South-Eastern Asia",
+    "aliases": [
+      "VN",
+      "Socialist Republic of Vietnam",
+      "Cộng hòa Xã hội chủ nghĩa Việt Nam",
+      "Viet Nam",
+      "Vietnam",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 16.16666666,
+    "lng": 107.83333333,
+    "currency": "VND",
+    "languages": [
+      "vie"
+    ]
+  },
+  {
+    "iso2": "WF",
+    "iso3": "WLF",
+    "m49": 876,
+    "name": "Wallis and Futuna",
+    "officialName": "Territory of the Wallis and Futuna Islands",
+    "region": "Oceania",
+    "subregion": "Polynesia",
+    "aliases": [
+      "WF",
+      "Territory of the Wallis and Futuna Islands",
+      "Territoire des îles Wallis et Futuna",
+      "Wallis and Futuna",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": -13.3,
+    "lng": -176.2,
+    "currency": "XPF",
+    "languages": [
+      "fra"
+    ]
+  },
+  {
+    "iso2": "EH",
+    "iso3": "ESH",
+    "m49": 732,
+    "name": "Western Sahara",
+    "officialName": "Sahrawi Arab Democratic Republic",
+    "region": "Africa",
+    "subregion": "Northern Africa",
+    "aliases": [
+      "EH",
+      "Taneẓroft Tutrimt",
+      "Sahrawi Arab Democratic Republic",
+      "Western Sahara",
+      "undefined"
+    ],
+    "territory": true,
+    "lat": 24.5,
+    "lng": -13,
+    "currency": "DZD",
+    "languages": [
+      "ber",
+      "mey",
+      "spa"
+    ]
+  },
+  {
+    "iso2": "YE",
+    "iso3": "YEM",
+    "m49": 887,
+    "name": "Yemen",
+    "officialName": "Republic of Yemen",
+    "region": "Asia",
+    "subregion": "Western Asia",
+    "aliases": [
+      "YE",
+      "Yemeni Republic",
+      "al-Jumhūriyyah al-Yamaniyyah",
+      "Republic of Yemen",
+      "Yemen",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": 15,
+    "lng": 48,
+    "currency": "YER",
+    "languages": [
+      "ara"
+    ]
+  },
+  {
+    "iso2": "ZM",
+    "iso3": "ZMB",
+    "m49": 894,
+    "name": "Zambia",
+    "officialName": "Republic of Zambia",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "ZM",
+      "Republic of Zambia",
+      "Zambia",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -15,
+    "lng": 30,
+    "currency": "ZMW",
+    "languages": [
+      "eng"
+    ]
+  },
+  {
+    "iso2": "ZW",
+    "iso3": "ZWE",
+    "m49": 716,
+    "name": "Zimbabwe",
+    "officialName": "Republic of Zimbabwe",
+    "region": "Africa",
+    "subregion": "Eastern Africa",
+    "aliases": [
+      "ZW",
+      "Republic of Zimbabwe",
+      "Zimbabwe",
+      "undefined"
+    ],
+    "territory": false,
+    "lat": -20,
+    "lng": 30,
+    "currency": "BWP",
+    "languages": [
+      "bwg",
+      "eng",
+      "kck",
+      "khi",
+      "ndc",
+      "nde",
+      "nya",
+      "sna",
+      "sot",
+      "toi",
+      "tsn",
+      "tso",
+      "ven",
+      "xho",
+      "zib"
+    ]
+  }
+]

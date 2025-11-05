@@ -1,0 +1,8 @@
+{
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "build:shared": "npm --workspace @travel-af/shared run build",
+    "dev:web": "npm --workspace web run dev"
+  }
+}
