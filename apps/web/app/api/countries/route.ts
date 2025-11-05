@@ -2,19 +2,22 @@ import { NextResponse } from 'next/server';
 import { COUNTRY_SEEDS, byIso2 } from '@/lib/seed';
 import { headers } from 'next/headers';
 import type { CountrySeed } from '@/lib/types';
+import { loadFacts } from '@/lib/facts';
+import type { CountryFacts } from '@/lib/facts';
 import { nameToIso2 } from '@/lib/countryMatch';
 
 type Advisory = {
   iso2?: string;
   country: string;
-  level: 1|2|3|4;
+  level: 1 | 2 | 3 | 4;
   updatedAt: string;
   url: string;
-  summary?: string;
+  summary: string; // required for easier typing downstream
 };
 
 type CountryOut = CountrySeed & {
   advisory: null | { level: 1|2|3|4; updatedAt: string; url: string; summary: string };
+  facts?: CountryFacts;
 };
 
 export const revalidate = 60 * 60 * 6;
@@ -29,7 +32,26 @@ export async function GET() {
   let advisories: Advisory[] = [];
   try {
     const advRes = await fetch(`${base}/api/advisories`, { cache: 'no-store' });
-    advisories = advRes.ok ? await advRes.json() : [];
+    const rawUnknown = advRes.ok ? ((await advRes.json()) as unknown) : null;
+    const raw = Array.isArray(rawUnknown)
+      ? (rawUnknown as Array<Record<string, unknown>>)
+      : [];
+
+    advisories = raw.map((r) => {
+      const levelNum = Number(r.level ?? 0);
+      const level = (levelNum === 1 || levelNum === 2 || levelNum === 3 || levelNum === 4)
+        ? levelNum
+        : 2; // sensible default
+
+      return {
+        iso2: typeof r.iso2 === 'string' ? r.iso2 : undefined,
+        country: typeof r.country === 'string' ? r.country : '',
+        level: level as 1 | 2 | 3 | 4,
+        updatedAt: typeof r.updatedAt === 'string' ? r.updatedAt : '',
+        url: typeof r.url === 'string' ? r.url : '',
+        summary: typeof r.summary === 'string' ? r.summary : '',
+      } satisfies Advisory;
+    });
   } catch {
     advisories = [];
   }
@@ -88,6 +110,20 @@ export async function GET() {
       } as CountryOut;
       merged.push(extra);
     }
+  }
+
+  // Load and attach facts (TravelSafe, SFTI, Reddit, visa, seasonality, flights, infrastructure, affordability)
+  try {
+    const iso2s = merged.map((r) => r.iso2.toUpperCase());
+
+    const factsByIso2 = await loadFacts(iso2s, advisories);
+
+    for (const row of merged) {
+      const keyUpper = row.iso2.toUpperCase();
+      row.facts = factsByIso2[keyUpper] ?? factsByIso2[row.iso2] ?? undefined;
+    }
+  } catch (e) {
+    console.warn('[countries] failed to attach facts:', e);
   }
 
   // Sort alphabetically by name

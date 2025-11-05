@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { DEFAULT_WEIGHTS, computeScoreFromFacts } from '@/lib/score';
-// import type { CountryFacts } from '@/lib/types';
+import { computeScoreFromFacts, DEFAULT_WEIGHTS } from '@travel-af/shared';
+import type { CountryFacts } from '@travel-af/shared';
+import Link from 'next/link';
 
 // Shape returned by /api/countries (seed + advisory overlay)
 type CountryRow = {
@@ -14,6 +15,7 @@ type CountryRow = {
   subregion?: string;
   aliases?: string[];
   advisory?: { level: 1 | 2 | 3 | 4; updatedAt: string; url: string; summary: string } | null;
+  facts?: Partial<CountryFacts> | undefined;
 };
 
 export default function Home() {
@@ -52,16 +54,18 @@ export default function Home() {
   }, [data, q]);
 
   const scoreFor = (c: CountryRow) => {
-    const month = new Date().getMonth() + 1;
-    // const facts: Partial<CountryFacts> = {
-    //   iso2: c.iso2,
-    //   advisoryLevel: c.advisory?.level,
-    // };
-    // try {
-    //   return computeScoreFromFacts(facts as CountryFacts, DEFAULT_WEIGHTS, month);
-    // } catch {
-    //   return undefined;
-    // }
+    try {
+      // Prefer facts joined by the API; fall back to minimal facts built from the row.
+      const provided: Partial<CountryFacts> | undefined = c.facts;
+      const facts: Partial<CountryFacts> = provided ?? {
+        iso2: c.iso2,
+        advisoryLevel: c.advisory?.level as 1 | 2 | 3 | 4 | undefined,
+      };
+      const score = computeScoreFromFacts(facts as CountryFacts, DEFAULT_WEIGHTS);
+      return Number.isFinite(score) ? score : undefined;
+    } catch {
+      return undefined;
+    }
   };
 
   return (
@@ -92,7 +96,11 @@ export default function Home() {
           {filtered.map((c) => {
             const s = scoreFor(c);
             return (
-              <div key={c.iso2} className="rounded-xl border border-zinc-200 dark:border-zinc-800 p-4">
+              <Link
+                key={c.iso2}
+                href={`/country/${c.iso2.toLowerCase()}`}
+                className="block rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition"
+              >
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <div className="text-lg font-semibold">{c.name}</div>
@@ -108,7 +116,9 @@ export default function Home() {
                     {typeof s === 'number' && (
                       <span
                         title="Travelability score"
-                        className="inline-flex h-7 min-w-[2.25rem] items-center justify-center rounded-full border px-2 text-sm font-semibold"
+                        className={`inline-flex h-7 min-w-[2.25rem] items-center justify-center rounded-full border px-2 text-sm font-semibold ${
+                          s >= 80 ? 'bg-green-100 text-green-800 border-green-300' : s >= 60 ? 'bg-yellow-100 text-yellow-800 border-yellow-300' : 'bg-red-100 text-red-800 border-red-300'
+                        }`}
                       >
                         {s}
                       </span>
@@ -121,7 +131,18 @@ export default function Home() {
                     <div className="text-sm">
                       <span className="font-medium">Advisory:</span>{' '}
                       Level {c.advisory.level} •{' '}
-                      <a className="underline" href={c.advisory.url} target="_blank" rel="noreferrer">travel.state.gov</a>
+                      <button
+                        className="underline text-blue-600"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (c.advisory?.url) {
+                            window.open(c.advisory.url, '_blank', 'noopener,noreferrer');
+                          }
+                        }}
+                      >
+                        travel.state.gov
+                      </button>
                       <div className="text-xs text-zinc-500">
                         Updated {new Date(c.advisory.updatedAt).toLocaleDateString()}
                       </div>
@@ -135,7 +156,11 @@ export default function Home() {
                     <div className="text-sm text-zinc-500">No advisory found.</div>
                   )}
                 </div>
-              </div>
+                <div className="mt-3 text-sm">
+                  <span className="text-zinc-500">Details: </span>
+                  <span className="text-blue-600 underline">Open country page →</span>
+                </div>
+              </Link>
             );
           })}
         </div>

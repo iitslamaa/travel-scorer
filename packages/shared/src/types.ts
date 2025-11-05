@@ -1,27 +1,34 @@
-// packages/shared/src/types.ts
 export type Weights = {
-  safety: number;
-  affordability: number;
-  english: number;
+  advisorySafety: number;
+  travelSafe: number;
+  soloFemale: number;
+  redditComposite: number;
   seasonality: number;
-  visa: number;
-  flightTime: number;
-  transit: number;
-  womenSafety: number;
-  soloSafety: number;
+  visaEase: number;
+  affordability: number;
+  directFlight: number;
+  infrastructure: number;
 };
 
 export type CountryFacts = {
   iso2: string;
 
-  // Inputs that may be present or null-ish
+  // Safety and sentiment
   advisoryLevel?: 1 | 2 | 3 | 4;
-  gdpPppPerCapita?: number;         // USD PPP per capita
-  englishProficiency?: number;      // 0..100
-  bestMonths?: number[];            // e.g., [4,5,9,10]
-  visaEaseUS?: 'visa-free' | 'evisa' | 'visa-required' | 'unknown';
-  estFlightHrsFromNYC?: number;     // hours
-  transit?: 'great-pt' | 'mixed' | 'car-only';
-  womenSafety?: number;             // 0..100
-  soloSafety?: number;              // 0..100
+  travelSafeOverall?: number;   // 0–100
+  soloFemaleIndex?: number;     // 0–100
+  redditComposite?: number;     // 0–100
+  redditN?: number;             // sample size
+
+  // Travel logistics
+  seasonality?: number;         // 0–100 (100 = currently peak season)
+  visaEase?: number;            // 0–100
+  affordability?: number;       // 0–100 (higher = cheaper)
+  directFlight?: number;        // 0–100 (1 = direct flight exists, or score inverse to hours)
+  infrastructure?: number;      // 0–100 (higher = better)
+
+  // Meta
+  advisoryUrl?: string;
+  advisorySummary?: string;
+  updatedAt?: string;
 };

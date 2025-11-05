@@ -1,0 +1,8 @@
+{
+  "US": { "score": 70, "n": 1500, "updatedAt": "2025-11-05" },
+  "CA": { "score": 78, "n": 900,  "updatedAt": "2025-11-05" },
+  "JP": { "score": 86, "n": 1300, "updatedAt": "2025-11-05" },
+  "GB": { "score": 75, "n": 800,  "updatedAt": "2025-11-05" },
+  "FR": { "score": 72, "n": 1100, "updatedAt": "2025-11-05" },
+  "MX": { "score": 60, "n": 1400, "updatedAt": "2025-11-05" }
+}
