@@ -53,22 +53,26 @@ Each country receives a **Travelability Score (0–100)** based on weighted fact
 
 ## Project Structure
 
+```
 travel-af/
-├─ apps/
-│  └─ web/                     # Next.js app (website)
-│     ├─ app/                  # Next.js App Router (pages, API routes)
-│     │  └─ api/
-│     │     ├─ advisories/route.ts   # Fetch & normalize travel.state.gov advisories
-│     │     └─ countries/route.ts    # Join UN/ISO seeds + advisories into one response
-│     ├─ lib/                  # Country matching, facts joiners, types
-│     ├─ data/                 # UN/ISO seed data + small public datasets
-│     └─ scripts/
-│        └─ generate-seeds.mjs # Seed generator (idempotent)
-├─ packages/
-│  └─ shared/                  # Reusable TypeScript library (scoring/types)
-│     ├─ src/                  # source (score.ts, types.ts, index.ts)
-│     └─ dist/                 # build output (published to the workspace only)
-└─ package.json                # npm workspaces (monorepo)
+├── apps/
+│   └── web/                     # Next.js app (website)
+│       ├── app/                 # Next.js App Router (pages, API routes)
+│       │   └── api/
+│       │       ├── advisories/route.ts   # Fetch & normalize travel.state.gov advisories
+│       │       └── countries/route.ts    # Join UN/ISO seeds + advisories into one response
+│       ├── lib/                 # Country matching, facts joiners, types
+│       ├── data/                # UN/ISO seed data + public datasets
+│       └── scripts/
+│           └── generate-seeds.mjs # Seed generator (idempotent)
+│
+├── packages/
+│   └── shared/                  # Shared TypeScript library (scoring/types)
+│       ├── src/                 # source (score.ts, types.ts, index.ts)
+│       └── dist/                # compiled output after build
+│
+└── package.json                 # npm workspaces (monorepo)
+```
 
 ## Running Locally
 
