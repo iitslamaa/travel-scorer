@@ -102,3 +102,14 @@ npm run build -w @travel-af/shared
 npm run dev -w apps/web
 # open http://localhost:3000
 ```
+### (Optional) Refresh seed data
+
+The repo ships with seeds. If you want to regenerate them:
+```
+node apps/web/scripts/generate-seeds.mjs
+```
+
+## Live advisories endpoint (travel.state.gov)
+	•	We fetch advisories at runtime via /api/advisories and join them with UN/ISO seeds in /api/countries.
+	•	If you see a console warning like non-RSS or a captcha snippet in dev logs, that’s expected; the parser handles it.
+	•	To inspect raw joined output: open http://localhost:3000/api/countries.
