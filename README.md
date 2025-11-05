@@ -81,17 +81,24 @@ travel-af/
 - npm 9+ (uses **npm workspaces**)
 
 ### 1) Clone & install
+
 ```bash
 git clone https://github.com/iitslamaa/travel-af.git
 cd travel-af
 npm install
 ```
+
 ### 2) Build the Shared Library
+
+```
 # from the repo root
 npm run build -w @travel-af/shared
 # (or) cd packages/shared && npm run build
+```
 
 ### 3) Start the web app (Next.js)
+```
 # from the repo root
 npm run dev -w apps/web
 # open http://localhost:3000
+```
