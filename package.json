@@ -8,5 +8,8 @@
     "build:shared": "npm --workspace @travel-af/shared run build",
     "dev:web": "npm --workspace web run dev"
   },
-  "packageManager": "pnpm@9.12.2"
+  "packageManager": "pnpm@9.12.2",
+  "devDependencies": {
+    "tsx": "^4.20.6"
+  }
 }
