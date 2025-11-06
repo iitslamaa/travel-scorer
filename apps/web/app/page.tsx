@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { computeScoreFromFacts, DEFAULT_WEIGHTS } from '@travel-af/shared';
 import type { CountryFacts } from '@travel-af/shared';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // Shape returned by /api/countries (seed + advisory overlay)
 type CountryRow = {
@@ -15,7 +15,7 @@ type CountryRow = {
   subregion?: string;
   aliases?: string[];
   advisory?: { level: 1 | 2 | 3 | 4; updatedAt: string; url: string; summary: string } | null;
-  facts?: Partial<CountryFacts> | undefined;
+  facts?: (Partial<CountryFacts> & { scoreTotal?: number }) | undefined;
 };
 
 export default function Home() {
@@ -54,22 +54,12 @@ export default function Home() {
   }, [data, q]);
 
   const scoreFor = (c: CountryRow) => {
-    try {
-      // Prefer facts joined by the API; fall back to minimal facts built from the row.
-      const provided: Partial<CountryFacts> | undefined = c.facts;
-      const facts: Partial<CountryFacts> = provided ?? {
-        iso2: c.iso2,
-        advisoryLevel: c.advisory?.level as 1 | 2 | 3 | 4 | undefined,
-      };
-      const score = computeScoreFromFacts(facts as CountryFacts, DEFAULT_WEIGHTS);
-      return Number.isFinite(score) ? score : undefined;
-    } catch {
-      return undefined;
-    }
+    const total = c.facts?.scoreTotal;
+    return typeof total === 'number' && Number.isFinite(total) ? total : undefined;
   };
 
   return (
-    <main className="mx-auto max-w-5xl p-6">
+    <main className="scribble mx-auto max-w-5xl p-6">
       <h1 className="text-3xl font-bold">TRAVEL APP AF</h1>
       <p className="text-zinc-600 dark:text-zinc-400 mb-4">
         Canonical UN/ISO countries & territories with live travel.state.gov advisory overlay.
@@ -98,14 +88,25 @@ export default function Home() {
             return (
               <Link
                 key={c.iso2}
-                href={`/country/${c.iso2.toLowerCase()}`}
-                className="block rounded-xl border border-zinc-200 dark:border-zinc-800 p-4 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition"
+                href={`/country/${c.iso2.toUpperCase()}`}
+                className="relative block paper p-4 hover:-translate-y-0.5 transition-transform"
               >
+                <span className="tape right" />
                 <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-lg font-semibold">{c.name}</div>
-                    <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                      {c.region || '—'} {c.subregion ? `• ${c.subregion}` : ''}
+                  <div className="flex items-center gap-2">
+                    <Image
+                      src={`https://flagcdn.com/w40/${c.iso2.toLowerCase()}.png`}
+                      alt={`${c.name} flag`}
+                      width={28}
+                      height={20}
+                      className="rounded shadow-sm ring-1 ring-black/10 dark:ring-white/10 bg-white"
+                      unoptimized
+                    />
+                    <div>
+                      <div className="text-lg font-semibold">{c.name}</div>
+                      <div className="text-sm text-zinc-600 dark:text-zinc-400">
+                        {c.region || '—'} {c.subregion ? `• ${c.subregion}` : ''}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

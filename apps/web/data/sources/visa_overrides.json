@@ -1,0 +1,9 @@
+{
+  "GE": {
+    "visaType": "visa_free",
+    "allowedDays": 365,
+    "notes": "365 days visa-free for U.S. citizens.",
+    "visaEase": 100,
+    "sourceUrl": "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Georgia.html"
+  }
+}

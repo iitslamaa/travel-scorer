@@ -24,3 +24,78 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* --- Scrapbook helpers --- */
+.paper {
+  position: relative;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow:
+    0 1px 0 rgba(0,0,0,0.06),
+    0 12px 24px -12px rgba(0,0,0,0.18),
+    inset 0 0 0 1px rgba(255,255,255,0.6);
+}
+.dark .paper {
+  background: rgb(24 24 27);
+  border-color: rgba(255,255,255,0.08);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06), 0 12px 24px -12px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+
+.paper--lined {
+  background-image: linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size: 100% 32px;
+  background-position: 0 24px;
+}
+.dark .paper--lined {
+  background-image: linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+}
+
+.paper--grid {
+  background-image:
+    linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+  background-size: 24px 24px, 24px 24px;
+}
+.dark .paper--grid {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+}
+
+.paper--tilt-sm { transform: rotate(-0.25deg); }
+.paper--tilt-md { transform: rotate(0.35deg); }
+
+.tape {
+  position: absolute; top: -10px; height: 24px; width: 88px;
+  background: rgba(253,230,138,0.88); /* amber-200 */
+  box-shadow: 0 6px 10px -6px rgba(0,0,0,0.25);
+  backdrop-filter: blur(0.5px);
+  border-radius: 4px;
+}
+.tape.left { left: 14px; transform: rotate(-2deg); }
+.tape.right { right: 14px; transform: rotate(3deg); }
+
+.index-card {
+  background: #fff;
+  border-radius: 12px;
+  border: 1px dashed rgba(0,0,0,0.14);
+  box-shadow: 0 12px 30px -16px rgba(0,0,0,0.25);
+}
+.dark .index-card { background: rgb(24 24 27); border-color: rgba(255,255,255,0.16); }
+
+.index-card__ruled {
+  background-image:
+    linear-gradient(rgba(239,68,68,0.45), rgba(239,68,68,0.45)), /* red margin */
+    linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 3px 100%, 100% 28px;
+  background-position: 28px 0, 0 22px;
+  background-repeat: no-repeat, repeat;
+}
+.dark .index-card__ruled { background-image: linear-gradient(rgba(239,68,68,0.55), rgba(239,68,68,0.55)), linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); }
+
+/* very subtle playful background */
+.scribble {
+  background: radial-gradient(1200px 200px at 10% 0%, rgba(2,132,199,0.06), transparent 50%),
+              radial-gradient(800px 160px at 80% 20%, rgba(180,83,9,0.06), transparent 60%);
+}
