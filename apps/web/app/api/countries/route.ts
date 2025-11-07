@@ -13,8 +13,6 @@ import { buildVisaIndex } from '@/lib/providers/visa';
 import { estimateDailySpendHotel } from '@/lib/providers/costs';
 import type { DailySpend } from '@/lib/providers/costs';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
 
 // Local type to avoid any
 type FactsExtraServer = Partial<CountryFacts> & {

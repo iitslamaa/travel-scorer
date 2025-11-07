@@ -134,8 +134,6 @@ function coerceAdvisories(items: RssItem[]): Advisory[] {
   return [...latest.values()].sort((a, b) => a.iso2.localeCompare(b.iso2));
 }
 
-export const revalidate = 60 * 60 * 6; // 6 hours (server-side)
-
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const debug = url.searchParams.has('debug');
