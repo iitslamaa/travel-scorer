@@ -1,59 +1,85 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { DEFAULT_WEIGHTS, type Weights } from '@/lib/score';
+import { DEFAULT_WEIGHTS, type Weights } from '@travel-af/shared';
+
+// Derive a safe key type from DEFAULT_WEIGHTS so our slider keys are checked
+type WeightMap = typeof DEFAULT_WEIGHTS;
+type WeightKey = Extract<keyof WeightMap, string>;
 
 type Props = { onChange: (w: Weights, month: number, tags: string[]) => void };
 
 export default function Filters({ onChange }: Props) {
-  const [w, setW] = useState<Weights>({ ...DEFAULT_WEIGHTS });
+  const [w, setW] = useState<WeightMap>({ ...DEFAULT_WEIGHTS });
   const [month, setMonth] = useState<number>(new Date().getMonth() + 1);
   const [tags, setTags] = useState<string[]>([]);
 
-  useEffect(() => { onChange(w, month, tags); }, []); // kick initial compute
+  // Kick an initial compute on mount
+  useEffect(() => {
+    onChange(w as unknown as Weights, month, tags);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const updateWeight = (k: keyof Weights, v: number) => {
-    const next = { ...w, [k]: v };
+  const updateWeight = (k: WeightKey, v: number) => {
+    const next = { ...w, [k]: v } as WeightMap;
     setW(next);
-    onChange(next, month, tags);
-  };
-  const updateMonth = (v: number) => { setMonth(v); onChange(w, v, tags); };
-  const toggleTag = (t: string) => {
-    const next = tags.includes(t) ? tags.filter(x => x !== t) : [...tags, t];
-    setTags(next);
-    onChange(w, month, next);
+    onChange(next as unknown as Weights, month, tags);
   };
 
-  const slider = (label: string, key: keyof Weights) => (
+  const updateMonth = (v: number) => {
+    setMonth(v);
+    onChange(w as unknown as Weights, v, tags);
+  };
+
+  const toggleTag = (t: string) => {
+    const next = tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t];
+    setTags(next);
+    onChange(w as unknown as Weights, month, next);
+  };
+
+  const slider = (label: string, key: WeightKey) => (
     <div className="mb-3">
-      <label className="block text-sm font-medium mb-1">{label}: {(w[key] * 100).toFixed(0)}%</label>
-      <input type="range" min={0} max={0.4} step={0.01}
-        value={w[key]} onChange={(e)=>updateWeight(key, Number(e.target.value))}
-        className="w-full"/>
+      <label className="block text-sm font-medium mb-1">
+        {label}: {(w[key] * 100).toFixed(0)}%
+      </label>
+      <input
+        type="range"
+        min={0}
+        max={0.4}
+        step={0.01}
+        value={w[key]}
+        onChange={(e) => updateWeight(key, Number(e.target.value))}
+        className="w-full"
+      />
     </div>
   );
 
-  const TAGS = ['food','nature','activities','architecture','history'];
+  const TAGS = ['food', 'nature', 'activities', 'architecture', 'history'];
 
   return (
     <div className="p-4 bg-white/60 dark:bg-zinc-900/60 rounded-lg border border-zinc-200 dark:border-zinc-800">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          {slider('Safety','safety')}
-          {slider('Affordability','affordability')}
-          {slider('English','english')}
-          {slider('Seasonality','seasonality')}
-          {slider('Visa','visa')}
+          {slider('Travel.gov advisory', 'travelGov' as WeightKey)}
+          {slider('TravelSafe Abroad', 'travelSafe' as WeightKey)}
+          {slider('Solo Female Travelers', 'stfi' as WeightKey)}
+          {slider('Reddit sentiment', 'reddit' as WeightKey)}
+          {slider('Seasonality', 'seasonality' as WeightKey)}
         </div>
         <div>
-          {slider('Flight Time','flightTime')}
-          {slider('Transit','transit')}
-          {slider('Women Safety','womenSafety')}
-          {slider('Solo Safety','soloSafety')}
+          {slider('Visa', 'visa' as WeightKey)}
+          {slider('Affordability', 'affordability' as WeightKey)}
+          {slider('Direct flight', 'directFlight' as WeightKey)}
+          {slider('Tourist infrastructure', 'infrastructure' as WeightKey)}
           <div className="mt-4">
             <label className="block text-sm font-medium mb-1">Target Month</label>
-            <input type="number" min={1} max={12} value={month}
-              onChange={(e)=>updateMonth(Number(e.target.value))}
-              className="w-24 rounded border px-2 py-1 bg-white dark:bg-zinc-900"/>
+            <input
+              type="number"
+              min={1}
+              max={12}
+              value={month}
+              onChange={(e) => updateMonth(Number(e.target.value))}
+              className="w-24 rounded border px-2 py-1 bg-white dark:bg-zinc-900"
+            />
           </div>
         </div>
       </div>
@@ -61,13 +87,16 @@ export default function Filters({ onChange }: Props) {
       <div className="mt-4">
         <div className="text-sm font-medium mb-2">Filter by tags</div>
         <div className="flex flex-wrap gap-2">
-          {TAGS.map(t=>(
-            <button key={t} onClick={()=>toggleTag(t)}
+          {TAGS.map((t) => (
+            <button
+              key={t}
+              onClick={() => toggleTag(t)}
               className={`px-3 py-1 rounded-full border text-sm ${
                 tags.includes(t)
-                 ? 'bg-zinc-900 text-white dark:bg-white dark:text-black'
-                 : 'bg-white dark:bg-zinc-900'
-              }`}>
+                  ? 'bg-zinc-900 text-white dark:bg-white dark:text-black'
+                  : 'bg-white dark:bg-zinc-900'
+              }`}
+            >
               {t}
             </button>
           ))}

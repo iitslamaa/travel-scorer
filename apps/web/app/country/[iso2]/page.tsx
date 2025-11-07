@@ -31,6 +31,16 @@ import type { CountryFacts } from '@/lib/facts';
 
 type AdvisoryLite = { level?: 1|2|3|4; url?: string; summary?: string; updatedAt?: string };
 
+// Shape attached by the API for estimated daily spend (hotel traveler)
+type DailySpendLocal = {
+  foodUsd: number;
+  activitiesUsd: number;
+  hotelUsd: number;
+  totalUsd: number;
+  basis?: { col?: number; food?: number };
+  notes?: string[];
+};
+
 // Extra optional fields we may have in our dataset for derived metrics
 type FactsExtra = CountryFacts & {
   costOfLivingIndex?: number;
@@ -42,6 +52,8 @@ type FactsExtra = CountryFacts & {
   redditThemes?: string[];
   redditSummary?: string;
   affordability?: number;
+  // Computed by API from COL/food/FX
+  dailySpend?: DailySpendLocal;
   // Visa enrichments (from visa provider)
   visaType?: 'visa_free' | 'voa' | 'evisa' | 'visa_required' | 'ban';
   visaAllowedDays?: number;
@@ -467,6 +479,58 @@ function explainSFTI(val?: number){
   return 'Reports indicate notable concerns; plan carefully.';
 }
 
+// Normalize daily-spend payload that might come from different server shapes
+type LegacyDailySpendFlat = {
+  // daily costs (USD) that may exist on older payloads
+  dailyFoodUsd?: number;
+  foodPerDayUsd?: number;
+  dailyActivitiesUsd?: number;
+  activitiesPerDayUsd?: number;
+  dailyHotelUsd?: number;
+  hotelNightUsd?: number;
+  dailyTotalUsd?: number;
+  totalPerDayUsd?: number;
+};
+
+function pickDailySpend(fx: Partial<FactsExtra> | undefined): DailySpendLocal | undefined {
+  if (!fx) return undefined;
+
+  // Preferred nested shape { dailySpend: { ... } }
+  const withDaily = fx as Partial<{ dailySpend: DailySpendLocal }>;
+  const nested = withDaily.dailySpend;
+  if (nested && typeof nested.totalUsd === 'number' && Number.isFinite(nested.totalUsd)) {
+    return nested;
+  }
+
+  // Legacy/alternate flat shapes (fallbacks)
+  const legacy = fx as LegacyDailySpendFlat;
+  const food = legacy.dailyFoodUsd ?? legacy.foodPerDayUsd;
+  const acts = legacy.dailyActivitiesUsd ?? legacy.activitiesPerDayUsd;
+  const hotel = legacy.dailyHotelUsd ?? legacy.hotelNightUsd;
+  const total = legacy.dailyTotalUsd ?? legacy.totalPerDayUsd;
+
+  const hasAny =
+    [food, acts, hotel, total].some(
+      (v) => typeof v === 'number' && Number.isFinite(v as number)
+    );
+
+  if (!hasAny) return undefined;
+
+  const safeNum = (x: unknown): number | undefined =>
+    typeof x === 'number' && Number.isFinite(x) ? x : undefined;
+
+  const dd: DailySpendLocal = {
+    foodUsd: safeNum(food) ?? 0,
+    activitiesUsd: safeNum(acts) ?? 0,
+    hotelUsd: safeNum(hotel) ?? 0,
+    totalUsd:
+      safeNum(total) ??
+      ((safeNum(food) ?? 0) + (safeNum(acts) ?? 0) + (safeNum(hotel) ?? 0)),
+    notes: [],
+  };
+  return dd;
+}
+
 type PageProps = { params: Promise<{ iso2?: string }> };
 export default async function CountryPage({ params }: PageProps) {
   const { iso2: iso2Raw } = await params;
@@ -508,6 +572,7 @@ export default async function CountryPage({ params }: PageProps) {
   const getRow = (k: string) => rows.find(r => r.key === k);
 
   const fxFacts: Partial<FactsExtra> = facts as Partial<FactsExtra>;
+  const daily = pickDailySpend(fxFacts);
 
   return (
     <div className="scribble max-w-4xl mx-auto px-6 py-8">
@@ -781,6 +846,14 @@ export default async function CountryPage({ params }: PageProps) {
               <p className="mt-2 text-sm leading-6">{explainAffordability(fxFacts)}</p>
               {renderFactorBreakdown(rows, 'affordability')}
               <ul className="mt-2 text-sm list-disc ml-6">
+                {daily && (
+                  <>
+                    <li>Food (daily): {fmtUSD(daily.foodUsd)}</li>
+                    <li>Activities (daily): {fmtUSD(daily.activitiesUsd)}</li>
+                    <li>Hotel (mid‑range, nightly): {fmtUSD(daily.hotelUsd)}</li>
+                    <li className="font-medium">Estimated daily total: {fmtUSD(daily.totalUsd)}</li>
+                  </>
+                )}
                 {fxFacts?.costOfLivingIndex != null && (
                   <li>Cost-of-living index: {Math.round(Number(fxFacts.costOfLivingIndex))}</li>
                 )}

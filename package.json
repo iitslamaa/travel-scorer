@@ -1,14 +1,16 @@
 {
+  "name": "travel-af",
   "private": true,
+  "packageManager": "pnpm@9.12.2",
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
-    "build:shared": "npm --workspace @travel-af/shared run build",
-    "dev:web": "npm --workspace web run dev"
+    "build:shared": "pnpm -F @travel-af/shared build",
+    "dev:web": "pnpm -F ./apps/web dev",
+    "build:web": "pnpm -F ./apps/web build"
   },
-  "packageManager": "pnpm@9.12.2",
   "devDependencies": {
     "tsx": "^4.20.6"
   }

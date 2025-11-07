@@ -10,6 +10,8 @@ import { gdpPerCapitaUSDMap } from '@/lib/providers/worldbank';
 import { fxLocalPerUSDMapByIso2 } from '@/lib/providers/fx';
 import { fmGroupByCountry, fmByIso2 } from '@/lib/providers/frequentmiler';
 import { buildVisaIndex } from '@/lib/providers/visa';
+import { estimateDailySpendHotel } from '@/lib/providers/costs';
+import type { DailySpend } from '@/lib/providers/costs';
 
 // Local type to avoid any
 type FactsExtraServer = Partial<CountryFacts> & {
@@ -34,6 +36,7 @@ type FactsExtraServer = Partial<CountryFacts> & {
   localPerUSD?: number;
   usdToLocalRate?: number;
   affordability?: number;
+  dailySpend?: DailySpend;
   // server-computed total
   scoreTotal?: number;
   // FM (Frequent Miler) seasonality enrichments
@@ -161,7 +164,7 @@ type CountryOut = CountrySeed & {
   facts?: CountryFacts;
 };
 
-export const revalidate = 60 * 60 * 6;
+export const revalidate = 21600;
 
 export async function GET() {
   // Build absolute base to call our other route reliably in dev/prod
@@ -265,6 +268,15 @@ export async function GET() {
       gdpPerCapitaUSDMap(iso2s),
       fxLocalPerUSDMapByIso2(iso2s),
     ]);
+    const costsByIso2: Map<string, DailySpend> = await (async () => {
+      try {
+        const mod = await import('@/lib/providers/costs');
+        const fn = (mod as { buildCostIndex?: () => Promise<Map<string, DailySpend>> }).buildCostIndex;
+        return fn ? await fn() : new Map<string, DailySpend>();
+      } catch {
+        return new Map<string, DailySpend>();
+      }
+    })();
 
     // Optionally enrich facts with macro signals for affordability + themes
     // These files are optional; if missing we proceed without them.
@@ -332,6 +344,26 @@ export async function GET() {
       if (themesMap[keyUpper]?.length) extra.redditThemes = themesMap[keyUpper];
 
       row.facts = facts ? { ...facts, ...extra } as CountryFacts : (extra as CountryFacts);
+
+      // --- Compute daily spend (hotel traveler) from provider (preferred), fallback to estimator
+      try {
+        const fxFacts = row.facts as unknown as FactsExtraServer;
+        const direct = costsByIso2.get(keyUpper);
+        if (direct) {
+          fxFacts.dailySpend = direct;
+        } else {
+          const spend = estimateDailySpendHotel({
+            costOfLivingIndex: fxFacts.costOfLivingIndex,
+            foodCostIndex: fxFacts.foodCostIndex,
+            fxLocalPerUSD: fxFacts.fxLocalPerUSD,
+            usdToLocalRate: fxFacts.usdToLocalRate,
+            gdpPerCapitaUsd: fxFacts.gdpPerCapitaUsd,
+          });
+          if (spend) {
+            fxFacts.dailySpend = spend;
+          }
+        }
+      } catch {}
 
       // --- Attach Visa (US passport) ease & details
       try {

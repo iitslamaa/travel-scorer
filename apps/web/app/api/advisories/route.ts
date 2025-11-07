@@ -66,7 +66,7 @@ function parseLevel(title: string, description?: string): 1 | 2 | 3 | 4 {
   return (n >= 1 && n <= 4 ? (n as 1 | 2 | 3 | 4) : 1);
 }
 
-export const revalidate = 60 * 60 * 6; // cache for 6 hours
+export const revalidate = 21600; // 6 hours
 
 export async function GET() {
   try {
