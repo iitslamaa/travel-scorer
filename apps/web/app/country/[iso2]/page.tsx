@@ -446,10 +446,9 @@ function pickDailySpend(fx: Partial<FactsExtra> | undefined): DailySpendLocal | 
   return dd;
 }
 
-type PageProps = { params: Promise<{ iso2?: string }> };
+type PageProps = { params: { iso2?: string } };
 export default async function CountryPage({ params }: PageProps) {
-  const { iso2: iso2Raw } = await params;
-  const iso2 = (iso2Raw || "").toUpperCase();
+  const iso2 = (params.iso2 || '').toUpperCase();
   const flagPng = `https://flagcdn.com/w80/${iso2.toLowerCase()}.png`;
   if (!iso2) {
     notFound();

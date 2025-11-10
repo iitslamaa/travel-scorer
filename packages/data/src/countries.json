@@ -1,0 +1,1704 @@
+[
+  {
+    "iso2": "KI",
+    "name": "Kiribati",
+    "score": 100,
+    "n": 0,
+    "updatedAt": "2024-12-02T05:00:00.000Z"
+  },
+  {
+    "iso2": "KG",
+    "name": "Kyrgyzstan",
+    "score": 100,
+    "n": 0,
+    "updatedAt": "2025-04-21T04:00:00.000Z"
+  },
+  {
+    "iso2": "FM",
+    "name": "Micronesia",
+    "score": 100,
+    "n": 0,
+    "updatedAt": "2025-01-22T05:00:00.000Z"
+  },
+  {
+    "iso2": "SN",
+    "name": "Senegal",
+    "score": 100,
+    "n": 0,
+    "updatedAt": "2024-10-21T04:00:00.000Z"
+  },
+  {
+    "iso2": "UZ",
+    "name": "Uzbekistan",
+    "score": 100,
+    "n": 0,
+    "updatedAt": "2024-09-27T04:00:00.000Z"
+  },
+  {
+    "iso2": "VU",
+    "name": "Vanuatu",
+    "score": 100,
+    "n": 0,
+    "updatedAt": "2025-05-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "ZM",
+    "name": "Zambia",
+    "score": 100,
+    "n": 0,
+    "updatedAt": "2023-07-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "DM",
+    "name": "Dominica",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2024-08-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "SV",
+    "name": "El Salvador",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2025-04-08T04:00:00.000Z"
+  },
+  {
+    "iso2": "FJ",
+    "name": "Fiji",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2024-12-02T05:00:00.000Z"
+  },
+  {
+    "iso2": "GE",
+    "name": "Georgia",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2025-03-13T04:00:00.000Z"
+  },
+  {
+    "iso2": "MH",
+    "name": "Marshall Islands",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2025-06-16T04:00:00.000Z"
+  },
+  {
+    "iso2": "MN",
+    "name": "Mongolia",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2025-01-22T05:00:00.000Z"
+  },
+  {
+    "iso2": "MK",
+    "name": "North Macedonia",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2025-01-14T05:00:00.000Z"
+  },
+  {
+    "iso2": "PY",
+    "name": "Paraguay",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2025-04-30T04:00:00.000Z"
+  },
+  {
+    "iso2": "VC",
+    "name": "Saint Vincent and the Grenadines",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2024-12-06T05:00:00.000Z"
+  },
+  {
+    "iso2": "SR",
+    "name": "Suriname",
+    "score": 99,
+    "n": 0,
+    "updatedAt": "2024-12-13T05:00:00.000Z"
+  },
+  {
+    "iso2": "BG",
+    "name": "Bulgaria",
+    "score": 98,
+    "n": 0,
+    "updatedAt": "2025-10-09T04:00:00.000Z"
+  },
+  {
+    "iso2": "GD",
+    "name": "Grenada",
+    "score": 98,
+    "n": 0,
+    "updatedAt": "2024-11-12T05:00:00.000Z"
+  },
+  {
+    "iso2": "KZ",
+    "name": "Kazakhstan",
+    "score": 98,
+    "n": 0,
+    "updatedAt": "2024-08-05T04:00:00.000Z"
+  },
+  {
+    "iso2": "MU",
+    "name": "Mauritius",
+    "score": 98,
+    "n": 0,
+    "updatedAt": "2024-08-30T04:00:00.000Z"
+  },
+  {
+    "iso2": "ME",
+    "name": "Montenegro",
+    "score": 98,
+    "n": 0,
+    "updatedAt": "2024-11-26T05:00:00.000Z"
+  },
+  {
+    "iso2": "PW",
+    "name": "Palau",
+    "score": 98,
+    "n": 0,
+    "updatedAt": "2024-08-06T04:00:00.000Z"
+  },
+  {
+    "iso2": "LC",
+    "name": "Saint Lucia",
+    "score": 98,
+    "n": 0,
+    "updatedAt": "2024-08-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "TO",
+    "name": "Tonga",
+    "score": 98,
+    "n": 0,
+    "updatedAt": "2024-12-02T05:00:00.000Z"
+  },
+  {
+    "iso2": "TV",
+    "name": "Tuvalu",
+    "score": 98,
+    "n": 0,
+    "updatedAt": "2024-12-02T05:00:00.000Z"
+  },
+  {
+    "iso2": "AG",
+    "name": "Antigua and Barbuda",
+    "score": 97,
+    "n": 0,
+    "updatedAt": "2024-08-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "LV",
+    "name": "Latvia",
+    "score": 97,
+    "n": 0,
+    "updatedAt": "2024-08-26T04:00:00.000Z"
+  },
+  {
+    "iso2": "RO",
+    "name": "Romania",
+    "score": 97,
+    "n": 0,
+    "updatedAt": "2025-10-14T04:00:00.000Z"
+  },
+  {
+    "iso2": "BB",
+    "name": "Barbados",
+    "score": 96,
+    "n": 0,
+    "updatedAt": "2024-08-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "LT",
+    "name": "Lithuania",
+    "score": 96,
+    "n": 0,
+    "updatedAt": "2024-08-09T04:00:00.000Z"
+  },
+  {
+    "iso2": "SK",
+    "name": "Slovakia",
+    "score": 96,
+    "n": 0,
+    "updatedAt": "2024-11-14T05:00:00.000Z"
+  },
+  {
+    "iso2": "BN",
+    "name": "Brunei",
+    "score": 95,
+    "n": 0,
+    "updatedAt": "2025-03-19T04:00:00.000Z"
+  },
+  {
+    "iso2": "EE",
+    "name": "Estonia",
+    "score": 95,
+    "n": 0,
+    "updatedAt": "2024-07-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "SI",
+    "name": "Slovenia",
+    "score": 95,
+    "n": 0,
+    "updatedAt": "2024-07-26T04:00:00.000Z"
+  },
+  {
+    "iso2": "BT",
+    "name": "Bhutan",
+    "score": 94,
+    "n": 0,
+    "updatedAt": "2025-10-20T04:00:00.000Z"
+  },
+  {
+    "iso2": "CY",
+    "name": "Cyprus",
+    "score": 94,
+    "n": 0,
+    "updatedAt": "2025-01-13T05:00:00.000Z"
+  },
+  {
+    "iso2": "KW",
+    "name": "Kuwait",
+    "score": 94,
+    "n": 0,
+    "updatedAt": "2025-04-08T04:00:00.000Z"
+  },
+  {
+    "iso2": "MT",
+    "name": "Malta",
+    "score": 94,
+    "n": 0,
+    "updatedAt": "2025-05-28T04:00:00.000Z"
+  },
+  {
+    "iso2": "KR",
+    "name": "South Korea",
+    "score": 93,
+    "n": 0,
+    "updatedAt": "2025-05-28T04:00:00.000Z"
+  },
+  {
+    "iso2": "JP",
+    "name": "Japan",
+    "score": 92,
+    "n": 0,
+    "updatedAt": "2025-05-15T04:00:00.000Z"
+  },
+  {
+    "iso2": "PT",
+    "name": "Portugal",
+    "score": 92,
+    "n": 0,
+    "updatedAt": "2025-03-03T05:00:00.000Z"
+  },
+  {
+    "iso2": "TW",
+    "name": "Taiwan",
+    "score": 92,
+    "n": 0,
+    "updatedAt": "2024-07-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "HR",
+    "name": "Croatia",
+    "score": 91,
+    "n": 0,
+    "updatedAt": "2025-10-09T04:00:00.000Z"
+  },
+  {
+    "iso2": "CW",
+    "name": "Curaçao",
+    "score": 91,
+    "n": 0,
+    "updatedAt": "2024-08-19T04:00:00.000Z"
+  },
+  {
+    "iso2": "CZ",
+    "name": "Czechia",
+    "score": 91,
+    "n": 0,
+    "updatedAt": "2025-04-28T04:00:00.000Z"
+  },
+  {
+    "iso2": "GR",
+    "name": "Greece",
+    "score": 91,
+    "n": 0,
+    "updatedAt": "2025-10-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "MY",
+    "name": "Malaysia",
+    "score": 91,
+    "n": 0,
+    "updatedAt": "2024-07-24T04:00:00.000Z"
+  },
+  {
+    "iso2": "WS",
+    "name": "Samoa",
+    "score": 91,
+    "n": 0,
+    "updatedAt": "2025-03-10T04:00:00.000Z"
+  },
+  {
+    "iso2": "AT",
+    "name": "Austria",
+    "score": 90,
+    "n": 0,
+    "updatedAt": "2024-08-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "FI",
+    "name": "Finland",
+    "score": 90,
+    "n": 0,
+    "updatedAt": "2024-08-09T04:00:00.000Z"
+  },
+  {
+    "iso2": "PF",
+    "name": "French Polynesia",
+    "score": 90,
+    "n": 0,
+    "updatedAt": "2024-12-02T05:00:00.000Z"
+  },
+  {
+    "iso2": "PL",
+    "name": "Poland",
+    "score": 90,
+    "n": 0,
+    "updatedAt": "2025-06-05T04:00:00.000Z"
+  },
+  {
+    "iso2": "TM",
+    "name": "Turkmenistan",
+    "score": 90,
+    "n": 0,
+    "updatedAt": "2025-02-28T05:00:00.000Z"
+  },
+  {
+    "iso2": "AW",
+    "name": "Aruba",
+    "score": 89,
+    "n": 0,
+    "updatedAt": "2024-08-19T04:00:00.000Z"
+  },
+  {
+    "iso2": "HU",
+    "name": "Hungary",
+    "score": 89,
+    "n": 0,
+    "updatedAt": "2024-08-21T04:00:00.000Z"
+  },
+  {
+    "iso2": "NR",
+    "name": "Nauru",
+    "score": 89,
+    "n": 0,
+    "updatedAt": "2024-12-02T05:00:00.000Z"
+  },
+  {
+    "iso2": "SC",
+    "name": "Seychelles",
+    "score": 89,
+    "n": 0,
+    "updatedAt": "2024-08-30T04:00:00.000Z"
+  },
+  {
+    "iso2": "SG",
+    "name": "Singapore",
+    "score": 89,
+    "n": 0,
+    "updatedAt": "2025-03-05T05:00:00.000Z"
+  },
+  {
+    "iso2": "VG",
+    "name": "British Virgin Islands",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2024-08-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "GF",
+    "name": "French Guiana",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2025-01-16T05:00:00.000Z"
+  },
+  {
+    "iso2": "IS",
+    "name": "Iceland",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2024-08-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "LI",
+    "name": "Liechtenstein",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2025-05-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "LU",
+    "name": "Luxembourg",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2024-07-19T04:00:00.000Z"
+  },
+  {
+    "iso2": "MS",
+    "name": "Montserrat",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2024-08-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "NO",
+    "name": "Norway",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2025-02-03T05:00:00.000Z"
+  },
+  {
+    "iso2": "QA",
+    "name": "Qatar",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2025-06-03T04:00:00.000Z"
+  },
+  {
+    "iso2": "KN",
+    "name": "Saint Kitts and Nevis",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2024-08-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "SX",
+    "name": "Sint Maarten",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2024-08-19T04:00:00.000Z"
+  },
+  {
+    "iso2": "CH",
+    "name": "Switzerland",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2025-05-20T04:00:00.000Z"
+  },
+  {
+    "iso2": "VN",
+    "name": "Vietnam",
+    "score": 88,
+    "n": 0,
+    "updatedAt": "2024-12-16T05:00:00.000Z"
+  },
+  {
+    "iso2": "IE",
+    "name": "Ireland",
+    "score": 87,
+    "n": 0,
+    "updatedAt": "2024-08-28T04:00:00.000Z"
+  },
+  {
+    "iso2": "CA",
+    "name": "Canada",
+    "score": 86,
+    "n": 0,
+    "updatedAt": "2025-06-11T04:00:00.000Z"
+  },
+  {
+    "iso2": "NZ",
+    "name": "New Zealand",
+    "score": 86,
+    "n": 0,
+    "updatedAt": "2025-01-03T05:00:00.000Z"
+  },
+  {
+    "iso2": "AU",
+    "name": "Australia",
+    "score": 84,
+    "n": 0,
+    "updatedAt": "2025-05-30T04:00:00.000Z"
+  },
+  {
+    "iso2": "AO",
+    "name": "Angola",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2024-09-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "BM",
+    "name": "Bermuda",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2024-11-12T05:00:00.000Z"
+  },
+  {
+    "iso2": "KY",
+    "name": "Cayman Islands",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2024-09-04T04:00:00.000Z"
+  },
+  {
+    "iso2": "EC",
+    "name": "Ecuador",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2025-10-14T04:00:00.000Z"
+  },
+  {
+    "iso2": "SZ",
+    "name": "Eswatini",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2024-07-01T04:00:00.000Z"
+  },
+  {
+    "iso2": "LS",
+    "name": "Lesotho",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2024-09-17T04:00:00.000Z"
+  },
+  {
+    "iso2": "MW",
+    "name": "Malawi",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2024-12-06T05:00:00.000Z"
+  },
+  {
+    "iso2": "ST",
+    "name": "São Tomé and Príncipe",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2025-10-08T04:00:00.000Z"
+  },
+  {
+    "iso2": "TJ",
+    "name": "Tajikistan",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2025-05-16T04:00:00.000Z"
+  },
+  {
+    "iso2": "TN",
+    "name": "Tunisia",
+    "score": 81,
+    "n": 0,
+    "updatedAt": "2024-10-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "AM",
+    "name": "Armenia",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2025-09-05T04:00:00.000Z"
+  },
+  {
+    "iso2": "BZ",
+    "name": "Belize",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2024-12-30T05:00:00.000Z"
+  },
+  {
+    "iso2": "BO",
+    "name": "Bolivia",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2024-06-06T04:00:00.000Z"
+  },
+  {
+    "iso2": "BA",
+    "name": "Bosnia and Herzegovina",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2024-12-12T05:00:00.000Z"
+  },
+  {
+    "iso2": "BW",
+    "name": "Botswana",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2024-02-26T05:00:00.000Z"
+  },
+  {
+    "iso2": "KH",
+    "name": "Cambodia",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2025-07-25T04:00:00.000Z"
+  },
+  {
+    "iso2": "KM",
+    "name": "Comoros",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2024-05-28T04:00:00.000Z"
+  },
+  {
+    "iso2": "DO",
+    "name": "Dominican Republic",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2025-06-12T04:00:00.000Z"
+  },
+  {
+    "iso2": "GM",
+    "name": "Gambia",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2024-10-16T04:00:00.000Z"
+  },
+  {
+    "iso2": "JO",
+    "name": "Jordan",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2024-09-12T04:00:00.000Z"
+  },
+  {
+    "iso2": "LA",
+    "name": "Laos",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2024-11-21T05:00:00.000Z"
+  },
+  {
+    "iso2": "MD",
+    "name": "Moldova",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2024-11-29T05:00:00.000Z"
+  },
+  {
+    "iso2": "RW",
+    "name": "Rwanda",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2025-07-16T04:00:00.000Z"
+  },
+  {
+    "iso2": "SL",
+    "name": "Sierra Leone",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2025-09-15T04:00:00.000Z"
+  },
+  {
+    "iso2": "LK",
+    "name": "Sri Lanka",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2025-10-14T04:00:00.000Z"
+  },
+  {
+    "iso2": "TL",
+    "name": "Timor-Leste",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2025-03-21T04:00:00.000Z"
+  },
+  {
+    "iso2": "ZW",
+    "name": "Zimbabwe",
+    "score": 80,
+    "n": 0,
+    "updatedAt": "2023-06-27T04:00:00.000Z"
+  },
+  {
+    "iso2": "AL",
+    "name": "Albania",
+    "score": 79,
+    "n": 0,
+    "updatedAt": "2024-12-31T05:00:00.000Z"
+  },
+  {
+    "iso2": "AZ",
+    "name": "Azerbaijan",
+    "score": 79,
+    "n": 0,
+    "updatedAt": "2025-05-21T04:00:00.000Z"
+  },
+  {
+    "iso2": "CR",
+    "name": "Costa Rica",
+    "score": 79,
+    "n": 0,
+    "updatedAt": "2024-12-10T05:00:00.000Z"
+  },
+  {
+    "iso2": "PA",
+    "name": "Panama",
+    "score": 79,
+    "n": 0,
+    "updatedAt": "2024-09-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "RS",
+    "name": "Serbia",
+    "score": 79,
+    "n": 0,
+    "updatedAt": "2025-04-11T04:00:00.000Z"
+  },
+  {
+    "iso2": "MV",
+    "name": "Maldives",
+    "score": 78,
+    "n": 0,
+    "updatedAt": "2025-10-07T04:00:00.000Z"
+  },
+  {
+    "iso2": "MA",
+    "name": "Morocco",
+    "score": 78,
+    "n": 0,
+    "updatedAt": "2025-04-21T04:00:00.000Z"
+  },
+  {
+    "iso2": "NA",
+    "name": "Namibia",
+    "score": 78,
+    "n": 0,
+    "updatedAt": "2024-12-23T05:00:00.000Z"
+  },
+  {
+    "iso2": "OM",
+    "name": "Oman",
+    "score": 78,
+    "n": 0,
+    "updatedAt": "2024-11-04T05:00:00.000Z"
+  },
+  {
+    "iso2": "TH",
+    "name": "Thailand",
+    "score": 78,
+    "n": 0,
+    "updatedAt": "2025-07-25T04:00:00.000Z"
+  },
+  {
+    "iso2": "UY",
+    "name": "Uruguay",
+    "score": 78,
+    "n": 0,
+    "updatedAt": "2025-05-07T04:00:00.000Z"
+  },
+  {
+    "iso2": "SE",
+    "name": "Sweden",
+    "score": 77,
+    "n": 0,
+    "updatedAt": "2024-07-24T04:00:00.000Z"
+  },
+  {
+    "iso2": "BH",
+    "name": "Bahrain",
+    "score": 76,
+    "n": 0,
+    "updatedAt": "2024-09-09T04:00:00.000Z"
+  },
+  {
+    "iso2": "CL",
+    "name": "Chile",
+    "score": 76,
+    "n": 0,
+    "updatedAt": "2025-01-16T05:00:00.000Z"
+  },
+  {
+    "iso2": "ID",
+    "name": "Indonesia",
+    "score": 76,
+    "n": 0,
+    "updatedAt": "2025-04-30T04:00:00.000Z"
+  },
+  {
+    "iso2": "ES",
+    "name": "Spain",
+    "score": 76,
+    "n": 0,
+    "updatedAt": "2025-05-12T04:00:00.000Z"
+  },
+  {
+    "iso2": "BS",
+    "name": "Bahamas",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-03-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "BE",
+    "name": "Belgium",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-05-22T04:00:00.000Z"
+  },
+  {
+    "iso2": "BJ",
+    "name": "Benin",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2024-05-24T04:00:00.000Z"
+  },
+  {
+    "iso2": "CM",
+    "name": "Cameroon",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2024-12-18T05:00:00.000Z"
+  },
+  {
+    "iso2": "DK",
+    "name": "Denmark",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2024-09-17T04:00:00.000Z"
+  },
+  {
+    "iso2": "DJ",
+    "name": "Djibouti",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-03-06T05:00:00.000Z"
+  },
+  {
+    "iso2": "FR",
+    "name": "France",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-05-28T04:00:00.000Z"
+  },
+  {
+    "iso2": "DE",
+    "name": "Germany",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-05-13T04:00:00.000Z"
+  },
+  {
+    "iso2": "GN",
+    "name": "Guinea",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2024-12-12T05:00:00.000Z"
+  },
+  {
+    "iso2": "IN",
+    "name": "India",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-06-16T04:00:00.000Z"
+  },
+  {
+    "iso2": "IT",
+    "name": "Italy",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-05-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "CI",
+    "name": "Ivory Coast",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2024-04-08T04:00:00.000Z"
+  },
+  {
+    "iso2": "MZ",
+    "name": "Mozambique",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-06-16T04:00:00.000Z"
+  },
+  {
+    "iso2": "PH",
+    "name": "Philippines",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-05-08T04:00:00.000Z"
+  },
+  {
+    "iso2": "SA",
+    "name": "Saudi Arabia",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2024-09-09T04:00:00.000Z"
+  },
+  {
+    "iso2": "TG",
+    "name": "Togo",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2024-11-07T05:00:00.000Z"
+  },
+  {
+    "iso2": "AE",
+    "name": "United Arab Emirates",
+    "score": 75,
+    "n": 0,
+    "updatedAt": "2025-08-08T04:00:00.000Z"
+  },
+  {
+    "iso2": "AD",
+    "name": "Andorra",
+    "score": 74,
+    "n": 0,
+    "updatedAt": "2025-08-12T04:00:00.000Z"
+  },
+  {
+    "iso2": "CU",
+    "name": "Cuba",
+    "score": 74,
+    "n": 0,
+    "updatedAt": "2025-05-07T04:00:00.000Z"
+  },
+  {
+    "iso2": "GQ",
+    "name": "Equatorial Guinea",
+    "score": 74,
+    "n": 0,
+    "updatedAt": "2025-10-07T04:00:00.000Z"
+  },
+  {
+    "iso2": "GA",
+    "name": "Gabon",
+    "score": 74,
+    "n": 0,
+    "updatedAt": "2024-12-18T05:00:00.000Z"
+  },
+  {
+    "iso2": "XK",
+    "name": "Kosovo",
+    "score": 74,
+    "n": 0,
+    "updatedAt": "2024-12-02T05:00:00.000Z"
+  },
+  {
+    "iso2": "NL",
+    "name": "Netherlands",
+    "score": 74,
+    "n": 0,
+    "updatedAt": "2024-08-09T04:00:00.000Z"
+  },
+  {
+    "iso2": "EG",
+    "name": "Egypt",
+    "score": 73,
+    "n": 0,
+    "updatedAt": "2025-07-15T04:00:00.000Z"
+  },
+  {
+    "iso2": "ER",
+    "name": "Eritrea",
+    "score": 73,
+    "n": 0,
+    "updatedAt": "2023-07-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "LR",
+    "name": "Liberia",
+    "score": 73,
+    "n": 0,
+    "updatedAt": "2023-07-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "PE",
+    "name": "Peru",
+    "score": 73,
+    "n": 0,
+    "updatedAt": "2025-05-16T04:00:00.000Z"
+  },
+  {
+    "iso2": "SB",
+    "name": "Solomon Islands",
+    "score": 73,
+    "n": 0,
+    "updatedAt": "2025-04-29T04:00:00.000Z"
+  },
+  {
+    "iso2": "GH",
+    "name": "Ghana",
+    "score": 72,
+    "n": 0,
+    "updatedAt": "2025-04-08T04:00:00.000Z"
+  },
+  {
+    "iso2": "CG",
+    "name": "Republic of the Congo",
+    "score": 72,
+    "n": 0,
+    "updatedAt": "2024-10-02T04:00:00.000Z"
+  },
+  {
+    "iso2": "ZA",
+    "name": "South Africa",
+    "score": 72,
+    "n": 0,
+    "updatedAt": "2025-05-27T04:00:00.000Z"
+  },
+  {
+    "iso2": "DZ",
+    "name": "Algeria",
+    "score": 71,
+    "n": 0,
+    "updatedAt": "2024-09-26T04:00:00.000Z"
+  },
+  {
+    "iso2": "GB",
+    "name": "United Kingdom",
+    "score": 71,
+    "n": 0,
+    "updatedAt": "2025-05-08T04:00:00.000Z"
+  },
+  {
+    "iso2": "HK",
+    "name": "Hong Kong",
+    "score": 70,
+    "n": 0,
+    "updatedAt": "2024-11-27T05:00:00.000Z"
+  },
+  {
+    "iso2": "AI",
+    "name": "Anguilla",
+    "score": 69,
+    "n": 0,
+    "updatedAt": "2024-11-27T05:00:00.000Z"
+  },
+  {
+    "iso2": "AQ",
+    "name": "Antarctica",
+    "score": 69,
+    "n": 0,
+    "updatedAt": "2025-09-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "TC",
+    "name": "Turks and Caicos Islands",
+    "score": 69,
+    "n": 0,
+    "updatedAt": "2025-03-04T05:00:00.000Z"
+  },
+  {
+    "iso2": "KE",
+    "name": "Kenya",
+    "score": 68,
+    "n": 0,
+    "updatedAt": "2025-03-17T04:00:00.000Z"
+  },
+  {
+    "iso2": "BR",
+    "name": "Brazil",
+    "score": 67,
+    "n": 0,
+    "updatedAt": "2025-05-29T04:00:00.000Z"
+  },
+  {
+    "iso2": "GL",
+    "name": "Greenland",
+    "score": 66,
+    "n": 0,
+    "updatedAt": "2024-10-29T04:00:00.000Z"
+  },
+  {
+    "iso2": "GT",
+    "name": "Guatemala",
+    "score": 62,
+    "n": 0,
+    "updatedAt": "2024-12-30T05:00:00.000Z"
+  },
+  {
+    "iso2": "HN",
+    "name": "Honduras",
+    "score": 62,
+    "n": 0,
+    "updatedAt": "2024-12-10T05:00:00.000Z"
+  },
+  {
+    "iso2": "JM",
+    "name": "Jamaica",
+    "score": 62,
+    "n": 0,
+    "updatedAt": "2025-11-03T05:00:00.000Z"
+  },
+  {
+    "iso2": "NI",
+    "name": "Nicaragua",
+    "score": 62,
+    "n": 0,
+    "updatedAt": "2024-12-13T05:00:00.000Z"
+  },
+  {
+    "iso2": "BD",
+    "name": "Bangladesh",
+    "score": 61,
+    "n": 0,
+    "updatedAt": "2025-04-18T04:00:00.000Z"
+  },
+  {
+    "iso2": "BI",
+    "name": "Burundi",
+    "score": 61,
+    "n": 0,
+    "updatedAt": "2025-04-29T04:00:00.000Z"
+  },
+  {
+    "iso2": "ET",
+    "name": "Ethiopia",
+    "score": 61,
+    "n": 0,
+    "updatedAt": "2023-07-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "GW",
+    "name": "Guinea-Bissau",
+    "score": 61,
+    "n": 0,
+    "updatedAt": "2025-03-24T04:00:00.000Z"
+  },
+  {
+    "iso2": "MG",
+    "name": "Madagascar",
+    "score": 61,
+    "n": 0,
+    "updatedAt": "2025-09-27T04:00:00.000Z"
+  },
+  {
+    "iso2": "NP",
+    "name": "Nepal",
+    "score": 61,
+    "n": 0,
+    "updatedAt": "2025-09-11T04:00:00.000Z"
+  },
+  {
+    "iso2": "MX",
+    "name": "Mexico",
+    "score": 60,
+    "n": 0
+  },
+  {
+    "iso2": "TZ",
+    "name": "Tanzania",
+    "score": 60,
+    "n": 0,
+    "updatedAt": "2025-10-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "TT",
+    "name": "Trinidad and Tobago",
+    "score": 60,
+    "n": 0,
+    "updatedAt": "2025-05-07T04:00:00.000Z"
+  },
+  {
+    "iso2": "CO",
+    "name": "Colombia",
+    "score": 58,
+    "n": 0,
+    "updatedAt": "2025-04-17T04:00:00.000Z"
+  },
+  {
+    "iso2": "GY",
+    "name": "Guyana",
+    "score": 58,
+    "n": 0,
+    "updatedAt": "2025-05-12T04:00:00.000Z"
+  },
+  {
+    "iso2": "US",
+    "name": "United States",
+    "score": 58,
+    "n": 0
+  },
+  {
+    "iso2": "CD",
+    "name": "DR Congo",
+    "score": 56,
+    "n": 0,
+    "updatedAt": "2025-08-12T04:00:00.000Z"
+  },
+  {
+    "iso2": "MR",
+    "name": "Mauritania",
+    "score": 56,
+    "n": 0,
+    "updatedAt": "2025-07-15T04:00:00.000Z"
+  },
+  {
+    "iso2": "MM",
+    "name": "Myanmar",
+    "score": 56,
+    "n": 0
+  },
+  {
+    "iso2": "NG",
+    "name": "Nigeria",
+    "score": 56,
+    "n": 0,
+    "updatedAt": "2025-07-15T04:00:00.000Z"
+  },
+  {
+    "iso2": "PK",
+    "name": "Pakistan",
+    "score": 56,
+    "n": 0,
+    "updatedAt": "2025-03-07T05:00:00.000Z"
+  },
+  {
+    "iso2": "PS",
+    "name": "Palestine",
+    "score": 56,
+    "n": 0
+  },
+  {
+    "iso2": "PG",
+    "name": "Papua New Guinea",
+    "score": 56,
+    "n": 0,
+    "updatedAt": "2025-04-29T04:00:00.000Z"
+  },
+  {
+    "iso2": "TR",
+    "name": "Türkiye",
+    "score": 56,
+    "n": 0
+  },
+  {
+    "iso2": "UG",
+    "name": "Uganda",
+    "score": 56,
+    "n": 0,
+    "updatedAt": "2025-04-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "VA",
+    "name": "Vatican City",
+    "score": 56,
+    "n": 0
+  },
+  {
+    "iso2": "AS",
+    "name": "American Samoa",
+    "score": 54,
+    "n": 0
+  },
+  {
+    "iso2": "TD",
+    "name": "Chad",
+    "score": 54,
+    "n": 0,
+    "updatedAt": "2025-03-18T04:00:00.000Z"
+  },
+  {
+    "iso2": "SM",
+    "name": "San Marino",
+    "score": 54,
+    "n": 0
+  },
+  {
+    "iso2": "CV",
+    "name": "Cape Verde",
+    "score": 53,
+    "n": 0
+  },
+  {
+    "iso2": "MP",
+    "name": "Northern Mariana Islands",
+    "score": 53,
+    "n": 0
+  },
+  {
+    "iso2": "MF",
+    "name": "Saint Martin",
+    "score": 53,
+    "n": 0
+  },
+  {
+    "iso2": "CN",
+    "name": "China",
+    "score": 52,
+    "n": 0
+  },
+  {
+    "iso2": "NC",
+    "name": "New Caledonia",
+    "score": 51,
+    "n": 0,
+    "updatedAt": "2024-06-04T04:00:00.000Z"
+  },
+  {
+    "iso2": "AX",
+    "name": "Åland Islands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "BV",
+    "name": "Bouvet Island",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "IO",
+    "name": "British Indian Ocean Territory",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "BQ",
+    "name": "Caribbean Netherlands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "CX",
+    "name": "Christmas Island",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "CC",
+    "name": "Cocos (Keeling) Islands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "CK",
+    "name": "Cook Islands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "FK",
+    "name": "Falkland Islands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "TF",
+    "name": "French Southern and Antarctic Lands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "GI",
+    "name": "Gibraltar",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "GP",
+    "name": "Guadeloupe",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "GU",
+    "name": "Guam",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "GG",
+    "name": "Guernsey",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "HM",
+    "name": "Heard Island and McDonald Islands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "JE",
+    "name": "Jersey",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "MQ",
+    "name": "Martinique",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "YT",
+    "name": "Mayotte",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "MC",
+    "name": "Monaco",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "NU",
+    "name": "Niue",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "NF",
+    "name": "Norfolk Island",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "PN",
+    "name": "Pitcairn Islands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "PR",
+    "name": "Puerto Rico",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "RE",
+    "name": "Réunion",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "BL",
+    "name": "Saint Barthélemy",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "SH",
+    "name": "Saint Helena, Ascension and Tristan da Cunha",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "PM",
+    "name": "Saint Pierre and Miquelon",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "GS",
+    "name": "South Georgia",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "SJ",
+    "name": "Svalbard and Jan Mayen",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "TK",
+    "name": "Tokelau",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "UM",
+    "name": "United States Minor Outlying Islands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "VI",
+    "name": "United States Virgin Islands",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "WF",
+    "name": "Wallis and Futuna",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "EH",
+    "name": "Western Sahara",
+    "score": 50,
+    "n": 0
+  },
+  {
+    "iso2": "IL",
+    "name": "Israel",
+    "score": 48,
+    "n": 0
+  },
+  {
+    "iso2": "AR",
+    "name": "Argentina",
+    "score": 47,
+    "n": 0,
+    "updatedAt": "2025-05-12T04:00:00.000Z"
+  },
+  {
+    "iso2": "FO",
+    "name": "Faroe Islands",
+    "score": 45,
+    "n": 0
+  },
+  {
+    "iso2": "MO",
+    "name": "Macau",
+    "score": 45,
+    "n": 0,
+    "updatedAt": "2024-11-27T05:00:00.000Z"
+  },
+  {
+    "iso2": "HT",
+    "name": "Haiti",
+    "score": 44,
+    "n": 0,
+    "updatedAt": "2025-07-15T04:00:00.000Z"
+  },
+  {
+    "iso2": "IM",
+    "name": "Isle of Man",
+    "score": 44,
+    "n": 0
+  },
+  {
+    "iso2": "UA",
+    "name": "Ukraine",
+    "score": 43,
+    "n": 0,
+    "updatedAt": "2024-11-14T05:00:00.000Z"
+  },
+  {
+    "iso2": "LB",
+    "name": "Lebanon",
+    "score": 42,
+    "n": 0,
+    "updatedAt": "2025-07-03T04:00:00.000Z"
+  },
+  {
+    "iso2": "BF",
+    "name": "Burkina Faso",
+    "score": 38,
+    "n": 0,
+    "updatedAt": "2025-04-16T04:00:00.000Z"
+  },
+  {
+    "iso2": "SO",
+    "name": "Somalia",
+    "score": 38,
+    "n": 0,
+    "updatedAt": "2025-05-14T04:00:00.000Z"
+  },
+  {
+    "iso2": "SS",
+    "name": "South Sudan",
+    "score": 38,
+    "n": 0,
+    "updatedAt": "2025-03-08T05:00:00.000Z"
+  },
+  {
+    "iso2": "SY",
+    "name": "Syria",
+    "score": 38,
+    "n": 0,
+    "updatedAt": "2025-07-23T04:00:00.000Z"
+  },
+  {
+    "iso2": "BY",
+    "name": "Belarus",
+    "score": 37,
+    "n": 0,
+    "updatedAt": "2025-08-28T04:00:00.000Z"
+  },
+  {
+    "iso2": "IQ",
+    "name": "Iraq",
+    "score": 37,
+    "n": 0,
+    "updatedAt": "2025-07-17T04:00:00.000Z"
+  },
+  {
+    "iso2": "LY",
+    "name": "Libya",
+    "score": 37,
+    "n": 0,
+    "updatedAt": "2025-07-16T04:00:00.000Z"
+  },
+  {
+    "iso2": "AF",
+    "name": "Afghanistan",
+    "score": 35,
+    "n": 0,
+    "updatedAt": "2025-01-13T05:00:00.000Z"
+  },
+  {
+    "iso2": "CF",
+    "name": "Central African Republic",
+    "score": 35,
+    "n": 0,
+    "updatedAt": "2024-12-26T05:00:00.000Z"
+  },
+  {
+    "iso2": "IR",
+    "name": "Iran",
+    "score": 35,
+    "n": 0,
+    "updatedAt": "2025-03-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "ML",
+    "name": "Mali",
+    "score": 35,
+    "n": 0,
+    "updatedAt": "2025-10-30T04:00:00.000Z"
+  },
+  {
+    "iso2": "NE",
+    "name": "Niger",
+    "score": 35,
+    "n": 0,
+    "updatedAt": "2025-10-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "SD",
+    "name": "Sudan",
+    "score": 35,
+    "n": 0,
+    "updatedAt": "2025-10-15T04:00:00.000Z"
+  },
+  {
+    "iso2": "YE",
+    "name": "Yemen",
+    "score": 35,
+    "n": 0,
+    "updatedAt": "2025-03-31T04:00:00.000Z"
+  },
+  {
+    "iso2": "RU",
+    "name": "Russia",
+    "score": 33,
+    "n": 0,
+    "updatedAt": "2025-05-08T04:00:00.000Z"
+  },
+  {
+    "iso2": "VE",
+    "name": "Venezuela",
+    "score": 33,
+    "n": 0,
+    "updatedAt": "2025-05-12T04:00:00.000Z"
+  },
+  {
+    "iso2": "KP",
+    "name": "North Korea",
+    "score": 29,
+    "n": 0,
+    "updatedAt": "2025-04-29T04:00:00.000Z"
+  }
+]
