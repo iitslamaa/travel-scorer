@@ -1,8 +1,13 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // Transpile our shared workspace package so Vercel can bundle it
-  transpilePackages: ['@travel-af/shared'],
+  // Transpile our shared workspace packages so Next/Vercel can bundle them
+  transpilePackages: [
+    'react-native',
+    'react-native-web',
+    '@travel-af/data',
+    '@travel-af/ui',
+  ],
 
   // Allow importing code from outside this app's directory (monorepo)
   experimental: {
