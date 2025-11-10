@@ -1,0 +1,5 @@
+[
+  {"name":"Japan","iso2":"JP","score":86,"categories":{"safety":88,"affordability":60,"seasonality":75},"lastUpdated":"2025-11-01"},
+  {"name":"Mexico","iso2":"MX","score":72,"categories":{"safety":55,"affordability":80,"seasonality":70},"lastUpdated":"2025-11-01"},
+  {"name":"Jordan","iso2":"JO","score":65,"categories":{"safety":70,"affordability":65,"seasonality":60},"lastUpdated":"2025-11-01"}
+]
