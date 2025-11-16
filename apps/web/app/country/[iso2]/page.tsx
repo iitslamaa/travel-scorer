@@ -9,6 +9,7 @@ import { TravelSafeSection } from '@/lib/display/TravelSafeSection';
 import { SoloFemaleSection } from '@/lib/display/SoloFemaleSection';
 import { SeasonalitySection } from '@/lib/display/SeasonalitySection';
 import { ScorePill } from '@/lib/display/ScorePill';
+import { VisaSection } from './components/VisaSection';
 
 // --- helpers hoisted to module scope to avoid defining components during render
 function factorNumbersFromRows(rows: FactRow[], key: FactRow['key']) {
@@ -100,55 +101,6 @@ function describeSeasonalityFM(f: Partial<FactsExtra>) {
   return parts.join(' ');
 }
 
-function titleForVisaType(t?: FactsExtra['visaType']) {
-  switch (t) {
-    case 'visa_free': return 'Visa-free';
-    case 'voa': return 'Visa on arrival';
-    case 'evisa': return 'eVisa';
-    case 'visa_required': return 'Visa required';
-    case 'ban': return 'Entry not permitted';
-    default: return undefined;
-  }
-}
-function describeVisa(f: Partial<FactsExtra>, raw?: number) {
-  const rounded = typeof raw === 'number' ? Math.round(raw) : undefined;
-  const baseType = titleForVisaType(f.visaType);
-  let kind = baseType;
-
-  // Infer free/paid wording for VOA/eVisa using fee or score bands
-  const hasFee = typeof f.visaFeeUsd === 'number' && f.visaFeeUsd > 0;
-  const isFree = typeof f.visaFeeUsd === 'number' && f.visaFeeUsd === 0;
-
-  if (f.visaType === 'voa') {
-    if (isFree || (!hasFee && typeof rounded === 'number' && rounded >= 90)) {
-      kind = 'Visa on arrival — free';
-    } else if (hasFee) {
-      kind = 'Visa on arrival — paid';
-    }
-  } else if (f.visaType === 'evisa') {
-    if (isFree || (!hasFee && typeof rounded === 'number' && rounded >= 60)) {
-      kind = 'Free eVisa/ETA';
-    } else if (hasFee) {
-      kind = 'eVisa/ETA — paid';
-    }
-  }
-
-  const days = typeof f.visaAllowedDays === 'number' ? `${Math.round(f.visaAllowedDays)} days` : undefined;
-  const fee = hasFee ? `fee about $${Math.round(f.visaFeeUsd as number)}` : undefined;
-  const bits = [kind, days, fee].filter(Boolean).join(' · ');
-  const fallback = typeof rounded === 'number' ? `Visa ease score ${rounded}` : 'Visa info not available';
-  const note = f.visaNotes ? ` ${f.visaNotes}` : '';
-  return (bits || fallback) + note;
-}
-
-function scoreBadgeClass(n?: number) {
-  if (typeof n !== 'number') return 'bg-zinc-100 text-zinc-700 border-zinc-200';
-  if (n >= 80) return 'bg-green-100 text-green-800 border-green-300';
-  if (n >= 60) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-  if (n > 0)   return 'bg-red-100 text-red-800 border-red-300';
-  return 'bg-black text-white border-black';
-}
-
 // Minimal shape returned by /api/countries that we use on this page
 type CountryRowLite = {
   iso2: string;
@@ -185,7 +137,7 @@ const W = {
   infrastructure: 0.05,
 } as const;
 
-type FactRow = {
+export type FactRow = {
   key: keyof typeof W;
   label: string;
   raw?: number;       // 0..100
@@ -731,37 +683,12 @@ export default async function CountryPage({ params }: PageProps) {
             <section id="visa" className="scroll-mt-24 card p-4">
               <header className="flex items-baseline justify-between">
                 <h4 className="font-medium">Visa ease (US passport)</h4>
-                <div className="text-sm muted">Raw: {rows.find(r=>r.key==='visa')?.raw ?? '—'} · Weight: {Math.round((rows.find(r=>r.key==='visa')?.weight ?? 0)*100)}%</div>
+                <div className="text-sm muted">
+                  Raw: {rows.find((r) => r.key === 'visa')?.raw ?? '—'} · Weight:{' '}
+                  {Math.round((rows.find((r) => r.key === 'visa')?.weight ?? 0) * 100)}%
+                </div>
               </header>
-              {(() => {
-                const raw = rows.find(r => r.key === 'visa')?.raw;
-                const easeNum = typeof raw === 'number' ? Math.round(raw) : undefined;
-                return (
-                  <div className="mt-2 flex items-center gap-2">
-                    <ScorePill value={easeNum} />
-                    <span className="muted" aria-hidden="true">|</span>
-                    <VisaBadge
-                      visaType={(facts as FactsExtra)?.visaType}
-                      ease={easeNum}
-                      feeUsd={typeof (facts as FactsExtra)?.visaFeeUsd === 'number'
-                        ? Number((facts as FactsExtra).visaFeeUsd)
-                        : undefined}
-                    />
-                  </div>
-                );
-              })()}
-              <p className="mt-2 text-sm leading-6">
-                {describeVisa(facts as Partial<FactsExtra>, rows.find(r=>r.key==='visa')?.raw)}
-                {(facts as FactsExtra)?.visaSource ? (
-                  <> {' '}<a className="underline" href={(facts as FactsExtra).visaSource} target="_blank" rel="noopener noreferrer">Source</a></>
-                ) : null}
-              </p>
-              <ul className="mt-2 text-sm list-disc ml-6">
-                {(facts as FactsExtra)?.visaType && (<li>Type: {titleForVisaType((facts as FactsExtra).visaType)}</li>)}
-                {typeof (facts as FactsExtra)?.visaAllowedDays === 'number' && (<li>Allowed stay: {Math.round(Number((facts as FactsExtra).visaAllowedDays))} days</li>)}
-                {typeof (facts as FactsExtra)?.visaFeeUsd === 'number' && (<li>Approx. fee: {'$' + Math.round(Number((facts as FactsExtra).visaFeeUsd)).toLocaleString()}</li>)}
-                {(facts as FactsExtra)?.visaNotes && (<li>Notes: {(facts as FactsExtra).visaNotes}</li>)}
-              </ul>
+              <VisaSection rows={rows} facts={facts} />
               {renderFactorBreakdown(rows, 'visa')}
             </section>
 
