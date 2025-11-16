@@ -7,9 +7,9 @@ import { AdvisoryBadge } from '@/lib/display/AdvisoryBadge';
 import { VisaBadge } from '@/lib/display/VisaBadge';
 import { TravelSafeSection } from '@/lib/display/TravelSafeSection';
 import { SoloFemaleSection } from '@/lib/display/SoloFemaleSection';
-import { SeasonalitySection } from '@/lib/display/SeasonalitySection';
 import { ScorePill } from '@/lib/display/ScorePill';
 import { VisaSection } from './components/VisaSection';
+import { Seasonality } from './components/Seasonality';
 
 // --- helpers hoisted to module scope to avoid defining components during render
 function factorNumbersFromRows(rows: FactRow[], key: FactRow['key']) {
@@ -76,6 +76,7 @@ type FactsExtra = CountryFacts & {
   fmSeasonalityTodayScore?: number;              // 0..100
   fmSeasonalityTodayLabel?: 'best' | 'good' | 'shoulder' | 'poor';
   fmSeasonalitySource?: string;
+  fmSeasonalityNotes?: string;
 };
 
 function monthName(n: number) {
@@ -657,22 +658,25 @@ export default async function CountryPage({ params }: PageProps) {
             {/* Seasonality */}
             <section id="seasonality" className="scroll-mt-24 card p-4">
               <header className="flex items-baseline justify-between">
-                {/* Hide duplicate title; keep metrics on the right */}
-                <h4 className="font-medium sr-only">Seasonality (now)</h4>
+                <h4 className="font-medium flex items-center gap-2">
+                  <span>📅 Seasonality</span>
+                </h4>
                 <div className="text-sm muted">
-                  Raw: {rows.find(r=>r.key==='seasonality')?.raw ?? '—'} · Weight: {Math.round((rows.find(r=>r.key==='seasonality')?.weight ?? 0)*100)}%
+                  Raw: {rows.find(r=>r.key==='seasonality')?.raw ?? '—'} · Weight:{' '}
+                  {Math.round((rows.find(r=>r.key==='seasonality')?.weight ?? 0) * 100)}%
                 </div>
               </header>
 
               {/* Single headline + summary comes from the component */}
-              <SeasonalitySection
-                raw={rows.find(r=>r.key==='seasonality')?.raw}
+              <Seasonality
+                rows={rows}
                 fm={{
                   best: fxFacts?.fmSeasonalityBestMonths,
                   todayLabel: fxFacts?.fmSeasonalityTodayLabel,
                   hasDual: fxFacts?.fmSeasonalityHasDualPeak,
                   areas: fxFacts?.fmSeasonalityAreas,
                   source: fxFacts?.fmSeasonalitySource,
+                  notes: fxFacts?.fmSeasonalityNotes,
                 }}
               />
 
@@ -682,7 +686,9 @@ export default async function CountryPage({ params }: PageProps) {
             {/* Visa */}
             <section id="visa" className="scroll-mt-24 card p-4">
               <header className="flex items-baseline justify-between">
-                <h4 className="font-medium">Visa ease (US passport)</h4>
+                <h4 className="font-medium flex items-center gap-2">
+                  <span>🛂 Visa ease (US passport)</span>
+                </h4>
                 <div className="text-sm muted">
                   Raw: {rows.find((r) => r.key === 'visa')?.raw ?? '—'} · Weight:{' '}
                   {Math.round((rows.find((r) => r.key === 'visa')?.weight ?? 0) * 100)}%

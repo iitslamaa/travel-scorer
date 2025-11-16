@@ -2,6 +2,7 @@
 // apps/web/lib/providers/frequentmiler.ts
 import { COUNTRY_SEEDS } from '@/lib/seed';
 import { nameToIso2 } from '@/lib/countryMatch';
+import { FM_NAME_OVERRIDES } from './fmOverrides';
 // Scrape + normalize Frequent Miler's country-by-month table
 // URL: https://frequentmiler.com/the-best-time-of-year-to-go-to-every-country-in-the-world-in-one-table/
 // Output: rows with country, area/region (if present), and months (1..12) with a check mark.
@@ -226,6 +227,12 @@ export function fmByIso2(group: Record<string, { area?: string; months: number[]
   const lut = buildNameLut();
   for (const countryName of Object.keys(group)) {
     const rows = group[countryName];
+    // 0) Manual override always wins
+    const override = FM_NAME_OVERRIDES[normName(countryName)];
+    if (override) {
+      out.set(override, rows);
+      continue;
+    }
     let iso2 = lut.get(normName(countryName));
     if (!iso2) {
       const guess = nameToIso2(countryName);
