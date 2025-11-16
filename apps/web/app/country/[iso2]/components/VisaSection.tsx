@@ -70,20 +70,35 @@ export function VisaSection({ rows, facts }: VisaSectionProps) {
 
   return (
     <>
-      <div className="mt-2 flex items-center gap-2">
+      <div className="mt-2 flex items-center gap-3">
         <ScorePill value={easeNum} />
-        <span className="muted" aria-hidden="true">
+        <span
+          className="text-xs text-zinc-300"
+          aria-hidden="true"
+        >
           |
         </span>
-        <VisaBadge
-          visaType={visaFacts.visaType}
-          ease={easeNum}
-          feeUsd={
-            typeof visaFacts.visaFeeUsd === 'number'
-              ? Number(visaFacts.visaFeeUsd)
-              : undefined
-          }
-        />
+        <span
+          className={`text-sm font-semibold inline-flex items-center gap-2 ${
+            easeNum == null
+              ? 'text-zinc-700'
+              : easeNum >= 80
+                ? 'text-emerald-800'
+                : easeNum >= 60
+                  ? 'text-amber-700'
+                  : 'text-red-700'
+          }`}
+        >
+          <VisaBadge
+            visaType={visaFacts.visaType}
+            ease={easeNum}
+            feeUsd={
+              typeof visaFacts.visaFeeUsd === 'number'
+                ? Number(visaFacts.visaFeeUsd)
+                : undefined
+            }
+          />
+        </span>
       </div>
       <p className="mt-2 text-sm leading-6">
         {describeVisa(visaFacts, raw)}

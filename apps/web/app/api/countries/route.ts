@@ -9,6 +9,7 @@ import { nameToIso2 } from '@/lib/countryMatch';
 import { gdpPerCapitaUSDMap } from '@/lib/providers/worldbank';
 import { fxLocalPerUSDMapByIso2 } from '@/lib/providers/fx';
 import { fmGroupByCountry, fmByIso2 } from '@/lib/providers/frequentmiler';
+import { FM_SEASONALITY_OVERRIDES } from '@/lib/providers/fmOverrides';
 import { buildVisaIndex } from '@/lib/providers/visa';
 import { estimateDailySpendHotel } from '@/lib/providers/costs';
 import type { DailySpend } from '@/lib/providers/costs';
@@ -47,6 +48,7 @@ type FactsExtraServer = Partial<CountryFacts> & {
   fmSeasonalityTodayScore?: number;              // 0..100
   fmSeasonalityTodayLabel?: 'best' | 'good' | 'shoulder' | 'poor';
   fmSeasonalitySource?: string;
+  fmSeasonalityNotes?: string;
 };
 
 // --- unified scoring helpers (server-side source of truth) ---
@@ -111,9 +113,9 @@ function clusterConsecutiveMonths(months: number[]): number[][] {
 }
 function fmTodayLabel(score?: number): 'best'|'good'|'shoulder'|'poor' {
   if (score == null) return 'shoulder';
-  if (score >= 80) return 'best';
-  if (score >= 70) return 'good';
-  if (score >= 40) return 'shoulder';
+  if (score >= 95) return 'best';
+  if (score >= 75) return 'shoulder';
+  if (score >= 30) return 'good';
   return 'poor';
 }
 
@@ -452,25 +454,60 @@ export async function GET() {
         }
       } catch {}
 
-      // --- Attach Frequent Miler seasonality (best months & today verdict)
+      // --- Attach seasonality: manual overrides first, then Frequent Miler fallback
       try {
-        const fmAreas = fmIsoMap.get(keyUpper) || [];
-        if (fmAreas.length) {
-          const allMonths = Array.from(new Set(fmAreas.flatMap(a => a.months))).sort((a,b)=>a-b);
+        const fxFacts = row.facts as unknown as FactsExtraServer;
+        const override = FM_SEASONALITY_OVERRIDES[keyUpper];
+
+        if (override && override.best && override.best.length) {
+          const allMonths = Array.from(new Set(override.best)).sort((a, b) => a - b);
           const groups = clusterConsecutiveMonths(allMonths);
           const dualPeak = groups.length >= 2;
-          const todayIsBest = allMonths.includes(todayMonth);
-          // simple score: best=100, adjacent=70, else 40
-          const adjacent = allMonths.includes(((todayMonth+10)%12)+1) || allMonths.includes((todayMonth%12)+1);
-          const todayScore = todayIsBest ? 100 : (adjacent ? 70 : 40);
 
-          const fxFacts = row.facts as unknown as FactsExtraServer;
+          const inBest = allMonths.includes(todayMonth);
+          const inShoulder = override.shoulder?.includes(todayMonth) ?? false;
+          const inGood = override.good?.includes(todayMonth) ?? false;
+          const inAvoid = override.avoid?.includes(todayMonth) ?? false;
+
+          let todayScore: number;
+          if (inBest) todayScore = 100;           // peak season
+          else if (inShoulder) todayScore = 80;   // shoulder season
+          else if (inGood) todayScore = 40;       // "only good" season
+          else if (inAvoid) todayScore = 0;       // avoid / low season
+          else todayScore = 50;                   // neutral fallback when month is unclassified
+
           fxFacts.fmSeasonalityBestMonths = allMonths;
-          fxFacts.fmSeasonalityAreas = fmAreas;
+          fxFacts.fmSeasonalityAreas = fxFacts.fmSeasonalityAreas ?? [];
           fxFacts.fmSeasonalityHasDualPeak = dualPeak;
           fxFacts.fmSeasonalityTodayScore = todayScore;
           fxFacts.fmSeasonalityTodayLabel = fmTodayLabel(todayScore);
-          fxFacts.fmSeasonalitySource = 'https://frequentmiler.com/the-best-time-of-year-to-go-to-every-country-in-the-world-in-one-table/';
+          fxFacts.fmSeasonalitySource = 'manual';
+          fxFacts.fmSeasonalityNotes = override.notes;
+          fxFacts.seasonality = todayScore;
+        } else {
+          const fmAreas = fmIsoMap.get(keyUpper) || [];
+          if (fmAreas.length) {
+            const allMonths = Array.from(new Set(fmAreas.flatMap(a => a.months))).sort((a,b)=>a-b);
+            const groups = clusterConsecutiveMonths(allMonths);
+            const dualPeak = groups.length >= 2;
+            const todayIsBest = allMonths.includes(todayMonth);
+            const prevMonth = ((todayMonth + 10) % 12) + 1; // one month before
+            const nextMonth = (todayMonth % 12) + 1;        // one month after
+            const adjacent = allMonths.includes(prevMonth) || allMonths.includes(nextMonth);
+
+            let todayScore: number;
+            if (todayIsBest) todayScore = 100;      // peak season
+            else if (adjacent) todayScore = 80;     // shoulder season
+            else todayScore = 0;                    // off-season / less ideal
+
+            fxFacts.fmSeasonalityBestMonths = allMonths;
+            fxFacts.fmSeasonalityAreas = fmAreas;
+            fxFacts.fmSeasonalityHasDualPeak = dualPeak;
+            fxFacts.fmSeasonalityTodayScore = todayScore;
+            fxFacts.fmSeasonalityTodayLabel = fmTodayLabel(todayScore);
+            fxFacts.fmSeasonalitySource = 'https://frequentmiler.com/the-best-time-of-year-to-go-to-every-country-in-the-world-in-one-table/';
+            fxFacts.seasonality = todayScore;
+          }
         }
       } catch {}
 
