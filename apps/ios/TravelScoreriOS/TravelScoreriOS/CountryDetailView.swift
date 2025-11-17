@@ -43,11 +43,11 @@ struct CountryDetailView: View {
                         .padding(.vertical, 8)
                         .background(
                             Capsule()
-                                .fill(Color.green.opacity(0.2))
+                                .fill(scoreBackgroundColor(for: country.score))
                         )
                         .overlay(
                             Capsule()
-                                .stroke(Color.green.opacity(0.7), lineWidth: 1)
+                                .stroke(scoreBorderColor(for: country.score), lineWidth: 1)
                         )
                 }
                 .padding()
