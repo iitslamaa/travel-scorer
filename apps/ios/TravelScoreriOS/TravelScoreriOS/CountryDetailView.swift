@@ -9,51 +9,38 @@ import SwiftUI
 
 struct CountryDetailView: View {
     @State var country: Country
-    
-    private let arabCountries: Set<String> = [
-        "Saudi Arabia","United Arab Emirates","Qatar","Bahrain","Kuwait","Oman","Yemen",
-        "Jordan","Lebanon","Syria","Iraq","Egypt","Palestine","Morocco","Algeria","Tunisia","Libya"
-    ]
-    
-    enum ArabStatus { case arab(flag: String), nonArab }
-    
-    private var arabStatus: ArabStatus {
-        arabCountries.contains(country.name)
-        ? .arab(flag: country.flagEmoji)
-        : .nonArab
-    }
-    
-    private var arabBadge: (emoji: String, text: String, tint: Color) {
-        switch arabStatus {
-        case .arab (let flag):
-            return(flag, "You have chosen an Arab country.", .green)
-        case .nonArab:
-            return("🌍", "You have chosen a non-Arab country.", .secondary)
-        }
-    }
-    
+    @State private var showFullAdvisory = false
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                // your existing card
+
+                // Main score card (same core info as list, but bigger)
                 CountryScoreCard(
                     name: country.name,
                     score: country.score,
                     advisoryLevel: country.advisoryLevel
                 )
+                .padding(.horizontal)
 
-                // 4) Region badge (visual enum in action)
-                HStack(alignment: .center, spacing: 12) {
-                    Text(arabBadge.emoji)
-                        .font(.system(size: 40))
+                // Flag + basic summary
+                HStack(alignment: .center, spacing: 16) {
+                    Text(country.flagEmoji)
+                        .font(.system(size: 60))
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(arabBadge.text)
-                            .font(.headline)
-                            .foregroundStyle(arabBadge.tint)
+                    VStack(alignment: .leading, spacing: 6) {
                         Text(country.name)
+                            .font(.title2)
+                            .bold()
+
+                        Text("Travelability score: \(country.score)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+
+                        if let adv = country.advisoryLevel {
+                            Text("Advisory: \(adv)")
+                                .font(.subheadline)
+                        }
                     }
 
                     Spacer()
@@ -62,10 +49,195 @@ struct CountryDetailView: View {
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .padding(.horizontal)
+
+                // Travel advisory section
+                if country.advisoryLevel != nil || country.advisorySummary != nil {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Travel advisory")
+                            .font(.headline)
+
+                        if let level = country.advisoryLevel {
+                            Text(level)
+                                .font(.subheadline)
+                                .bold()
+                        }
+
+                        if let summary = country.advisorySummary, !summary.isEmpty {
+                            Text(cleanAdvisory(summary))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(showFullAdvisory ? nil : 3)
+
+                            // Only show toggle if text is long enough
+                            if summary.count > 200 {
+                                Button(action: {
+                                    withAnimation {
+                                        showFullAdvisory.toggle()
+                                    }
+                                }) {
+                                    Text(showFullAdvisory ? "Show less" : "Show more")
+                                        .font(.footnote)
+                                        .fontWeight(.semibold)
+                                }
+                            }
+                        }
+
+                        if let updated = country.advisoryUpdatedAt, !updated.isEmpty {
+                            Text("Last updated: \(updated)")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if let url = country.advisoryUrl {
+                            Link("View official advisory", destination: url)
+                                .font(.footnote)
+                        }
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.thinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .padding(.horizontal)
+                }
+
+                // Seasonality section
+                if let seasonalityScore = country.seasonalityScore {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Seasonality")
+                            .font(.headline)
+
+                        HStack(spacing: 12) {
+                            Text("\(seasonalityScore)")
+                                .font(.system(size: 32, weight: .bold, design: .rounded))
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(country.seasonalityLabel?.capitalized ?? "Current timing")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+
+                                if let months = country.seasonalityBestMonths, !months.isEmpty {
+                                    Text("Best months: \(months.map { String($0) }.joined(separator: ", "))")
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.thinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .padding(.horizontal)
+                }
+
+                // Visa section
+                if country.visaEaseScore != nil || country.visaType != nil {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text("Visa")
+                            .font(.headline)
+
+                        if let type = country.visaType {
+                            Text("Visa type: \(type.replacingOccurrences(of: "_", with: " ").capitalized)")
+                                .font(.subheadline)
+                        }
+
+                        if let ease = country.visaEaseScore {
+                            Text("Visa ease score: \(ease)")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if let days = country.visaAllowedDays {
+                            Text("Allowed stay: up to \(days) days")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if let fee = country.visaFeeUsd {
+                            Text(String(format: "Approx. fee: $%.0f USD", fee))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if let notes = country.visaNotes, !notes.isEmpty {
+                            Text(notes)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        if let url = country.visaSourceUrl {
+                            Link("View official visa source", destination: url)
+                                .font(.footnote)
+                        }
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.thinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .padding(.horizontal)
+                }
+
+                // You can add more sections later: Reddit sentiment, TravelSafe, Solo Female Travel, etc.
             }
             .frame(maxWidth: .infinity, alignment: .top)
+            .padding(.vertical, 16)
         }
         .navigationTitle(country.name)
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+    // Clean up advisory text (fix common mojibake and HTML entities)
+    private func cleanAdvisory(_ text: String) -> String {
+        var s = text
+
+        // Replace non-breaking and weird unicode spaces
+        s = s.replacingOccurrences(of: "\u{00A0}", with: " ")
+        s = s.replacingOccurrences(of: "\u{200B}", with: "")
+        s = s.replacingOccurrences(of: "\u{FEFF}", with: "")
+
+        // Common mojibake fixes
+        s = s.replacingOccurrences(of: "â€™", with: "’")
+        s = s.replacingOccurrences(of: "â€œ", with: "“")
+        s = s.replacingOccurrences(of: "â€", with: "”")
+        s = s.replacingOccurrences(of: "â€“", with: "–")
+        s = s.replacingOccurrences(of: "â€”", with: "—")
+        s = s.replacingOccurrences(of: "â€¦", with: "…")
+        s = s.replacingOccurrences(of: "Â", with: "")
+
+        // HTML entity fixes
+        s = s.replacingOccurrences(of: "&amp;", with: "&")
+        s = s.replacingOccurrences(of: "&quot;", with: "\"")
+        s = s.replacingOccurrences(of: "&apos;", with: "'")
+        s = s.replacingOccurrences(of: "&#39;", with: "'")
+        s = s.replacingOccurrences(of: "&rsquo;", with: "’")
+        s = s.replacingOccurrences(of: "&lsquo;", with: "‘")
+        s = s.replacingOccurrences(of: "&rdquo;", with: "”")
+        s = s.replacingOccurrences(of: "&ldquo;", with: "“")
+        s = s.replacingOccurrences(of: "&hellip;", with: "…")
+        s = s.replacingOccurrences(of: "&mdash;", with: "—")
+        s = s.replacingOccurrences(of: "&ndash;", with: "–")
+
+        // Strip leftover HTML tags (very basic)
+        s = s.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression)
+
+        // Trim weird double-spaces
+        while s.contains("  ") {
+            s = s.replacingOccurrences(of: "  ", with: " ")
+        }
+
+        return s
+    }
+
+#Preview {
+    NavigationStack {
+        CountryDetailView(
+            country: Country(
+                iso2: "JP",
+                name: "Japan",
+                score: 90,
+                advisoryLevel: "Level 1"
+            )
+        )
     }
 }

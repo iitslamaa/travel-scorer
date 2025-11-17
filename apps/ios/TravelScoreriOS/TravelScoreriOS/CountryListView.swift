@@ -7,18 +7,47 @@
 
 import SwiftUI
 
+enum SortOrder {
+    case ascending
+    case descending
+}
+
+struct MapPlaceholderView: View {
+    var body: some View {
+        NavigationStack {
+            Text("Global map view coming soon 🌍")
+                .navigationTitle("Map")
+        }
+    }
+}
+
 struct CountryListView: View {
     @State private var sort: CountrySort = .name
+    @State private var sortOrder: SortOrder = .descending
     @State private var search = ""
     @State private var countries: [Country] = []
+    @State private var showingMap = false
 
     private var filteredAndSorted: [Country] {
         let filtered = countries.filter {
             search.isEmpty || $0.name.localizedCaseInsensitiveContains(search)
         }
+
+        let baseSorted: [Country]
         switch sort {
-        case .name:  return filtered.sorted { $0.name  < $1.name }
-        case .score: return filtered.sorted { $0.score > $1.score }
+        case .name:
+            baseSorted = filtered.sorted {
+                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+            }
+        case .score:
+            baseSorted = filtered.sorted { $0.score < $1.score }
+        }
+
+        switch sortOrder {
+        case .ascending:
+            return baseSorted
+        case .descending:
+            return Array(baseSorted.reversed())
         }
     }
 
@@ -43,17 +72,39 @@ struct CountryListView: View {
         .searchable(text: $search, prompt: "Search countries")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Picker("Sort", selection: $sort) {
-                    ForEach(CountrySort.allCases, id: \.self) { s in
-                        Text(s.rawValue).tag(s)
+                HStack(spacing: 12) {
+                    // Sort picker
+                    Picker("Sort", selection: $sort) {
+                        ForEach(CountrySort.allCases, id: \.self) { s in
+                            Text(s.rawValue).tag(s)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .frame(width: 180)
+
+                    // Sort order button
+                    Button {
+                        sortOrder = (sortOrder == .ascending) ? .descending : .ascending
+                    } label: {
+                        Image(systemName: sortOrder == .ascending ? "arrow.up" : "arrow.down")
+                    }
+
+                    // 🗺️ Map button (future global map view)
+                    Button {
+                        showingMap = true
+                    } label: {
+                        Text("🗺️")
                     }
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 220)
             }
         }
+        .sheet(isPresented: $showingMap) {
+            MapPlaceholderView()
+        }
+        .navigationDestination(for: Country.self) { country in
+            CountryDetailView(country: country)
+        }
         .navigationTitle("TravelAF")
-        // Load from API, fall back to bundled JSON if API fails
         .task {
             do {
                 let apiCountries = try await CountryAPI.fetchCountries()
