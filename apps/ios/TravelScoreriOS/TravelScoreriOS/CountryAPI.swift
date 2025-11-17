@@ -8,38 +8,66 @@
 import Foundation
 
 enum CountryAPI {
-    static let baseURL = URL(string: "https://travel-scorer.vercel.app")! // or your local URL
+    static let baseURL = URL(string: "https://travel-scorer.vercel.app")!
     static var countriesURL: URL { baseURL.appendingPathComponent("api/countries") }
 
     static func fetchCountries() async throws -> [Country] {
+        print("🔵 [CountryAPI] Fetching:", countriesURL.absoluteString)
+
         let (data, resp) = try await URLSession.shared.data(from: countriesURL)
-        guard let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+
+        guard let http = resp as? HTTPURLResponse else {
+            print("🔴 [CountryAPI] Non-HTTP response")
             throw URLError(.badServerResponse)
         }
 
-        // debug peek
-        if let s = String(data: data, encoding: .utf8) { print("🌐 API sample:", s.prefix(400)) }
+        print("🔵 [CountryAPI] Status:", http.statusCode)
 
-        // ✅ your API is a top-level array
-        let dtos = try JSONDecoder().decode([CountryDTO].self, from: data)
-        return dtos.map {
+        guard (200..<300).contains(http.statusCode) else {
+            if let body = String(data: data, encoding: .utf8) {
+                print("🔴 [CountryAPI] Bad status \(http.statusCode). Body:", body.prefix(400))
+            }
+            throw URLError(.badServerResponse)
+        }
+
+        #if DEBUG
+        if let s = String(data: data, encoding: .utf8) {
+            print("🌐 [CountryAPI] Sample body:", s.prefix(400))
+        }
+        #endif
+
+        let decoder = JSONDecoder()
+
+        // ⬇️ KEY CHANGE: decode the array directly
+        let dtos = try decoder.decode([CountryDTO].self, from: data)
+        print("🟢 [CountryAPI] Decoded \(dtos.count) DTOs")
+
+        let countries = dtos.map { dto in
             Country(
-                name: $0.name,
-                score: deriveScore(from: $0.score, advisoryLevel: $0.advisoryLevelNumber),
-                advisoryLevel: $0.advisoryLevelText
+                iso2: dto.iso2,
+                name: dto.name,
+                score: dto.score ?? 0,
+                advisoryLevel: dto.advisoryLevelText,
+                advisorySummary: dto.advisorySummary,
+                advisoryUpdatedAt: dto.advisoryUpdatedAt,
+                advisoryUrl: dto.advisoryUrl,
+                seasonalityScore: dto.seasonalityScore,
+                seasonalityLabel: dto.seasonalityLabel,
+                seasonalityBestMonths: dto.seasonalityBestMonths,
+                visaEaseScore: dto.visaEaseScore,
+                visaType: dto.visaType,
+                visaAllowedDays: dto.visaAllowedDays,
+                visaFeeUsd: dto.visaFeeUsd,
+                visaNotes: dto.visaNotes,
+                visaSourceUrl: dto.visaSourceUrl,
+                dailySpendTotalUsd: dto.dailySpendTotalUsd,
+                dailySpendHotelUsd: dto.dailySpendHotelUsd,
+                dailySpendFoodUsd: dto.dailySpendFoodUsd,
+                dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd
             )
         }
-    }
 
-    private static func deriveScore(from direct: Int?, advisoryLevel: Int?) -> Int {
-        if let v = direct, (0...100).contains(v) { return v }
-        switch advisoryLevel {
-        case 1: return 90
-        case 2: return 70
-        case 3: return 50
-        case 4: return 30
-        case .none: return 60
-        case .some(let n): return max(0, min(100, 100 - n * 20))
-        }
+        print("🟢 [CountryAPI] Mapped \(countries.count) countries")
+        return countries
     }
 }
