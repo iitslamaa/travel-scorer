@@ -26,6 +26,7 @@ struct CountryDTO: Decodable {
     let seasonalityScore: Int?        // 0...100 (today)
     let seasonalityLabel: String?     // "best" | "good" | "shoulder" | "poor"
     let seasonalityBestMonths: [Int]? // 1..12
+    let seasonalityNotes: String?     // extra description from FM / overrides
 
     /// Visa (US passport)
     let visaEaseScore: Int?           // 0...100
@@ -168,6 +169,7 @@ struct CountryDTO: Decodable {
         }
         self.seasonalityLabel = facts?.fmSeasonalityTodayLabel
         self.seasonalityBestMonths = facts?.fmSeasonalityBestMonths
+        self.seasonalityNotes = facts?.fmSeasonalityNotes
 
         // --- Visa (from facts) ---
         if let visaEase = facts?.visaEase {

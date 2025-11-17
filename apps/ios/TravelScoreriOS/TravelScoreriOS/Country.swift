@@ -25,6 +25,7 @@ struct Country: Identifiable, Hashable {
     let seasonalityScore: Int?
     let seasonalityLabel: String?
     let seasonalityBestMonths: [Int]?
+    let seasonalityNotes: String?
 
     // Visa
     let visaEaseScore: Int?
@@ -69,6 +70,7 @@ struct Country: Identifiable, Hashable {
         seasonalityScore: Int? = nil,
         seasonalityLabel: String? = nil,
         seasonalityBestMonths: [Int]? = nil,
+        seasonalityNotes: String? = nil,
         visaEaseScore: Int? = nil,
         visaType: String? = nil,
         visaAllowedDays: Int? = nil,
@@ -92,6 +94,7 @@ struct Country: Identifiable, Hashable {
         self.seasonalityScore = seasonalityScore
         self.seasonalityLabel = seasonalityLabel
         self.seasonalityBestMonths = seasonalityBestMonths
+        self.seasonalityNotes = seasonalityNotes
         self.visaEaseScore = visaEaseScore
         self.visaType = visaType
         self.visaAllowedDays = visaAllowedDays

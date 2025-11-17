@@ -56,6 +56,7 @@ enum CountryAPI {
                 seasonalityScore: dto.seasonalityScore,
                 seasonalityLabel: dto.seasonalityLabel,
                 seasonalityBestMonths: dto.seasonalityBestMonths,
+                seasonalityNotes: dto.seasonalityNotes,
                 visaEaseScore: dto.visaEaseScore,
                 visaType: dto.visaType,
                 visaAllowedDays: dto.visaAllowedDays,
