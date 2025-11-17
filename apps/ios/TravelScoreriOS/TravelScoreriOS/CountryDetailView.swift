@@ -15,37 +15,43 @@ struct CountryDetailView: View {
         ScrollView {
             VStack(spacing: 16) {
 
-                // Main score card (same core info as list, but bigger)
-                CountryScoreCard(
-                    name: country.name,
-                    score: country.score,
-                    advisoryLevel: country.advisoryLevel
-                )
-                .padding(.horizontal)
-
-                // Flag + basic summary
+                // Flag + header summary (main header card)
                 HStack(alignment: .center, spacing: 16) {
+                    // Flag
                     Text(country.flagEmoji)
                         .font(.system(size: 60))
 
+                    // Name + region
                     VStack(alignment: .leading, spacing: 6) {
                         Text(country.name)
                             .font(.title2)
                             .bold()
 
-                        Text("Travelability score: \(country.score)")
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-
-                        if let adv = country.advisoryLevel {
-                            Text("Advisory: \(adv)")
+                        if let regionLabel = country.regionLabel {
+                            Text(regionLabel)
                                 .font(.subheadline)
+                                .foregroundStyle(.secondary)
                         }
                     }
 
                     Spacer()
+
+                    // Big score pill on the right
+                    Text("\(country.score)")
+                        .font(.title2.bold())
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            Capsule()
+                                .fill(Color.green.opacity(0.2))
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(Color.green.opacity(0.7), lineWidth: 1)
+                        )
                 }
                 .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .padding(.horizontal)
@@ -179,13 +185,12 @@ struct CountryDetailView: View {
 
                 // You can add more sections later: Reddit sentiment, TravelSafe, Solo Female Travel, etc.
             }
-            .frame(maxWidth: .infinity, alignment: .top)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
             .padding(.vertical, 16)
         }
         .navigationTitle(country.name)
         .navigationBarTitleDisplayMode(.inline)
     }
-}
 
     // Clean up advisory text (fix common mojibake and HTML entities)
     private func cleanAdvisory(_ text: String) -> String {
@@ -228,6 +233,7 @@ struct CountryDetailView: View {
 
         return s
     }
+}
 
 #Preview {
     NavigationStack {
@@ -236,6 +242,8 @@ struct CountryDetailView: View {
                 iso2: "JP",
                 name: "Japan",
                 score: 90,
+                region: "Asia",
+                subregion: "East Asia",
                 advisoryLevel: "Level 1"
             )
         )

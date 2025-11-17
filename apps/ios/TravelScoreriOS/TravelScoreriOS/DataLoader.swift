@@ -27,6 +27,7 @@ enum DataLoader {
                     iso2: dto.iso2,
                     name: dto.name,
                     score: dto.score ?? 0,
+                    region: dto.region,
                     advisoryLevel: dto.advisoryLevelText
                 )
             }

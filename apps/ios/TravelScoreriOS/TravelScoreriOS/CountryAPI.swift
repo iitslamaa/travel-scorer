@@ -47,6 +47,8 @@ enum CountryAPI {
                 iso2: dto.iso2,
                 name: dto.name,
                 score: dto.score ?? 0,
+                region: dto.region,
+                subregion: dto.subregion,
                 advisoryLevel: dto.advisoryLevelText,
                 advisorySummary: dto.advisorySummary,
                 advisoryUpdatedAt: dto.advisoryUpdatedAt,
