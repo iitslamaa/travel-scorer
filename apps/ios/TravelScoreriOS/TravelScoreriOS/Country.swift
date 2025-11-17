@@ -12,6 +12,8 @@ struct Country: Identifiable, Hashable {
     let iso2: String
     let name: String
     let score: Int
+    let region: String?
+    let subregion: String?
     let advisoryLevel: String?
 
     // Extra details from API
@@ -37,12 +39,29 @@ struct Country: Identifiable, Hashable {
     let dailySpendHotelUsd: Double?
     let dailySpendFoodUsd: Double?
     let dailySpendActivitiesUsd: Double?
-
+    
+    // Nice combined label for UI, similar to web
+    var regionLabel: String? {
+        switch (subregion, region) {
+        case let (sub?, reg?) where sub != reg:
+            // e.g. "Western Europe, Europe" or "South America, Latin America & Caribbean"
+            return "\(sub), \(reg)"
+        case (nil, let reg?):
+            return reg
+        case (let sub?, nil):
+            return sub
+        default:
+            return nil
+        }
+    }
+    
     // Custom initializer to maintain compatibility
     init(
         iso2: String,
         name: String,
         score: Int,
+        region: String? = nil,
+        subregion: String? = nil,
         advisoryLevel: String?,
         advisorySummary: String? = nil,
         advisoryUpdatedAt: String? = nil,
@@ -64,6 +83,8 @@ struct Country: Identifiable, Hashable {
         self.iso2 = iso2
         self.name = name
         self.score = score
+        self.region = region
+        self.subregion = subregion
         self.advisoryLevel = advisoryLevel
         self.advisorySummary = advisorySummary
         self.advisoryUpdatedAt = advisoryUpdatedAt

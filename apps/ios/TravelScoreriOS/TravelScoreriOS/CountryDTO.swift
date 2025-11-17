@@ -10,6 +10,8 @@ import Foundation
 struct CountryDTO: Decodable {
     let iso2: String
     let name: String
+    let region: String?
+    let subregion: String?
 
     /// Final 0...100 Travelability score
     let score: Int?
@@ -46,6 +48,8 @@ struct CountryDTO: Decodable {
     private enum CodingKeys: String, CodingKey {
         case iso2
         case name
+        case region
+        case subregion
 
         // old/easy places to look for a score
         case score, overallScore, rating, value
@@ -101,6 +105,8 @@ struct CountryDTO: Decodable {
 
         self.iso2 = try c.decode(String.self, forKey: .iso2)
         self.name = try c.decode(String.self, forKey: .name)
+        self.region = try c.decodeIfPresent(String.self, forKey: .region)
+        self.subregion = try c.decodeIfPresent(String.self, forKey: .subregion)
 
         // Try lots of shapes for scores: Int, Double, String
         func decodeIntLikeScore(for key: CodingKeys) -> Int? {
