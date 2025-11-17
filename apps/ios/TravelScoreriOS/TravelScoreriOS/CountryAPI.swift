@@ -66,7 +66,8 @@ enum CountryAPI {
                 dailySpendTotalUsd: dto.dailySpendTotalUsd,
                 dailySpendHotelUsd: dto.dailySpendHotelUsd,
                 dailySpendFoodUsd: dto.dailySpendFoodUsd,
-                dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd
+                dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd,
+                travelSafeScore: dto.travelSafeScore
             )
         }
 
