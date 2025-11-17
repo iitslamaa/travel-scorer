@@ -105,6 +105,61 @@ struct CountryDetailView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     .padding(.horizontal)
                 }
+                
+                // Travel safety section — web-style factor card
+                if let safety = country.travelSafeScore {
+                    VStack(alignment: .leading, spacing: 12) {
+                        // Title row
+                        HStack {
+                            Text("Travel safety")
+                                .font(.headline)
+                            Spacer()
+                            Text("TravelSafe · 15%")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+
+                        // Score pill + description
+                        HStack(spacing: 12) {
+                            Text("\(safety)")
+                                .font(.system(size: 22, weight: .bold, design: .rounded))
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 6)
+                                .background(
+                                    Capsule()
+                                        .fill(scoreBackgroundColor(for: safety))
+                                )
+                                .overlay(
+                                    Capsule()
+                                        .stroke(scoreBorderColor(for: safety), lineWidth: 1)
+                                )
+
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(travelSafeHeadline(for: country))
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+
+                                Text(travelSafeBody(for: country))
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+
+                        // Footer row with weight info
+                        HStack(spacing: 12) {
+                            Text("Normalized: \(safety)")
+                            Text("Weight: 15%")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(.thinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .padding(.horizontal)
+                }
 
                 // Seasonality section — web-style factor card
                 if let seasonalityScore = country.seasonalityScore {
@@ -376,6 +431,40 @@ struct CountryDetailView: View {
             return "Current rules may severely limit or ban entry; check official guidance before planning."
         default:
             return "Entry rules may depend on your trip details; confirm with official government sources."
+        }
+    }
+    
+    private func travelSafeHeadline(for country: Country) -> String {
+        guard let score = country.travelSafeScore else {
+            return "Safety information is limited"
+        }
+
+        switch score {
+        case 80...100:
+            return "Generally very safe ✅"
+        case 60..<80:
+            return "Mostly safe with normal caution"
+        case 40..<60:
+            return "Mixed safety; stay aware"
+        default:
+            return "Higher risk; plan carefully"
+        }
+    }
+
+    private func travelSafeBody(for country: Country) -> String {
+        guard let score = country.travelSafeScore else {
+            return "Based on TravelSafe global crime and safety data. Check local guidance and recent news for context."
+        }
+
+        switch score {
+        case 80...100:
+            return "TravelSafe suggests relatively low crime and good safety conditions, though normal precautions still apply."
+        case 60..<80:
+            return "Conditions are generally safe, but you should stay alert to petty crime and follow common-sense precautions."
+        case 40..<60:
+            return "Safety conditions vary a lot by neighborhood; research your areas and follow local advice."
+        default:
+            return "TravelSafe reports elevated risk. If you go, plan carefully, avoid high-risk areas, and follow official guidance."
         }
     }
     
