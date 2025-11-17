@@ -28,7 +28,25 @@ enum DataLoader {
                     name: dto.name,
                     score: dto.score ?? 0,
                     region: dto.region,
-                    advisoryLevel: dto.advisoryLevelText
+                    subregion: dto.subregion,
+                    advisoryLevel: dto.advisoryLevelText,
+                    advisorySummary: dto.advisorySummary,
+                    advisoryUpdatedAt: dto.advisoryUpdatedAt,
+                    advisoryUrl: dto.advisoryUrl,
+                    seasonalityScore: dto.seasonalityScore,
+                    seasonalityLabel: dto.seasonalityLabel,
+                    seasonalityBestMonths: dto.seasonalityBestMonths,
+                    seasonalityNotes: dto.seasonalityNotes,
+                    visaEaseScore: dto.visaEaseScore,
+                    visaType: dto.visaType,
+                    visaAllowedDays: dto.visaAllowedDays,
+                    visaFeeUsd: dto.visaFeeUsd,
+                    visaNotes: dto.visaNotes,
+                    visaSourceUrl: dto.visaSourceUrl,
+                    dailySpendTotalUsd: dto.dailySpendTotalUsd,
+                    dailySpendHotelUsd: dto.dailySpendHotelUsd,
+                    dailySpendFoodUsd: dto.dailySpendFoodUsd,
+                    dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd
                 )
             }
         } catch {
