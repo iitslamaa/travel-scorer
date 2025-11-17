@@ -12,7 +12,7 @@ struct CountryScoreCard: View {
     let score: Int
     let advisoryLevel: String?
     
-    @State private var pressed = true
+    @State private var pressed = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -48,20 +48,44 @@ struct CountryScoreCard: View {
 struct ScorePill: View {
     let score: Int
     
-    private var color: Color {
-        switch score{
-        case 80...:     return .green
-        case 60..<80:   return .yellow
-        default:        return .red
-        }
-    }
     var body: some View {
         Text("\(score)")
-            .font(.subheadline.weight(.semibold))
-            .padding(.horizontal, 10)
+            .font(.headline)
+            .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(Capsule().fill(Color(UIColor.systemGray6)))
-            .overlay(Capsule().stroke(Color(UIColor.systemGray3), lineWidth: 1))
-            .foregroundStyle(color)
+            .background(
+                Capsule()
+                    .fill(scoreBackgroundColor(for: score))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(scoreBorderColor(for: score), lineWidth: 1)
+            )
+    }
+    
+    private func scoreBackgroundColor(for score: Int) -> Color {
+        switch score {
+        case 80...100:
+            return Color.green.opacity(0.2)
+        case 60..<80:
+            return Color.yellow.opacity(0.2)
+        case 40..<60:
+            return Color.orange.opacity(0.2)
+        default:
+            return Color.red.opacity(0.2)
+        }
+    }
+
+    private func scoreBorderColor(for score: Int) -> Color {
+        switch score {
+        case 80...100:
+            return Color.green.opacity(0.7)
+        case 60..<80:
+            return Color.yellow.opacity(0.7)
+        case 40..<60:
+            return Color.orange.opacity(0.7)
+        default:
+            return Color.red.opacity(0.7)
+        }
     }
 }
