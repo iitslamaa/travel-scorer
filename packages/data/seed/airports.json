@@ -1,0 +1,47 @@
+[
+  {
+    "iata": "LAX",
+    "name": "Los Angeles International Airport",
+    "cityName": "Los Angeles",
+    "citySlug": "los-angeles",
+    "countryIso2": "US",
+    "lat": 33.9416,
+    "lon": -118.4085
+  },
+  {
+    "iata": "JFK",
+    "name": "John F. Kennedy International Airport",
+    "cityName": "New York",
+    "citySlug": "new-york-city",
+    "countryIso2": "US",
+    "lat": 40.6413,
+    "lon": -73.7781
+  },
+  {
+    "iata": "CDG",
+    "name": "Charles de Gaulle Airport",
+    "cityName": "Paris",
+    "citySlug": "paris",
+    "countryIso2": "FR",
+    "lat": 49.0097,
+    "lon": 2.5479
+  },
+  {
+    "iata": "DXB",
+    "name": "Dubai International Airport",
+    "cityName": "Dubai",
+    "citySlug": "dubai",
+    "countryIso2": "AE",
+    "lat": 25.2532,
+    "lon": 55.3657
+  },
+  {
+    "iata": "BEY",
+    "name": "Beirut–Rafic Hariri International Airport",
+    "cityName": "Beirut",
+    "citySlug": "beirut",
+    "countryIso2": "LB",
+    "lat": 33.8209,
+    "lon": 35.4884
+  }
+]
