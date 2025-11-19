@@ -5,6 +5,8 @@ import type { CountrySeed } from '@/lib/types';
 import { loadFacts } from '@/lib/facts';
 import type { CountryFacts } from '@/lib/facts';
 import { nameToIso2 } from '@/lib/countryMatch';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 
 import { gdpPerCapitaUSDMap } from '@/lib/providers/worldbank';
 import { fxLocalPerUSDMapByIso2 } from '@/lib/providers/fx';
@@ -33,12 +35,19 @@ type FactsExtraServer = Partial<CountryFacts> & {
   // affordability inputs
   costOfLivingIndex?: number;
   foodCostIndex?: number;
+  housingCostIndex?: number;
+  transportCostIndex?: number;
   gdpPerCapitaUsd?: number;
   fxLocalPerUSD?: number;
   localPerUSD?: number;
   usdToLocalRate?: number;
-  affordability?: number;
+  affordability?: number;          // final 0–100 affordability score (cheap = 100)
   dailySpend?: DailySpend;
+
+  // server-computed affordability details
+  averageDailyCostUsd?: number;    // per-person daily cost in USD
+  affordabilityCategory?: number;  // 1 (cheapest) .. 10 (most expensive)
+
   // server-computed total
   scoreTotal?: number;
   // FM (Frequent Miler) seasonality enrichments
@@ -158,6 +167,7 @@ function totalScoreFromFacts(f: Partial<CountryFacts>): number {
     { key: 'directFlight',  value: fx.directFlight },
     { key: 'infrastructure',value: fx.infrastructure },
   ];
+
   const presentSum = signals
     .filter(s => Number.isFinite(s.value as number))
     .reduce((a,s)=>a+(W_WEIGHTS[s.key]||0), 0);
@@ -171,12 +181,61 @@ function totalScoreFromFacts(f: Partial<CountryFacts>): number {
   return Math.round(total);
 }
 
+function extractAverageDailyCostUsd(fx: FactsExtraServer): number | undefined {
+  const spend = fx.dailySpend as unknown as {
+    totalUsd?: number;
+    totalUSD?: number;
+    hotelUsd?: number;
+    hostelUsd?: number;
+    foodUsd?: number;
+    transportUsd?: number;
+  } | undefined;
+
+  if (!spend) return undefined;
+
+  if (typeof spend.totalUsd === 'number') return spend.totalUsd;
+  if (typeof spend.totalUSD === 'number') return spend.totalUSD;
+
+  const parts: number[] = [];
+  if (typeof spend.hotelUsd === 'number') parts.push(spend.hotelUsd);
+  if (typeof spend.hostelUsd === 'number') parts.push(spend.hostelUsd);
+  if (typeof spend.foodUsd === 'number') parts.push(spend.foodUsd);
+  if (typeof spend.transportUsd === 'number') parts.push(spend.transportUsd);
+
+  if (!parts.length) return undefined;
+  return parts.reduce((a, b) => a + b, 0);
+}
+
+function costToAffordabilityCategory(costUsd: number, minCostUsd: number, maxCostUsd: number): number {
+  if (!Number.isFinite(costUsd)) return 0;
+  const range = maxCostUsd - minCostUsd;
+  if (range <= 0) return 5;
+
+  let t = (costUsd - minCostUsd) / range; // 0..1
+  if (t < 0) t = 0;
+  if (t >= 1) t = 0.999999;
+
+  const idx = Math.floor(t * 10); // 0..9
+  return idx + 1;                 // 1..10
+}
+
+function affordabilityScoreFromCategory(category: number): number {
+  if (!Number.isFinite(category)) return 50;
+  if (category < 1) category = 1;
+  if (category > 10) category = 10;
+  // Cheap (1) -> 100, Expensive (10) -> 10
+  return (11 - category) * 10;
+}
+
 // Best-effort optional JSON imports (files may not exist in all demos)
-async function safeJsonImport<T = Record<string, unknown>>(path: string): Promise<T | null> {
+// We read JSON directly from the filesystem so this works reliably in Node/Next.
+async function safeJsonImport<T = Record<string, unknown>>(relativePath: string): Promise<T | null> {
   try {
-    const mod = await import(path);
-    return (mod?.default ?? mod) as T;
-  } catch {
+    const fullPath = path.join(process.cwd(), relativePath);
+    const raw = await fs.readFile(fullPath, 'utf8');
+    return JSON.parse(raw) as T;
+  } catch (err) {
+    console.warn('[countries] safeJsonImport failed for', relativePath, err);
     return null;
   }
 }
@@ -357,33 +416,59 @@ export async function GET() {
     // Optionally enrich facts with macro signals for affordability + themes
     // These files are optional; if missing we proceed without them.
 
-    const [gdpJson, fxJson, colJson, themesJson] = await Promise.all([
-      safeJsonImport<Record<string, number>>("@/data/sources/gdp_per_capita.json"),
-      safeJsonImport<Record<string, number>>("@/data/sources/fx_local_per_usd.json"),
-      safeJsonImport<Record<string, number>>("@/data/sources/cost_of_living.json"),
-      safeJsonImport<Record<string, string[]>>("@/data/sources/reddit_themes.json"),
+    const [
+      colJson,
+      foodJson,
+      housingJson,
+      transportJson,
+    ] = await Promise.all([
+      safeJsonImport<Record<string, number>>("data/sources/cost_of_living.json"),
+      safeJsonImport<Record<string, number>>("data/sources/food_index.json"),
+      safeJsonImport<Record<string, number>>("data/sources/housing_index.json"),
+      safeJsonImport<Record<string, number>>("data/sources/transport_index.json"),
     ]);
 
+    console.log('[countries] affordability JSON presence', {
+      hasColJson: !!colJson,
+      hasFoodJson: !!foodJson,
+      hasHousingJson: !!housingJson,
+      hasTransportJson: !!transportJson,
+    });
+
     // Normalize keys to ISO2 uppercase where possible
-    function toIso2Key(k: string): string { return k?.toUpperCase?.() ?? k; }
-    const gdpMap: Record<string, number> = Object.fromEntries(
-      Object.entries(gdpJson ?? {}).map(([k,v]) => [toIso2Key(k), Number(v)])
-    );
-    const fxMap: Record<string, number> = Object.fromEntries(
-      Object.entries(fxJson ?? {}).map(([k,v]) => [toIso2Key(k), Number(v)])
-    );
+    function toIso2Key(k: string): string {
+      return k?.toUpperCase?.() ?? k;
+    }
+    const gdpMap: Record<string, number> = {};
+    const fxMap: Record<string, number> = {};
     const colMap: Record<string, number> = Object.fromEntries(
-      Object.entries(colJson ?? {}).map(([k,v]) => [toIso2Key(k), Number(v)])
+      Object.entries(colJson ?? {}).map(([k, v]) => [toIso2Key(k), Number(v)])
     );
-    const themesMap: Record<string, string[]> = Object.fromEntries(
-      Object.entries(themesJson ?? {}).map(([k,v]) => [toIso2Key(k), Array.isArray(v) ? v : []])
+    const foodMap: Record<string, number> = Object.fromEntries(
+      Object.entries(foodJson ?? {}).map(([k, v]) => [toIso2Key(k), Number(v)])
     );
+    const housingMap: Record<string, number> = Object.fromEntries(
+      Object.entries(housingJson ?? {}).map(([k, v]) => [toIso2Key(k), Number(v)])
+    );
+    const transportMap: Record<string, number> = Object.fromEntries(
+      Object.entries(transportJson ?? {}).map(([k, v]) => [toIso2Key(k), Number(v)])
+    );
+    const themesMap: Record<string, string[]> = {};
+
+    console.log('[countries] affordability map samples', {
+      colKeys: Object.keys(colMap).slice(0, 10),
+      foodKeys: Object.keys(foodMap).slice(0, 10),
+      housingKeys: Object.keys(housingMap).slice(0, 10),
+      transportKeys: Object.keys(transportMap).slice(0, 10),
+    });
 
     // Prefetch Frequent Miler table grouped by country to avoid per-row fetch
     const fmGrouped = await fmGroupByCountry();
     const fmIsoMap = fmByIso2(fmGrouped);
     const todayMonth = new Date().getMonth() + 1; // 1..12
 
+    const affordabilityCostsUsd: number[] = [];
+    
     for (const row of merged) {
       const keyUpper = row.iso2.toUpperCase();
       const facts = factsByIso2[keyUpper] ?? factsByIso2[row.iso2] ?? undefined;
@@ -392,6 +477,8 @@ export async function GET() {
       const extra: Partial<CountryFacts & {
         costOfLivingIndex?: number;
         foodCostIndex?: number; // reserved; currently same as COL if specific food index missing
+        housingCostIndex?: number;
+        transportCostIndex?: number;
         gdpPerCapitaUsd?: number;
         fxLocalPerUSD?: number;
         redditThemes?: string[];
@@ -413,8 +500,21 @@ export async function GET() {
 
       if (colMap[keyUpper] != null) {
         extra.costOfLivingIndex = Number(colMap[keyUpper]);
-        // If you don’t have a separate food index, mirror COL for a mild influence
+      }
+      if (foodMap[keyUpper] != null) {
+        extra.foodCostIndex = Number(foodMap[keyUpper]);
+      } else if (colMap[keyUpper] != null) {
         extra.foodCostIndex = Number(colMap[keyUpper]);
+      }
+      if (housingMap[keyUpper] != null) {
+        extra.housingCostIndex = Number(housingMap[keyUpper]);
+      } else if (colMap[keyUpper] != null) {
+        extra.housingCostIndex = Number(colMap[keyUpper]);
+      }
+      if (transportMap[keyUpper] != null) {
+        extra.transportCostIndex = Number(transportMap[keyUpper]);
+      } else if (colMap[keyUpper] != null) {
+        extra.transportCostIndex = Number(colMap[keyUpper]);
       }
       if (themesMap[keyUpper]?.length) extra.redditThemes = themesMap[keyUpper];
 
@@ -430,6 +530,8 @@ export async function GET() {
           const spend = estimateDailySpendHotel({
             costOfLivingIndex: fxFacts.costOfLivingIndex,
             foodCostIndex: fxFacts.foodCostIndex,
+            housingCostIndex: fxFacts.housingCostIndex,
+            transportCostIndex: fxFacts.transportCostIndex,
             fxLocalPerUSD: fxFacts.fxLocalPerUSD,
             usdToLocalRate: fxFacts.usdToLocalRate,
             gdpPerCapitaUsd: fxFacts.gdpPerCapitaUsd,
@@ -511,12 +613,44 @@ export async function GET() {
         }
       } catch {}
 
-      // compute and store canonical total on the server so all clients agree
+      // --- Compute average daily cost in USD for affordability buckets
       try {
-        const total = totalScoreFromFacts(row.facts as Partial<CountryFacts>);
-        (row.facts as unknown as FactsExtraServer).scoreTotal = total;
+        const fxFacts = row.facts as unknown as FactsExtraServer;
+        const avgCostUsd = extractAverageDailyCostUsd(fxFacts);
+        if (avgCostUsd != null && Number.isFinite(avgCostUsd)) {
+          fxFacts.averageDailyCostUsd = avgCostUsd;
+          affordabilityCostsUsd.push(avgCostUsd);
+        }
       } catch {}
     }
+    // Second pass: turn averageDailyCostUsd into affordability buckets and scores
+    try {
+      if (affordabilityCostsUsd.length >= 2) {
+        const minCostUsd = Math.min(...affordabilityCostsUsd);
+        const maxCostUsd = Math.max(...affordabilityCostsUsd);
+
+        for (const row of merged) {
+          const fxFacts = row.facts as unknown as FactsExtraServer;
+          const cost = fxFacts?.averageDailyCostUsd;
+          if (typeof cost !== 'number' || !Number.isFinite(cost)) continue;
+
+          const category = costToAffordabilityCategory(cost, minCostUsd, maxCostUsd);
+          const score = affordabilityScoreFromCategory(category);
+
+          fxFacts.affordabilityCategory = category;
+          fxFacts.affordability = score;
+
+          // compute and store canonical total on the server so all clients agree
+          try {
+            const total = totalScoreFromFacts(row.facts as Partial<CountryFacts>);
+            fxFacts.scoreTotal = total;
+          } catch {}
+        }
+      }
+    } catch (err) {
+      console.warn('[countries] failed to compute affordability buckets:', err);
+    }
+
     if (merged.length) {
       const s = merged[0];
       const sampleVisaEase = (s.facts ? (s.facts as FactsExtraServer).visaEase : undefined);

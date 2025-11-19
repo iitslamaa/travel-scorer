@@ -1,0 +1,9 @@
+iso2,name,hotel_usd,hostel_usd,food_usd,transport_usd,activities_usd,source,notes
+JP,Japan,120,45,25,12,15,BudgetYourTrip,"Example numbers – replace with real"
+TH,Thailand,40,15,12,8,10,BudgetYourTrip,"Example numbers – replace with real"
+MX,Mexico,60,20,18,10,12,BudgetYourTrip,"Example numbers – replace with real"
+CH,Switzerland,180,70,40,20,25,BudgetYourTrip,"Example numbers – replace with real"
+BB,Barbados,180,70,40,18,25,BudgetYourTrip,"Example numbers – replace with real"
+KW,Kuwait,150,65,30,20,20,BudgetYourTrip,"Example numbers – replace with real"
+FJ,Fiji,140,55,30,20,20,BudgetYourTrip,"Example numbers – replace with real"
+BT,Bhutan,75,30,18,10,15,BudgetYourTrip,"Example numbers – replace with real"

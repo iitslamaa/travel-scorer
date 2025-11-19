@@ -10,6 +10,7 @@ import { SoloFemaleSection } from '@/lib/display/SoloFemaleSection';
 import { ScorePill } from '@/lib/display/ScorePill';
 import { VisaSection } from './components/VisaSection';
 import { Seasonality } from './components/Seasonality';
+import { AffordabilitySection } from "./components/AffordabilitySection";
 
 // --- helpers hoisted to module scope to avoid defining components during render
 function factorNumbersFromRows(rows: FactRow[], key: FactRow['key']) {
@@ -40,12 +41,14 @@ function renderFactorBreakdown(rows: FactRow[], key: FactRow['key']) {
 // Minimal advisory shape from /api/countries
 type AdvisoryLite = { level?: 1|2|3|4; url?: string; summary?: string; updatedAt?: string };
 
-// Shape attached by the API for estimated daily spend (hotel traveler)
+// Shape attached by the API for estimated daily spend (hotel/hostel/transport breakdown)
 type DailySpendLocal = {
   foodUsd: number;
   activitiesUsd: number;
   hotelUsd: number;
   totalUsd: number;
+  hostelUsd?: number;
+  transportUsd?: number;
   basis?: { col?: number; food?: number };
   notes?: string[];
 };
@@ -54,14 +57,18 @@ type DailySpendLocal = {
 type FactsExtra = CountryFacts & {
   costOfLivingIndex?: number;
   foodCostIndex?: number;
+  housingCostIndex?: number;
+  transportCostIndex?: number;
   gdpPerCapitaUsd?: number;
   fxLocalPerUSD?: number;
   localPerUSD?: number;
   usdToLocalRate?: number;
   redditThemes?: string[];
   redditSummary?: string;
-  affordability?: number;
-  // Computed by API from COL/food/FX
+  affordability?: number;            // 0–100, cheap = 100
+  affordabilityCategory?: number;    // 1 = cheapest, 10 = most expensive
+  averageDailyCostUsd?: number;      // per-person daily cost in USD
+  // Computed by API or estimator
   dailySpend?: DailySpendLocal;
   // Visa enrichments (from visa provider)
   visaType?: 'visa_free' | 'voa' | 'evisa' | 'visa_required' | 'ban';
@@ -301,14 +308,41 @@ function explainAdvisory(name: string, level?: 1|2|3|4, updatedAt?: string) {
 }
 
 function explainAffordability(fx: Partial<FactsExtra>){
-  const col = fx.costOfLivingIndex; const food = fx.foodCostIndex; const gdp = fx.gdpPerCapitaUsd; const rate = pick(fx.fxLocalPerUSD, fx.localPerUSD, fx.usdToLocalRate);
   const parts: string[] = [];
-  if (col != null) parts.push(`cost-of-living index ≈ ${Math.round(col)}`);
-  if (food != null) parts.push(`food cost index ≈ ${Math.round(food)}`);
-  if (gdp != null) parts.push(`GDP per capita ≈ ${fmtUSD(gdp)}`);
-  if (rate != null) parts.push(`about ${rate} local units per USD`);
-  if (!parts.length) return 'Using a neutral affordability baseline (need COL/GDP/FX inputs for a better estimate).';
-  return `Estimated using ${parts.join(', ')}. Lower COL/food and stronger USD rate improve affordability; higher GDP per capita reduces it.`;
+
+  const cat = fx.affordabilityCategory;
+  const daily = fx.averageDailyCostUsd;
+
+  if (typeof cat === 'number') {
+    if (cat === 1) {
+      parts.push('This is among the cheapest destinations in the dataset (cost level 1 out of 10).');
+    } else if (cat === 10) {
+      parts.push('This is among the most expensive destinations in the dataset (cost level 10 out of 10).');
+    } else {
+      parts.push(`Overall cost level is ${cat} out of 10 compared with other countries.`);
+    }
+  }
+
+  if (typeof daily === 'number' && Number.isFinite(daily)) {
+    parts.push(`Typical daily spend for one traveler lands around ${fmtUSD(daily)} when you combine housing, food, and local transport.`);
+  }
+
+  // Fall back to macro indicators if we don't have good direct cost data
+  if (!parts.length) {
+    const col = fx.costOfLivingIndex;
+    const food = fx.foodCostIndex;
+    const gdp = fx.gdpPerCapitaUsd;
+    const rate = pick(fx.fxLocalPerUSD, fx.localPerUSD, fx.usdToLocalRate);
+    const macro: string[] = [];
+    if (col != null) macro.push(`cost-of-living index ≈ ${Math.round(col)}`);
+    if (food != null) macro.push(`food cost index ≈ ${Math.round(food)}`);
+    if (gdp != null) macro.push(`GDP per capita ≈ ${fmtUSD(gdp)}`);
+    if (rate != null) macro.push(`about ${rate} local units per USD`);
+    if (!macro.length) return 'Using a neutral affordability baseline until we have better cost-of-living and price data.';
+    return `Estimated using ${macro.join(', ')}. Lower COL/food and a stronger USD generally make a destination feel cheaper on the ground.`;
+  }
+
+  return parts.join(' ');
 }
 
 function explainReddit(themes?: string[], summary?: string){
@@ -702,24 +736,53 @@ export default async function CountryPage({ params }: PageProps) {
             <section id="affordability" className="scroll-mt-24 card p-4">
               <header className="flex items-baseline justify-between">
                 <h4 className="font-medium">Affordability</h4>
-                <div className="text-sm muted">Raw: {rows.find(r=>r.key==='affordability')?.raw ?? '—'} · Weight: {Math.round((rows.find(r=>r.key==='affordability')?.weight ?? 0)*100)}%</div>
+                <div className="text-sm muted">
+                  Raw: {rows.find(r=>r.key==='affordability')?.raw ?? '—'} · Weight:{' '}
+                  {Math.round((rows.find(r=>r.key==='affordability')?.weight ?? 0)*100)}%
+                </div>
               </header>
+
               <div className="mt-2 flex items-center gap-2">
-                <ScorePill value={typeof rows.find(r=>r.key==='affordability')?.raw === 'number' ? Math.round(rows.find(r=>r.key==='affordability')!.raw as number) : undefined} />
+                <ScorePill
+                  value={
+                    typeof rows.find(r=>r.key==='affordability')?.raw === 'number'
+                      ? Math.round(rows.find(r=>r.key==='affordability')!.raw as number)
+                      : undefined
+                  }
+                />
                 <span className="text-sm font-semibold">💵 Costs</span>
               </div>
-              <p className="mt-2 text-sm leading-6">{explainAffordability(facts as Partial<FactsExtra>)}</p>
+
+              <p className="mt-2 text-sm leading-6">
+                {explainAffordability(facts as Partial<FactsExtra>)}
+              </p>
+
               {renderFactorBreakdown(rows, 'affordability')}
+
               {(() => {
                 const daily = pickDailySpend(facts as Partial<FactsExtra>);
-                return daily ? (
+                if (!daily) return null;
+
+                return (
                   <ul className="mt-2 text-sm list-disc ml-6">
-                    <li>Food (daily): {fmtUSD(daily.foodUsd)}</li>
-                    <li>Activities (daily): {fmtUSD(daily.activitiesUsd)}</li>
-                    <li>Hotel (mid-range, nightly): {fmtUSD(daily.hotelUsd)}</li>
+                    {daily.hotelUsd != null && (
+                      <li>Hotel (mid-range, nightly): {fmtUSD(daily.hotelUsd)}</li>
+                    )}
+                    {daily.hostelUsd != null && (
+                      <li>Hostel (budget, nightly): {fmtUSD(daily.hostelUsd)}</li>
+                    )}
+                    {daily.foodUsd != null && (
+                      <li>Food (daily): {fmtUSD(daily.foodUsd)}</li>
+                    )}
+                    {daily.transportUsd != null && (
+                      <li>Transport (daily): {fmtUSD(daily.transportUsd)}</li>
+                    )}
+                    {daily.activitiesUsd != null && (
+                      <li>Activities / extras (daily): {fmtUSD(daily.activitiesUsd)}</li>
+                    )}
                     <li className="font-medium">Estimated daily total: {fmtUSD(daily.totalUsd)}</li>
                   </ul>
-                ) : null;
+                );
               })()}
             </section>
 
