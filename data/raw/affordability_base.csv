@@ -1,0 +1,251 @@
+iso2,icp_pli,icp_pli_us,food_rel,housing_rel,transport_rel,name,col
+AF,,,,,,Afghanistan,0.187925
+AX,,,,,,Åland Islands,1.000000
+AL,,,,,,Albania,0.426243
+DZ,,,,,,Algeria,0.320814
+AS,,,,,,American Samoa,1.000000
+AD,,,,,,Andorra,0.657913
+AO,,,,,,Angola,0.254204
+AI,,,,,,Anguilla,1.000000
+AQ,,,,,,Antarctica,1.000000
+AG,,,,,,Antigua and Barbuda,0.706075
+AR,,,,,,Argentina,0.459253
+AM,,,,,,Armenia,0.372455
+AW,,,,,,Aruba,0.755766
+AU,,,,,,Australia,0.904686
+AT,,,,,,Austria,0.793561
+AZ,,,,,,Azerbaijan,0.290320
+BS,,,,,,Bahamas,0.957705
+BH,,,,,,Bahrain,0.447073
+BD,,,,,,Bangladesh,0.268838
+BB,,,,,,Barbados,1.118819
+BY,,,,,,Belarus,0.251971
+BE,,,,,,Belgium,0.775790
+BZ,,,,,,Belize,0.558524
+BJ,,,,,,Benin,0.334955
+BM,,,,,,Bermuda,1.160513
+BT,,,,,,Bhutan,0.236214
+BO,,,,,,Bolivia,0.357576
+BA,,,,,,Bosnia and Herzegovina,0.407688
+BW,,,,,,Botswana,0.374681
+BV,,,,,,Bouvet Island,1.000000
+BR,,,,,,Brazil,0.460311
+IO,,,,,,British Indian Ocean Territory,1.000000
+VG,,,,,,British Virgin Islands,1.000000
+BN,,,,,,Brunei,0.371280
+BG,,,,,,Bulgaria,0.423801
+BF,,,,,,Burkina Faso,0.340904
+BI,,,,,,Burundi,0.162060
+KH,,,,,,Cambodia,0.329724
+CM,,,,,,Cameroon,0.315187
+CA,,,,,,Canada,0.829209
+CV,,,,,,Cape Verde,0.468208
+BQ,,,,,,Caribbean Netherlands,1.000000
+KY,,,,,,Cayman Islands,1.127586
+CF,,,,,,Central African Republic,0.408493
+TD,,,,,,Chad,0.343049
+CL,,,,,,Chile,0.482427
+CN,,,,,,China,0.490803
+CX,,,,,,Christmas Island,1.000000
+CC,,,,,,Cocos (Keeling) Islands,1.000000
+CO,,,,,,Colombia,0.368185
+KM,,,,,,Comoros,0.439965
+CK,,,,,,Cook Islands,1.000000
+CR,,,,,,Costa Rica,0.618277
+HR,,,,,,Croatia,0.492666
+CU,,,,,,Cuba,1.000000
+CW,,,,,,Curaçao,0.685702
+CY,,,,,,Cyprus,0.631192
+CZ,,,,,,Czechia,0.558160
+DK,,,,,,Denmark,0.903633
+DJ,,,,,,Djibouti,0.449636
+DM,,,,,,Dominica,0.488495
+DO,,,,,,Dominican Republic,0.394887
+CD,,,,,,DR Congo,0.378677
+EC,,,,,,Ecuador,0.434002
+EG,,,,,,Egypt,0.174843
+SV,,,,,,El Salvador,0.420661
+GQ,,,,,,Equatorial Guinea,0.383987
+ER,,,,,,Eritrea,0.327594
+EE,,,,,,Estonia,0.631820
+SZ,,,,,,Eswatini,0.334014
+ET,,,,,,Ethiopia,0.355396
+FK,,,,,,Falkland Islands,1.000000
+FO,,,,,,Faroe Islands,0.918240
+FJ,,,,,,Fiji,0.392234
+FI,,,,,,Finland,0.829889
+FR,,,,,,France,0.752596
+GF,,,,,,French Guiana,1.000000
+PF,,,,,,French Polynesia,1.000000
+TF,,,,,,French Southern and Antarctic Lands,1.000000
+GA,,,,,,Gabon,0.382099
+GM,,,,,,Gambia,0.263704
+GE,,,,,,Georgia,0.323518
+DE,,,,,,Germany,0.771786
+GH,,,,,,Ghana,0.299707
+GI,,,,,,Gibraltar,1.000000
+GR,,,,,,Greece,0.561600
+GL,,,,,,Greenland,0.741990
+GD,,,,,,Grenada,0.588659
+GP,,,,,,Guadeloupe,1.000000
+GU,,,,,,Guam,1.000000
+GT,,,,,,Guatemala,0.428017
+GG,,,,,,Guernsey,1.000000
+GN,,,,,,Guinea,0.374969
+GW,,,,,,Guinea-Bissau,0.315454
+GY,,,,,,Guyana,0.373986
+HT,,,,,,Haiti,0.673049
+HM,,,,,,Heard Island and McDonald Islands,1.000000
+HN,,,,,,Honduras,0.457711
+HK,,,,,,Hong Kong,0.719358
+HU,,,,,,Hungary,0.489353
+IS,,,,,,Iceland,1.056800
+IN,,,,,,India,0.241661
+ID,,,,,,Indonesia,0.299450
+IR,,,,,,Iran,0.258731
+IQ,,,,,,Iraq,0.419903
+IE,,,,,,Ireland,0.818115
+IM,,,,,,Isle of Man,1.000000
+IL,,,,,,Israel,0.972813
+IT,,,,,,Italy,0.661102
+CI,,,,,,Ivory Coast,0.354075
+JM,,,,,,Jamaica,0.601916
+JP,,,,,,Japan,0.628342
+JE,,,,,,Jersey,1.000000
+JO,,,,,,Jordan,0.426752
+KZ,,,,,,Kazakhstan,0.343159
+KE,,,,,,Kenya,0.333285
+KI,,,,,,Kiribati,0.618161
+XK,,,,,,Kosovo,1.000000
+KW,,,,,,Kuwait,0.623865
+KG,,,,,,Kyrgyzstan,0.302053
+LA,,,,,,Laos,0.217002
+LV,,,,,,Latvia,0.532692
+LB,,,,,,Lebanon,0.276562
+LS,,,,,,Lesotho,0.324103
+LR,,,,,,Liberia,0.448974
+LY,,,,,,Libya,0.452809
+LI,,,,,,Liechtenstein,1.000000
+LT,,,,,,Lithuania,0.540050
+LU,,,,,,Luxembourg,0.912081
+MO,,,,,,Macau,0.569488
+MG,,,,,,Madagascar,0.289348
+MW,,,,,,Malawi,0.273399
+MY,,,,,,Malaysia,0.306418
+MV,,,,,,Maldives,0.497897
+ML,,,,,,Mali,0.328282
+MT,,,,,,Malta,0.628630
+MH,,,,,,Marshall Islands,0.910775
+MQ,,,,,,Martinique,1.000000
+MR,,,,,,Mauritania,0.286437
+MU,,,,,,Mauritius,0.382331
+YT,,,,,,Mayotte,1.000000
+MX,,,,,,Mexico,0.551148
+FM,,,,,,Micronesia,0.958535
+MD,,,,,,Moldova,0.406994
+MC,,,,,,Monaco,1.000000
+MN,,,,,,Mongolia,0.350381
+ME,,,,,,Montenegro,0.387523
+MS,,,,,,Montserrat,1.000000
+MA,,,,,,Morocco,0.387517
+MZ,,,,,,Mozambique,0.380822
+MM,,,,,,Myanmar,0.226639
+NA,,,,,,Namibia,0.377623
+NR,,,,,,Nauru,0.936834
+NP,,,,,,Nepal,0.252293
+NL,,,,,,Netherlands,0.810021
+NC,,,,,,New Caledonia,1.000000
+NZ,,,,,,New Zealand,0.884805
+NI,,,,,,Nicaragua,0.326973
+NE,,,,,,Niger,0.358680
+NG,,,,,,Nigeria,0.125306
+NU,,,,,,Niue,1.000000
+NF,,,,,,Norfolk Island,1.000000
+KP,,,,,,North Korea,1.000000
+MK,,,,,,North Macedonia,0.350170
+MP,,,,,,Northern Mariana Islands,1.000000
+NO,,,,,,Norway,0.859234
+OM,,,,,,Oman,0.485991
+PK,,,,,,Pakistan,0.236163
+PW,,,,,,Palau,0.906896
+PS,,,,,,Palestine,0.593054
+PA,,,,,,Panama,0.461368
+PG,,,,,,Papua New Guinea,0.629325
+PY,,,,,,Paraguay,0.346373
+PE,,,,,,Peru,0.474788
+PH,,,,,,Philippines,0.337865
+PN,,,,,,Pitcairn Islands,1.000000
+PL,,,,,,Poland,0.496698
+PT,,,,,,Portugal,0.569862
+PR,,,,,,Puerto Rico,0.783264
+QA,,,,,,Qatar,0.604836
+CG,,,,,,Republic of the Congo,0.353277
+RE,,,,,,Réunion,1.000000
+RO,,,,,,Romania,0.412060
+RU,,,,,,Russia,0.314081
+RW,,,,,,Rwanda,0.269386
+BL,,,,,,Saint Barthélemy,1.000000
+SH,,,,,,"Saint Helena, Ascension and Tristan da Cunha",1.000000
+KN,,,,,,Saint Kitts and Nevis,0.640640
+LC,,,,,,Saint Lucia,0.514436
+MF,,,,,,Saint Martin,1.000000
+PM,,,,,,Saint Pierre and Miquelon,1.000000
+VC,,,,,,Saint Vincent and the Grenadines,0.540672
+WS,,,,,,Samoa,0.625059
+SM,,,,,,San Marino,0.714558
+ST,,,,,,São Tomé and Príncipe,0.520880
+SA,,,,,,Saudi Arabia,0.492077
+SN,,,,,,Senegal,0.341263
+RS,,,,,,Serbia,0.424375
+SC,,,,,,Seychelles,0.537292
+SL,,,,,,Sierra Leone,0.248435
+SG,,,,,,Singapore,0.601729
+SX,,,,,,Sint Maarten,0.768514
+SK,,,,,,Slovakia,0.554206
+SI,,,,,,Slovenia,0.603024
+SB,,,,,,Solomon Islands,0.748266
+SO,,,,,,Somalia,0.397925
+ZA,,,,,,South Africa,0.404553
+GS,,,,,,South Georgia,1.000000
+KR,,,,,,South Korea,0.615309
+SS,,,,,,South Sudan,0.666367
+ES,,,,,,Spain,0.620048
+LK,,,,,,Sri Lanka,0.288856
+SD,,,,,,Sudan,0.465034
+SR,,,,,,Suriname,0.336738
+SJ,,,,,,Svalbard and Jan Mayen,1.000000
+SE,,,,,,Sweden,0.812655
+CH,,,,,,Switzerland,1.105002
+SY,,,,,,Syria,0.182228
+TW,,,,,,Taiwan,1.000000
+TJ,,,,,,Tajikistan,0.248096
+TZ,,,,,,Tanzania,0.280929
+TH,,,,,,Thailand,0.297275
+TL,,,,,,Timor-Leste,0.282269
+TG,,,,,,Togo,0.322047
+TK,,,,,,Tokelau,1.000000
+TO,,,,,,Tonga,0.619370
+TT,,,,,,Trinidad and Tobago,0.536205
+TN,,,,,,Tunisia,0.301038
+TR,,,,,,Türkiye,0.352209
+TM,,,,,,Turkmenistan,0.420016
+TC,,,,,,Turks and Caicos Islands,0.988207
+TV,,,,,,Tuvalu,1.031501
+UG,,,,,,Uganda,0.327470
+UA,,,,,,Ukraine,0.290530
+AE,,,,,,United Arab Emirates,0.633379
+GB,,,,,,United Kingdom,0.868302
+US,,,,,,United States,1.000000
+UM,,,,,,United States Minor Outlying Islands,1.000000
+VI,,,,,,United States Virgin Islands,0.890103
+UY,,,,,,Uruguay,0.656450
+UZ,,,,,,Uzbekistan,0.266169
+VU,,,,,,Vanuatu,0.983456
+VA,,,,,,Vatican City,1.000000
+VE,,,,,,Venezuela,0.625040
+VN,,,,,,Vietnam,0.287894
+WF,,,,,,Wallis and Futuna,1.000000
+EH,,,,,,Western Sahara,1.000000
+YE,,,,,,Yemen,0.435717
+ZM,,,,,,Zambia,0.292400
+ZW,,,,,,Zimbabwe,0.677362
