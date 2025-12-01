@@ -122,6 +122,29 @@ export default function Home() {
         Canonical UN/ISO countries & territories with live travel.state.gov advisory overlay.
       </p>
 
+      <section className="mb-6">
+        <div className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white/80 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5 sm:py-4 dark:border-zinc-800 dark:bg-zinc-900/60">
+          <div className="space-y-1">
+            <p className="text-[11px] font-semibold tracking-wide text-zinc-500 uppercase">
+              New · When to Go
+            </p>
+            <p className="text-sm text-zinc-700 dark:text-zinc-300 max-w-xl">
+              Explore which countries are in peak or shoulder season for each month of the year
+              before you compare safety and affordability.
+            </p>
+          </div>
+          <div className="flex-shrink-0">
+            <Link
+              href="/seasonality"
+              className="inline-flex items-center rounded-full border border-zinc-300 bg-white/90 px-4 py-2 text-sm font-medium text-zinc-900 shadow-sm hover:bg-zinc-50 hover:border-zinc-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:bg-zinc-900 dark:text-zinc-50 dark:border-zinc-700 dark:hover:bg-zinc-800 dark:hover:border-zinc-500 dark:focus-visible:ring-offset-zinc-950"
+            >
+              Open “When to Go”
+              <span className="ml-1.5 text-xs">→</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 mb-4">
         <input
           value={q}
