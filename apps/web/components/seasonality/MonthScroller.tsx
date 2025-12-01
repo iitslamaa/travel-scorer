@@ -12,16 +12,16 @@ interface MonthMeta {
 interface MonthScrollerProps {
   months: MonthMeta[];
   selectedMonth: MonthNumber;
-  onMonthChange: (month: MonthNumber) => void;
+  onSelectMonth: (month: MonthNumber) => void;
 }
 
 export const MonthScroller: React.FC<MonthScrollerProps> = ({
   months,
   selectedMonth,
-  onMonthChange,
+  onSelectMonth,
 }) => {
   const handleClick = (month: MonthNumber) => {
-    onMonthChange(month);
+    onSelectMonth(month);
   };
 
   return (
