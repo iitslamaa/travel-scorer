@@ -1,13 +1,19 @@
 'use client';
 
 import * as React from 'react';
-import type { CountrySeasonality } from '../../../../packages/data/src';
+
+type UiCountry = {
+  isoCode: string;
+  name: string;
+  region?: string;
+  score?: number;
+};
 
 interface CountryListProps {
   title: string;
   description?: string;
   tone: 'peak' | 'shoulder';
-  countries: CountrySeasonality[];
+  countries: UiCountry[];
 }
 
 export const CountryList: React.FC<CountryListProps> = ({
@@ -54,9 +60,11 @@ export const CountryList: React.FC<CountryListProps> = ({
               className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs text-stone-800 shadow-sm"
             >
               <span className="font-medium">{c.name}</span>
-              <span className="text-[10px] uppercase tracking-[0.18em] text-stone-400">
-                {c.region}
-              </span>
+              {c.region && (
+                <span className="text-[10px] uppercase tracking-[0.18em] text-stone-400">
+                  {c.region}
+                </span>
+              )}
             </li>
           ))}
         </ul>
