@@ -148,7 +148,7 @@ export default function Home() {
       ) : error ? (
         <div className="text-red-600">{error}</div>
       ) : (
-        <div className="grid-cards">
+        <div className="grid-cards gap-3 md:gap-4 lg:gap-6">
           {filtered.map((c) => {
             const s = scoreFor(c);
             return (
@@ -191,34 +191,28 @@ export default function Home() {
                 </div>
                 {/* rest of the card stays the same */}
                 <div className="mt-3">
-                  {c.advisory ? (
-                    <div className="text-sm">
-                      <span className="font-medium">Advisory:</span>{' '}
-                      Level {c.advisory.level} •{' '}
-                      <button
-                        className="underline text-blue-600"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (c.advisory?.url) {
-                            window.open(c.advisory.url, '_blank', 'noopener,noreferrer');
-                          }
-                        }}
-                      >
-                        travel.state.gov
-                      </button>
-                      <div className="text-xs muted hidden sm:block">
-                        Updated {new Date(c.advisory.updatedAt).toLocaleDateString()}
-                      </div>
-                      {c.advisory.summary && (
-                        <div className="hidden sm:block text-xs mt-1 muted line-clamp-3 max-w-prose">
-                          {c.advisory.summary}
-                        </div>
-                      )}
+                  <div className="text-sm">
+                    <span className="font-medium">Advisory:</span>{' '}
+                    Level {c.advisory?.level ?? '—'} •{' '}
+                    <button
+                      className="underline text-blue-600"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (c.advisory?.url) {
+                          window.open(c.advisory.url, '_blank', 'noopener,noreferrer');
+                        }
+                      }}
+                    >
+                      travel.state.gov
+                    </button>
+                    <div className="text-xs muted">
+                      Updated {c.advisory?.updatedAt ? new Date(c.advisory.updatedAt).toLocaleDateString() : '—'}
                     </div>
-                  ) : (
-                    <div className="text-sm muted">No advisory found.</div>
-                  )}
+                    <div className="text-xs mt-1 muted line-clamp-2 min-h-[2.75em] max-w-prose">
+                      {c.advisory?.summary || ''}
+                    </div>
+                  </div>
                 </div>
                 <div className="mt-3 text-sm hidden sm:block">
                   <span className="muted">Details: </span>
