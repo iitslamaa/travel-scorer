@@ -10,8 +10,10 @@ import path from 'node:path';
 
 import { gdpPerCapitaUSDMap } from '@/lib/providers/worldbank';
 import { fxLocalPerUSDMapByIso2 } from '@/lib/providers/fx';
-import { fmGroupByCountry, fmByIso2 } from '@/lib/providers/frequentmiler';
-import { FM_SEASONALITY_OVERRIDES } from '@/lib/providers/fmOverrides';
+import {
+  COUNTRY_SEASONALITY_DEFINITIONS,
+  type CountrySeasonalityDefinition,
+} from '../../../../../packages/data/src/countrySeasonality';
 import { buildVisaIndex } from '@/lib/providers/visa';
 import { estimateDailySpendHotel } from '@/lib/providers/costs';
 import type { DailySpend } from '@/lib/providers/costs';
@@ -462,9 +464,6 @@ export async function GET() {
       transportKeys: Object.keys(transportMap).slice(0, 10),
     });
 
-    // Prefetch Frequent Miler table grouped by country to avoid per-row fetch
-    const fmGrouped = await fmGroupByCountry();
-    const fmIsoMap = fmByIso2(fmGrouped);
     const todayMonth = new Date().getMonth() + 1; // 1..12
 
     const affordabilityCostsUsd: number[] = [];
@@ -556,10 +555,11 @@ export async function GET() {
         }
       } catch {}
 
-      // --- Attach seasonality: manual overrides first, then Frequent Miler fallback
+      // --- Attach seasonality: manual overrides only
       try {
         const fxFacts = row.facts as unknown as FactsExtraServer;
-        const override = FM_SEASONALITY_OVERRIDES[keyUpper];
+        const override: CountrySeasonalityDefinition | undefined =
+          COUNTRY_SEASONALITY_DEFINITIONS[keyUpper];
 
         if (override && override.best && override.best.length) {
           const allMonths = Array.from(new Set(override.best)).sort((a, b) => a - b);
@@ -586,30 +586,6 @@ export async function GET() {
           fxFacts.fmSeasonalitySource = 'manual';
           fxFacts.fmSeasonalityNotes = override.notes;
           fxFacts.seasonality = todayScore;
-        } else {
-          const fmAreas = fmIsoMap.get(keyUpper) || [];
-          if (fmAreas.length) {
-            const allMonths = Array.from(new Set(fmAreas.flatMap(a => a.months))).sort((a,b)=>a-b);
-            const groups = clusterConsecutiveMonths(allMonths);
-            const dualPeak = groups.length >= 2;
-            const todayIsBest = allMonths.includes(todayMonth);
-            const prevMonth = ((todayMonth + 10) % 12) + 1; // one month before
-            const nextMonth = (todayMonth % 12) + 1;        // one month after
-            const adjacent = allMonths.includes(prevMonth) || allMonths.includes(nextMonth);
-
-            let todayScore: number;
-            if (todayIsBest) todayScore = 100;      // peak season
-            else if (adjacent) todayScore = 80;     // shoulder season
-            else todayScore = 0;                    // off-season / less ideal
-
-            fxFacts.fmSeasonalityBestMonths = allMonths;
-            fxFacts.fmSeasonalityAreas = fmAreas;
-            fxFacts.fmSeasonalityHasDualPeak = dualPeak;
-            fxFacts.fmSeasonalityTodayScore = todayScore;
-            fxFacts.fmSeasonalityTodayLabel = fmTodayLabel(todayScore);
-            fxFacts.fmSeasonalitySource = 'https://frequentmiler.com/the-best-time-of-year-to-go-to-every-country-in-the-world-in-one-table/';
-            fxFacts.seasonality = todayScore;
-          }
         }
       } catch {}
 
