@@ -10,6 +10,7 @@ import {
 } from '../../../../packages/data/src/seasonality';
 import { MonthScroller } from './MonthScroller';
 import { CountryList } from './CountryList';
+import { ScorePill } from '@/lib/display/ScorePill';
 
 const SCORE_BANDS = {
   high: 90,
@@ -23,12 +24,31 @@ function getScoreTone(score?: number) {
   return 'low';
 }
 
+function isoToFlagEmoji(isoCode?: string) {
+  if (!isoCode) return '';
+  const code = isoCode.toUpperCase();
+  if (code.length !== 2) return '';
+  const A = 0x1f1e6;
+  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  const chars = [...code].map((ch) => {
+    const index = alpha.indexOf(ch);
+    if (index === -1) return '';
+    return String.fromCodePoint(A + index);
+  });
+
+  return chars.join('');
+}
+
 type UiCountry = {
   isoCode: string;
   name: string;
   score?: number;
   region?: string;
   advisoryLevel?: number;
+  seasonalityScore?: number;
+  affordabilityScore?: number;
+  visaEaseScore?: number;
 };
 
 type CountriesApiCountry = {
@@ -39,6 +59,9 @@ type CountriesApiCountry = {
   advisoryLevel?: number;
   facts?: {
     scoreTotal?: number; // overall TravelScorer score used for coloring
+    seasonality?: number;
+    affordability?: number;
+    visaEase?: number;
   };
 };
 
@@ -57,47 +80,116 @@ type CountryPreviewProps = {
 
 const CountryPreviewCard: React.FC<CountryPreviewProps> = ({ country }) => {
   const tone = getScoreTone(country.score);
+  const flag = isoToFlagEmoji(country.isoCode);
 
-  const scoreBadgeClasses =
-    tone === 'high'
+  const safetyLabel =
+    typeof country.advisoryLevel === 'number'
+      ? `Safety · Lvl ${country.advisoryLevel}`
+      : 'Safety info';
+
+  const safetyClasses =
+    typeof country.advisoryLevel !== 'number'
+      ? 'bg-neutral-100 text-neutral-700'
+      : country.advisoryLevel <= 2
       ? 'bg-emerald-50 text-emerald-700'
-      : tone === 'medium'
+      : country.advisoryLevel === 3
       ? 'bg-amber-50 text-amber-700'
-      : tone === 'low'
-      ? 'bg-red-50 text-red-700'
-      : 'bg-neutral-100 text-neutral-700';
+      : 'bg-red-50 text-red-700';
 
   return (
     <div className="h-full rounded-2xl border border-neutral-200 bg-white/80 p-4 shadow-sm">
-      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
-        Selected destination
-      </p>
-      <h3 className="mb-1 text-lg font-semibold text-neutral-900">{country.name}</h3>
-      {country.region && (
-        <p className="mb-1 text-xs text-neutral-500">{country.region}</p>
-      )}
-      <div className="mt-2 flex items-center gap-2">
+      {/* Header: label + flag + name + region + score pill */}
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+            Selected destination
+          </p>
+          <div className="mt-1 flex items-center gap-2">
+            {flag && (
+              <span className="text-2xl" aria-hidden="true">
+                {flag}
+              </span>
+            )}
+            <div>
+              <h3 className="text-lg font-semibold text-neutral-900">
+                {country.name}
+              </h3>
+              {country.region && (
+                <p className="text-xs text-neutral-500">{country.region}</p>
+              )}
+            </div>
+          </div>
+        </div>
+
         {typeof country.score === 'number' && (
-          <span
-            className={
-              'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ' +
-              scoreBadgeClasses
-            }
-          >
-            TravelScorer score: <span className="ml-1">{country.score}</span>
-          </span>
+          <ScorePill
+            value={country.score}
+            title="Overall TravelScorer score"
+          />
         )}
-        {typeof country.advisoryLevel === 'number' && (
-          <span className="inline-flex items-center rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
-            Advisory level {country.advisoryLevel}
+      </div>
+
+      {/* Badges row */}
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
+        <span
+          className={`inline-flex items-center rounded-full px-2.5 py-1 font-medium ${safetyClasses}`}
+        >
+          {safetyLabel}
+        </span>
+
+        {country.region && (
+          <span className="inline-flex items-center rounded-full bg-neutral-50 px-2.5 py-1 font-medium text-neutral-700">
+            Region · {country.region}
           </span>
         )}
       </div>
+
+      {/* Compact score breakdown */}
+      {(typeof country.seasonalityScore === 'number' ||
+        typeof country.affordabilityScore === 'number' ||
+        typeof country.visaEaseScore === 'number') && (
+        <div className="mt-3 rounded-xl bg-neutral-50 px-3 py-2">
+          <p className="mb-1 text-xs font-semibold text-neutral-600">
+            Score snapshot
+          </p>
+          <dl className="space-y-1 text-xs">
+            {typeof country.seasonalityScore === 'number' && (
+              <div className="flex items-center justify-between">
+                <dt className="text-neutral-500">Seasonality</dt>
+                <dd>
+                  <ScorePill value={country.seasonalityScore} />
+                </dd>
+              </div>
+            )}
+            {typeof country.affordabilityScore === 'number' && (
+              <div className="flex items-center justify-between">
+                <dt className="text-neutral-500">Affordability</dt>
+                <dd>
+                  <ScorePill value={country.affordabilityScore} />
+                </dd>
+              </div>
+            )}
+            {typeof country.visaEaseScore === 'number' && (
+              <div className="flex items-center justify-between">
+                <dt className="text-neutral-500">Visa ease</dt>
+                <dd>
+                  <ScorePill value={country.visaEaseScore} />
+                </dd>
+              </div>
+            )}
+          </dl>
+        </div>
+      )}
+
+      {/* Short summary */}
       <p className="mt-3 text-sm text-neutral-600">
-        This month is one of the best times to visit based on weather, crowds, and overall
-        conditions.
+        This month is one of the best times to visit based on weather, crowds, and
+        overall conditions. Open the full country page to compare safety, affordability,
+        and visa details.
       </p>
-      <div className="mt-4">
+
+      {/* Footer link */}
+      <div className="mt-4 border-t border-neutral-100 pt-3">
         <Link
           href={`/country/${country.isoCode.toLowerCase()}`}
           className="inline-flex items-center text-sm font-medium text-neutral-900 underline underline-offset-4 hover:text-neutral-700"
@@ -115,7 +207,18 @@ export const SeasonalityExplorer: React.FC = () => {
   const [selectedCountry, setSelectedCountry] = useState<UiCountry | null>(null);
 
   const [countryMetaByIso, setCountryMetaByIso] = useState<
-    Record<string, { name: string; score?: number; region?: string; advisoryLevel?: number }>
+    Record<
+      string,
+      {
+        name: string;
+        score?: number;
+        region?: string;
+        advisoryLevel?: number;
+        seasonalityScore?: number;
+        affordabilityScore?: number;
+        visaEaseScore?: number;
+      }
+    >
   >({});
   const [isLoadingMeta, setIsLoadingMeta] = useState<boolean>(true);
 
@@ -139,7 +242,18 @@ export const SeasonalityExplorer: React.FC = () => {
           list = raw.countries;
         }
 
-        const map: Record<string, { name: string; score?: number; region?: string; advisoryLevel?: number }> = {};
+        const map: Record<
+          string,
+          {
+            name: string;
+            score?: number;
+            region?: string;
+            advisoryLevel?: number;
+            seasonalityScore?: number;
+            affordabilityScore?: number;
+            visaEaseScore?: number;
+          }
+        > = {};
         for (const c of list) {
           if (!c || !c.iso2) continue;
           const iso = String(c.iso2).toUpperCase();
@@ -155,6 +269,9 @@ export const SeasonalityExplorer: React.FC = () => {
             score: overallScore,
             region: c.region,
             advisoryLevel: c.advisoryLevel,
+            seasonalityScore: c.facts?.seasonality,
+            affordabilityScore: c.facts?.affordability,
+            visaEaseScore: c.facts?.visaEase,
           };
         }
 
@@ -204,6 +321,9 @@ export const SeasonalityExplorer: React.FC = () => {
           score: meta.score,
           region: meta.region,
           advisoryLevel: meta.advisoryLevel,
+          seasonalityScore: meta.seasonalityScore,
+          affordabilityScore: meta.affordabilityScore,
+          visaEaseScore: meta.visaEaseScore,
         } as UiCountry;
       });
 
