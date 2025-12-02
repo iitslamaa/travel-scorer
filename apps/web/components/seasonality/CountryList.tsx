@@ -14,6 +14,8 @@ interface CountryListProps {
   description?: string;
   tone: 'peak' | 'shoulder';
   countries: UiCountry[];
+  selectedIsoCode?: string | null;
+  onSelectCountry?: (country: UiCountry) => void;
 }
 
 export const CountryList: React.FC<CountryListProps> = ({
@@ -21,6 +23,8 @@ export const CountryList: React.FC<CountryListProps> = ({
   description,
   tone,
   countries,
+  selectedIsoCode,
+  onSelectCountry,
 }) => {
   const toneClasses =
     tone === 'peak'
@@ -54,19 +58,39 @@ export const CountryList: React.FC<CountryListProps> = ({
         </p>
       ) : (
         <ul className="mt-1 flex flex-wrap gap-2">
-          {countries.map((c) => (
-            <li
-              key={c.isoCode}
-              className="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1 text-xs text-stone-800 shadow-sm"
-            >
-              <span className="font-medium">{c.name}</span>
-              {c.region && (
-                <span className="text-[10px] uppercase tracking-[0.18em] text-stone-400">
-                  {c.region}
-                </span>
-              )}
-            </li>
-          ))}
+          {countries.map((c) => {
+            const isSelected =
+              selectedIsoCode &&
+              selectedIsoCode.toUpperCase() === c.isoCode.toUpperCase();
+
+            const baseClasses =
+              'inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs text-stone-800 shadow-sm border transition-colors';
+            const stateClasses = isSelected
+              ? 'border-stone-500'
+              : 'border-stone-200 hover:border-stone-300 hover:bg-white';
+
+            return (
+              <li key={c.isoCode}>
+                <button
+                  type="button"
+                  onClick={() => onSelectCountry && onSelectCountry(c)}
+                  className={`${baseClasses} ${stateClasses}`}
+                >
+                  <span className="font-medium">{c.name}</span>
+                  {c.region && (
+                    <span className="text-[10px] uppercase tracking-[0.18em] text-stone-400">
+                      {c.region}
+                    </span>
+                  )}
+                  {typeof c.score === 'number' && (
+                    <span className="text-[10px] font-medium text-stone-500">
+                      {c.score}
+                    </span>
+                  )}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </section>

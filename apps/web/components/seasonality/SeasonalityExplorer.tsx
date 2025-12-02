@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import {
   ALL_MONTHS,
   getCountriesForMonth,
@@ -33,6 +34,7 @@ function getCurrentMonth(): MonthNumber {
 
 export const SeasonalityExplorer: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState<MonthNumber>(getCurrentMonth());
+  const [selectedCountry, setSelectedCountry] = useState<UiCountry | null>(null);
 
   const [countryMetaByIso, setCountryMetaByIso] = useState<
     Record<string, { name: string; score?: number }>
@@ -88,6 +90,11 @@ export const SeasonalityExplorer: React.FC = () => {
     };
   }, []);
 
+  const handleSelectMonth = (month: MonthNumber) => {
+    setSelectedMonth(month);
+    setSelectedCountry(null);
+  };
+
   // Raw seasonality from shared dataset (iso-only)
   const { peak: rawPeak, shoulder: rawShoulder } = useMemo(
     () => getCountriesForMonth(selectedMonth),
@@ -127,6 +134,7 @@ export const SeasonalityExplorer: React.FC = () => {
   }, [rawPeak, rawShoulder, countryMetaByIso]);
 
   const totalCount = peak.length + shoulder.length;
+  const selectedIsoCode = selectedCountry?.isoCode ?? null;
 
   return (
     <div className="space-y-8">
@@ -144,7 +152,7 @@ export const SeasonalityExplorer: React.FC = () => {
         <MonthScroller
           months={ALL_MONTHS}
           selectedMonth={selectedMonth}
-          onSelectMonth={(month: MonthNumber) => setSelectedMonth(month)}
+          onSelectMonth={handleSelectMonth}
         />
       </section>
 
@@ -166,20 +174,92 @@ export const SeasonalityExplorer: React.FC = () => {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-2">
-        <CountryList
-          title="Peak season"
-          tone="peak"
-          description="Best weather and overall conditions — usually the busiest and priciest."
-          countries={peak}
-        />
-        <CountryList
-          title="Shoulder season"
-          tone="shoulder"
-          description="Still good conditions, often fewer crowds and better value."
-          countries={shoulder}
-        />
+      <section className="grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)]">
+        {/* Left: peak + shoulder lists */}
+        <div className="space-y-4">
+          <CountryList
+            title="Peak season"
+            tone="peak"
+            description="Best weather and overall conditions — usually the busiest and priciest."
+            countries={peak}
+            selectedIsoCode={selectedIsoCode}
+            onSelectCountry={setSelectedCountry}
+          />
+          <CountryList
+            title="Shoulder season"
+            tone="shoulder"
+            description="Still good conditions, often fewer crowds and better value."
+            countries={shoulder}
+            selectedIsoCode={selectedIsoCode}
+            onSelectCountry={setSelectedCountry}
+          />
+        </div>
+
+        {/* Right: desktop side panel */}
+        <aside className="hidden md:block">
+          {selectedCountry ? (
+            <div className="h-full rounded-2xl border border-neutral-200 bg-white/80 p-4 shadow-sm">
+              <p className="text-xs font-semibold tracking-wide text-neutral-500 uppercase mb-1">
+                Selected destination
+              </p>
+              <h3 className="text-lg font-semibold text-neutral-900 mb-1">
+                {selectedCountry.name}
+              </h3>
+              {typeof selectedCountry.score === 'number' && (
+                <p className="text-sm text-neutral-600 mb-3">
+                  TravelScorer score:{' '}
+                  <span className="font-semibold text-neutral-900">
+                    {selectedCountry.score}
+                  </span>
+                </p>
+              )}
+
+              <div className="mt-3">
+                <Link
+                  href={`/country/${selectedCountry.isoCode.toLowerCase()}`}
+                  className="inline-flex items-center text-sm font-medium text-neutral-900 underline underline-offset-4 hover:text-neutral-700"
+                >
+                  Open full country page
+                  <span className="ml-1 text-xs">→</span>
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <div className="h-full rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/60 p-4 text-sm text-neutral-500">
+              Click any country in the list to preview its details here.
+            </div>
+          )}
+        </aside>
       </section>
+
+      {/* Mobile: selected country card below lists */}
+      {selectedCountry && (
+        <section className="md:hidden">
+          <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
+            <p className="text-xs font-semibold tracking-wide text-neutral-500 uppercase mb-1">
+              Selected destination
+            </p>
+            <h3 className="text-base font-semibold text-neutral-900 mb-1">
+              {selectedCountry.name}
+            </h3>
+            {typeof selectedCountry.score === 'number' && (
+              <p className="text-sm text-neutral-600 mb-3">
+                TravelScorer score:{' '}
+                <span className="font-semibold text-neutral-900">
+                  {selectedCountry.score}
+                </span>
+              </p>
+            )}
+            <Link
+              href={`/country/${selectedCountry.isoCode.toLowerCase()}`}
+              className="inline-flex items-center text-sm font-medium text-neutral-900 underline underline-offset-4 hover:text-neutral-700"
+            >
+              Open full country page
+              <span className="ml-1 text-xs">→</span>
+            </Link>
+          </div>
+        </section>
+      )}
     </div>
   );
 };
