@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { toneClass } from '@/lib/display/ScorePill';
 
 type UiCountry = {
   isoCode: string;
@@ -64,17 +65,18 @@ export const CountryList: React.FC<CountryListProps> = ({
               selectedIsoCode.toUpperCase() === c.isoCode.toUpperCase();
 
             const baseClasses =
-              'inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs text-stone-800 shadow-sm border transition-colors';
-            const stateClasses = isSelected
-              ? 'border-stone-500'
-              : 'border-stone-200 hover:border-stone-300 hover:bg-white';
+              'inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs shadow-sm border transition-colors';
+            const toneClasses = toneClass(c.score);
+            const selectedClasses = isSelected
+              ? ' ring-2 ring-stone-500 ring-offset-1'
+              : ' hover:brightness-105';
 
             return (
               <li key={c.isoCode}>
                 <button
                   type="button"
                   onClick={() => onSelectCountry && onSelectCountry(c)}
-                  className={`${baseClasses} ${stateClasses}`}
+                  className={`${baseClasses} ${toneClasses} ${selectedClasses}`}
                 >
                   <span className="font-medium">{c.name}</span>
                   {c.region && (
@@ -83,9 +85,8 @@ export const CountryList: React.FC<CountryListProps> = ({
                     </span>
                   )}
                   {typeof c.score === 'number' && (
-                    <span className="text-[10px] font-medium text-stone-500">
-                      {c.score}
-                    </span>
+                    <span className="text-[10px] font-medium text-stone-700">
+                      {Math.round(c.score)}</span>
                   )}
                 </button>
               </li>

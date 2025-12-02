@@ -11,16 +11,35 @@ import {
 import { MonthScroller } from './MonthScroller';
 import { CountryList } from './CountryList';
 
+const SCORE_BANDS = {
+  high: 90,
+  medium: 75,
+} as const;
+
+function getScoreTone(score?: number) {
+  if (typeof score !== 'number') return 'neutral';
+  if (score >= SCORE_BANDS.high) return 'high';
+  if (score >= SCORE_BANDS.medium) return 'medium';
+  return 'low';
+}
+
 type UiCountry = {
   isoCode: string;
   name: string;
   score?: number;
+  region?: string;
+  advisoryLevel?: number;
 };
 
 type CountriesApiCountry = {
   iso2: string;
   name: string;
-  score?: number;
+  score?: number; // legacy / fallback
+  region?: string;
+  advisoryLevel?: number;
+  facts?: {
+    scoreTotal?: number; // overall TravelScorer score used for coloring
+  };
 };
 
 type CountriesApiResponse = {
@@ -32,12 +51,71 @@ function getCurrentMonth(): MonthNumber {
   return (now.getMonth() + 1) as MonthNumber;
 }
 
+type CountryPreviewProps = {
+  country: UiCountry;
+};
+
+const CountryPreviewCard: React.FC<CountryPreviewProps> = ({ country }) => {
+  const tone = getScoreTone(country.score);
+
+  const scoreBadgeClasses =
+    tone === 'high'
+      ? 'bg-emerald-50 text-emerald-700'
+      : tone === 'medium'
+      ? 'bg-amber-50 text-amber-700'
+      : tone === 'low'
+      ? 'bg-red-50 text-red-700'
+      : 'bg-neutral-100 text-neutral-700';
+
+  return (
+    <div className="h-full rounded-2xl border border-neutral-200 bg-white/80 p-4 shadow-sm">
+      <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
+        Selected destination
+      </p>
+      <h3 className="mb-1 text-lg font-semibold text-neutral-900">{country.name}</h3>
+      {country.region && (
+        <p className="mb-1 text-xs text-neutral-500">{country.region}</p>
+      )}
+      <div className="mt-2 flex items-center gap-2">
+        {typeof country.score === 'number' && (
+          <span
+            className={
+              'inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ' +
+              scoreBadgeClasses
+            }
+          >
+            TravelScorer score: <span className="ml-1">{country.score}</span>
+          </span>
+        )}
+        {typeof country.advisoryLevel === 'number' && (
+          <span className="inline-flex items-center rounded-full bg-neutral-100 px-3 py-1 text-xs font-medium text-neutral-700">
+            Advisory level {country.advisoryLevel}
+          </span>
+        )}
+      </div>
+      <p className="mt-3 text-sm text-neutral-600">
+        This month is one of the best times to visit based on weather, crowds, and overall
+        conditions.
+      </p>
+      <div className="mt-4">
+        <Link
+          href={`/country/${country.isoCode.toLowerCase()}`}
+          className="inline-flex items-center text-sm font-medium text-neutral-900 underline underline-offset-4 hover:text-neutral-700"
+        >
+          Open full country page
+          <span className="ml-1 text-xs">→</span>
+        </Link>
+      </div>
+    </div>
+  );
+};
+
 export const SeasonalityExplorer: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState<MonthNumber>(getCurrentMonth());
   const [selectedCountry, setSelectedCountry] = useState<UiCountry | null>(null);
 
   const [countryMetaByIso, setCountryMetaByIso] = useState<
-    Record<string, { name: string; score?: number }>
+    Record<string, { name: string; score?: number; region?: string; advisoryLevel?: number }>
   >({});
   const [isLoadingMeta, setIsLoadingMeta] = useState<boolean>(true);
 
@@ -61,13 +139,22 @@ export const SeasonalityExplorer: React.FC = () => {
           list = raw.countries;
         }
 
-        const map: Record<string, { name: string; score?: number }> = {};
+        const map: Record<string, { name: string; score?: number; region?: string; advisoryLevel?: number }> = {};
         for (const c of list) {
           if (!c || !c.iso2) continue;
           const iso = String(c.iso2).toUpperCase();
+          const overallScore =
+            typeof c.score === 'number'
+              ? c.score
+              : typeof c.facts?.scoreTotal === 'number'
+                ? c.facts.scoreTotal
+                : undefined;
+
           map[iso] = {
             name: c.name ?? iso,
-            score: c.score,
+            score: overallScore,
+            region: c.region,
+            advisoryLevel: c.advisoryLevel,
           };
         }
 
@@ -115,7 +202,9 @@ export const SeasonalityExplorer: React.FC = () => {
           isoCode: c.isoCode,
           name: meta.name ?? c.name ?? c.isoCode,
           score: meta.score,
-        };
+          region: meta.region,
+          advisoryLevel: meta.advisoryLevel,
+        } as UiCountry;
       });
 
       enriched.sort((a, b) => {
@@ -198,32 +287,7 @@ export const SeasonalityExplorer: React.FC = () => {
         {/* Right: desktop side panel */}
         <aside className="hidden md:block">
           {selectedCountry ? (
-            <div className="h-full rounded-2xl border border-neutral-200 bg-white/80 p-4 shadow-sm">
-              <p className="text-xs font-semibold tracking-wide text-neutral-500 uppercase mb-1">
-                Selected destination
-              </p>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-1">
-                {selectedCountry.name}
-              </h3>
-              {typeof selectedCountry.score === 'number' && (
-                <p className="text-sm text-neutral-600 mb-3">
-                  TravelScorer score:{' '}
-                  <span className="font-semibold text-neutral-900">
-                    {selectedCountry.score}
-                  </span>
-                </p>
-              )}
-
-              <div className="mt-3">
-                <Link
-                  href={`/country/${selectedCountry.isoCode.toLowerCase()}`}
-                  className="inline-flex items-center text-sm font-medium text-neutral-900 underline underline-offset-4 hover:text-neutral-700"
-                >
-                  Open full country page
-                  <span className="ml-1 text-xs">→</span>
-                </Link>
-              </div>
-            </div>
+            <CountryPreviewCard country={selectedCountry} />
           ) : (
             <div className="h-full rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/60 p-4 text-sm text-neutral-500">
               Click any country in the list to preview its details here.
@@ -235,29 +299,7 @@ export const SeasonalityExplorer: React.FC = () => {
       {/* Mobile: selected country card below lists */}
       {selectedCountry && (
         <section className="md:hidden">
-          <div className="mt-4 rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
-            <p className="text-xs font-semibold tracking-wide text-neutral-500 uppercase mb-1">
-              Selected destination
-            </p>
-            <h3 className="text-base font-semibold text-neutral-900 mb-1">
-              {selectedCountry.name}
-            </h3>
-            {typeof selectedCountry.score === 'number' && (
-              <p className="text-sm text-neutral-600 mb-3">
-                TravelScorer score:{' '}
-                <span className="font-semibold text-neutral-900">
-                  {selectedCountry.score}
-                </span>
-              </p>
-            )}
-            <Link
-              href={`/country/${selectedCountry.isoCode.toLowerCase()}`}
-              className="inline-flex items-center text-sm font-medium text-neutral-900 underline underline-offset-4 hover:text-neutral-700"
-            >
-              Open full country page
-              <span className="ml-1 text-xs">→</span>
-            </Link>
-          </div>
+          <CountryPreviewCard country={selectedCountry} />
         </section>
       )}
     </div>

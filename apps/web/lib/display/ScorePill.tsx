@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 
-function toneClass(n?: number) {
+export function toneClass(n?: number) {
   if (typeof n !== 'number') return 'bg-zinc-100 text-zinc-700 border-zinc-200';
   if (n >= 80) return 'bg-green-100 text-green-800 border-green-300';
   if (n >= 60) return 'bg-yellow-100 text-yellow-800 border-yellow-300';
