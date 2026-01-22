@@ -18,7 +18,7 @@ struct CountryPreviewCardMobile: View {
                         .fontWeight(.semibold)
                         .foregroundColor(.secondary)
                     
-                    Text(country.name)
+                    Text(country.name ?? country.isoCode)
                         .font(.headline)
                     
                     if let region = country.region {
@@ -74,7 +74,7 @@ struct CountryPreviewCardMobile: View {
             // TODO: wire this into your existing CountryDetailView navigation
             NavigationLink {
                 // Replace with your real detail view constructor
-                Text("TODO: Country detail for \(country.isoCode)")
+                Text("TODO: Country detail for \(country.name ?? country.isoCode)")
             } label: {
                 HStack(spacing: 4) {
                     Text("Open full country page")

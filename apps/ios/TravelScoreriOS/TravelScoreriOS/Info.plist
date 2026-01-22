@@ -7,11 +7,17 @@
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>192.168.254.209</key>
-			<dict/>
-			<key>Allow Insecure HTTP Loads</key>
-			<true/>
-			<key>Includes Subdomains</key>
-			<true/>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
+			<key>localhost</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
 		</dict>
 	</dict>
 </dict>

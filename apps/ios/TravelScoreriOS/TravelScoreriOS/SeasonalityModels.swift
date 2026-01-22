@@ -9,7 +9,7 @@ import Foundation
 
 struct SeasonalityCountry: Identifiable, Decodable {
     let isoCode: String
-    let name: String
+    let name: String?
     let score: Double?
     let region: String?
     let advisoryLevel: Int?
