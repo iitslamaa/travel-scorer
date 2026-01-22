@@ -8,7 +8,7 @@
 import Foundation
 
 enum CountryAPI {
-    static let baseURL = URL(string: "https://travel-scorer.vercel.app")!
+    static let baseURL = APIConfig.baseURL
     static var countriesURL: URL { baseURL.appendingPathComponent("api/countries") }
 
     static func fetchCountries() async throws -> [Country] {
