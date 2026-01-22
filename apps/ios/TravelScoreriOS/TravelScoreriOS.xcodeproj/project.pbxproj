@@ -6,13 +6,31 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		170F3EC02F218C6C0083E900 /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F3EBF2F218C6C0083E900 /* APIConfig.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		170F3EBF2F218C6C0083E900 /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 		17AFEC8A2EC2C3D800B9585B /* TravelScoreriOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelScoreriOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		173877702EDEF6F600A171DB /* Exceptions for "TravelScoreriOS" folder in "TravelScoreriOS" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 17AFEC892EC2C3D800B9585B /* TravelScoreriOS */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		17AFEC8C2EC2C3D800B9585B /* TravelScoreriOS */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				173877702EDEF6F600A171DB /* Exceptions for "TravelScoreriOS" folder in "TravelScoreriOS" target */,
+			);
 			path = TravelScoreriOS;
 			sourceTree = "<group>";
 		};
@@ -32,6 +50,7 @@
 		17AFEC812EC2C3D800B9585B = {
 			isa = PBXGroup;
 			children = (
+				170F3EBF2F218C6C0083E900 /* APIConfig.swift */,
 				17AFEC8C2EC2C3D800B9585B /* TravelScoreriOS */,
 				17AFEC8B2EC2C3D800B9585B /* Products */,
 			);
@@ -119,6 +138,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				170F3EC02F218C6C0083E900 /* APIConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +274,7 @@
 				DEVELOPMENT_TEAM = SVZL633CJV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TravelScoreriOS/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -287,6 +308,7 @@
 				DEVELOPMENT_TEAM = SVZL633CJV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TravelScoreriOS/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

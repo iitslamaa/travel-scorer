@@ -11,6 +11,7 @@ import SwiftUI
 struct RootTabView: View {
     var body: some View {
         TabView {
+            // Main scores / country list
             NavigationStack {
                 CountryListView()
             }
@@ -18,11 +19,12 @@ struct RootTabView: View {
                 Label("Scores", systemImage: "chart.bar.fill")
             }
 
+            // NEW: When to Go tab
             NavigationStack {
-                MyTripsView()
+                WhenToGoView()
             }
             .tabItem {
-                Label("My Trips", systemImage: "airplane.departure")
+                Label("When to Go", systemImage: "calendar")
             }
 
             NavigationStack {
@@ -49,6 +51,7 @@ struct RootTabView: View {
     }
 }
 
+// You can keep these placeholders or delete the ones you’re not using yet
 struct MyTripsView: View {
     var body: some View { Text("My Trips (coming soon)") }
 }
