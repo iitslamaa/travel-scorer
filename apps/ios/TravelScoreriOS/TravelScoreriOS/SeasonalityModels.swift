@@ -13,17 +13,133 @@ struct SeasonalityCountry: Identifiable, Decodable {
     let score: Double?
     let region: String?
     let advisoryLevel: Int?
-    
-    // Sub-scores for the little snapshot in the drawer
+
+    // Sub-scores for the little snapshot in the drawer.
+    // NOTE: The backend is not consistent about key names, so ScoreSnapshot accepts multiple variants
+    // (e.g. `visaEase`, `visa_ease_score`, etc.) via CodingKeys + custom decoding.
     struct ScoreSnapshot: Decodable {
+        let advisory: Double?
         let seasonality: Double?
         let affordability: Double?
         let visaEase: Double?
+
+        enum CodingKeys: String, CodingKey {
+            case advisory
+            case seasonality
+            case affordability
+            case visaEase
+
+            // Common API variants (when backend sends *_score)
+            case advisoryScore
+            case seasonalityScore
+            case affordabilityScore
+            case visaEaseScore
+
+            // Other possible variants
+            case advisoryLevel
+
+            // Visa variants we may receive from different endpoints
+            case visa
+            case visaScore
+            case visaEaseType
+            case visaType
+        }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+
+            // NOTE: SeasonalityService uses `.convertFromSnakeCase`.
+            // That means JSON keys like `visa_ease_score` become `visaEaseScore` here.
+            self.advisory =
+                try c.decodeIfPresent(Double.self, forKey: .advisory)
+                ?? (try c.decodeIfPresent(Double.self, forKey: .advisoryScore))
+                ?? (try c.decodeIfPresent(Double.self, forKey: .advisoryLevel))
+
+            self.seasonality =
+                try c.decodeIfPresent(Double.self, forKey: .seasonality)
+                ?? (try c.decodeIfPresent(Double.self, forKey: .seasonalityScore))
+
+            self.affordability =
+                try c.decodeIfPresent(Double.self, forKey: .affordability)
+                ?? (try c.decodeIfPresent(Double.self, forKey: .affordabilityScore))
+
+            self.visaEase =
+                try c.decodeIfPresent(Double.self, forKey: .visaEase)
+                ?? (try c.decodeIfPresent(Double.self, forKey: .visaEaseScore))
+                ?? (try c.decodeIfPresent(Double.self, forKey: .visa))
+                ?? (try c.decodeIfPresent(Double.self, forKey: .visaScore))
+
+            // Some endpoints may send a non-numeric visa descriptor like `visa_free` / `visa_required`.
+            // We intentionally ignore those here because the drawer expects a 0–100 style score.
+            _ = try? c.decodeIfPresent(String.self, forKey: .visaEaseType)
+            _ = try? c.decodeIfPresent(String.self, forKey: .visaType)
+        }
     }
-    
+
     let scores: ScoreSnapshot?
-    
+
     var id: String { isoCode }
+
+    enum CodingKeys: String, CodingKey {
+        // Standard fields (after convertFromSnakeCase)
+        case isoCode
+        case name
+        case score
+        case region
+        case advisoryLevel
+        case scores
+
+        // Alternate field names that might appear from older endpoints
+        case iso
+        case countryName
+        case advisory
+
+        // Alternate containers for the snapshot
+        case scoreSnapshot
+        case subScores
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+
+        // isoCode
+        let decodedIsoCode =
+            try c.decodeIfPresent(String.self, forKey: .isoCode)
+            ?? (try c.decodeIfPresent(String.self, forKey: .iso))
+
+        self.isoCode = decodedIsoCode ?? ""
+
+        // name
+        self.name =
+            try c.decodeIfPresent(String.self, forKey: .name)
+            ?? (try c.decodeIfPresent(String.self, forKey: .countryName))
+
+        // overall score
+        self.score = try c.decodeIfPresent(Double.self, forKey: .score)
+
+        // region
+        self.region = try c.decodeIfPresent(String.self, forKey: .region)
+
+        // advisory level
+        self.advisoryLevel =
+            try c.decodeIfPresent(Int.self, forKey: .advisoryLevel)
+            ?? (try c.decodeIfPresent(Int.self, forKey: .advisory))
+
+        // score snapshot
+        self.scores =
+            try c.decodeIfPresent(ScoreSnapshot.self, forKey: .scores)
+            ?? (try c.decodeIfPresent(ScoreSnapshot.self, forKey: .scoreSnapshot))
+            ?? (try c.decodeIfPresent(ScoreSnapshot.self, forKey: .subScores))
+    }
+}
+
+extension SeasonalityCountry.ScoreSnapshot {
+    init(advisory: Double? = nil, seasonality: Double? = nil, affordability: Double? = nil, visaEase: Double? = nil) {
+        self.advisory = advisory
+        self.seasonality = seasonality
+        self.affordability = affordability
+        self.visaEase = visaEase
+    }
 }
 
 struct SeasonalityResponse: Decodable {
