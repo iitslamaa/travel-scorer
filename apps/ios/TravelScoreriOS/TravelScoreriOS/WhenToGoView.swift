@@ -195,30 +195,36 @@ private struct SeasonalityCountryBottomDrawerView: View {
 
     let country: SeasonalityCountry
 
+    // Advisory: map level (1–4) into a 0–100 style score so it fits the same pill UX.
+    // Level 1 -> 100, Level 2 -> 75, Level 3 -> 50, Level 4 -> 25
+    private var advisoryScore: Double? {
+        guard let level = country.advisoryLevel else { return nil }
+        let clamped = min(max(level, 1), 4)
+        return Double(5 - clamped) * 25.0
+    }
+
+    private var advisorySubtitle: String? {
+        guard let level = country.advisoryLevel else { return nil }
+        return "Level \(level)"
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text(country.name ?? "Unknown")
-                    .font(.title2).bold()
-                Spacer()
-                Button {
-                    dismiss()
-                } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
+            header
 
             Text((country.region ?? "").uppercased())
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
-            // Basic snapshot (replace with real values later)
-            HStack(spacing: 12) {
-                snapshotPill(title: "Seasonality", value: country.score)
+            VStack(alignment: .leading, spacing: 10) {
+                scoreRow(title: "Advisory", value: advisoryScore, subtitle: advisorySubtitle)
+                scoreRow(title: "Affordability", value: country.scores?.affordability)
+                scoreRow(title: "Visa ease", value: country.scores?.visaEase)
+                scoreRow(title: "Seasonality", value: country.scores?.seasonality)
             }
+            .padding(12)
+            .background(.thinMaterial)
+            .clipShape(RoundedRectangle(cornerRadius: 16))
 
             Text("Open the full country page to compare safety, affordability, and visa details.")
                 .font(.subheadline)
@@ -230,17 +236,74 @@ private struct SeasonalityCountryBottomDrawerView: View {
         .navigationBarHidden(true)
     }
 
-    @ViewBuilder
-    private func snapshotPill(title: String, value: Double?) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-            Text(String(format: "%.0f", value ?? 0))
-                .font(.headline).bold()
+    // MARK: - Header
+
+    private var header: some View {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .center, spacing: 10) {
+                    Text(country.name ?? "Unknown")
+                        .font(.title2.bold())
+
+                    Spacer()
+
+                    // Overall score pill next to title
+                    scorePill(value: country.score)
+                }
+            }
+
+            Button {
+                dismiss()
+            } label: {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.secondary)
+            }
+            .buttonStyle(.plain)
         }
-        .padding(10)
-        .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
+
+    // MARK: - Rows + Pills
+
+    private func scoreRow(title: String, value: Double?, subtitle: String? = nil) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+
+                if let subtitle {
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Spacer()
+
+            scorePill(value: value)
+        }
+        .padding(.vertical, 6)
+    }
+
+    private func scorePill(value: Double?) -> some View {
+        let v = value ?? 0
+        return Text(String(format: "%.0f", v))
+            .font(.caption.weight(.semibold))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(scoreColor(v).opacity(0.18))
+            .foregroundStyle(scoreColor(v))
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(scoreColor(v).opacity(0.25), lineWidth: 1)
+            )
+            .accessibilityLabel("Score \(Int(v))")
+    }
+
+    private func scoreColor(_ v: Double) -> Color {
+        // Simple, consistent mapping (swap later to your shared helper if you want).
+        if v >= 80 { return .green }
+        if v >= 60 { return .yellow }
+        return .red }
 }
