@@ -22,6 +22,9 @@ struct MapPlaceholderView: View {
 }
 
 struct CountryListView: View {
+    @EnvironmentObject private var bucketList: BucketListStore
+    @EnvironmentObject private var traveled: TraveledStore
+
     @State private var sort: CountrySort = .name
     @State private var sortOrder: SortOrder = .descending
     @State private var search = ""
@@ -66,6 +69,21 @@ struct CountryListView: View {
                     ScorePill(score: country.score)
                 }
                 .padding(.vertical, 6)
+                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                    Button {
+                        bucketList.toggle(country.id)
+                    } label: {
+                        Text(bucketList.contains(country.id) ? "🪣 Unbucket" : "🪣 Bucket")
+                    }
+                    .tint(.blue)
+
+                    Button {
+                        traveled.toggle(country.id)
+                    } label: {
+                        Text(traveled.contains(country.id) ? "📝 Unvisit" : "📝 Visited")
+                    }
+                    .tint(.green)
+                }
             }
         }
         .listStyle(.plain)

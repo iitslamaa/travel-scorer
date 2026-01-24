@@ -8,8 +8,9 @@
 import Foundation
 
 struct Country: Identifiable, Hashable {
-    let id = UUID()
     let iso2: String
+    /// Stable identifier for persistence (do NOT use random UUIDs).
+    var id: String { iso2.uppercased() }
     let name: String
     let score: Int
     let region: String?
