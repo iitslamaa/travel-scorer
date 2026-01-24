@@ -39,6 +39,157 @@ final class SeasonalityViewModel: ObservableObject {
 
     private var countryMetaByISO: [String: CountryMeta] = [:]
 
+    // MARK: - Local-first cache for seasonality (per-month)
+
+    private func applyCachedSeasonalityIfAvailable(forMonth month: Int) {
+        guard let cached = SeasonalityCache.load(month: month) else { return }
+
+        selectedMonth = cached.month
+
+        // Enrich cached lists if we already have meta; otherwise show cached as-is
+        let peak = enrich(cached.peak)
+        let shoulder = enrich(cached.shoulder)
+
+        peakCountries = peak
+        shoulderCountries = shoulder
+
+        if selectedCountry == nil {
+            selectedCountry = peak.first ?? shoulder.first
+        }
+
+        loadError = nil
+
+#if DEBUG
+        print("💾 [SeasonalityViewModel] Loaded cached seasonality for month \(month) (peak=\(peak.count), shoulder=\(shoulder.count))")
+#endif
+    }
+
+    private enum SeasonalityCache {
+        private static let filePrefix = "seasonality_month_"
+        private static let fileSuffix = "_v1.json"
+        private static let refreshKeyPrefix = "seasonality_last_refresh_month_"
+        private static let refreshKeySuffix = "_v1"
+
+        struct Payload: Codable {
+            let month: Int
+            let peak: [CountryItem]
+            let shoulder: [CountryItem]
+            let savedAt: TimeInterval
+
+            var peakCountries: [SeasonalityCountry] { peak.map { $0.toModel() } }
+            var shoulderCountries: [SeasonalityCountry] { shoulder.map { $0.toModel() } }
+        }
+
+        struct CountryItem: Codable {
+            let isoCode: String
+            let name: String?
+            let score: Double?
+            let region: String?
+            let advisoryLevel: Int?
+            let scores: ScoreItem?
+
+            struct ScoreItem: Codable {
+                let advisory: Double?
+                let seasonality: Double?
+                let affordability: Double?
+                let visaEase: Double?
+            }
+
+            init(from model: SeasonalityCountry) {
+                self.isoCode = model.isoCode
+                self.name = model.name
+                self.score = model.score
+                self.region = model.region
+                self.advisoryLevel = model.advisoryLevel
+                if let s = model.scores {
+                    self.scores = ScoreItem(
+                        advisory: s.advisory,
+                        seasonality: s.seasonality,
+                        affordability: s.affordability,
+                        visaEase: s.visaEase
+                    )
+                } else {
+                    self.scores = nil
+                }
+            }
+
+            func toModel() -> SeasonalityCountry {
+                let snapshot: SeasonalityCountry.ScoreSnapshot? = {
+                    guard let s = scores else { return nil }
+                    return SeasonalityCountry.ScoreSnapshot(
+                        advisory: s.advisory,
+                        seasonality: s.seasonality,
+                        affordability: s.affordability,
+                        visaEase: s.visaEase
+                    )
+                }()
+
+                return SeasonalityCountry(
+                    isoCode: isoCode,
+                    name: name,
+                    score: score,
+                    region: region,
+                    advisoryLevel: advisoryLevel,
+                    scores: snapshot
+                )
+            }
+        }
+
+        static func save(month: Int, peak: [SeasonalityCountry], shoulder: [SeasonalityCountry]) {
+            let payload = Payload(
+                month: month,
+                peak: peak.map { CountryItem(from: $0) },
+                shoulder: shoulder.map { CountryItem(from: $0) },
+                savedAt: Date().timeIntervalSince1970
+            )
+            do {
+                let encoder = JSONEncoder()
+                let data = try encoder.encode(payload)
+                try data.write(to: fileURL(for: month), options: [.atomic])
+                UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: refreshKey(for: month))
+#if DEBUG
+                print("💾 [SeasonalityCache] Saved month \(month)")
+#endif
+            } catch {
+#if DEBUG
+                print("🔴 [SeasonalityCache] Save failed:", error)
+#endif
+            }
+        }
+
+        static func load(month: Int) -> (month: Int, peak: [SeasonalityCountry], shoulder: [SeasonalityCountry])? {
+            do {
+                let data = try Data(contentsOf: fileURL(for: month))
+                let decoder = JSONDecoder()
+                let payload = try decoder.decode(Payload.self, from: data)
+                return (payload.month, payload.peakCountries, payload.shoulderCountries)
+            } catch {
+                return nil
+            }
+        }
+
+        static func shouldRefresh(month: Int, minInterval: TimeInterval) -> Bool {
+            let last = UserDefaults.standard.double(forKey: refreshKey(for: month))
+            guard last > 0 else { return true }
+            return (Date().timeIntervalSince1970 - last) >= minInterval
+        }
+
+        private static func refreshKey(for month: Int) -> String {
+            "\(refreshKeyPrefix)\(month)\(refreshKeySuffix)"
+        }
+
+        private static func fileURL(for month: Int) -> URL {
+            let fm = FileManager.default
+            let dir = (try? fm.url(
+                for: .applicationSupportDirectory,
+                in: .userDomainMask,
+                appropriateFor: nil,
+                create: true
+            )) ?? fm.temporaryDirectory
+            return dir.appendingPathComponent("\(filePrefix)\(month)\(fileSuffix)")
+        }
+    }
+
 #if DEBUG
     private func debugMirrorTree(_ value: Any, name: String = "root", depth: Int = 0, maxDepth: Int = 4) {
         if depth > maxDepth { return }
@@ -261,7 +412,13 @@ final class SeasonalityViewModel: ObservableObject {
 
     func loadInitial() {
         Task {
+            // 0) Load cached seasonality for the initial month immediately (offline/fast)
+            applyCachedSeasonalityIfAvailable(forMonth: selectedMonth)
+
+            // 1) Load country meta (names/scores) from cache if possible, then from network
             await loadCountryMetaIfNeeded()
+
+            // 2) Load seasonality (will use cache + refresh)
             await load(forMonth: selectedMonth)
         }
     }
@@ -271,7 +428,14 @@ final class SeasonalityViewModel: ObservableObject {
         if !countryMetaByISO.isEmpty { return }
 
         do {
-            let countries = try await CountryAPI.fetchCountries()
+            let countries: [Country]
+            if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
+                countries = cached
+            } else if let refreshed = await CountryAPI.refreshCountriesIfNeeded(minInterval: 60), !refreshed.isEmpty {
+                countries = refreshed
+            } else {
+                countries = try await CountryAPI.fetchCountries()
+            }
             var map: [String: CountryMeta] = [:]
             for c in countries {
                 // Country model uses `iso2` in this codebase (see CountryAPI mapping)
@@ -370,7 +534,23 @@ final class SeasonalityViewModel: ObservableObject {
     }
 
     func load(forMonth month: Int) async {
-        isLoading = true
+        // 0) Show cached month results immediately (even if offline)
+        applyCachedSeasonalityIfAvailable(forMonth: month)
+
+        // If we have cached data and we're within cooldown, don't spam network
+        if !SeasonalityCache.shouldRefresh(month: month, minInterval: 60) {
+#if DEBUG
+            print("🟡 [SeasonalityViewModel] Skipping seasonality refresh for month \(month) (cooldown)")
+#endif
+            return
+        }
+
+        // Show spinner only if we don't have anything to show yet
+        if peakCountries.isEmpty && shoulderCountries.isEmpty {
+            isLoading = true
+        } else {
+            isLoading = false
+        }
         loadError = nil
 
         do {
@@ -386,6 +566,9 @@ final class SeasonalityViewModel: ObservableObject {
             peakCountries = enrichedPeak
             shoulderCountries = enrichedShoulder
 
+            // Cache the raw seasonality result (as a lightweight Codable payload)
+            SeasonalityCache.save(month: response.month, peak: response.peak, shoulder: response.shoulder)
+
             // Reset selection when month changes
             if let first = enrichedPeak.first {
                 selectedCountry = first
@@ -393,7 +576,14 @@ final class SeasonalityViewModel: ObservableObject {
                 selectedCountry = enrichedShoulder.first
             }
         } catch {
-            loadError = error.localizedDescription
+            // If we already showed cached data, keep it and show a soft error
+            if peakCountries.isEmpty && shoulderCountries.isEmpty {
+                loadError = error.localizedDescription
+            } else {
+#if DEBUG
+                print("⚠️ [SeasonalityViewModel] Refresh failed but cache shown:", error)
+#endif
+            }
         }
 
         isLoading = false
