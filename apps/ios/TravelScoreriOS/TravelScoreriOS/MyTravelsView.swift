@@ -58,16 +58,19 @@ struct MyTravelsView: View {
             CountryDetailView(country: country)
         }
         .task {
-            guard countries.isEmpty else { return }
-            do {
-                let apiCountries = try await CountryAPI.fetchCountries()
-                if !apiCountries.isEmpty {
-                    countries = apiCountries
-                } else {
-                    countries = DataLoader.loadCountriesFromBundle()
-                }
-            } catch {
-                print("Failed to load countries:", error)
+            // 1) Show cached data immediately (fast/offline)
+            if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
+                countries = cached
+            }
+
+            // 2) Try to refresh from API (skips if refreshed recently)
+            if let fresh = await CountryAPI.refreshCountriesIfNeeded(minInterval: 60), !fresh.isEmpty {
+                countries = fresh
+                return
+            }
+
+            // 3) If we still have nothing, fall back to bundled data
+            if countries.isEmpty {
                 countries = DataLoader.loadCountriesFromBundle()
             }
         }
