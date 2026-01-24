@@ -28,10 +28,17 @@ struct RootTabView: View {
             }
 
             NavigationStack {
-                WishlistView()
+                BucketListView()
             }
             .tabItem {
-                Label("Wishlist", systemImage: "heart.fill")
+                Label("Bucket List", systemImage: "bookmark.fill")
+            }
+
+            NavigationStack {
+                MyTravelsView()
+            }
+            .tabItem {
+                Label("My Travels", systemImage: "backpack.fill")
             }
 
             NavigationStack {
@@ -49,15 +56,6 @@ struct RootTabView: View {
             }
         }
     }
-}
-
-// You can keep these placeholders or delete the ones you’re not using yet
-struct MyTripsView: View {
-    var body: some View { Text("My Trips (coming soon)") }
-}
-
-struct WishlistView: View {
-    var body: some View { Text("Wishlist (coming soon)") }
 }
 
 struct FriendsView: View {

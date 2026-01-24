@@ -1,0 +1,57 @@
+//
+//  BucketListStore.swift
+//  TravelScoreriOS
+//
+//  Created by Lama Yassine on 1/23/26.
+//
+
+import Foundation
+import Combine
+
+@MainActor
+final class BucketListStore: ObservableObject {
+    @Published private(set) var ids: Set<String> = []
+
+    private let saveKey = "bucket_list_country_ids_v2_iso2"
+
+    init() {
+        load()
+    }
+
+    func contains(_ id: String) -> Bool {
+        ids.contains(id)
+    }
+
+    func toggle(_ id: String) {
+        if ids.contains(id) {
+            ids.remove(id)
+        } else {
+            ids.insert(id)
+        }
+        save()
+    }
+
+    func add(_ id: String) {
+        ids.insert(id)
+        save()
+    }
+
+    func remove(_ id: String) {
+        ids.remove(id)
+        save()
+    }
+
+    private func load() {
+        guard let data = UserDefaults.standard.data(forKey: saveKey) else { return }
+        if let decoded = try? JSONDecoder().decode([String].self, from: data) {
+            ids = Set(decoded)
+        }
+    }
+
+    private func save() {
+        let array = Array(ids)
+        if let data = try? JSONEncoder().encode(array) {
+            UserDefaults.standard.set(data, forKey: saveKey)
+        }
+    }
+}

@@ -1,0 +1,47 @@
+//
+//  TraveledStore.swift
+//  TravelScoreriOS
+//
+//  Created by Lama Yassine on 1/24/26.
+//
+
+import Foundation
+import Combine
+
+@MainActor
+final class TraveledStore: ObservableObject {
+    @Published private(set) var ids: Set<String> = []
+
+    private let saveKey = "traveled_country_ids_v2_iso2"
+
+    init() {
+        load()
+    }
+
+    func contains(_ id: String) -> Bool {
+        ids.contains(id)
+    }
+
+    func toggle(_ id: String) {
+        if ids.contains(id) {
+            ids.remove(id)
+        } else {
+            ids.insert(id)
+        }
+        save()
+    }
+
+    private func load() {
+        guard let data = UserDefaults.standard.data(forKey: saveKey) else { return }
+        if let decoded = try? JSONDecoder().decode([String].self, from: data) {
+            ids = Set(decoded)
+        }
+    }
+
+    private func save() {
+        let array = Array(ids)
+        if let data = try? JSONEncoder().encode(array) {
+            UserDefaults.standard.set(data, forKey: saveKey)
+        }
+    }
+}
