@@ -31,6 +31,24 @@ struct CountryListView: View {
     @State private var countries: [Country] = []
     @State private var showingMap = false
 
+    // MARK: - Quick swipe confirmation (brief checkmark)
+
+    private enum QuickConfirm {
+        case bucket
+        case visited
+    }
+
+    @State private var quickConfirmByCountryId: [String: QuickConfirm] = [:]
+
+    private func flashConfirm(_ type: QuickConfirm, for id: String) {
+        quickConfirmByCountryId[id] = type
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
+            if quickConfirmByCountryId[id] == type {
+                quickConfirmByCountryId[id] = nil
+            }
+        }
+    }
+
     private var filteredAndSorted: [Country] {
         let filtered = countries.filter {
             search.isEmpty || $0.name.localizedCaseInsensitiveContains(search)
@@ -43,7 +61,9 @@ struct CountryListView: View {
                 $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
             }
         case .score:
-            baseSorted = filtered.sorted { $0.score < $1.score }
+            baseSorted = filtered.sorted(by: { (a: Country, b: Country) -> Bool in
+                a.score < b.score
+            })
         }
 
         switch sortOrder {
@@ -55,8 +75,13 @@ struct CountryListView: View {
     }
 
     var body: some View {
-        List(filteredAndSorted) { country in
-            NavigationLink(value: country) {
+        List(filteredAndSorted, id: \.id) { country in
+            let idStr = country.id
+            let showConfirm = quickConfirmByCountryId[idStr] != nil
+
+            NavigationLink {
+                CountryDetailView(country: country)
+            } label: {
                 HStack(spacing: 12) {
                     Text(country.flagEmoji).font(.largeTitle)
                     VStack(alignment: .leading, spacing: 4) {
@@ -66,28 +91,47 @@ struct CountryListView: View {
                         }
                     }
                     Spacer()
-                    ScorePill(score: country.score)
+
+                    HStack(spacing: 8) {
+                        ScorePill(score: country.score)
+
+                        ZStack {
+                            // invisible placeholder to keep layout stable
+                            Image(systemName: "checkmark.circle.fill")
+                                .opacity(0)
+                        }
+                        .frame(width: 22, height: 22)
+                        .overlay {
+                            if showConfirm {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .transition(.opacity)
+                            }
+                        }
+                        .animation(.easeInOut(duration: 0.18), value: showConfirm)
+                    }
                 }
                 .padding(.vertical, 6)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button {
-                        bucketList.toggle(country.id)
+                        bucketList.toggle(idStr)
+                        flashConfirm(.bucket, for: idStr)
                     } label: {
-                        Text(bucketList.contains(country.id) ? "🪣 Unbucket" : "🪣 Bucket")
+                        Text(bucketList.contains(idStr) ? "🪣 Unbucket" : "🪣 Bucket")
                     }
                     .tint(.blue)
 
                     Button {
-                        traveled.toggle(country.id)
+                        traveled.toggle(idStr)
+                        flashConfirm(.visited, for: idStr)
                     } label: {
-                        Text(traveled.contains(country.id) ? "📝 Unvisit" : "📝 Visited")
+                        Text(traveled.contains(idStr) ? "📝 Unvisit" : "📝 Visited")
                     }
                     .tint(.green)
                 }
             }
         }
         .listStyle(.plain)
-        .searchable(text: $search, prompt: "Search countries")
+        .searchable(text: $search, prompt: Text("Search countries"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 12) {
@@ -118,9 +162,6 @@ struct CountryListView: View {
         }
         .sheet(isPresented: $showingMap) {
             MapPlaceholderView()
-        }
-        .navigationDestination(for: Country.self) { country in
-            CountryDetailView(country: country)
         }
         .navigationTitle("TravelAF")
         .task {
