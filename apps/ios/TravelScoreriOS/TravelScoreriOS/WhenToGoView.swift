@@ -10,6 +10,7 @@ import SwiftUI
 
 struct WhenToGoView: View {
     @StateObject private var viewModel = SeasonalityViewModel()
+    @State private var isDrawerOpen: Bool = false
     
     var body: some View {
         NavigationStack {
@@ -38,16 +39,7 @@ struct WhenToGoView: View {
                     viewModel.loadInitial()
                 }
             }
-            .sheet(
-                isPresented: Binding(
-                    get: { viewModel.selectedCountry != nil },
-                    set: { isPresented in
-                        if !isPresented {
-                            viewModel.selectedCountry = nil
-                        }
-                    }
-                )
-            ) {
+            .sheet(isPresented: $isDrawerOpen) {
                 if let selected = viewModel.selectedCountry {
                     NavigationStack {
                         SeasonalityCountryBottomDrawerView(country: selected)
@@ -77,6 +69,8 @@ struct WhenToGoView: View {
                     let isSelected = month.id == viewModel.selectedMonth
                     Button {
                         Task {
+                            isDrawerOpen = false
+                            viewModel.selectedCountry = nil
                             await viewModel.load(forMonth: month.id)
                         }
                     } label: {
@@ -178,6 +172,7 @@ struct WhenToGoView: View {
             } else {
                 WrapChips(countries: countries) { country in
                     viewModel.select(country)
+                    isDrawerOpen = true
                 }
             }
         }
