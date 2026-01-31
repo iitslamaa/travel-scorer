@@ -163,7 +163,7 @@ struct CountryListView: View {
         .sheet(isPresented: $showingMap) {
             MapPlaceholderView()
         }
-        .navigationTitle("TravelAF")
+        .navigationTitle("Travel AF")
         .task {
             // 1) Show cached data immediately (fast/offline)
             if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
