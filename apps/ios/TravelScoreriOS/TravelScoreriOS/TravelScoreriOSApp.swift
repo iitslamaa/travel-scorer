@@ -19,15 +19,15 @@ struct TravelScoreriOSApp: App {
             RootTabView()
                 .environmentObject(bucketListStore)
                 .environmentObject(traveledStore)
-                // Warm cache on first launch (non-blocking)
+                // Backend-controlled refresh on app launch
                 .task {
-                    _ = await CountryAPI.refreshCountriesIfNeeded(minInterval: 0)
+                    await DataLoader.loadInitialDataIfNeeded()
                 }
-                // Refresh when app becomes active (with cooldown inside CountryAPI)
+                // Re-check freshness when app becomes active
                 .onChange(of: scenePhase) { _, newPhase in
                     guard newPhase == .active else { return }
                     Task {
-                        _ = await CountryAPI.refreshCountriesIfNeeded(minInterval: 60)
+                        await DataLoader.loadInitialDataIfNeeded()
                     }
                 }
         }

@@ -54,4 +54,57 @@ enum DataLoader {
             return []
         }
     }
+
+    // MARK: - Backend-controlled refresh
+
+    struct Meta: Codable, Equatable {
+        let countriesVersion: String
+        let seasonalityVersion: String
+    }
+
+    private static let metaCacheKey = "cached_meta_v1"
+
+    static func loadInitialDataIfNeeded() async {
+        do {
+            let remoteMeta = try await fetchRemoteMeta()
+            let localMeta = loadCachedMeta()
+
+            if localMeta != remoteMeta {
+                print("🔄 Meta changed, refreshing remote data")
+                await refreshRemoteData()
+                saveCachedMeta(remoteMeta)
+            } else {
+                print("✅ Meta unchanged, using cached data")
+            }
+        } catch {
+            print("❌ Meta check failed:", error)
+        }
+    }
+
+    private static func fetchRemoteMeta() async throws -> Meta {
+        let url = APIConfig.baseURL.appendingPathComponent("/api/meta")
+        let (data, _) = try await URLSession.shared.data(from: url)
+        return try JSONDecoder().decode(Meta.self, from: data)
+    }
+
+    private static func loadCachedMeta() -> Meta? {
+        guard let data = UserDefaults.standard.data(forKey: metaCacheKey) else {
+            return nil
+        }
+        return try? JSONDecoder().decode(Meta.self, from: data)
+    }
+
+    private static func saveCachedMeta(_ meta: Meta) {
+        if let data = try? JSONEncoder().encode(meta) {
+            UserDefaults.standard.set(data, forKey: metaCacheKey)
+        }
+    }
+
+    private static func refreshRemoteData() async {
+        // Countries are globally cached and safe to refresh here
+        _ = await CountryAPI.refreshCountriesIfNeeded(minInterval: 0)
+
+        // Seasonality is view-driven and refreshes via SeasonalityViewModel
+        // (on appear / month change), so we do not trigger it here.
+    }
 }
