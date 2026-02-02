@@ -397,6 +397,7 @@ export async function GET() {
   try {
     const iso2s = merged.map((r) => r.iso2.toUpperCase());
 
+    // Disable caching for downstream fetches (e.g. Wikipedia HTML) to avoid Next.js cache warnings
     const factsByIso2 = await loadFacts(iso2s, advisories);
     const visaIndex = await buildVisaIndex();
 
