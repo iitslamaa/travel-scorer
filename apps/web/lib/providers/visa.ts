@@ -176,7 +176,7 @@ async function fetchVisaFromWikipedia(): Promise<Map<string, VisaRow>> {
 
 // Build a ready-to-use index for API routes.
 // Having a runtime export ensures this module has value exports (types are erased).
-import visaSnapshot from '@/data/snapshots/visa_us_citizens.json';
+import visaSnapshot from '../../data/snapshots/visa_us_citizens.json';
 
 // Runtime source of truth: static snapshot (no Wikipedia fetches in prod)
 export async function buildVisaIndex(): Promise<Map<string, VisaRow>> {
