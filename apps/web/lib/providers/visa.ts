@@ -72,7 +72,9 @@ function scoreFor(visaType: VisaType, feeUsd?: number): number {
  * [0] Country | [1] Requirement | [2] Allowed stay | [3] Notes
  */
 async function fetchVisaFromWikipedia(): Promise<Map<string, VisaRow>> {
-  const res = await fetch(WP_URL, { cache: 'force-cache' });
+  const res = await fetch(WP_URL, {
+    cache: 'no-store',
+  });
   if (!res.ok) throw new Error(`Visa WP fetch failed: ${res.status}`);
   const html = await res.text();
 
@@ -174,9 +176,18 @@ async function fetchVisaFromWikipedia(): Promise<Map<string, VisaRow>> {
 
 // Build a ready-to-use index for API routes.
 // Having a runtime export ensures this module has value exports (types are erased).
+import visaSnapshot from '@/data/snapshots/visa_us_citizens.json';
+
+// Runtime source of truth: static snapshot (no Wikipedia fetches in prod)
 export async function buildVisaIndex(): Promise<Map<string, VisaRow>> {
-  return fetchVisaFromWikipedia();
+  const map = new Map<string, VisaRow>();
+
+  for (const [iso2, row] of Object.entries(visaSnapshot)) {
+    map.set(iso2.toUpperCase(), row as VisaRow);
+  }
+
+  return map;
 }
 
-// Optionally expose the raw fetch for debugging (not used by app code).
-export { fetchVisaFromWikipedia as __debug_fetchVisaFromWikipedia };
+// Debug-only export for snapshot scripts (never used at runtime)
+export { fetchVisaFromWikipedia };
