@@ -536,6 +536,7 @@ final class SeasonalityViewModel: ObservableObject {
     func load(forMonth month: Int) async {
         // 0) Show cached month results immediately (even if offline)
         applyCachedSeasonalityIfAvailable(forMonth: month)
+        selectedMonth = month
 
         // If we have cached data and we're within cooldown, don't spam network
         if !SeasonalityCache.shouldRefresh(month: month, minInterval: 60) {
