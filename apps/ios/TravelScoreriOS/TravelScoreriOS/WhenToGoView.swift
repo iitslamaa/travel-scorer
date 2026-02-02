@@ -68,9 +68,11 @@ struct WhenToGoView: View {
                 ForEach(allMonthsMeta) { month in
                     let isSelected = month.id == viewModel.selectedMonth
                     Button {
+                        isDrawerOpen = false
+                        viewModel.selectedCountry = nil
+                        viewModel.selectedMonth = month.id   // 👈 ADD THIS
+
                         Task {
-                            isDrawerOpen = false
-                            viewModel.selectedCountry = nil
                             await viewModel.load(forMonth: month.id)
                         }
                     } label: {
