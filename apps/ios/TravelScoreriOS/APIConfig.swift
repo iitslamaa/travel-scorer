@@ -8,19 +8,23 @@
 import Foundation
 
 enum APIConfig {
-    /// Set `API_BASE_URL` in Info.plist to override (useful for debug / staging).
+
+    /// Optional override via Info.plist (useful for local dev or staging)
+    /// Example value: http://192.168.1.100:3000
     private static var overrideBaseURLString: String? {
         Bundle.main.object(forInfoDictionaryKey: "API_BASE_URL") as? String
     }
 
     static var baseURL: URL {
-        if let s = overrideBaseURLString?.trimmingCharacters(in: .whitespacesAndNewlines),
+        // 1) Explicit override always wins
+        if let s = overrideBaseURLString?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
            !s.isEmpty,
            let url = URL(string: s) {
             return url
         }
 
-        // Production default (Railway)
+        // 2) Production default (Railway – always-on backend)
         return URL(string: "https://travel-app-af-production.up.railway.app")!
     }
 }
