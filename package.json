@@ -12,6 +12,7 @@
     "build:web": "pnpm -F ./apps/web build"
   },
   "devDependencies": {
+    "ts-node": "^10.9.2",
     "tsx": "^4.20.6"
   },
   "dependencies": {
