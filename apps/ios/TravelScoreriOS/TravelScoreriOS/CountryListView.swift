@@ -29,8 +29,12 @@ struct CountryListView: View {
     @State private var sortOrder: SortOrder = .descending
     @State private var search = ""
     @State private var countries: [Country] = []
+    @State private var visibleCountries: [Country] = []
     @State private var showingMap = false
     @State private var hasLoaded = false
+
+    // Keep a handle to the latest recompute task so we can cancel stale work
+    @State private var recomputeTask: Task<Void, Never>?
 
     // MARK: - Quick swipe confirmation (brief checkmark)
 
@@ -50,33 +54,56 @@ struct CountryListView: View {
         }
     }
 
-    private var filteredAndSorted: [Country] {
-        let filtered = countries.filter {
-            search.isEmpty || $0.name.localizedCaseInsensitiveContains(search)
-        }
+    private func scheduleRecomputeVisible() {
+        // Cancel any in-flight recompute so fast typing / toggling doesn't queue work.
+        recomputeTask?.cancel()
 
-        let baseSorted: [Country]
-        switch sort {
-        case .name:
-            baseSorted = filtered.sorted {
-                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+        // Capture a snapshot of inputs to process off-main.
+        let snapshotCountries = countries
+        let snapshotSearch = search
+        let snapshotSort = sort
+        let snapshotSortOrder = sortOrder
+
+        recomputeTask = Task.detached(priority: .userInitiated) {
+            // Filter
+            let filtered: [Country]
+            if snapshotSearch.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                filtered = snapshotCountries
+            } else {
+                filtered = snapshotCountries.filter { $0.name.localizedCaseInsensitiveContains(snapshotSearch) }
             }
-        case .score:
-            baseSorted = filtered.sorted(by: { (a: Country, b: Country) -> Bool in
-                a.score < b.score
-            })
-        }
 
-        switch sortOrder {
-        case .ascending:
-            return baseSorted
-        case .descending:
-            return Array(baseSorted.reversed())
+            // Sort
+            let baseSorted: [Country]
+            switch snapshotSort {
+            case .name:
+                baseSorted = filtered.sorted {
+                    $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
+                }
+            case .score:
+                // Sort ascending, then flip based on order
+                baseSorted = filtered.sorted { $0.score < $1.score }
+            }
+
+            let result: [Country]
+            switch snapshotSortOrder {
+            case .ascending:
+                result = baseSorted
+            case .descending:
+                result = Array(baseSorted.reversed())
+            }
+
+            // Publish back on main
+            await MainActor.run {
+                // If this task was cancelled, don't apply.
+                if Task.isCancelled { return }
+                self.visibleCountries = result
+            }
         }
     }
 
     var body: some View {
-        List(filteredAndSorted, id: \.id) { country in
+        List(visibleCountries, id: \.id) { country in
             let idStr = country.id
             let showConfirm = quickConfirmByCountryId[idStr] != nil
 
@@ -165,36 +192,53 @@ struct CountryListView: View {
             MapPlaceholderView()
         }
         .navigationTitle("Travel AF")
-        .onAppear {
+        .task {
             guard !hasLoaded else { return }
             hasLoaded = true
 
             // 1) Show cached data immediately (fast/offline)
             if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
                 countries = cached
+                scheduleRecomputeVisible()
             }
 
-            Task {
-                // 2) Try to refresh from API (skips if refreshed recently)
-                if let fresh = await CountryAPI.refreshCountriesIfNeeded(minInterval: 60),
-                   !fresh.isEmpty {
-                    await MainActor.run {
-                        countries = fresh
-                    }
-                    return
-                }
-
-                // 3) If we still have nothing, fall back to bundled data
-                if countries.isEmpty {
-                    await MainActor.run {
-                        countries = DataLoader.loadCountriesFromBundle()
-                    }
-                }
+            // 2) Refresh from API (skips if refreshed recently)
+            if let fresh = await CountryAPI.refreshCountriesIfNeeded(minInterval: 60),
+               !fresh.isEmpty {
+                countries = fresh
+                scheduleRecomputeVisible()
+                return
             }
+
+            // 3) If we still have nothing, fall back to bundled data
+            if countries.isEmpty {
+                // Bundle decoding can be non-trivial; do it off-main.
+                let bundled = await Task.detached(priority: .utility) {
+                    DataLoader.loadCountriesFromBundle()
+                }.value
+
+                countries = bundled
+                scheduleRecomputeVisible()
+            }
+        }
+        // Recompute visible list when inputs change
+        .onChange(of: search) { _, _ in
+            scheduleRecomputeVisible()
+        }
+        .onChange(of: sort) { _, _ in
+            scheduleRecomputeVisible()
+        }
+        .onChange(of: sortOrder) { _, _ in
+            scheduleRecomputeVisible()
+        }
+        .onChange(of: countries.count) { _, _ in
+            scheduleRecomputeVisible()
         }
     }
 }
 
 #Preview {
     CountryListView()
+        .environmentObject(BucketListStore())
+        .environmentObject(TraveledStore())
 }

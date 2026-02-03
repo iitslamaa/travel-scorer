@@ -8,11 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		170F3EC02F218C6C0083E900 /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F3EBF2F218C6C0083E900 /* APIConfig.swift */; };
+		17F063812F32730600F1F4F3 /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063802F32730600F1F4F3 /* SupabaseClient.swift */; };
+		17F063832F32732F00F1F4F3 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063822F32732F00F1F4F3 /* AuthViewModel.swift */; };
+		17F063852F32734800F1F4F3 /* EmailAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063842F32734800F1F4F3 /* EmailAuthView.swift */; };
+		17F063882F32747D00F1F4F3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 17F063872F32747D00F1F4F3 /* Supabase */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		170F3EBF2F218C6C0083E900 /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 		17AFEC8A2EC2C3D800B9585B /* TravelScoreriOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelScoreriOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		17F063802F32730600F1F4F3 /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
+		17F063822F32732F00F1F4F3 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
+		17F063842F32734800F1F4F3 /* EmailAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAuthView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -41,6 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17F063882F32747D00F1F4F3 /* Supabase in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,8 +58,12 @@
 		17AFEC812EC2C3D800B9585B = {
 			isa = PBXGroup;
 			children = (
+				17F063802F32730600F1F4F3 /* SupabaseClient.swift */,
+				17F063822F32732F00F1F4F3 /* AuthViewModel.swift */,
+				17F063842F32734800F1F4F3 /* EmailAuthView.swift */,
 				170F3EBF2F218C6C0083E900 /* APIConfig.swift */,
 				17AFEC8C2EC2C3D800B9585B /* TravelScoreriOS */,
+				17F063862F32747D00F1F4F3 /* Frameworks */,
 				17AFEC8B2EC2C3D800B9585B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -62,6 +74,13 @@
 				17AFEC8A2EC2C3D800B9585B /* TravelScoreriOS.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		17F063862F32747D00F1F4F3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -84,6 +103,7 @@
 			);
 			name = TravelScoreriOS;
 			packageProductDependencies = (
+				17F063872F32747D00F1F4F3 /* Supabase */,
 			);
 			productName = TravelScoreriOS;
 			productReference = 17AFEC8A2EC2C3D800B9585B /* TravelScoreriOS.app */;
@@ -113,6 +133,9 @@
 			);
 			mainGroup = 17AFEC812EC2C3D800B9585B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				17F0637F2F326FDA00F1F4F3 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 17AFEC8B2EC2C3D800B9585B /* Products */;
 			projectDirPath = "";
@@ -138,7 +161,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17F063852F32734800F1F4F3 /* EmailAuthView.swift in Sources */,
+				17F063832F32732F00F1F4F3 /* AuthViewModel.swift in Sources */,
 				170F3EC02F218C6C0083E900 /* APIConfig.swift in Sources */,
+				17F063812F32730600F1F4F3 /* SupabaseClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -356,6 +382,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		17F0637F2F326FDA00F1F4F3 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/supabase-community/supabase-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.5.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		17F063872F32747D00F1F4F3 /* Supabase */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 17F0637F2F326FDA00F1F4F3 /* XCRemoteSwiftPackageReference "supabase-swift" */;
+			productName = Supabase;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 17AFEC822EC2C3D800B9585B /* Project object */;
 }
