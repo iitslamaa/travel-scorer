@@ -1,0 +1,1304 @@
+{
+  "AF": {
+    "visaType": "visa_required",
+    "notes": "Visitors born in Afghanistan do not require a visa. All visitors are required to register with the Ministry of Foreign Affairs upon arrival. The U.S. government forced all Afghan diplomatic missions in the U.S. to close in March 2022. Applicants must now obtain a visa from a mission in another country. Since 2024, the Taliban only accepts visas issued by approved diplomatic missions , though those who have already entered on a visa issued by another mission are allowed to stay. The U.S. government advises its citizens not to visit Afghanistan due to civil unrest, crime, terrorism, risk of wrongful detention, kidnapping, and limited health facilities . U.S. citizens in Afghanistan are urged to depart immediately via commercial means if possible.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "AL": {
+    "visaType": "visa_free",
+    "allowedDays": 365,
+    "notes": "One must leave for 90 days to reset the visa free period.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "DZ": {
+    "visaType": "visa_required",
+    "notes": "Application for a tourist visa to Algeria must be accompanied by a certificate of accommodation. Persons may be denied entry if entering with a passport containing visas or stamps issued by Israel. Visa can be obtained on arrival for certain cities in the southern region of the country if travel is booked through a local travel agency.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "AD": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "AO": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "notes": "30 days per stay, max 90 days in a year. Proof of onwards tickets and hotel reservations required. Yellow fever vaccine no longer required of US citizens.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "AG": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "notes": "Stringent application of rules regarding proof of sufficient funds, return ticket and accommodation.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "AR": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Extendable up to 180 days. Argentina requires a mandatory travellers to have a health insurance prior to the arrival as July 2025.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "AM": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period. Tourism purpose only.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "AU": {
+    "visaType": "visa_required",
+    "allowedDays": 90,
+    "feeUsd": 20,
+    "notes": "eTA fee is AUD$20 90 days on each visit in 12-month period if granted. May enter using SmartGate .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "AT": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area . Residence permit ( Aufenthaltstitel ) for stays of longer than 90 days obtainable after arrival under certain conditions.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "AZ": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "Travelers departing from New York can obtain a visa at the airport upon arrival in Baku, however no airline currently operates this route. Visa can be obtained on arrival in certain emergency situations. If staying in Azerbaijan for more than ten days, visitors must register at the State Migration Service within three days of arrival. Applicants of Armenian ancestry or with Armenian visas in their passport may be denied a visa. Travellers with a visa or evidence of travel to the now-defunct Republic of Artsakh (stamps) are permanently denied entry.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "BS": {
+    "visaType": "visa_free",
+    "allowedDays": 240,
+    "notes": "Passport card or enhanced drivers license valid for sea travel.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "BH": {
+    "visaType": "voa",
+    "allowedDays": 14,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "BD": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "Visa on arrival is available at Dhaka, Chittagong, and Sylhet international airports, pre arrival visa required if arriving by sea or by land border crossing. No visa required for Bangladeshi Americans and their spouse and children with a copy of a former Bangladeshi passport, a Dual Nationality Certificate, NVR, a Bangladeshi NID, or a digital birth registration certificate.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "BB": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "BY": {
+    "visaType": "evisa",
+    "allowedDays": 30,
+    "notes": "The U.S. government advises its citizens not to visit Belarus due to the Belarusian authorities’ arbitrary enforcement of local laws, the risk of detention, the continued facilitation of Russia’s war against Ukraine , the potential of civil unrest, and the Embassy’s limited ability to assist U.S. citizens residing in or traveling to Belarus. U.S. citizens in Belarus are advised to depart immediately.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "BE": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area Residence permit ( Titre de séjour / Verblijfstitel / Aufenthaltstitel ) obtainable after arrival for stays longer than 90 days under certain conditions.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "BZ": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "notes": "Mandatory Car Disinfection at border. If one fails to do so, they will be sent back to go through this procedure. A fee does apply.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "BJ": {
+    "visaType": "evisa",
+    "allowedDays": 30,
+    "notes": "International Certificate of Vaccination or Prophylaxis required. eVisas are available for 30 or 90 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "BT": {
+    "visaType": "evisa",
+    "notes": "“Sustainable Development Fee”of 100 USD per day for almost all visitors to Bhutan. Tour guide required for all travelers except in city of Thimpu and Paro. Even in these cities, tourists are not permitted to enter any tourist attraction without a guide. They are only allowed to walk and shop around these cities without a guide.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "BO": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "BA": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 6-month period.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "BW": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 1-year period.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "BR": {
+    "visaType": "evisa",
+    "allowedDays": 90,
+    "notes": "Brazilian authorities have announced that United States citizens will require a visa beginning April 10, 2025. United States citizens will be able to obtain visas online.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "BN": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "BG": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "BF": {
+    "visaType": "visa_required",
+    "allowedDays": 30,
+    "notes": "International Certificate of Vaccination or Prophylaxis required. The U.S. government advises its citizens not to visit Burkina Faso for any reason due to terrorism, crime, and kidnapping . Following Niger's example, Burkina Faso has suspended visa services for U.S. citizens and barred Americans from entering.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "BI": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "Visa on arrival obtainable at Bujumbura International Airport , and all land borders.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "KH": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "Visa is also obtainable online.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "CM": {
+    "visaType": "evisa",
+    "notes": "International Certificate of Vaccination or Prophylaxis and current immunization records required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "CA": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "notes": "Anyone with a criminal record (including misdemeanors or alcohol-related driving offenses in the US) may not be able to enter Canada without first obtaining an approval for rehabilitation or a Temporary Resident Permit (TRP). Passport Card, NEXUS card, or enhanced drivers license valid for land and sea travel. United States citizens and permanent residents are exempt from obtaining Canada ETA.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "CV": {
+    "visaType": "visa_required",
+    "allowedDays": 30,
+    "notes": "Must register online at least five days prior to arrival.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "CF": {
+    "visaType": "visa_required",
+    "notes": "International Certificate of Vaccination or Prophylaxis required. The U.S. government advises its citizens not to visit Central African Republic (CAR) due to armed conflict, crime, civil unrest, and kidnapping , as well as Embassy Bangui’s limited capacity to provide support to U.S. citizens.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "TD": {
+    "visaType": "visa_required",
+    "notes": "On June 5, 2025, Chad has suspended visa issuances to U.S. citizens in response to Donald Trump's travel ban, current visas will still be honored until their expiration. Dual-citizens of Chad can still travel to Chad but can only travel with a valid Chad passport. Passengers with an entry authorisation issued by the authorities of Chad can obtain a visa on arrival. International Certificate of Vaccination or Prophylaxis required only if arriving from a high risk country as defined by the WHO. Registration within 72 hours is mandatory prior to arrival.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "CL": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "No reciprocity fees required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "CN": {
+    "visaType": "visa_required",
+    "notes": "30-day visa‑free entry to Hainan Province if arriving at the island from outside Mainland China. 240-hour (10-day) visa-free transit to a third country or region (including Hong Kong , Macau or Taiwan ) using any mode of transport. Must have a confirmed onward ticket/itinerary, and enter through 1 of 64 approved ports . During which, may freely travel within the 24 provinces permitted for visa-free transit and engage in tourism, business, and visits. 24-hour visa-free transit to a third country or region (including Hong Kong, Macau, and Taiwan), is available at most international airports , without leaving the airport. Travellers who need to leave the airport may obtain a temporary entry permit from immigration . 5-day port visa (Visa on Arrival) for Shenzhen if arriving at designated ports of entry from Hong Kong by land or sea, for stays within Shenzhen. 3-day port visa (Visa on Arrival) if arriving in Zhuhai or Xiamen at designated ports of entry , for stays within the respective city. 15-day visa-free entry for cruise ship passengers in tour groups, if arriving at any cruise port along China's coastline, including but not limited to Tianjin ; Dalian ; Shanghai ; Lianyungang ; Wenzhou ; Zhoushan ; Xiamen ; Qingdao ; Guangzhou ; Shenzhen ; Beihai ; Haikou ; Sanya . May further travel inland to all regions of coastal provinces (and equivalents) and Beijing. May apply for a port visa (Visa on Arrival) if travelling for an urgent, qualified reason. Prior clearance for port visa is highly recommended or may be denied boarding by airlines. Visas for U.S. citizens are valid for up to 10 years. U.S. citizens arriving via cruise ports as part of tour groups are visa exempt for stays of up to 15 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "CO": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Extendable up to 180-days stay within a one-year period Colombian-born U.S. citizens and U.S. citizens traveling with children may face special exit requirements.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "KM": {
+    "visaType": "voa",
+    "allowedDays": 45,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "CG": {
+    "visaType": "evisa",
+    "notes": "International Certificate of Vaccination or Prophylaxis required. In April 2019 Congolese authorities announced a plan to introduce an electronic visa in August 2019. Visa applications can already be submitted online at the Republic of the Congo embassy in France website.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "CD": {
+    "visaType": "evisa",
+    "allowedDays": 7,
+    "notes": "International Certificate of Vaccination or Prophylaxis required. Registration required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "CR": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 Days out of any 12-month period.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "CI": {
+    "visaType": "evisa",
+    "allowedDays": 90,
+    "notes": "e-Visa holders must arrive via Port Bouet Airport . International Certificate of Vaccination or Prophylaxis required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "HR": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "CU": {
+    "visaType": "evisa",
+    "allowedDays": 90,
+    "notes": "Tourist travel is prohibited under U.S. law for U.S. citizens, permanent residents, and others subject to U.S. jurisdiction. Under the Cuban Assets Control Regulations , all persons subject to U.S. jurisdiction are not permitted to travel to Cuba unless licensed to engage in travel-related transactions. In addition to specific licenses granted by the Office of Foreign Assets Control (OFAC), there are 12 \"general licenses\" that people can choose to travel on without being required to notify OFAC, and the broad and self-reported nature of these licenses means travel is in practice subject to few restrictions. Cuba requires travelers to purchase a tourist card prior to arrival, which can be obtained from the airline or a Cuban diplomatic mission. Tourist cards are valid for one entry and a 30-day stay, which can be extended once by 90 days at a hotel or immigration office in Cuba. Cuba requires travelers to have health insurance valid in Cuba, which can be purchased from the airline.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "CY": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "CZ": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "DK": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "U.S. citizens can enter Denmark for up to 90 days out of any 180 day period, regardless of time spent in other Schengen countries prior to entry into Denmark.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "DJ": {
+    "visaType": "evisa",
+    "allowedDays": 90,
+    "notes": "eVisas valid at any port of entry.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "DM": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "DO": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "notes": "Extendable up to 90 days. Passport card or enhanced drivers license valid for sea travel.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "EC": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Extendable for another 90 days, per year",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "EG": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "eVisa issued for 30 days. Visa-free travel for tourists arriving at Sharm El Sheikh , St. Catherine , or Taba airports and remaining in the Sinai resorts up to 15 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "SV": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "notes": "Part of the Central America-4 Free Mobility Agreement . One ninety-day extension may be granted if applied five days before the first expires. In the CA4 area, one gets 90 days total for the entire area. To reset one's stay, they must leave the area.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "GQ": {
+    "visaType": "evisa",
+    "notes": "International Certificate of Vaccination or Prophylaxis required if one is traveling from a country with risk of yellow fever.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "ER": {
+    "visaType": "visa_required",
+    "notes": "Permit required to leave capital.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "EE": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "SZ": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "notes": "Extendable up to 60 days",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "ET": {
+    "visaType": "voa",
+    "allowedDays": 90,
+    "notes": "Visa on arrival is obtainable only at Addis Ababa Bole International Airport . e-Visa holders must arrive via Addis Ababa Bole International Airport . e-Visa is available for 30 or 90 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "FJ": {
+    "visaType": "visa_free",
+    "allowedDays": 120,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "FI": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "FR": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area (in Regions of France ) A bilateral agreement pre-dating the Schengen area may allow 90 days of stay in France regardless of days spent in other Schengen countries.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "GA": {
+    "visaType": "evisa",
+    "allowedDays": 90,
+    "notes": "US Embassy in Libreville announced that effective January 1, 2026, Gabon has issued a reciprocal visa ban for U.S. Citizens. eVisas are available for one to six months. eVisa holders must arrive via Libreville International Airport . International Certificate of Vaccination or Prophylaxis required. Embassy visas are valid for 5 years and multiple entries for US citizens",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "GM": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "International Certificate of Vaccination or Prophylaxis required only for travellers arriving high risk countries and having transited for more than 12 hours",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "GE": {
+    "visaType": "visa_free",
+    "allowedDays": 365,
+    "notes": "365 days visa-free for U.S. citizens.",
+    "sourceUrl": "https://travel.state.gov/content/travel/en/international-travel/International-Travel-Country-Information-Pages/Georgia.html",
+    "visaEase": 100
+  },
+  "DE": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area Residence permit ( Aufenthaltstitel ) for stays of longer than 90 days obtainable after arrival under certain conditions. Germany requires that all passports be signed.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "GH": {
+    "visaType": "evisa",
+    "feeUsd": 60,
+    "notes": "Pre approved visa can be obtained on arrival. International Certificate of Vaccination or Prophylaxis required. Visas for US citizens are either single entry or multiple entry and valid for 5 years. The fee for single entry 3 month validity is US$60 and the fee for the multiple entry visa is US$100.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 35
+  },
+  "GR": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "GD": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "GT": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Part of the Central America-4 Free Mobility Agreement . In the CA4 area, one gets 90 days total for the entire area. To reset one's stay, they must leave the area.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "GN": {
+    "visaType": "evisa",
+    "allowedDays": 90,
+    "notes": "International Certificate of Vaccination or Prophylaxis required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "GW": {
+    "visaType": "voa",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "GY": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "HT": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "feeUsd": 10,
+    "notes": "Travel currently almost impossible due to gang violence. Only open borders are the sea borders. Air borders are currently not open, nor is the border with the Dominican Republic. Foreign visitors are required to pay a US$10 Tourist visa fee. The U.S. government advises its citizens not to visit Haiti due to kidnapping, crime, civil unrest , and limited health care.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "HN": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Part of the Central America-4 Free Mobility Agreement . In the CA4 area, one gets 90 days total for the entire area. To reset one's stay, they must leave the area.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "HU": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "IS": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "IN": {
+    "visaType": "evisa",
+    "allowedDays": 30,
+    "notes": "e-Visa holders must arrive via 32 designated airports or 5 designated seaports. An Indian e-Tourist Visa may only be obtained twice within 1 calendar year. Foreigners of Pakistani origin or who hold a Pakistani Passport are not eligible for an e-Visa. Foreigners who are not Pakistani nationals, but whose parents or grandparents (either paternal or maternal) were born in, or were permanent residents in Pakistan, are also not eligible for an e-Visa. American citizens are also eligible for a ten-year, multiple-entry tourist visa. American citizens of Pakistani heritage are not eligible for an eVisa nor are they eligible for a ten-year, multiple-entry tourist visa, and must apply for a regular visa.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "ID": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "IR": {
+    "visaType": "visa_required",
+    "notes": "Iranian visas must be obtained from the Iranian Interests section of the Embassy of Pakistan, Washington, D.C. or an Iranian embassy in a third country. Independent travelers must be accompanied by an authorized guide at all times. Admission refused if passport contains stamps or visas issued by Israel. The U.S. government advises its citizens not to visit Iran due to the risk of terrorism, civil unrest, kidnapping, arbitrary arrest of U.S. citizens, and wrongful detention.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "IQ": {
+    "visaType": "evisa",
+    "allowedDays": 30,
+    "notes": "Authorities in Iraq have decided to remove the visa-on-arrival requirement for nationals of the European Union and several other countries, requiring them to now apply for an e-visa to enter Iraq through the official platform. The U.S. government advises its citizens not to visit Iraq for any reason due to terrorism, kidnapping, armed conflict, civil unrest , and the U.S. government’s limited ability to provide emergency services to U.S. citizens in Iraq.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "IE": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Residence permit for stays of longer than 90 days obtainable after arrival under certain conditions.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "IL": {
+    "visaType": "evisa",
+    "allowedDays": 90,
+    "notes": "eTA fee is 25 NIS 90 days on each visit in 2-year period if granted. Dual nationals of Israel and the United States who don't have an Israeli passport, including infants, may be required to obtain an Israeli passport in order to leave Israel. Entry prohibited for any person \"who knowingly issues a public call for boycotting Israel\".",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "IT": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area A bilateral agreement pre-dating the Schengen area may allow 90 days of stay in Italy regardless of days spent in other Schengen countries.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "JM": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "notes": "Departure tax collected by airline for all arrivals by air.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "JP": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Persons who have been sentenced to 1 year or more of jail are not eligible for visa free travel to Japan. United States citizens are also eligible for a Japanese eVisa.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "JO": {
+    "visaType": "voa",
+    "notes": "Visa can be obtained upon arrival. Not available at King Hussein/Allenby Bridge Crossing via any border with Israel may cause issues when entering some countries. Visa fee can be waived with Jordan Pass and three night hotel stay.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "KZ": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "notes": "Visa free was granted in 2014 under the unilateral visa waiver for countries with high investment in the Kazakhstan economy.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "KE": {
+    "visaType": "visa_required",
+    "allowedDays": 90,
+    "notes": "Applications can be submitted up to 90 days prior to travel and must be submitted at least 3 days in advance. eTA fee is USD 32.50. Proof of reservation at the hotel where visitors plan to stay is required (if staying with friends, an invitation letter is also acceptable). Yellow fever vaccination certificate is required if coming from endemic countries.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "KI": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "May not exceed 90 days within any 12-month period.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "KP": {
+    "visaType": "visa_required",
+    "notes": "U.S. passports holders must obtain a special passport validation from the U.S. federal government before travel. Such validations are only ever issued if travel is in the interests of US national security. United States citizens require a visa when traveling to North Korea; as there is no North Korean diplomatic mission in the United States, US citizens must obtain a visa from a diplomatic mission in a third country. U.S. secretary of state Rex Tillerson authorized a ban on American travel to North Korea that went into effect in August 2017, following the death of Otto Warmbier , a US student who was detained in North Korea and sentenced to 15 years of hard labor for allegedly stealing a propaganda poster. The U.S. government advises its citizens not to visit North Korea for any reason due to the continuing serious risk of arrest, long-term detention, and the threat of wrongful detention of U.S. nationals.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "KR": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "From September 2021, travelers require the Korean Electronic Travel Authorization (K-ETA). The validity period is 3 years from the date of approval. The government of the Republic of Korea announced that from April 1, 2023, to December 31, 2025, a K-ETA is not required for 27 countries citizens visiting Korea for 90 days or less for business or tourism.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "KW": {
+    "visaType": "voa",
+    "allowedDays": 90,
+    "notes": "Visa on arrival is free for US citizens",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "KG": {
+    "visaType": "visa_free",
+    "allowedDays": 60,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "LA": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "18 of the 33 border crossings are only open to regular visa holders. e-Visa may be used to enter Laos through the Luang Prabang , Pakse and Vientiane international airports, 3 Thai-Lao Friendship Bridges, in Boten (road and railroad ), and in Vientiane (at Khamsavath railway station ). Visa on arrival is available at the Luang Prabang , Pakse and Vientiane international airports, 4 Thai-Lao Friendship Bridges and 7 border crossings.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "LV": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "notes": "90 days within any 180-day period in the Schengen Area . A bilateral agreement pre-dating the Schengen area allows an additional 90 days of stay in Latvia (to a total of 180) regardless of days spent in other Schengen countries.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "LB": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "Extendable for 2 additional months. Visa waiver granted if there is no Israeli visa or seal and traveler has a telephone number, an address in Lebanon, and a non refundable return or circle trip ticket. Pagers and handheld radios prohibited from boarding flights in Lebanon to protect aviation safety. The US government advises its citizens not to visit Lebanon due to crime, terrorism, civil unrest, kidnapping, unexploded landmines, and the risk of armed conflict.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "LS": {
+    "visaType": "visa_free",
+    "allowedDays": 14,
+    "notes": "Extendable up to 180 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "LR": {
+    "visaType": "evisa",
+    "notes": "all persons entering Liberia are required to have a valid Certificate of Immunization (Yellow Book). Starting March 11, 2025, international travelers can apply for an electronic visa on arrival to visit Liberia, but if there is a Liberian embassy in one's country, the traveler is required to apply for a visa directly at the embassy and not through this portal. 3-year Multiple Entry Visa is the only option.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "LY": {
+    "visaType": "evisa",
+    "allowedDays": 30,
+    "notes": "The U.S. government advises its citizens not to visit Libya due to crime, terrorism, unexploded landmines, civil unrest, kidnapping, and armed conflict . U.S. citizens who are in Libya are urged to depart as soon as possible via commercial means if possible.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "LI": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "LT": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area . Mandatory medical insurance.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "LU": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "MG": {
+    "visaType": "voa",
+    "allowedDays": 60,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "MW": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "MY": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Immigration offenses, such as visa overstaying, are punishable by caning .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "MV": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "Extendable up to 90 days. Permission from the Maldivian government required to travel to non resort islands.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "ML": {
+    "visaType": "visa_required",
+    "notes": "International Certificate of Vaccination or Prophylaxis required. Visas for U.S. citizens are valid for 5 years and are 185 USD. The U.S. government advises its citizens not to visit Mali due to crime, terrorism, and kidnapping . Following Niger's example, Mali has suspended visa services for U.S. citizens and barred Americans from entering.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "MT": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "MH": {
+    "visaType": "visa_required",
+    "notes": "The United States has a Compact of Free Association relationship with the Marshall Islands, Micronesia and Palau.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "MR": {
+    "visaType": "evisa",
+    "allowedDays": 30,
+    "notes": "International Certificate of Vaccination or Prophylaxis required only for travellers arriving from high risk countries",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "MU": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "MX": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "feeUsd": 40,
+    "notes": "Visitors must obtain a Multiple Immigration Form. There is no charge for a tourist FMM for stays of less than 7 days when entering by land. For visitors staying more than 7 days and entering by land, it will cost 687 Mexican pesos or around US$40. The FMM is required for all visitors entering via air, regardless of length of stay, and the cost is included in the traveler's airfare and remitted by the airline. Passport card or enhanced drivers license is valid for land and sea travel. Exit stamp required if one entered using paper FMM (All land POEs) A person is in Mexico illegally if they did not get a FMM at the border (even if using the 7 day FMM fee exemption via land) or eFMM Mandatory car disinfection at Mexico's southern borders (Guatemala and Belize)",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "FM": {
+    "visaType": "visa_required",
+    "notes": "The United States has a Compact of Free Association relationship with the Marshall Islands, Micronesia and Palau.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "MD": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period. Registration upon arrival is mandatory.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "MC": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "MN": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Registration required after 30 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "ME": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Registration with the local police within 24 hours of arrival is mandatory.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "MA": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "MZ": {
+    "visaType": "evisa",
+    "allowedDays": 30,
+    "notes": "Visitors must register their ETA on the e-Visa platform at least 48 hours before travel and pay a processing fee of 650 MZN.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "MM": {
+    "visaType": "evisa",
+    "allowedDays": 28,
+    "notes": "e-Visa holders must arrive via Yangon , Nay Pyi Taw or Mandalay airports or via land border crossings at Tachileik , Myawaddy , Kawthaung , Rih Khaw Dar or Tamu . e-Visa available for both tourism (allowed stay is 28 days) or business (allowed stay is 70 days) purposes. The U.S. government advises its citizens not to visit Myanmar due to armed conflict , the potential for civil unrest , arbitrary enforcement of local laws, poor health infrastructure, land mines and unexploded ordnance, crime, and wrongful detentions.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "NA": {
+    "visaType": "voa",
+    "allowedDays": 90,
+    "feeUsd": 1,
+    "notes": "Beginning April 1st, 2025, US citizens will have to obtain a visa for Namibia. US citizens will be issued with visas on arrival upon payment of a designated fee. Can be obtained online or on arrival for a fee of N$1,600 (approximately €82 / US$88).",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 75
+  },
+  "NR": {
+    "visaType": "visa_required",
+    "allowedDays": 30,
+    "notes": "Visas are issued with validity of 30 days. Visa can be obtained in the Nauruan Press Office at the United Nations.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "NP": {
+    "visaType": "voa",
+    "allowedDays": 90,
+    "notes": "Obtainable at Tribhuvan International Airport and certain land borders. Total aggregate stay of no more than 150 days in any given calendar year. US Citizens are eligible for five-year multiple entry visas.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "NL": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area ( European Netherlands ). Residence permit ( Verblijfstitel ) for stays of longer than 90 days obtainable after arrival under certain conditions.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "NZ": {
+    "visaType": "visa_required",
+    "allowedDays": 90,
+    "feeUsd": 17,
+    "notes": "eTA fee is NZD$17 requested via mobile app or NZD$23 requested via online plus an International Visitor Conservation and Tourism Levy (IVL) of NZD$100 must be paid. IVL not required for American Samoan citizens. 3 months on each visit in 2-year period if granted. May enter using eGate . Holders of an Australian Permanent Resident Visa or Resident Return Visa may be granted a New Zealand Resident Visa on arrival permitting indefinite stay (pursuant to the Trans-Tasman Travel Arrangement ). Strict enforcement of food import laws, fines of NZD400 for not declaring food.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "NI": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Tourist card must be purchased upon arrival. Part of the Central America-4 Free Mobility Agreement . In the CA4 area, a person gets 90 days total for the entire area. To reset their stay, they must leave the area.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "NE": {
+    "visaType": "visa_required",
+    "notes": "Holders of a pre-approved confirmation from the National Police may obtain a visa on arrival (flyer visa) upon arrival at Niamey. The passport will be compounded for 1 working day and the traveler is required to appear at the Director General of Immigration the next working day to register and collect their passport. International Certificate of Vaccination or Prophylaxis required. The U.S. government advises its citizens not to travel to Niger due to crime, unrest, terrorism, health, and kidnapping. Niger has suspended issuance of visas to U.S. citizens and openly barred Americans from entering.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "NG": {
+    "visaType": "evisa",
+    "allowedDays": 30,
+    "notes": "Business eVisas-on-arrival available for \"Frequently Traveled Business Persons of International Reputes\" or \"Executives of Multi-national Companies\", as well as for government officials International Certificate of Vaccination or Prophylaxis required if arriving from a country with a risk of yellow fever transmission.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "MK": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Registration with the local police within 24 hours of arrival is mandatory.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "NO": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "3 months within a 6-month period, regardless of previous time spent in other Schengen countries , but including time spent in other Nordic countries.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "OM": {
+    "visaType": "visa_free",
+    "allowedDays": 14,
+    "notes": "Visa exemption valid for 10 days, eVisa for 30 days. Holders of a visa or entrance stamp of the Emirate of Dubai that is valid for at least 21 days are visa exempt. Holders of a visa for Qatar that is valid for travel to Oman and valid for at least one month are visa exempt when arriving directly from Qatar.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "PK": {
+    "visaType": "evisa",
+    "allowedDays": 90,
+    "notes": "Pakistan eVisas are free for US citizens under new visa fee exemption scheme.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "PW": {
+    "visaType": "visa_required",
+    "notes": "The United States has a Compact of Free Association relationship with the Marshall Islands, Micronesia and Palau.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "PA": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "notes": "Denial of entry or transit to any person who has a criminal conviction.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "PG": {
+    "visaType": "evisa",
+    "allowedDays": 60,
+    "notes": "Extendable for 30 days",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "PY": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "PE": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Determined on arrival.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "PH": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "notes": "Naturalized US citizens who have ever held Philippine nationality (current or formerly) allowed to stay for up to one year as a balikbayan . This extends to their spouse and children of any age traveling with the dual-citizen/former Filipino, and present proof of association such as their marriage or birth certificate.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "PL": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area . Dual nationals must use their Polish passport . A bilateral agreement pre-dating the Schengen area allows a stay in Poland regardless of days spent in other Schengen countries.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "PT": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "QA": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Effective October 1, 2024, eligible US citizens will be granted 90 days visa free travel to the State Of Qatar Visa issued upon arrival for no cost. There is a QAR 76 entry fee, valid for 90 days. Persons with unpaid fines are prohibited from departing Qatar.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "RO": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "RU": {
+    "visaType": "visa_required",
+    "notes": "72-hour visa-free transit for international cruise ship/ferry passengers only if travelling with an organized tour and accompanied at all times by a tour operator. Registration required after 7 business days. Russia signed the \"Shared Values Visa\" law on August 19, 2024, aimed at simplifying the residence permits for citizens of countries that do not conform to Russia's traditional spirit and values. This means that one can obtain a three-month temporary residency without passing the exam. The focus of this law is to simplify the residence permit for foreign citizens with traditional Russian spirit and values. As long as they comply with Russian values, foreign citizens do not need to prove their knowledge of Russian language, Russian history, or Russian law (without examination), and can obtain a temporary residence permit for three months. By simplifying the process, more people can be attracted to settle in Russia, and these foreign citizens must come from countries that oppose Russian values. This list applies to 47 regions, including United States. American citizens may receive multiple-entry visas valid for three years. Residents of Alaska who are members of the indigenous population do not require a visa to visit Chukotka Autonomous Okrug if they have relatives (blood relatives, members of the same tribe, native people who have similar language and cultural heritage) in Chukotka. Individuals must be invited by a relative in Chukotka and must leave Chukotka within 90 days. Entry points are in Anadyr , Provideniya , Lavrentiya and Uelen . The U.S. government advises its citizens not to visit Russia for any reason for the following reasons: Danger associated with the continuing war between Russia and Ukraine . The risk of harassment or wrongful detention by Russian security officials. The arbitrary enforcement of local laws. The possibility of terrorism. US citizens in Russia are advised to leave immediately.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "RW": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "International Certificate of Vaccination or Prophylaxis required only if arriving from high risk countries as defined by WHO.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "KN": {
+    "visaType": "visa_required",
+    "allowedDays": 90,
+    "feeUsd": 17,
+    "notes": "eTA fee is US$17",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "LC": {
+    "visaType": "visa_free",
+    "allowedDays": 42,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "VC": {
+    "visaType": "visa_free",
+    "allowedDays": 180,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "WS": {
+    "visaType": "visa_required",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "SM": {
+    "visaType": "visa_free",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "ST": {
+    "visaType": "visa_free",
+    "allowedDays": 15,
+    "notes": "International Certificate of Vaccination or Prophylaxis required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "SA": {
+    "visaType": "voa",
+    "allowedDays": 90,
+    "notes": "Access to Mecca and Medina are restricted to Muslims only and non-Muslims are denied entry. Import of alcohol strictly prohibited.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "SN": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "International Certificate of Vaccination or Prophylaxis required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "RS": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "SC": {
+    "visaType": "visa_required",
+    "allowedDays": 90,
+    "notes": "Application can be submitted up to 30 days before travel. Visitors must upload a reservation confirmation(s) for each visitor's location of stay in Seychelles. Yellow fever vaccination certificate is required if coming from endemic countries. Payment of the fee (EUR 10) by credit or debit card. Valid for one journey only and it expires once exit the country.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "SL": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "International Certificate of Vaccination or Prophylaxis required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "SG": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "US citizens can use Automated Border Control",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "SK": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "feeUsd": 50,
+    "notes": "90 days within any 180-day period in the Schengen Area . Medical insurance required. Sufficient funds of US$50 per person per day required. Registration within 3 working days required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "SI": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area . Registration with the local police required within 72 hours of arrival.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "SB": {
+    "visaType": "visa_required",
+    "allowedDays": 90,
+    "notes": "3 months within 12 months. Visitors visa issued upon arrival for free.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "SO": {
+    "visaType": "evisa",
+    "allowedDays": 30,
+    "notes": "All visitors must have an approved Electronic Visa (eTAS) before the start of their journey. The U.S. government advises its citizens not to visit Somalia due to crime, terrorism, civil unrest , health, kidnapping, piracy, and lack of availability of routine consular services.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "ZA": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Holders of passports without 2 blank pages may be denied entry.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "SS": {
+    "visaType": "evisa",
+    "notes": "Printed visa authorization must be presented at the time of travel. International Certificate of Vaccination or Prophylaxis required. The US government advises its citizens not to visit South Sudan due to the security situation in the country . Crime, kidnappings, and armed conflict are present throughout the country.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "ES": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "LK": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "SD": {
+    "visaType": "visa_required",
+    "notes": "If arriving from a country of high yellow fever risk and stayed for more than 12 hours, then Yellow Fever vaccine required. Exit visa required. Registration within 3 days mandatory. The U.S. government advises its citizens not to visit Sudan due to armed conflict , civil unrest, crime, terrorism, and kidnapping. Khartoum International Airport is currently closed, making it very difficult for Americans to leave the country.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "SR": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "An entrance fee of USD 50 or EUR 50 must be paid online prior to arrival. Multiple entry e-Visa is also available.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "SE": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "CH": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period in the Schengen Area .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "SY": {
+    "visaType": "evisa",
+    "notes": "Persons with passports bearing Israeli visas or entry/exit stamps are denied entry. Visa not required for foreign citizens with proof of Syrian origin, such as an identification card or passport. Dual-citizen males ages 17–42 need military service book. If not forgiven by the military, dual-citizens may apply for a visit visa once a year through the embassy. The U.S. government advises its citizens not to visit Syria for any reason due to the risk of terrorism, civil unrest, kidnapping, hostage taking, armed conflict , and unjust detention.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "TW": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Persons importing pork to Taiwan can be fined up to 1 million NT if caught.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "TJ": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "notes": "e-Visa also available. e-Visa holders can enter through all border points. Visa waiver stay is 30 days. e-Visa gives a stay of 60.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "TZ": {
+    "visaType": "voa",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "TH": {
+    "visaType": "visa_free",
+    "allowedDays": 60,
+    "notes": "Visa waiver program rules: One can enter for 60 days per visa exempt stay. One can enter an unlimited number of times via air. Maximum of two entries if entering by sea or land. Else, one need hard visa. Overstayers will be banned and fined upon departure depending on length of overstay. All passengers must complete the Thai Digital Arrival Card (TDAC), which is available starting 3 days before arrival.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "TL": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "For arrivals by air only",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "TG": {
+    "visaType": "evisa",
+    "allowedDays": 15,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "TO": {
+    "visaType": "voa",
+    "allowedDays": 31,
+    "notes": "Visas issued upon arrival at no charge to the passenger. Valid for 31 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "TT": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "TN": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "TM": {
+    "visaType": "visa_required",
+    "notes": "10-day visa on arrival if holding letter of invitation issued by a company registered in Turkmenistan with a prior approval from the Foreign Ministry .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "TV": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "Extendable up to 3 months.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  },
+  "UG": {
+    "visaType": "evisa",
+    "allowedDays": 90,
+    "notes": "Must apply online at least 2 business days prior to travel. Airlines may deny passengers permission to board flights to Uganda without proof that they had successfully applied for an eVisa. Ugandan immigration authorities may require additional documentation, including proof of a return plane ticket and detailed tour itinerary in Uganda. International Certificate of Vaccination or Prophylaxis required.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "UA": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "90 days within any 180-day period Entry via Russian occupied territories are considered illegal and will result in legal consequences Entry only possible via land or sea following closure of air borders on February 24, 2022 due to the Russian invasion of Ukraine . The U.S. government advises its citizens not to visit Ukraine due to Russia's aggression towards Ukraine .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "AE": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "notes": "Extension possible with a fee. Iris scan taken on arrival. U.S. passport holders can sign up for E-Gate access on arrival/departure at Dubai International Airport.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "GB": {
+    "visaType": "visa_required",
+    "allowedDays": 180,
+    "feeUsd": 16,
+    "notes": "An ETA is required to travel to the United Kingdom, including Northern Ireland . eTA fee is £16 6 months on each visit in 2-year period if granted. Up to 90 days if arriving from Ireland ( Common Travel Area )",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "UY": {
+    "visaType": "visa_free",
+    "allowedDays": 90,
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "UZ": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "notes": "5-day visa-free transit at the international airports if holding a confirmed onward ticket for a flight to a third country. Registration within 3 days is mandatory. Starting January 1, 2026, all U.S. citizens will be able to enter Uzbekistan visa-free and stay for up to 30 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "VU": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "notes": "Extendable up to 120 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "VA": {
+    "visaType": "visa_free",
+    "notes": "Open borders but de facto follows Italian visa policy. No foreign accommodations, residency restricted to Vatican citizens only. Even though no hotels exist in the Vatican, there is no limit to how many times a person may enter the country in a year.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "VE": {
+    "visaType": "visa_required",
+    "notes": "The U.S. government advises its citizens not to travel to or remain in Venezuela for any reason due to the high risk of wrongful detention, torture in detention, terrorism, kidnapping, arbitrary enforcement of local laws, crime, civil unrest, and poor health infrastructure . U.S. citizens and Lawful Permanent Residents in Venezuela are strongly advised to depart immediately.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 30
+  },
+  "VN": {
+    "visaType": "evisa",
+    "notes": "e-Visa is valid up to the exit date stated on application with a maximum length of 90 days, single and multiple entry options. Phú Quốc visa exemption for up to 30 days.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "YE": {
+    "visaType": "evisa",
+    "notes": "Registration mandatory. Exit visa required for stays over 30 days. Passengers can transit without visa with a confirmed onward ticket for a flight to a third country within 24 hours. They must stay in the international transit area of the airport and have documents required for the next destination. Passengers can transit without visa with a confirmed onward ticket for a flight to a third country within 24 hours. They must stay in the international transit area of the airport and have documents required for the next destination. Yemen introduces electronic visa system since June 24, 2025 for some eligible nationals. The U.S. government advises its citizens not to visit Yemen due to terrorism, civil unrest, crime, health risks, kidnapping, armed conflict, and landmines .",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 50
+  },
+  "ZM": {
+    "visaType": "visa_free",
+    "allowedDays": 30,
+    "notes": "Also eligible for a universal visa allowing access to Zimbabwe. Two blank pages required. International Certificate of Vaccination or Prophylaxis required only travellers arriving from certain places as defined by Government. Please check the WHO 2020 Yellow Fever vaccination requirements document for exact list.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 100
+  },
+  "ZW": {
+    "visaType": "voa",
+    "allowedDays": 30,
+    "notes": "Also eligible for a universal visa allowing access to Zambia. Tourism purposes only.",
+    "sourceUrl": "https://en.wikipedia.org/wiki/Visa_requirements_for_United_States_citizens",
+    "visaEase": 90
+  }
+}
