@@ -7,19 +7,25 @@
 
 import Foundation
 import SwiftUI
+import Supabase
 
 struct RootTabView: View {
+    @EnvironmentObject private var bucketList: BucketListStore
+    @EnvironmentObject private var traveled: TraveledStore
+
     var body: some View {
         TabView {
             // Main scores / country list
             NavigationStack {
                 CountryListView()
             }
+            .environmentObject(bucketList)
+            .environmentObject(traveled)
             .tabItem {
                 Label("Scores", systemImage: "chart.bar.fill")
             }
 
-            // NEW: When to Go tab
+            // When to Go tab
             NavigationStack {
                 WhenToGoView()
             }
@@ -30,6 +36,7 @@ struct RootTabView: View {
             NavigationStack {
                 BucketListView()
             }
+            .environmentObject(bucketList)
             .tabItem {
                 Label("Bucket List", systemImage: "bookmark.fill")
             }
@@ -37,6 +44,7 @@ struct RootTabView: View {
             NavigationStack {
                 MyTravelsView()
             }
+            .environmentObject(traveled)
             .tabItem {
                 Label("My Travels", systemImage: "backpack.fill")
             }
@@ -50,6 +58,15 @@ struct RootTabView: View {
 
             NavigationStack {
                 ProfileView()
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Sign out") {
+                                Task {
+                                    try? await SupabaseManager.client.auth.signOut()
+                                }
+                            }
+                        }
+                    }
             }
             .tabItem {
                 Label("Profile", systemImage: "person.crop.circle")

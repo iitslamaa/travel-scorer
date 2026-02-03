@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>CFBundleDisplayName</key>
-    <string>Travel AF</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSExceptionDomains</key>
@@ -22,5 +20,9 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>SUPABASE_ANON_KEY</key>
+	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuenpubmhkZHZucmh4dGx2Y2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMzY4OTksImV4cCI6MjA4NTcxMjg5OX0.tokNdsN_xfcAcaFYxN611mhz12uqgZE3j0LGA9zudL4</string>
+	<key>SUPABASE_URL</key>
+	<string>https://rnzznnhddvnrhxtlvcfe.supabase.co</string>
 </dict>
 </plist>
