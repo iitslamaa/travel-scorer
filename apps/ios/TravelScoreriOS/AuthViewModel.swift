@@ -16,7 +16,7 @@ final class AuthViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    private let client = SupabaseManager.client
+    let client = SupabaseManager.client
 
     func sendEmailOTP() async {
         isLoading = true

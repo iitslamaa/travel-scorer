@@ -1,5 +1,8 @@
 import Foundation
 import SwiftUI
+import AuthenticationServices
+import CryptoKit
+import Supabase
 
 struct EmailAuthView: View {
     @StateObject private var vm = AuthViewModel()
@@ -7,6 +10,8 @@ struct EmailAuthView: View {
     @FocusState private var focusedField: Field?
     @State private var isSending = false
     @State private var cooldownSeconds = 0
+    @State private var appleNonce: String?
+    @State private var appleError: String?
 
     enum Step {
         case enterEmail
@@ -25,6 +30,47 @@ struct EmailAuthView: View {
             Text("Sign in")
                 .font(.largeTitle)
                 .bold()
+
+            SignInWithAppleButton(.signIn) { request in
+                let nonce = randomNonceString()
+                appleNonce = nonce
+
+                request.requestedScopes = [.fullName, .email]
+                request.nonce = sha256(nonce)
+            } onCompletion: { result in
+                Task {
+                    switch result {
+                    case .success(let authorization):
+                        guard
+                            let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+                            let tokenData = credential.identityToken,
+                            let idToken = String(data: tokenData, encoding: .utf8),
+                            let nonce = appleNonce
+                        else {
+                            appleError = "Apple Sign In failed."
+                            return
+                        }
+
+                        do {
+                            let credentials = OpenIDConnectCredentials(
+                                provider: .apple,
+                                idToken: idToken,
+                                nonce: nonce
+                            )
+                            try await vm.client.auth.signInWithIdToken(credentials: credentials)
+                            appleError = nil
+                        } catch {
+                            appleError = error.localizedDescription
+                        }
+
+                    case .failure(let error):
+                        appleError = error.localizedDescription
+                    }
+                }
+            }
+            .signInWithAppleButtonStyle(.black)
+            .frame(height: 48)
+            .clipShape(RoundedRectangle(cornerRadius: 12))
 
             if step == .enterEmail {
                 TextField("Email address", text: $vm.email)
@@ -104,6 +150,13 @@ struct EmailAuthView: View {
                     .multilineTextAlignment(.center)
             }
 
+            if let appleError {
+                Text(appleError)
+                    .foregroundColor(.red)
+                    .font(.caption)
+                    .multilineTextAlignment(.center)
+            }
+
             Spacer()
         }
         .padding()
@@ -121,5 +174,37 @@ struct EmailAuthView: View {
                 }
             }
         }
+    }
+
+    private func randomNonceString(length: Int = 32) -> String {
+        precondition(length > 0)
+        let charset: [Character] =
+            Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        var result = ""
+        result.reserveCapacity(length)
+
+        var remainingLength = length
+        while remainingLength > 0 {
+            var randoms = [UInt8](repeating: 0, count: 16)
+            let status = SecRandomCopyBytes(kSecRandomDefault, randoms.count, &randoms)
+            if status != errSecSuccess {
+                fatalError("Unable to generate nonce")
+            }
+
+            randoms.forEach { random in
+                if remainingLength == 0 { return }
+                if random < charset.count {
+                    result.append(charset[Int(random)])
+                    remainingLength -= 1
+                }
+            }
+        }
+        return result
+    }
+
+    private func sha256(_ input: String) -> String {
+        let inputData = Data(input.utf8)
+        let hashed = SHA256.hash(data: inputData)
+        return hashed.map { String(format: "%02x", $0) }.joined()
     }
 }
