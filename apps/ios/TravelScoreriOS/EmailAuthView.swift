@@ -4,9 +4,31 @@ import AuthenticationServices
 import CryptoKit
 import Supabase
 
+// Keep this in the same file for now so Xcode can always find it.
+struct TranslucentAuthButton<Content: View>: View {
+    let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(Color.white)
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .shadow(color: Color.black.opacity(0.15), radius: 10, x: 0, y: 6)
+    }
+}
+
 struct EmailAuthView: View {
     @StateObject private var vm = AuthViewModel()
     @State private var step: Step = .enterEmail
+    @State private var showEmailFlow = false
     @FocusState private var focusedField: Field?
     @State private var isSending = false
     @State private var cooldownSeconds = 0
@@ -25,177 +47,199 @@ struct EmailAuthView: View {
     }
 
     var body: some View {
-        VStack(spacing: 20) {
+        VStack {
             Spacer()
 
-            Text("Sign in")
-                .font(.largeTitle)
-                .bold()
+            ZStack {
+                if !showEmailFlow {
+                    VStack(spacing: 20) {
+                        // Apple
+                        TranslucentAuthButton {
+                            SignInWithAppleButton(.signIn) { request in
+                                let nonce = randomNonceString()
+                                appleNonce = nonce
+                                request.requestedScopes = [.fullName, .email]
+                                request.nonce = sha256(nonce)
+                            } onCompletion: { result in
+                                Task {
+                                    switch result {
+                                    case .success(let authorization):
+                                        guard
+                                            let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
+                                            let tokenData = credential.identityToken,
+                                            let idToken = String(data: tokenData, encoding: .utf8),
+                                            let nonce = appleNonce
+                                        else {
+                                            appleError = "Apple Sign In failed."
+                                            return
+                                        }
 
-            SignInWithAppleButton(.signIn) { request in
-                let nonce = randomNonceString()
-                appleNonce = nonce
+                                        do {
+                                            let credentials = OpenIDConnectCredentials(
+                                                provider: .apple,
+                                                idToken: idToken,
+                                                nonce: nonce
+                                            )
+                                            try await vm.client.auth.signInWithIdToken(credentials: credentials)
+                                            appleError = nil
+                                        } catch {
+                                            appleError = error.localizedDescription
+                                        }
 
-                request.requestedScopes = [.fullName, .email]
-                request.nonce = sha256(nonce)
-            } onCompletion: { result in
-                Task {
-                    switch result {
-                    case .success(let authorization):
-                        guard
-                            let credential = authorization.credential as? ASAuthorizationAppleIDCredential,
-                            let tokenData = credential.identityToken,
-                            let idToken = String(data: tokenData, encoding: .utf8),
-                            let nonce = appleNonce
-                        else {
-                            appleError = "Apple Sign In failed."
-                            return
+                                    case .failure(let error):
+                                        appleError = error.localizedDescription
+                                    }
+                                }
+                            }
+                            .signInWithAppleButtonStyle(.white)
+                            .frame(height: 52)
                         }
 
-                        do {
-                            let credentials = OpenIDConnectCredentials(
-                                provider: .apple,
-                                idToken: idToken,
-                                nonce: nonce
-                            )
-                            try await vm.client.auth.signInWithIdToken(credentials: credentials)
-                            appleError = nil
-                        } catch {
-                            appleError = error.localizedDescription
+                        // Google
+                        TranslucentAuthButton {
+                            Button {
+                                Task {
+                                    do {
+                                        try await vm.client.auth.signInWithOAuth(
+                                            provider: .google,
+                                            redirectTo: URL(string: "travelscorer://login-callback")
+                                        )
+                                        googleError = nil
+                                    } catch {
+                                        googleError = error.localizedDescription
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 10) {
+                                    Image("google_logo")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 20, height: 20)
+
+                                    Text("Continue with Google")
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.black.opacity(0.85))
+                                }
+                            }
                         }
 
-                    case .failure(let error):
-                        appleError = error.localizedDescription
-                    }
-                }
-            }
-            .signInWithAppleButtonStyle(.black)
-            .frame(height: 48)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-
-            Button {
-                Task {
-                    do {
-                        try await vm.client.auth.signInWithOAuth(
-                            provider: .google,
-                            redirectTo: URL(string: "travelscorer://login-callback")
-                        )
-                        googleError = nil
-                    } catch {
-                        googleError = error.localizedDescription
-                    }
-                }
-            } label: {
-                HStack(spacing: 8) {
-                    Image(systemName: "g.circle.fill")
-                    Text("Continue with Google")
-                        .fontWeight(.semibold)
-                }
-                .frame(maxWidth: .infinity)
-                .frame(height: 48)
-            }
-            .buttonStyle(.bordered)
-
-            if step == .enterEmail {
-                TextField("Email address", text: $vm.email)
-                    .textInputAutocapitalization(.never)
-                    .keyboardType(.emailAddress)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($focusedField, equals: .email)
-
-                Button {
-                    guard !isSending && cooldownSeconds == 0 else { return }
-
-                    isSending = true
-
-                    Task {
-                        await vm.sendEmailOTP()
-
-                        await MainActor.run {
-                            isSending = false
-
-                            if vm.errorMessage == nil {
-                                step = .enterCode
-                                focusedField = .code
-                                cooldownSeconds = 30
-                                startCooldown()
+                        // Email entry trigger (no keyboard yet)
+                        TranslucentAuthButton {
+                            Button {
+                                withAnimation(.easeInOut(duration: 0.4)) {
+                                    showEmailFlow = true
+                                }
+                            } label: {
+                                Text("Continue with Email")
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.black.opacity(0.85))
                             }
                         }
                     }
-                } label: {
-                    if isSending {
-                        ProgressView()
-                    } else {
-                        Text(
-                            cooldownSeconds > 0
-                            ? "Resend in \(cooldownSeconds)s"
-                            : "Send code"
-                        )
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+
+                if showEmailFlow && step == .enterEmail {
+                    FrostedCard {
+                        VStack(spacing: 14) {
+                            Text("Enter your email address")
+                                .font(.headline)
+                                .foregroundColor(.primary)
+
+                            TextField("Email address", text: $vm.email)
+                                .textInputAutocapitalization(.never)
+                                .keyboardType(.emailAddress)
+                                .textFieldStyle(.plain)
+                                .padding(12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.white.opacity(0.25))
+                                )
+                                .focused($focusedField, equals: .email)
+                                .onAppear {
+                                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                        focusedField = .email
+                                    }
+                                }
+
+                            Button {
+                                guard !isSending && cooldownSeconds == 0 else { return }
+                                isSending = true
+
+                                Task {
+                                    await vm.sendEmailOTP()
+                                    await MainActor.run {
+                                        isSending = false
+                                        if vm.errorMessage == nil {
+                                            step = .enterCode
+                                            focusedField = .code
+                                            cooldownSeconds = 30
+                                            startCooldown()
+                                        }
+                                    }
+                                }
+                            } label: {
+                                if isSending {
+                                    ProgressView()
+                                } else {
+                                    Text(cooldownSeconds > 0 ? "Resend in \(cooldownSeconds)s" : "Send code")
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(isSending || cooldownSeconds > 0 || vm.email.isEmpty)
+                        }
                     }
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(isSending || cooldownSeconds > 0 || vm.email.isEmpty)
-            }
 
-            if step == .enterCode {
-                Text("Check your email for the 6‑digit code")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                if step == .enterCode {
+                    FrostedCard {
+                        VStack(spacing: 14) {
+                            Text("Check your email for the 6‑digit code")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
 
-                TextField("6‑digit code", text: $vm.otp)
-                    .keyboardType(.numberPad)
-                    .textFieldStyle(.roundedBorder)
-                    .focused($focusedField, equals: .code)
+                            TextField("6‑digit code", text: $vm.otp)
+                                .keyboardType(.numberPad)
+                                .textFieldStyle(.plain)
+                                .padding(12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.white.opacity(0.25))
+                                )
+                                .focused($focusedField, equals: .code)
 
-                Button {
-                    Task { await vm.verifyEmailOTP() }
-                } label: {
-                    if vm.isLoading {
-                        ProgressView()
-                    } else {
-                        Text("Verify")
+                            Button {
+                                Task { await vm.verifyEmailOTP() }
+                            } label: {
+                                if vm.isLoading {
+                                    ProgressView()
+                                } else {
+                                    Text("Verify")
+                                }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(vm.isLoading || vm.otp.count < 6)
+
+                            Button("Change email") {
+                                vm.otp = ""
+                                step = .enterEmail
+                                focusedField = .email
+                            }
+                            .font(.footnote)
+                        }
                     }
+                    .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(vm.isLoading || vm.otp.count < 6)
-
-                Button("Change email") {
-                    vm.otp = ""
-                    step = .enterEmail
-                    focusedField = .email
-                }
-                .font(.footnote)
             }
-
-            if let error = vm.errorMessage {
-                Text(error)
-                    .foregroundColor(.red)
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-            }
-
-            if let appleError {
-                Text(appleError)
-                    .foregroundColor(.red)
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-            }
-
-            if let googleError {
-                Text(googleError)
-                    .foregroundColor(.red)
-                    .font(.caption)
-                    .multilineTextAlignment(.center)
-            }
+            .animation(.easeInOut(duration: 0.4), value: showEmailFlow)
+            .animation(.easeInOut(duration: 0.4), value: step)
 
             Spacer()
         }
         .padding()
-        .onAppear {
-            focusedField = .email
-        }
     }
-    
+
     private func startCooldown() {
         Task {
             while cooldownSeconds > 0 {
@@ -209,8 +253,7 @@ struct EmailAuthView: View {
 
     private func randomNonceString(length: Int = 32) -> String {
         precondition(length > 0)
-        let charset: [Character] =
-            Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
         var result = ""
         result.reserveCapacity(length)
 
