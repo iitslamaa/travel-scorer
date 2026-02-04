@@ -12,6 +12,7 @@ struct EmailAuthView: View {
     @State private var cooldownSeconds = 0
     @State private var appleNonce: String?
     @State private var appleError: String?
+    @State private var googleError: String?
 
     enum Step {
         case enterEmail
@@ -71,6 +72,29 @@ struct EmailAuthView: View {
             .signInWithAppleButtonStyle(.black)
             .frame(height: 48)
             .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            Button {
+                Task {
+                    do {
+                        try await vm.client.auth.signInWithOAuth(
+                            provider: .google,
+                            redirectTo: URL(string: "travelscorer://login-callback")
+                        )
+                        googleError = nil
+                    } catch {
+                        googleError = error.localizedDescription
+                    }
+                }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "g.circle.fill")
+                    Text("Continue with Google")
+                        .fontWeight(.semibold)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 48)
+            }
+            .buttonStyle(.bordered)
 
             if step == .enterEmail {
                 TextField("Email address", text: $vm.email)
@@ -152,6 +176,13 @@ struct EmailAuthView: View {
 
             if let appleError {
                 Text(appleError)
+                    .foregroundColor(.red)
+                    .font(.caption)
+                    .multilineTextAlignment(.center)
+            }
+
+            if let googleError {
+                Text(googleError)
                     .foregroundColor(.red)
                     .font(.caption)
                     .multilineTextAlignment(.center)
