@@ -229,6 +229,10 @@ struct CountryDetailView: View {
                         }
                         .font(.caption)
                         .foregroundStyle(.secondary)
+
+                        Text("Seasonality insights are based on historical climate averages and typical travel patterns. Timing may vary year to year.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
                     }
                     .padding()
                     .frame(maxWidth: .infinity, alignment: .leading)

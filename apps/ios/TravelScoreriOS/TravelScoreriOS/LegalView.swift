@@ -22,7 +22,7 @@ struct LegalView: View {
                         .font(.headline)
 
                     Text("""
-                    Travel Adventure Finder provides informational travel insights only. All scores, advisories, and recommendations are intended for general guidance and educational purposes.
+                    Travel Adventure Finder provides informational travel insights only. All scores, advisories, and recommendations are intended for general guidance and educational purposes. Seasonality insights are based on historical climate averages and typical travel patterns.
                     """)
                 }
 
