@@ -234,8 +234,10 @@ export default function Home() {
                         Updated {new Date(c.advisory.updatedAt).toLocaleDateString()}
                       </div>
                       {c.advisory.summary && (
-                        <div className="hidden sm:block text-xs mt-1 muted line-clamp-3 max-w-prose">
-                          {c.advisory.summary}
+                        <div className="hidden sm:block text-xs mt-1 muted max-w-prose">
+                          {c.advisory.summary.length > 280
+                            ? c.advisory.summary.slice(0, 280) + '…'
+                            : c.advisory.summary}
                         </div>
                       )}
                     </div>

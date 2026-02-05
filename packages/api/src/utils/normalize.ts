@@ -1,12 +1,70 @@
 import type { Advisory, Seasonality } from "../types/country";
 
+function decodeHtmlEntities(input: string): string {
+  if (!input) return input;
+
+  let decoded = input;
+
+  // 1) Decode HTML entities using DOM when available
+  if (typeof document !== 'undefined') {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = decoded;
+    decoded = txt.value;
+  }
+
+  // 2) Fix common UTF-8 mojibake from RSS / feeds
+  const mojibakeMap: Record<string, string> = {
+    'â€™': '’',
+    'â€œ': '“',
+    'â€�': '”',
+    'â€“': '–',
+    'â€”': '—',
+    'â€¦': '…',
+    'Ã©': 'é',
+    'Ã¨': 'è',
+    'Ãª': 'ê',
+    'Ã¡': 'á',
+    'Ã³': 'ó',
+    'Ã±': 'ñ',
+    'Ã¼': 'ü',
+  };
+
+  for (const [bad, good] of Object.entries(mojibakeMap)) {
+    decoded = decoded.split(bad).join(good);
+  }
+
+  // 3) Normalize whitespace
+  return decoded
+    .replace(/\u00a0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function normalizeAdvisory(input: any): Advisory {
-  const n = input?.level ?? input?.advisory_level ?? input?.advisoryLevel ?? input?.levelNumber ?? null;
-  const levelNumber =
-    typeof n === "number" ? n :
-    typeof n === "string" ? (parseInt(n, 10) || null) :
+  const raw =
+    input?.level ??
+    input?.advisory_level ??
+    input?.advisoryLevel ??
+    input?.levelNumber ??
     null;
-  return { levelNumber, levelText: levelNumber ? `Level ${levelNumber}` : null };
+
+  const levelNumber =
+    typeof raw === "number"
+      ? raw
+      : typeof raw === "string"
+      ? parseInt(raw, 10) || null
+      : null;
+
+  const summary =
+    typeof input?.summary === "string"
+      ? decodeHtmlEntities(input.summary)
+      : null;
+
+  return {
+    levelNumber,
+    levelText: levelNumber ? `Level ${levelNumber}` : null,
+    summary,
+  };
 }
 
 export function normalizeSeasonality(input: any): Seasonality {
