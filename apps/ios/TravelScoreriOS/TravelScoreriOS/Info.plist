@@ -2,33 +2,26 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-
-    <key>NSAppTransportSecurity</key>
-    <dict>
-    </dict>
-
-    <key>API_BASE_URL</key>
-    <string>https://travel-af.vercel.app</string>
-
-    <key>SUPABASE_URL</key>
-    <string>https://rnzznnhddvnrhxtlvcfe.supabase.co</string>
-
-    <key>SUPABASE_ANON_KEY</key>
-    <string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuenpubmhkZHZucmh4dGx2Y2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMzY4OTksImV4cCI6MjA4NTcxMjg5OX0.tokNdsN_xfcAcaFYxN611mhz12uqgZE3j0LGA9zudL4</string>
-
-    <key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLName</key>
-            <string>com.iitslamaa.TravelScoreriOS</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <string>travelscorer</string>
-            </array>
-        </dict>
-    </array>
-
+	<key>API_BASE_URL</key>
+	<string>https://travel-af.vercel.app</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.iitslamaa.TravelScoreriOS</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>travelscorer</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSAppTransportSecurity</key>
+	<dict/>
+	<key>SUPABASE_ANON_KEY</key>
+	<string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuenpubmhkZHZucmh4dGx2Y2ZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMzY4OTksImV4cCI6MjA4NTcxMjg5OX0.tokNdsN_xfcAcaFYxN611mhz12uqgZE3j0LGA9zudL4</string>
+	<key>SUPABASE_URL</key>
+	<string>https://rnzznnhddvnrhxtlvcfe.supabase.co</string>
 </dict>
 </plist>
