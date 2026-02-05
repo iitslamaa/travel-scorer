@@ -105,6 +105,48 @@ struct CountryDTO: Decodable {
         let dailySpend: DailySpend?
     }
 
+    private static func decodeHTML(_ text: String) -> String {
+        var s = text
+
+        // Decode numeric HTML entities (e.g. &#8217;)
+        if let regex = try? NSRegularExpression(pattern: "&#([0-9]+);") {
+            let matches = regex.matches(in: s, range: NSRange(s.startIndex..., in: s))
+            for match in matches.reversed() {
+                guard
+                    match.numberOfRanges == 2,
+                    let codeRange = Range(match.range(at: 1), in: s),
+                    let fullRange = Range(match.range(at: 0), in: s),
+                    let code = Int(s[codeRange]),
+                    let scalar = UnicodeScalar(code)
+                else { continue }
+
+                s.replaceSubrange(fullRange, with: String(Character(scalar)))
+            }
+        }
+
+        // Decode common named entities
+        s = s
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&apos;", with: "'")
+            .replacingOccurrences(of: "&rsquo;", with: "’")
+            .replacingOccurrences(of: "&lsquo;", with: "‘")
+            .replacingOccurrences(of: "&rdquo;", with: "”")
+            .replacingOccurrences(of: "&ldquo;", with: "“")
+            .replacingOccurrences(of: "&ndash;", with: "–")
+            .replacingOccurrences(of: "&mdash;", with: "—")
+            .replacingOccurrences(of: "&hellip;", with: "…")
+
+        // Normalize whitespace
+        s = s
+            .replacingOccurrences(of: "\u{00A0}", with: " ")
+            .replacingOccurrences(of: "\\s+", with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return s
+    }
+
     // MARK: - Init
 
     init(from decoder: Decoder) throws {
@@ -162,7 +204,7 @@ struct CountryDTO: Decodable {
         // nested advisory.level (API)
         let advisory = try? c.decode(Advisory.self, forKey: .advisory)
         self.advisoryLevelNumber = advisory?.level
-        self.advisorySummary = advisory?.summary
+        self.advisorySummary = advisory?.summary.map { Self.decodeHTML($0) }
         self.advisoryUpdatedAt = advisory?.updatedAt
         if let urlString = advisory?.url, let url = URL(string: urlString) {
             self.advisoryUrl = url

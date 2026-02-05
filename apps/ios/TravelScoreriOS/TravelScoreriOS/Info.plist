@@ -5,22 +5,10 @@
 
     <key>NSAppTransportSecurity</key>
     <dict>
-        <key>NSExceptionDomains</key>
-        <dict>
-            <key>192.168.254.209</key>
-            <dict>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-                <key>NSIncludesSubdomains</key>
-                <true/>
-            </dict>
-            <key>localhost</key>
-            <dict>
-                <key>NSExceptionAllowsInsecureHTTPLoads</key>
-                <true/>
-            </dict>
-        </dict>
     </dict>
+
+    <key>API_BASE_URL</key>
+    <string>https://travel-af.vercel.app</string>
 
     <key>SUPABASE_URL</key>
     <string>https://rnzznnhddvnrhxtlvcfe.supabase.co</string>
