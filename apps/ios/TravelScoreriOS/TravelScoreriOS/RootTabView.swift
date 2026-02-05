@@ -74,6 +74,9 @@ struct ProfileView: View {
 }
 
 struct MoreView: View {
+    private var isAppReviewMode: Bool {
+        (Bundle.main.object(forInfoDictionaryKey: "APP_REVIEW_MODE") as? Bool) == true
+    }
     var body: some View {
         List {
             NavigationLink("Friends") {
@@ -85,12 +88,14 @@ struct MoreView: View {
             NavigationLink("Legal & Disclaimers") {
                 LegalView()
             }
-            Button(role: .destructive) {
-                Task {
-                    try? await SupabaseManager.client.auth.signOut()
+            if !isAppReviewMode {
+                Button(role: .destructive) {
+                    Task {
+                        try? await SupabaseManager.client.auth.signOut()
+                    }
+                } label: {
+                    Text("Sign Out")
                 }
-            } label: {
-                Text("Sign Out")
             }
         }
         .navigationTitle("More")

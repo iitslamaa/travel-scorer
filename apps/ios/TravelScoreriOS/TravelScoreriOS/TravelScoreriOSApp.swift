@@ -28,6 +28,10 @@ struct AuthGate: View {
     @StateObject private var bucketListStore = BucketListStore()
     @StateObject private var traveledStore = TraveledStore()
 
+    private var isAppReviewMode: Bool {
+        (Bundle.main.object(forInfoDictionaryKey: "APP_REVIEW_MODE") as? Bool) == true
+    }
+
     var body: some View {
         ZStack {
             if !didShowIntro {
@@ -43,7 +47,7 @@ struct AuthGate: View {
                 ProgressView("Loading…")
                     .transition(.opacity)
 
-            } else if session == nil {
+            } else if !isAppReviewMode && session == nil {
                 AuthLandingView(onIntroFinished: nil)
                     .transition(.opacity)
 
@@ -56,7 +60,7 @@ struct AuthGate: View {
         }
         .animation(.easeInOut(duration: 0.25), value: didShowIntro)
         .animation(.easeInOut(duration: 0.25), value: isAuthResolved)
-        .animation(.easeInOut(duration: 0.25), value: session != nil)
+        .animation(.easeInOut(duration: 0.25), value: isAppReviewMode || session != nil)
         .task {
             // Resolve session exactly once (in parallel with intro)
             do {
