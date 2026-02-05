@@ -86,6 +86,33 @@ function normalizeName(s: string): string {
     .replace(/\s+/g, ' ');                           // collapse spaces
 }
 
+function decodeHtmlEntitiesServer(input?: string): string | undefined {
+  if (!input) return input;
+
+  let s = input
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, hex) => {
+      const cp = parseInt(hex, 16);
+      return Number.isFinite(cp) ? String.fromCodePoint(cp) : _;
+    })
+    .replace(/&#(\d+);/g, (_, num) => {
+      const cp = parseInt(num, 10);
+      return Number.isFinite(cp) ? String.fromCodePoint(cp) : _;
+    });
+
+  s = s
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+
+  return s
+    .replace(/[\u00a0\u202f\u2007]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 // Build a lookup from normalized official names and aliases → ISO2
 const NAME_INDEX: Map<string, string> = (() => {
   const m = new Map<string, string>();
@@ -300,7 +327,7 @@ export async function GET() {
         level,
         updatedAt: getStr(r.updatedAt) ?? getStr(r.updated),
         url: getStr(r.url),
-        summary: getStr(r.summary),
+        summary: decodeHtmlEntitiesServer(getStr(r.summary)),
       };
     });
   } catch (err) {
@@ -363,7 +390,7 @@ export async function GET() {
             level: adv.level,
             updatedAt: adv.updatedAt || '',
             url: adv.url || '',
-            summary: adv.summary ?? '',
+            summary: decodeHtmlEntitiesServer(adv.summary) ?? '',
           }
         : null,
     };
@@ -386,7 +413,7 @@ export async function GET() {
           level: a.level,
           updatedAt: a.updatedAt || '',
           url: a.url || '',
-          summary: a.summary ?? '',
+          summary: decodeHtmlEntitiesServer(a.summary) ?? '',
         },
       } as CountryOut;
       merged.push(extra);
