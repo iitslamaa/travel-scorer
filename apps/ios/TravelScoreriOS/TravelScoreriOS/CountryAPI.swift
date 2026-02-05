@@ -38,8 +38,27 @@ enum CountryAPI {
 
         let decoder = JSONDecoder()
 
-        // ⬇️ KEY CHANGE: decode the array directly
-        let dtos = try decoder.decode([CountryDTO].self, from: data)
+        struct CountriesEnvelope: Decodable {
+            let countries: [CountryDTO]
+        }
+
+        let dtos: [CountryDTO]
+        do {
+            // First try direct array
+            dtos = try decoder.decode([CountryDTO].self, from: data)
+        } catch {
+            // Fallback to envelope shape
+            do {
+                let env = try decoder.decode(CountriesEnvelope.self, from: data)
+                dtos = env.countries
+            } catch {
+                #if DEBUG
+                let body = String(data: data, encoding: .utf8) ?? "<non-utf8>"
+                print("🔴 [CountryAPI] Decode failed for both shapes. Body:", body.prefix(400))
+                #endif
+                throw error
+            }
+        }
         print("🟢 [CountryAPI] Decoded \(dtos.count) DTOs")
 
         let countries = dtos.map { dto in
@@ -143,7 +162,28 @@ extension CountryAPI {
             UserDefaults.standard.set(now, forKey: CountriesCache.lastRefreshKey)
 
             let decoder = JSONDecoder()
-            let dtos = try decoder.decode([CountryDTO].self, from: data)
+
+            struct CountriesEnvelope: Decodable {
+                let countries: [CountryDTO]
+            }
+
+            let dtos: [CountryDTO]
+            do {
+                // First try direct array
+                dtos = try decoder.decode([CountryDTO].self, from: data)
+            } catch {
+                // Fallback to envelope shape
+                do {
+                    let env = try decoder.decode(CountriesEnvelope.self, from: data)
+                    dtos = env.countries
+                } catch {
+                    #if DEBUG
+                    let body = String(data: data, encoding: .utf8) ?? "<non-utf8>"
+                    print("🔴 [CountryAPI] Decode failed for both shapes. Body:", body.prefix(400))
+                    #endif
+                    throw error
+                }
+            }
 
             let countries = dtos.map { dto in
                 Country(
@@ -190,7 +230,15 @@ extension CountryAPI {
 
     private static func fetchCountriesData() async throws -> Data {
         let (data, resp) = try await URLSession.shared.data(from: countriesURL)
-        guard let http = resp as? HTTPURLResponse, (200..<300).contains(http.statusCode) else {
+        guard let http = resp as? HTTPURLResponse else {
+            throw URLError(.badServerResponse)
+        }
+        if !(200..<300).contains(http.statusCode) {
+            #if DEBUG
+            if let body = String(data: data, encoding: .utf8) {
+                print("🔴 [CountryAPI] Bad status \(http.statusCode). Body:", body.prefix(400))
+            }
+            #endif
             throw URLError(.badServerResponse)
         }
         return data

@@ -68,14 +68,15 @@ struct CountryDetailView: View {
                                 .bold()
                         }
 
-                        if let summary = country.advisorySummary, !summary.isEmpty {
-                            Text(cleanAdvisory(summary))
+                        if let rawSummary = country.advisorySummary, !rawSummary.isEmpty {
+                            let advisoryText = cleanAdvisory(rawSummary)
+
+                            Text(advisoryText)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                                 .lineLimit(showFullAdvisory ? nil : 3)
 
-                            // Only show toggle if text is long enough
-                            if summary.count > 200 {
+                            if advisoryText.count > 200 {
                                 Button(action: {
                                     withAnimation {
                                         showFullAdvisory.toggle()

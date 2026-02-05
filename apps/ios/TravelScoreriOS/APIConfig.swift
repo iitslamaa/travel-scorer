@@ -16,15 +16,13 @@ enum APIConfig {
     }
 
     static var baseURL: URL {
-        // 1) Explicit override always wins
-        if let s = overrideBaseURLString?
-            .trimmingCharacters(in: .whitespacesAndNewlines),
-           !s.isEmpty,
-           let url = URL(string: s) {
-            return url
-        }
+        // 🔒 Hard-locked production backend (Railway)
+        let url = URL(string: "https://travel-app-af-production.up.railway.app")!
 
-        // 2) Production default (Railway – always-on backend)
-        return URL(string: "https://travel-app-af-production.up.railway.app")!
+        #if DEBUG
+        print("🌍 [APIConfig] Using base URL:", url.absoluteString)
+        #endif
+
+        return url
     }
 }

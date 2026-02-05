@@ -59,6 +59,20 @@ final class SeasonalityService {
 
         let decoder = JSONDecoder()
         decoder.keyDecodingStrategy = .convertFromSnakeCase
-        return try decoder.decode(SeasonalityResponse.self, from: data)
+
+        // Handle both possible backend shapes defensively
+        // 1) { month, peakCountries, shoulderCountries }
+        // 2) direct SeasonalityResponse
+        do {
+            return try decoder.decode(SeasonalityResponse.self, from: data)
+        } catch {
+            #if DEBUG
+            print("[SeasonalityService] ❌ Decode failed:", error)
+            if let body = String(data: data, encoding: .utf8) {
+                print("[SeasonalityService] Raw body (truncated):\n\(String(body.prefix(1500)))")
+            }
+            #endif
+            throw error
+        }
     }
 }
