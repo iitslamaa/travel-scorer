@@ -50,26 +50,10 @@ struct RootTabView: View {
             }
 
             NavigationStack {
-                FriendsView()
+                MoreView()
             }
             .tabItem {
-                Label("Friends", systemImage: "person.2.fill")
-            }
-
-            NavigationStack {
-                ProfileView()
-                    .toolbar {
-                        ToolbarItem(placement: .topBarTrailing) {
-                            Button("Sign out") {
-                                Task {
-                                    try? await SupabaseManager.client.auth.signOut()
-                                }
-                            }
-                        }
-                    }
-            }
-            .tabItem {
-                Label("Profile", systemImage: "person.crop.circle")
+                Label("More", systemImage: "ellipsis")
             }
         }
     }
@@ -80,5 +64,35 @@ struct FriendsView: View {
 }
 
 struct ProfileView: View {
-    var body: some View { Text("Profile (coming soon)") }
+    var body: some View {
+        List {
+            Text("Profile features coming soon")
+                .foregroundColor(.secondary)
+        }
+        .navigationTitle("Profile")
+    }
+}
+
+struct MoreView: View {
+    var body: some View {
+        List {
+            NavigationLink("Friends") {
+                FriendsView()
+            }
+            NavigationLink("Profile") {
+                ProfileView()
+            }
+            NavigationLink("Legal & Disclaimers") {
+                LegalView()
+            }
+            Button(role: .destructive) {
+                Task {
+                    try? await SupabaseManager.client.auth.signOut()
+                }
+            } label: {
+                Text("Sign Out")
+            }
+        }
+        .navigationTitle("More")
+    }
 }
