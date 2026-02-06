@@ -1,15 +1,21 @@
-//
-//  SupabaseClient.swift
-//  TravelScoreriOS
-//
-//  Created by Lama Yassine on 2/3/26.
-//
-
 import Foundation
+import Combine
 import Supabase
 
-enum SupabaseManager {
-    static let client: SupabaseClient = {
+/// Low-level Supabase wrapper.
+/// ❗️Not MainActor. Not UI. No SwiftUI state.
+final class SupabaseManager {
+    static let shared = SupabaseManager()
+
+    let client: SupabaseClient
+
+    // Emits whenever auth state changes (sign in / sign out)
+    private let authStateSubject = PassthroughSubject<Void, Never>()
+    var authStatePublisher: AnyPublisher<Void, Never> {
+        authStateSubject.eraseToAnyPublisher()
+    }
+
+    private init() {
         guard
             let urlString = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_URL") as? String,
             let anonKey = Bundle.main.object(forInfoDictionaryKey: "SUPABASE_ANON_KEY") as? String,
@@ -18,9 +24,31 @@ enum SupabaseManager {
             fatalError("Missing Supabase credentials in Info.plist")
         }
 
-        return SupabaseClient(
+        self.client = SupabaseClient(
             supabaseURL: url,
             supabaseKey: anonKey
         )
-    }()
+    }
+
+    func startAuthListener() async {
+        await client.auth.onAuthStateChange { [weak self] _, _ in
+            Task { @MainActor in
+                self?.authStateSubject.send(())
+            }
+        }
+    }
+
+    // MARK: - Session
+
+    /// Supabase SDK exposes session asynchronously
+    func fetchCurrentSession() async throws -> Session? {
+        try await client.auth.session
+    }
+
+    // MARK: - Auth helpers
+
+    func signOut() async throws {
+        try await client.auth.signOut()
+        authStateSubject.send(())
+    }
 }

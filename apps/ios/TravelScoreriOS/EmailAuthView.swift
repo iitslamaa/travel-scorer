@@ -1,10 +1,16 @@
-import Foundation
+//
+//  EmailAuthView.swift
+//  TravelScoreriOS
+//
+//  Created by Lama Yassine on 2/5/26.
+//
+
 import SwiftUI
 import AuthenticationServices
 import CryptoKit
-import Supabase
 
-// Keep this in the same file for now so Xcode can always find it.
+// MARK: - Reusable Button Wrapper
+
 struct TranslucentAuthButton<Content: View>: View {
     let content: Content
 
@@ -25,16 +31,22 @@ struct TranslucentAuthButton<Content: View>: View {
     }
 }
 
+// MARK: - Email Auth Flow
+
 struct EmailAuthView: View {
     @StateObject private var vm = AuthViewModel()
+    @EnvironmentObject private var sessionManager: SessionManager
+
     @State private var step: Step = .enterEmail
     @State private var showEmailFlow = false
     @FocusState private var focusedField: Field?
+
     @State private var isSending = false
     @State private var cooldownSeconds = 0
+
+    // Apple
     @State private var appleNonce: String?
     @State private var appleError: String?
-    @State private var googleError: String?
 
     enum Step {
         case enterEmail
@@ -51,9 +63,12 @@ struct EmailAuthView: View {
             Spacer()
 
             ZStack {
+                // MARK: - Initial Auth Menu
+
                 if !showEmailFlow {
                     VStack(spacing: 20) {
-                        // Apple
+
+                        // Apple Sign In
                         TranslucentAuthButton {
                             SignInWithAppleButton(.signIn) { request in
                                 let nonce = randomNonceString()
@@ -70,24 +85,20 @@ struct EmailAuthView: View {
                                             let idToken = String(data: tokenData, encoding: .utf8),
                                             let nonce = appleNonce
                                         else {
-                                            appleError = "Apple Sign In failed."
                                             return
                                         }
 
-                                        do {
-                                            let credentials = OpenIDConnectCredentials(
-                                                provider: .apple,
-                                                idToken: idToken,
-                                                nonce: nonce
-                                            )
-                                            try await vm.client.auth.signInWithIdToken(credentials: credentials)
-                                            appleError = nil
-                                        } catch {
-                                            appleError = error.localizedDescription
+                                        await vm.signInWithApple(
+                                            idToken: idToken,
+                                            nonce: nonce
+                                        )
+
+                                        if vm.errorMessage == nil {
+                                            await sessionManager.forceRefreshAuthState()
                                         }
 
                                     case .failure(let error):
-                                        appleError = error.localizedDescription
+                                        vm.errorMessage = error.localizedDescription
                                     }
                                 }
                             }
@@ -95,18 +106,14 @@ struct EmailAuthView: View {
                             .frame(height: 52)
                         }
 
-                        // Google
+                        // Google Sign In
                         TranslucentAuthButton {
                             Button {
                                 Task {
-                                    do {
-                                        try await vm.client.auth.signInWithOAuth(
-                                            provider: .google,
-                                            redirectTo: URL(string: "travelscorer://login-callback")
-                                        )
-                                        googleError = nil
-                                    } catch {
-                                        googleError = error.localizedDescription
+                                    await vm.signInWithGoogle()
+
+                                    if vm.errorMessage == nil {
+                                        await sessionManager.forceRefreshAuthState()
                                     }
                                 }
                             } label: {
@@ -123,11 +130,12 @@ struct EmailAuthView: View {
                             }
                         }
 
-                        // Email entry trigger (no keyboard yet)
+                        // Email Entry
                         TranslucentAuthButton {
                             Button {
                                 withAnimation(.easeInOut(duration: 0.4)) {
                                     showEmailFlow = true
+                                    step = .enterEmail
                                 }
                             } label: {
                                 Text("Continue with Email")
@@ -139,17 +147,24 @@ struct EmailAuthView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
 
+                // MARK: - Enter Email
+
                 if showEmailFlow && step == .enterEmail {
                     FrostedCard {
                         VStack(spacing: 14) {
+
+                            // Back button (EMAIL SCREEN ONLY)
+                            HStack {
+                                backButton
+                                Spacer()
+                            }
+
                             Text("Enter your email address")
                                 .font(.headline)
-                                .foregroundColor(.primary)
 
                             TextField("Email address", text: $vm.email)
                                 .textInputAutocapitalization(.never)
                                 .keyboardType(.emailAddress)
-                                .textFieldStyle(.plain)
                                 .padding(12)
                                 .background(
                                     RoundedRectangle(cornerRadius: 8)
@@ -168,40 +183,51 @@ struct EmailAuthView: View {
 
                                 Task {
                                     await vm.sendEmailOTP()
-                                    await MainActor.run {
-                                        isSending = false
-                                        if vm.errorMessage == nil {
-                                            step = .enterCode
-                                            focusedField = .code
-                                            cooldownSeconds = 30
-                                            startCooldown()
-                                        }
+
+                                    isSending = false
+                                    if vm.errorMessage == nil {
+                                        step = .enterCode
+                                        focusedField = .code
+                                        cooldownSeconds = 30
+                                        startCooldown()
                                     }
                                 }
                             } label: {
                                 if isSending {
                                     ProgressView()
                                 } else {
-                                    Text(cooldownSeconds > 0 ? "Resend in \(cooldownSeconds)s" : "Send code")
+                                    Text(
+                                        cooldownSeconds > 0
+                                        ? "Resend in \(cooldownSeconds)s"
+                                        : "Send code"
+                                    )
                                 }
                             }
                             .buttonStyle(.borderedProminent)
-                            .disabled(isSending || cooldownSeconds > 0 || vm.email.isEmpty)
+                            .disabled(vm.email.isEmpty || cooldownSeconds > 0)
                         }
                     }
                     .transition(.move(edge: .trailing).combined(with: .opacity))
                 }
 
+                // MARK: - Enter Code
+
                 if step == .enterCode {
                     FrostedCard {
                         VStack(spacing: 14) {
-                            Text("Check your email for the 6‑digit code")
+
+                            // Back button (CODE SCREEN ONLY)
+                            HStack {
+                                backButton
+                                Spacer()
+                            }
+
+                            Text("Check your email for the 6-digit code")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
 
-                            TextField("6‑digit code", text: $vm.otp)
+                            TextField("6-digit code", text: $vm.otp)
                                 .keyboardType(.numberPad)
-                                .textFieldStyle(.plain)
                                 .padding(12)
                                 .background(
                                     RoundedRectangle(cornerRadius: 8)
@@ -210,7 +236,14 @@ struct EmailAuthView: View {
                                 .focused($focusedField, equals: .code)
 
                             Button {
-                                Task { await vm.verifyEmailOTP() }
+                                Task {
+                                    await vm.verifyEmailOTP()
+
+                                    if vm.errorMessage == nil {
+                                        dismissKeyboard()
+                                        await sessionManager.forceRefreshAuthState()
+                                    }
+                                }
                             } label: {
                                 if vm.isLoading {
                                     ProgressView()
@@ -219,14 +252,7 @@ struct EmailAuthView: View {
                                 }
                             }
                             .buttonStyle(.borderedProminent)
-                            .disabled(vm.isLoading || vm.otp.count < 6)
-
-                            Button("Change email") {
-                                vm.otp = ""
-                                step = .enterEmail
-                                focusedField = .email
-                            }
-                            .font(.footnote)
+                            .disabled(vm.otp.count < 6)
                         }
                     }
                     .transition(.move(edge: .trailing).combined(with: .opacity))
@@ -235,41 +261,73 @@ struct EmailAuthView: View {
             .animation(.easeInOut(duration: 0.4), value: showEmailFlow)
             .animation(.easeInOut(duration: 0.4), value: step)
 
+            if let msg = vm.errorMessage {
+                Text(msg)
+                    .foregroundColor(.red)
+                    .font(.footnote)
+                    .multilineTextAlignment(.center)
+                    .padding(.top, 8)
+            }
+
             Spacer()
         }
         .padding()
+        .onChange(of: sessionManager.isAuthenticated) { isAuthed in
+            if isAuthed {
+                dismissKeyboard()
+            }
+        }
     }
+
+    // MARK: - Back Button
+
+    private var backButton: some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                showEmailFlow = false
+                step = .enterEmail
+            }
+            dismissKeyboard()
+            vm.otp = ""
+            vm.errorMessage = nil
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "chevron.left")
+                Text("Back")
+            }
+            .font(.headline)
+            .foregroundColor(.white)
+        }
+    }
+
+    // MARK: - Helpers
 
     private func startCooldown() {
         Task {
             while cooldownSeconds > 0 {
                 try? await Task.sleep(nanoseconds: 1_000_000_000)
-                await MainActor.run {
-                    cooldownSeconds -= 1
-                }
+                cooldownSeconds -= 1
             }
         }
     }
 
+    private func dismissKeyboard() {
+        focusedField = nil
+    }
+
     private func randomNonceString(length: Int = 32) -> String {
-        precondition(length > 0)
-        let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        let charset = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
         var result = ""
-        result.reserveCapacity(length)
+        var remaining = length
 
-        var remainingLength = length
-        while remainingLength > 0 {
+        while remaining > 0 {
             var randoms = [UInt8](repeating: 0, count: 16)
-            let status = SecRandomCopyBytes(kSecRandomDefault, randoms.count, &randoms)
-            if status != errSecSuccess {
-                fatalError("Unable to generate nonce")
-            }
+            _ = SecRandomCopyBytes(kSecRandomDefault, randoms.count, &randoms)
 
-            randoms.forEach { random in
-                if remainingLength == 0 { return }
-                if random < charset.count {
-                    result.append(charset[Int(random)])
-                    remainingLength -= 1
+            for r in randoms where remaining > 0 {
+                if r < charset.count {
+                    result.append(charset[Int(r)])
+                    remaining -= 1
                 }
             }
         }
@@ -277,8 +335,8 @@ struct EmailAuthView: View {
     }
 
     private func sha256(_ input: String) -> String {
-        let inputData = Data(input.utf8)
-        let hashed = SHA256.hash(data: inputData)
-        return hashed.map { String(format: "%02x", $0) }.joined()
+        let data = Data(input.utf8)
+        let hash = SHA256.hash(data: data)
+        return hash.map { String(format: "%02x", $0) }.joined()
     }
 }

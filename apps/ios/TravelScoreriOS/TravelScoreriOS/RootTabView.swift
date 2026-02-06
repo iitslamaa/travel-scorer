@@ -5,27 +5,25 @@
 //  Created by Lama Yassine on 11/15/25.
 //
 
-import Foundation
 import SwiftUI
-import Supabase
 
 struct RootTabView: View {
+    @EnvironmentObject private var sessionManager: SessionManager
     @EnvironmentObject private var bucketList: BucketListStore
     @EnvironmentObject private var traveled: TraveledStore
 
     var body: some View {
         TabView {
-            // Main scores / country list
+
+            // Scores / Countries
             NavigationStack {
                 CountryListView()
             }
-            .environmentObject(bucketList)
-            .environmentObject(traveled)
             .tabItem {
                 Label("Scores", systemImage: "chart.bar.fill")
             }
 
-            // When to Go tab
+            // When to Go
             NavigationStack {
                 WhenToGoView()
             }
@@ -33,22 +31,23 @@ struct RootTabView: View {
                 Label("When to Go", systemImage: "calendar")
             }
 
+            // Bucket List
             NavigationStack {
                 BucketListView()
             }
-            .environmentObject(bucketList)
             .tabItem {
                 Label("Bucket List", systemImage: "bookmark.fill")
             }
 
+            // My Travels
             NavigationStack {
                 MyTravelsView()
             }
-            .environmentObject(traveled)
             .tabItem {
                 Label("My Travels", systemImage: "backpack.fill")
             }
 
+            // More
             NavigationStack {
                 MoreView()
             }
@@ -59,9 +58,44 @@ struct RootTabView: View {
     }
 }
 
-struct FriendsView: View {
-    var body: some View { Text("Friends (coming soon)") }
+// MARK: - More Tab
+
+struct MoreView: View {
+    @EnvironmentObject private var sessionManager: SessionManager
+
+    var body: some View {
+        List {
+
+            NavigationLink("Profile") {
+                ProfileView()
+            }
+
+            NavigationLink("Legal & Disclaimers") {
+                LegalView()
+            }
+
+            if sessionManager.isAuthenticated {
+                Button(role: .destructive) {
+                    Task {
+                        await sessionManager.signOut()
+                    }
+                } label: {
+                    Text("Sign Out")
+                }
+            } else {
+                Button {
+                    // Exit guest mode → AuthGate will reveal AuthLandingView
+                    sessionManager.didContinueAsGuest = false
+                } label: {
+                    Text("Sign in from the home screen")
+                }
+            }
+        }
+        .navigationTitle("More")
+    }
 }
+
+// MARK: - Placeholder Views
 
 struct ProfileView: View {
     var body: some View {
@@ -70,34 +104,5 @@ struct ProfileView: View {
                 .foregroundColor(.secondary)
         }
         .navigationTitle("Profile")
-    }
-}
-
-struct MoreView: View {
-    private var isAppReviewMode: Bool {
-        (Bundle.main.object(forInfoDictionaryKey: "APP_REVIEW_MODE") as? Bool) == true
-    }
-    var body: some View {
-        List {
-            NavigationLink("Friends") {
-                FriendsView()
-            }
-            NavigationLink("Profile") {
-                ProfileView()
-            }
-            NavigationLink("Legal & Disclaimers") {
-                LegalView()
-            }
-            if !isAppReviewMode {
-                Button(role: .destructive) {
-                    Task {
-                        try? await SupabaseManager.client.auth.signOut()
-                    }
-                } label: {
-                    Text("Sign Out")
-                }
-            }
-        }
-        .navigationTitle("More")
     }
 }

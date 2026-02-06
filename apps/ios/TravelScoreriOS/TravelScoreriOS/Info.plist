@@ -14,10 +14,10 @@
     <string>https://rnzznnhddvnrhxtlvcfe.supabase.co</string>
 
     <key>SUPABASE_ANON_KEY</key>
-    <string>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuenpubmhkZHZucmh4dGZlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAxMzY4OTksImV4cCI6MjA4NTcxMjg5OX0.tokNdsN_xfcAcaFYxN611mhz12uqgZE3j0LGA9zudL4</string>
+    <string>sb_publishable_I4wj-S64nvDxUBhuyH2FDw_OTOKaRc4</string>
 
     <key>APP_REVIEW_MODE</key>
-    <true/>
+    <false/>
 
     <key>CFBundleURLTypes</key>
     <array>

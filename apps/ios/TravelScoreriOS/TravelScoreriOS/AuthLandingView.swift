@@ -1,90 +1,87 @@
-//
-//  AuthLandingView.swift
-//  TravelScoreriOS
-//
-//  Created by Lama Yassine on 2/4/26.
-//
-
-import Foundation
 import SwiftUI
 
 struct AuthLandingView: View {
-    let onIntroFinished: (() -> Void)?
-    @State private var showingAuthUI = false
-    @State private var showLoop = false
-    @State private var hasPlayedIntro = false
+    @EnvironmentObject private var sessionManager: SessionManager
+
+    // MARK: - State
+    @State private var phase: Phase = .intro
+    @State private var showAuthUI = false
+    @State private var hasStarted = false
+
+    enum Phase {
+        case intro
+        case loop
+    }
 
     var body: some View {
         ZStack {
-            // Background: intro once, then loop forever
-            Group {
-                if showLoop {
-                    VideoBackgroundView(
-                        videoName: "auth_loop",
-                        videoType: "mp4",
-                        loop: true
-                    )
-                    .transition(.opacity)
-                } else {
-                    VideoBackgroundView(
-                        videoName: "intro",
-                        videoType: "mp4",
-                        loop: false
-                    )
-                    .transition(.opacity)
-                }
+            // MARK: - Video layer (always mounted, NO animation)
+            ZStack {
+                VideoBackgroundView(
+                    videoName: "intro",
+                    videoType: "mp4",
+                    loop: false
+                )
+                .ignoresSafeArea()
+                .opacity(phase == .intro ? 1 : 0)
+
+                VideoBackgroundView(
+                    videoName: "auth_loop",
+                    videoType: "mp4",
+                    loop: true
+                )
+                .ignoresSafeArea()
+                .opacity(phase == .intro ? 0 : 1)
             }
-            .ignoresSafeArea()
 
-            // Subtle dark gradient for contrast (kept very light)
-            LinearGradient(
-                colors: [
-                    Color.black.opacity(0.12),
-                    Color.black.opacity(0.38)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
+            // MARK: - Auth UI (smooth + fast)
+            if !sessionManager.isAuthenticated && !sessionManager.didContinueAsGuest {
+                VStack {
+                    Spacer()
 
-            // Foreground: auth UI only (no text overlays)
-            VStack {
-                Spacer()
+                    VStack(spacing: 16) {
+                        EmailAuthView()
 
-                if showingAuthUI {
-                    EmailAuthView()
-                        .transition(.opacity)
+                        Button("Continue as Guest") {
+                            sessionManager.continueAsGuest()
+                        }
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(.white)
+                        .padding(.top, 4)
+                    }
+                    .frame(maxWidth: 360)
+                    .opacity(showAuthUI ? 1 : 0)
+                    .animation(.easeOut(duration: 0.35), value: showAuthUI)
+
+                    Spacer()
                 }
-
-                Spacer()
+                .padding(.horizontal, 20)
             }
-            .padding(.horizontal, 20)
         }
-        .ignoresSafeArea()
         .onAppear {
-            guard !hasPlayedIntro else { return }
-            hasPlayedIntro = true
+            guard !hasStarted else { return }
+            hasStarted = true
 
             Task { @MainActor in
-                // Give SwiftUI a moment to fully mount the intro video
-                try? await Task.sleep(nanoseconds: 200_000_000)
-
-                // Let intro video play fully (match Canva export length)
+                // 1️⃣ Intro plays (4s)
                 try? await Task.sleep(nanoseconds: 4_000_000_000)
 
-                // Crossfade to looping background
-                withAnimation(.easeInOut(duration: 0.35)) {
-                    showLoop = true
-                }
+                // 2️⃣ Instantly switch to loop
+                phase = .loop
 
-                // Ensure loop is visible before notifying parent
-                try? await Task.sleep(nanoseconds: 300_000_000)
-                onIntroFinished?()
-
-                // Fade in auth UI
-                withAnimation(.easeInOut(duration: 0.45)) {
-                    showingAuthUI = true
-                }
+                // 3️⃣ Show auth UI almost immediately (0.2s)
+                try? await Task.sleep(nanoseconds: 200_000_000)
+                showAuthUI = true
+            }
+        }
+        .onChange(of: sessionManager.isAuthenticated) { isAuthed in
+            if isAuthed {
+                showAuthUI = false
+            }
+        }
+        .onChange(of: sessionManager.didContinueAsGuest) { didGuest in
+            if didGuest {
+                showAuthUI = false
             }
         }
     }
