@@ -124,7 +124,7 @@ struct EmailAuthView: View {
                                         .frame(width: 20, height: 20)
 
                                     Text("Continue with Google")
-                                        .fontWeight(.semibold)
+                                        .font(.system(size: 17, weight: .semibold))
                                         .foregroundColor(.black.opacity(0.85))
                                 }
                             }
@@ -138,8 +138,8 @@ struct EmailAuthView: View {
                                     step = .enterEmail
                                 }
                             } label: {
-                                Text("Continue with Email")
-                                    .fontWeight(.semibold)
+                                Text("✉️ Continue with Email")
+                                    .font(.system(size: 17, weight: .semibold))
                                     .foregroundColor(.black.opacity(0.85))
                             }
                         }
