@@ -158,6 +158,23 @@ struct CountryListView: View {
                 }
             }
         }
+        .refreshable {
+            do {
+                // Always attempt a refresh, but never block the UI indefinitely
+                if let fresh = await CountryAPI.refreshCountriesIfNeeded(minInterval: 0),
+                   !fresh.isEmpty {
+                    countries = fresh
+
+                    // Recompute visible list once, after refresh completes
+                    DispatchQueue.main.async {
+                        scheduleRecomputeVisible()
+                    }
+                }
+            } catch {
+                // Swallow errors so the refresh control always ends
+                print("🔴 Pull-to-refresh failed, keeping cached data:", error)
+            }
+        }
         .listStyle(.plain)
         .searchable(text: $search, prompt: Text("Search countries"))
         .toolbar {
