@@ -3,7 +3,7 @@ import dns from 'node:dns';
 dns.setDefaultResultOrder('ipv4first');
 
 import { XMLParser } from 'fast-xml-parser';
-import { nameToIso2 } from '@/lib/countryMatch';
+import { COUNTRY_SEEDS } from '@/lib/seed';
 
 // Force Node runtime (so we can use regular Node features if needed)
 export const runtime = 'nodejs';
@@ -25,6 +25,120 @@ const FEEDS = [
   'https://travel.state.gov/_res/rss/TWs.xml',
   'https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories.xml',
 ] as const;
+
+// Build iso3 -> iso2 lookup from seeds
+const ISO3_TO_ISO2 = new Map(
+  COUNTRY_SEEDS
+    .filter(s => s.iso3 && s.iso2)
+    .map(s => [String(s.iso3).toUpperCase(), String(s.iso2).toUpperCase()])
+);
+
+// Explicit allowlist for territories without destination.<iso3>.html pages
+// Keys are URL slugs, values are canonical ISO2 codes
+const TERRITORY_SLUG_ALLOWLIST: Record<string, string> = {
+  'turks-and-caicos': 'TC',
+  'turks-and-caicos-islands': 'TC',
+  'turks-and-caicos-islands-travel-advisory': 'TC',
+  'turks-caicos': 'TC',
+  'cayman-islands': 'KY',
+  'bermuda': 'BM',
+  'british-virgin-islands': 'VG',
+  'u-s-virgin-islands': 'VI',
+  'saint-martin': 'MF',
+  'sint-maarten': 'SX',
+  'curacao': 'CW',
+  'aruba': 'AW',
+  'anguilla': 'AI',
+  'turkey': 'TR',
+  'turkiye': 'TR',
+  'turkmenistan': 'TM',
+};
+
+function normalizeSlugKey(s: string) {
+  return s
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // strip accents (Türkiye)
+    .replace(/[^a-z0-9]+/g, '')                      // collapse punctuation/spaces/dashes
+    .trim();
+}
+
+// Build exact slug/name/alias -> ISO2 index (NO fuzzy substring matching)
+const SLUG_TO_ISO2 = new Map<string, string>();
+for (const seed of COUNTRY_SEEDS) {
+  const iso2 = String(seed.iso2).toUpperCase();
+  const add = (label?: string) => {
+    if (!label) return;
+    const k = normalizeSlugKey(label);
+    if (k && !SLUG_TO_ISO2.has(k)) SLUG_TO_ISO2.set(k, iso2);
+  };
+  add(seed.name);
+  if (Array.isArray(seed.aliases)) {
+    for (const a of seed.aliases) add(a);
+  }
+}
+
+// Weird territory slugs that don't match seed names exactly (keep this SMALL)
+const SLUG_OVERRIDES: Record<string, string> = {
+  // Turks & Caicos slug variants
+  'turksandcaicos': 'TC',
+  'turksandcaicosislands': 'TC',
+
+  // Common “The …” country slugs / formal names
+  'thegambia': 'GM',
+  'gambia': 'GM',
+  'thebahamas': 'BS',
+  'bahamas': 'BS',
+
+  // Saint Vincent & the Grenadines
+  'saintvincentandthegrenadines': 'VC',
+  'stvincentandthegrenadines': 'VC',
+
+  // Belize
+  'belize': 'BZ',
+
+  // Kyrgyzstan
+  'kyrgyzstan': 'KG',
+  'kyrgyzrepublic': 'KG',
+
+  // Palestine / Palestinian territories (best-effort ISO2: PS)
+  'palestine': 'PS',
+  'palestinianterritories': 'PS',
+
+  // US territories (often not present in travel.state.gov advisories)
+  'puertorico': 'PR',
+  'guam': 'GU',
+  'americansamoa': 'AS',
+  'northernmarianaislands': 'MP',
+  'usvirginislands': 'VI',
+};
+
+function iso2FromLink(link: string): string | null {
+  if (!link) return null;
+
+  // Case 1: destination.<iso3>.html (canonical)
+  const m = link.match(/\/destination\.([a-z]{3})\.html/i);
+  if (m?.[1]) {
+    const iso3 = m[1].toUpperCase();
+    return ISO3_TO_ISO2.get(iso3) ?? null;
+  }
+
+  // Case 2: <slug>-travel-advisory.html (country slug pages)
+  const s = link.match(/\/([a-z0-9-]+)-travel-advisory\.html/i);
+  if (s?.[1]) {
+    const rawSlug = s[1];
+    const key = normalizeSlugKey(rawSlug);
+
+    // 2a) explicit weird territory overrides
+    const o = SLUG_OVERRIDES[key] ?? TERRITORY_SLUG_ALLOWLIST[rawSlug.toLowerCase()];
+    if (o && /^[A-Z]{2}$/.test(o)) return o;
+
+    // 2b) exact match against seed names/aliases (e.g., japan, singapore, thailand, turkiye)
+    const iso2 = SLUG_TO_ISO2.get(key);
+    if (iso2 && /^[A-Z]{2}$/.test(iso2)) return iso2;
+  }
+
+  return null;
+}
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore JSON import without explicit types
@@ -107,16 +221,17 @@ function coerceAdvisories(items: RssItem[]): Advisory[] {
     const link = it.link || '';
     const pubDate = it.pubDate || new Date().toISOString();
 
-    const country = extractCountry(title) || 'Unknown';
-    const level = parseLevel(title, description);
-    const iso2 = nameToIso2(country)?.toUpperCase();
+    const iso2 = iso2FromLink(link);
 
-    // Only return records that have a valid ISO2 (we overlay by iso2)
+    // STRICT: only accept advisories with canonical ISO2 from URL or allowlist
     if (!iso2 || !/^[A-Z]{2}$/.test(iso2)) return null;
+
+    // Guard: only allow advisories for countries we actually have
+    if (!COUNTRY_SEEDS.some(s => s.iso2 === iso2)) return null;
 
     return {
       iso2,
-      level,
+      level: parseLevel(title, description),
       summary: description || title,
       url: link || undefined,
       updated: new Date(pubDate).toISOString(),
@@ -159,28 +274,34 @@ export async function GET(req: Request) {
       }
     }
 
-    const out = coerceAdvisories(items);
+    const rssOut = coerceAdvisories(items);
 
-    if (out.length === 0) {
-      // Fallback to snapshot so the app keeps working
-      const fb = loadSnapshot();
-      if (debug) {
-        return NextResponse.json(
-          { ok: true, source: 'snapshot-fallback', count: fb.length, sample: fb.slice(0, 5) },
-          { status: 200, headers: { 'cache-control': 'no-store', 'x-advisories-source': 'snapshot-fallback' } }
-        );
-      }
-      return NextResponse.json(fb, { status: 200, headers: { 'cache-control': 'no-store', 'x-advisories-source': 'snapshot-fallback' } });
-    }
+    // Always load snapshot and fill missing ISO2s so common countries never go missing
+    const snapshotOut = loadSnapshot();
+    const byIso = new Map<string, Advisory>();
+
+    for (const a of snapshotOut) byIso.set(a.iso2, a); // snapshot baseline
+    for (const a of rssOut) byIso.set(a.iso2, a);      // RSS overrides snapshot
+
+    const out = [...byIso.values()].sort((a, b) => a.iso2.localeCompare(b.iso2));
 
     if (debug) {
       return NextResponse.json(
-        { ok: true, source: 'rss', feedsTried: FEEDS.length, itemsParsed: items.length, count: out.length, sample: out.slice(0, 5) },
-        { status: 200, headers: { 'cache-control': 'no-store', 'x-advisories-source': 'rss' } }
+        {
+          ok: true,
+          source: 'rss+snapshot',
+          feedsTried: FEEDS.length,
+          itemsParsed: items.length,
+          rssCount: rssOut.length,
+          snapshotCount: snapshotOut.length,
+          count: out.length,
+          sample: out.slice(0, 8),
+        },
+        { status: 200, headers: { 'cache-control': 'no-store', 'x-advisories-source': 'rss+snapshot' } }
       );
     }
 
-    return NextResponse.json(out, { status: 200, headers: { 'cache-control': 'no-store', 'x-advisories-source': 'rss' } });
+    return NextResponse.json(out, { status: 200, headers: { 'cache-control': 'no-store', 'x-advisories-source': 'rss+snapshot' } });
   } catch (e) {
     const fb = loadSnapshot();
     if (debug) {

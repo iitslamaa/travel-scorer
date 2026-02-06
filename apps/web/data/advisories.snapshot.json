@@ -1,5 +1,3 @@
-
-
 [
   {
     "iso2": "US",
@@ -91,5 +89,19 @@
     "summary": "Reconsider travel due to terrorism and kidnapping.",
     "url": "https://www.travel-advisory.info/algeria",
     "updated": "2025-10-01"
+  },
+  {
+    "iso2": "MM",
+    "level": 4,
+    "summary": "Do not travel due to armed conflict, civil unrest, and arbitrary enforcement of local laws.",
+    "url": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/myanmar-travel-advisory.html",
+    "updated": "2025-02-01"
+  },
+  {
+    "iso2": "AR",
+    "level": 1,
+    "summary": "Exercise normal precautions.",
+    "url": "https://travel.state.gov/content/travel/en/traveladvisories/traveladvisories/argentina-travel-advisory.html",
+    "updated": "2025-02-01"
   }
 ]
