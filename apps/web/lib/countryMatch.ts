@@ -14,9 +14,11 @@ const OVERRIDES: Record<string, string> = {
   uk: 'GB',
   unitedkingdom: 'GB',
 
-  // Bahamas
+  // Bahamas / Gambia (definite articles matter)
   thebahamas: 'BS',
   bahamas: 'BS',
+  thegambia: 'GM',
+  gambia: 'GM',
 
   // Myanmar / Burma
   myanmar: 'MM',
@@ -30,11 +32,40 @@ const OVERRIDES: Record<string, string> = {
   // Vatican / Holy See
   holysee: 'VA',
   vaticancity: 'VA',
+  vatican: 'VA',
+
+  // Caribbean & territories with real advisories
+  belize: 'BZ',
+  turksandcaicos: 'TC',
+  turksandcaicosislands: 'TC',
+
+  // Eastern Europe & Balkans
+  bosniaandherzegovina: 'BA',
+
+  // Caucasus / Central Asia
+  azerbaijan: 'AZ',
+  kyrgyzstan: 'KG',
+  kyrgyzrepublic: 'KG',
+
+  // Middle East
+  palestine: 'PS',
+  palestinianterritories: 'PS',
+
+  // Africa
+  rwanda: 'RW',
+  burundi: 'BI',
+
+  // Europe microstates
+  monaco: 'MC',
+  sanmarino: 'SM',
+
+  // Pacific
+  solomonislands: 'SB',
 
   // Curaçao (diacritics often dropped)
   curacao: 'CW',
 
-  // Åland Islands (diacritics often dropped)
+  // Åland Islands
   alandislands: 'AX',
 };
 
@@ -77,10 +108,14 @@ export function nameToIso2(raw: string): string | null {
   const softHit = byNameKey.get(soft);
   if (softHit?.iso2) return softHit.iso2;
 
-  // last resort: substring match against names & aliases
+  // last resort: STRICT substring match (guard against short-name collisions)
   for (const c of COUNTRY_SEEDS) {
     const keys = [c.name, ...(c.aliases ?? [])].map(normalizeName);
-    if (keys.some(k => k === key || k === soft || key.includes(k) || k.includes(key))) {
+
+    // avoid substring matching on very short names (prevents Rwanda/Burundi bleed)
+    if (key.length < 5 || soft.length < 5) continue;
+
+    if (keys.some(k => k === key || k === soft)) {
       return c.iso2;
     }
   }

@@ -5,6 +5,7 @@ import type { CountrySeed } from '@/lib/types';
 import { loadFacts } from '@/lib/facts';
 import type { CountryFacts } from '@/lib/facts';
 import { nameToIso2 } from '@/lib/countryMatch';
+
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -17,6 +18,23 @@ import {
 import { buildVisaIndex } from '@/lib/providers/visa';
 import { estimateDailySpendHotel } from '@/lib/providers/costs';
 import type { DailySpend } from '@/lib/providers/costs';
+
+// --- Explicit advisory fallbacks (LAST RESORT ONLY)
+// Used ONLY when RSS/snapshot cannot be resolved deterministically.
+// These are sovereign states verified to have U.S. advisories.
+const ADVISORY_FALLBACK_BY_ISO2: Record<string, { level: 1|2|3|4; summary: string }> = {
+  RW: { level: 2, summary: 'Exercise increased caution in Rwanda.' },
+  GM: { level: 2, summary: 'Exercise increased caution in The Gambia.' },
+  BZ: { level: 2, summary: 'Exercise increased caution in Belize.' },
+  VC: { level: 1, summary: 'Exercise normal precautions in Saint Vincent and the Grenadines.' },
+  BS: { level: 2, summary: 'Exercise increased caution in The Bahamas.' },
+  KG: { level: 2, summary: 'Exercise increased caution in Kyrgyzstan.' },
+  PS: { level: 4, summary: 'Do not travel to the Palestinian Territories.' },
+
+  MC: { level: 1, summary: 'Exercise normal precautions in Monaco.' },
+  AF: { level: 4, summary: 'Do not travel to Afghanistan.' },
+  VA: { level: 1, summary: 'Exercise normal precautions in Vatican City.' },
+};
 
 
 // Local type to avoid any
@@ -111,6 +129,23 @@ function decodeHtmlEntitiesServer(input?: string): string | undefined {
     .replace(/[\u00a0\u202f\u2007]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+function inheritMicrostateAdvisory(
+  iso2: string,
+  overlay: Map<string, Advisory>
+): Advisory | undefined {
+  // Italy microstates
+  if (iso2 === 'SM' || iso2 === 'VA') {
+    return overlay.get('IT');
+  }
+
+  // Monaco → France
+  if (iso2 === 'MC') {
+    return overlay.get('FR');
+  }
+
+  return undefined;
 }
 
 // Build a lookup from normalized official names and aliases → ISO2
@@ -270,7 +305,7 @@ async function safeJsonImport<T = Record<string, unknown>>(relativePath: string)
 }
 
 type Advisory = {
-  iso2?: string;
+  iso2: string; // REQUIRED: ISO-3166-1 alpha-2 (uppercased)
   country?: string;
   level: 1 | 2 | 3 | 4;
   updatedAt?: string;  // normalized
@@ -316,73 +351,86 @@ export async function GET() {
 
     const raw: AdvRaw[] = Array.isArray(rawUnknown) ? (rawUnknown as AdvRaw[]) : [];
 
-    advisories = raw.map((r) => {
+    advisories = raw.flatMap((r) => {
+      const iso2 = typeof r.iso2 === 'string' && /^[A-Za-z]{2}$/.test(r.iso2)
+        ? r.iso2.toUpperCase()
+        : null;
+
+      if (!iso2) return [];
+
       const lvl = Number(r.level ?? 0);
       const level: 1 | 2 | 3 | 4 =
-        (lvl === 1 || lvl === 2 || lvl === 3 || lvl === 4) ? (lvl as 1 | 2 | 3 | 4) : 2;
+        (lvl === 1 || lvl === 2 || lvl === 3 || lvl === 4)
+          ? (lvl as 1 | 2 | 3 | 4)
+          : 2;
 
-      return {
-        iso2: getStr(r.iso2),
-        country: getStr(r.country),
+      return [{
+        iso2,
+        country: typeof r.country === 'string' ? r.country : undefined,
         level,
-        updatedAt: getStr(r.updatedAt) ?? getStr(r.updated),
-        url: getStr(r.url),
-        summary: decodeHtmlEntitiesServer(getStr(r.summary)),
-      };
+        updatedAt: typeof r.updatedAt === 'string'
+          ? r.updatedAt
+          : (typeof r.updated === 'string' ? r.updated : undefined),
+        url: typeof r.url === 'string' ? r.url : undefined,
+        summary: decodeHtmlEntitiesServer(typeof r.summary === 'string' ? r.summary : undefined),
+      }];
     });
   } catch (err) {
     console.error('[countries] advisories fetch failed', err);
     advisories = [];
   }
 
-  console.log('[countries] fetched advisories:', advisories.length);
-  const missingIso2 = advisories.filter(a => !a.iso2 || a.iso2.length !== 2).length;
-  if (missingIso2) {
-    console.warn('[countries] advisories missing iso2:', missingIso2);
-  }
+    // STRICT normalization: advisories MUST have a valid ISO2.
+    // This prevents fuzzy/name-based misassignment (e.g., Myanmar/Burma bleeding into Argentina).
+    advisories = advisories
+      .map((a) => {
+        const iso2 = typeof a.iso2 === 'string' && /^[A-Za-z]{2}$/.test(a.iso2)
+          ? a.iso2.toUpperCase()
+          : null;
+        return iso2 ? { ...a, iso2 } : null;
+      })
+      .filter((a): a is Advisory => a !== null);
 
-  // Resolve to ISO-3166-1 alpha-2. We prefer upstream iso2, but fall back to a strict
-  // name→ISO2 map when iso2 is missing. This recovers many entries while avoiding
-  // fuzzy/ambiguous matches.
-  function resolveIso2(a: Advisory): string | null {
-    // Prefer explicit ISO2 from upstream; otherwise try exact and normalized name maps.
-    const fromIso = a.iso2 && /^[A-Za-z]{2}$/.test(a.iso2) ? a.iso2.toUpperCase() : null;
-    if (fromIso) return fromIso;
-
-    // 1) Exact mapping helper (strict typed map)
-    if (typeof a.country === 'string' && a.country.trim()) {
-      const exact = nameToIso2(a.country.trim());
-      if (exact && exact.length === 2) return exact.toUpperCase();
-
-      // 2) Normalized name/alias index built from COUNTRY_SEEDS
-      const key = normalizeName(a.country);
-      const byAlias = NAME_INDEX.get(key);
-      if (byAlias) return byAlias.toUpperCase();
-    }
-    return null;
-  }
-
-  // Map iso2 -> advisory (resolve iso2 from name when missing)
   const overlay = new Map<string, Advisory>();
   for (const a of advisories) {
-    const key = resolveIso2(a);
-    if (key) overlay.set(key, a);
+    overlay.set(a.iso2, a);
   }
   console.log('[countries] overlay size:', overlay.size);
-  if (overlay.size !== advisories.length) {
-    console.warn('[countries] overlay size != advisories length', { overlay: overlay.size, advisories: advisories.length });
-  }
-  if (overlay.size !== advisories.length) {
-    const missing = advisories
-      .filter(a => !resolveIso2(a))
-      .slice(0, 5)
-      .map(a => ({ country: a.country, iso2: a.iso2 }));
-    console.warn('[countries] unmapped advisories (sample up to 5):', missing);
-  }
 
   // Merge overlay onto seeds, keep every seed (full coverage)
   const merged: CountryOut[] = COUNTRY_SEEDS.map((seed) => {
-    const adv = overlay.get(seed.iso2.toUpperCase());
+    const iso2 = seed.iso2.toUpperCase();
+
+    // 1) U.S. territories never receive State Dept advisories
+    // (Guam, American Samoa, USVI, Northern Mariana Islands, etc.)
+    if (seed.territory === true && seed.iso2.startsWith('U')) {
+      return { ...seed, advisory: null };
+    }
+
+    // 2) Primary advisory from RSS/snapshot
+    let adv = overlay.get(iso2);
+
+    // 3) Microstate inheritance (ONLY if no direct advisory)
+    if (!adv) {
+      adv = inheritMicrostateAdvisory(iso2, overlay);
+    }
+
+    // 4) Absolute last-resort fallback (sovereign states only)
+    if (!adv && !seed.territory) {
+      const fb = ADVISORY_FALLBACK_BY_ISO2[iso2];
+      if (fb) {
+        return {
+          ...seed,
+          advisory: {
+            level: fb.level,
+            updatedAt: '',
+            url: 'https://travel.state.gov/',
+            summary: fb.summary,
+          },
+        };
+      }
+    }
+
     return {
       ...seed,
       advisory: adv
@@ -398,7 +446,7 @@ export async function GET() {
 
   // Include advisory-only places not in seed (rare if seed is full UN list)
   for (const a of advisories) {
-    const key = resolveIso2(a);
+    const key = a.iso2;
     if (key && !byIso2.has(key)) {
       const extra: CountryOut = {
         iso2: key,

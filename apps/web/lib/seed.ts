@@ -2,7 +2,12 @@
 import seeds from '@/data/seeds/countries.json';
 import type { CountrySeed } from './types';
 
-export const COUNTRY_SEEDS: CountrySeed[] = seeds as CountrySeed[];
+const US_TERRITORIES = new Set(['AS','GU','MP','PR','VI']);
+
+export const COUNTRY_SEEDS: CountrySeed[] = (seeds as CountrySeed[]).map(c => ({
+  ...c,
+  isUSTerritory: US_TERRITORIES.has(c.iso2.toUpperCase()),
+}));
 
 // Lookup maps
 export const byIso2 = new Map(COUNTRY_SEEDS.map(c => [c.iso2.toUpperCase(), c]));
