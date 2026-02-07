@@ -12,6 +12,7 @@ final class SessionManager: ObservableObject {
 
     @Published private(set) var isAuthenticated: Bool = false
     @Published var didContinueAsGuest: Bool = false
+    @Published private(set) var userId: UUID? = nil
 
     private let supabase: SupabaseManager
     private var cancellables = Set<AnyCancellable>()
@@ -42,6 +43,7 @@ final class SessionManager: ObservableObject {
         try? await supabase.signOut()
         didContinueAsGuest = false
         isAuthenticated = false
+        userId = nil
         print("🧪 signOut → isAuthenticated=false")
     }
 
@@ -57,17 +59,21 @@ final class SessionManager: ObservableObject {
                 if session.isExpired {
                     print("🧪 session is expired → treating as logged out")
                     isAuthenticated = false
+                    userId = nil
                 } else {
                     print("🧪 session is valid → isAuthenticated=true")
                     isAuthenticated = true
+                    userId = session.user.id
                 }
             } else {
                 print("🧪 no session → isAuthenticated=false")
                 isAuthenticated = false
+                userId = nil
             }
         } catch {
             print("🧪 forceRefreshAuthState error:", error)
             isAuthenticated = false
+            userId = nil
         }
     }
 
@@ -88,12 +94,15 @@ final class SessionManager: ObservableObject {
 
                 if let session, !session.isExpired {
                     isAuthenticated = true
+                    userId = session.user.id
                 } else {
                     isAuthenticated = false
+                    userId = nil
                 }
             } catch {
                 print("🧪 refreshFromCurrentSession error:", error)
                 isAuthenticated = false
+                userId = nil
             }
         }
     }
@@ -107,3 +116,4 @@ final class SessionManager: ObservableObject {
             .store(in: &cancellables)
     }
 }
+
