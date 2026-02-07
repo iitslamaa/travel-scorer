@@ -10,13 +10,14 @@ import SwiftUI
 
 struct BucketToggleButton: View {
     @EnvironmentObject private var bucketList: BucketListStore
+    @EnvironmentObject private var sessionManager: SessionManager
 
     let countryId: String
     var size: CGFloat = 18
 
     var body: some View {
         Button {
-            bucketList.toggle(countryId)
+            sessionManager.toggleBucket(countryId)
         } label: {
             Text("🪣")
                 .font(.system(size: size))
