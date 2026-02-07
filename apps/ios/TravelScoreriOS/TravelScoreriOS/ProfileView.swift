@@ -5,27 +5,42 @@
 //  Created by Lama Yassine on 2/6/26.
 //
 
-import Foundation
 import SwiftUI
 
 struct ProfileView: View {
+    @EnvironmentObject private var sessionManager: SessionManager
+    @EnvironmentObject private var bucketList: BucketListStore
+    @EnvironmentObject private var traveled: TraveledStore
+
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 16) {
-                Text("Profile")
-                    .font(.largeTitle)
-                    .bold()
+        List {
 
-                Text("Coming soon ✨")
-                    .foregroundColor(.secondary)
+            // MARK: - User
+            Section {
+                if sessionManager.isAuthenticated {
+                    Text("Signed in")
+                        .font(.headline)
+                } else {
+                    Text("Guest User")
+                        .foregroundColor(.secondary)
+                }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(.systemBackground))
-            .navigationTitle("Profile")
-        }
-    }
-}
 
-#Preview {
-    ProfileView()
+            // MARK: - Stats
+            Section("Stats") {
+                Label {
+                    Text("\(traveled.ids.count) countries traveled")
+                } icon: {
+                    Image(systemName: "airplane")
+                }
+
+                Label {
+                    Text("\(bucketList.ids.count) on bucket list")
+                } icon: {
+                    Image(systemName: "bookmark")
+                }
+            }
+        }
+        .navigationTitle("Profile")
+    }
 }
