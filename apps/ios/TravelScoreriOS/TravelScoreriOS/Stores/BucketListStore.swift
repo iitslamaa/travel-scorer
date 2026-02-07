@@ -40,6 +40,16 @@ final class BucketListStore: ObservableObject {
         ids.remove(id)
         save()
     }
+    
+    func replace(with ids: Set<String>) {
+        self.ids = ids
+        save()
+    }
+
+    func clear() {
+        ids.removeAll()
+        save()
+    }
 
     private func load() {
         guard let data = UserDefaults.standard.data(forKey: saveKey) else { return }
