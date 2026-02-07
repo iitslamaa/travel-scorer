@@ -68,6 +68,7 @@ struct MoreView: View {
 
             NavigationLink("Profile") {
                 ProfileView()
+                    .environmentObject(sessionManager)
             }
 
             NavigationLink("Legal & Disclaimers") {
@@ -92,17 +93,5 @@ struct MoreView: View {
             }
         }
         .navigationTitle("More")
-    }
-}
-
-// MARK: - Placeholder Views
-
-struct ProfileView: View {
-    var body: some View {
-        List {
-            Text("Profile features coming soon")
-                .foregroundColor(.secondary)
-        }
-        .navigationTitle("Profile")
     }
 }
