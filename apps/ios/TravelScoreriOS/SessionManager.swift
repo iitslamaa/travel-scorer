@@ -13,6 +13,7 @@ final class SessionManager: ObservableObject {
     @Published private(set) var isAuthenticated: Bool = false
     @Published var didContinueAsGuest: Bool = false
     @Published private(set) var userId: UUID? = nil
+    @Published private(set) var authScreenNonce: UUID = UUID()
 
     private let supabase: SupabaseManager
     private var cancellables = Set<AnyCancellable>()
@@ -20,6 +21,9 @@ final class SessionManager: ObservableObject {
     private let bucketListStore: BucketListStore
     private let traveledStore: TraveledStore
     private let listSync: ListSyncService
+
+    private var guestBucketSnapshot: Set<String> = []
+    private var guestTraveledSnapshot: Set<String> = []
 
     // MARK: - Initializers
 
@@ -38,6 +42,9 @@ final class SessionManager: ObservableObject {
             await supabase.startAuthListener()
         }
 
+        guestBucketSnapshot = bucketListStore.ids
+        guestTraveledSnapshot = traveledStore.ids
+
         // Begin observing auth state
         startAuthObservation()
     }
@@ -48,6 +55,7 @@ final class SessionManager: ObservableObject {
         didContinueAsGuest = true
         isAuthenticated = false
         print("🧪 continueAsGuest → didContinueAsGuest=true")
+        bumpAuthScreen()
     }
 
     func signOut() async {
@@ -55,14 +63,23 @@ final class SessionManager: ObservableObject {
         didContinueAsGuest = false
         isAuthenticated = false
         userId = nil
-        bucketListStore.clear()
-        traveledStore.clear()
+        bucketListStore.replace(with: guestBucketSnapshot)
+        traveledStore.replace(with: guestTraveledSnapshot)
         print("🧪 signOut → isAuthenticated=false")
+        bumpAuthScreen()
+    }
+
+    func bumpAuthScreen() {
+        authScreenNonce = UUID()
     }
 
     func toggleBucket(_ countryId: String) {
         // 1. Update local store first (optimistic UI)
         bucketListStore.toggle(countryId)
+
+        if !isAuthenticated {
+            guestBucketSnapshot = bucketListStore.ids
+        }
 
         // 2. If authenticated, write-through to Supabase
         guard let userId = userId else { return }
@@ -72,6 +89,26 @@ final class SessionManager: ObservableObject {
                 userId: userId,
                 countryId: countryId,
                 add: bucketListStore.contains(countryId)
+            )
+        }
+    }
+
+    func toggleTraveled(_ countryId: String) {
+        // 1. Update local store first (optimistic UI)
+        traveledStore.toggle(countryId)
+
+        if !isAuthenticated {
+            guestTraveledSnapshot = traveledStore.ids
+        }
+
+        // 2. If authenticated, write-through to Supabase
+        guard let userId = userId else { return }
+
+        Task {
+            await listSync.setTraveled(
+                userId: userId,
+                countryId: countryId,
+                add: traveledStore.contains(countryId)
             )
         }
     }
@@ -91,6 +128,7 @@ final class SessionManager: ObservableObject {
                     userId = nil
                     bucketListStore.clear()
                     traveledStore.clear()
+                    bumpAuthScreen()
                 } else {
                     print("🧪 session is valid → isAuthenticated=true")
                     isAuthenticated = true
@@ -108,18 +146,16 @@ final class SessionManager: ObservableObject {
                     }
                 }
             } else {
-                print("🧪 no session → isAuthenticated=false")
+                print("🧪 no session → guest mode")
                 isAuthenticated = false
                 userId = nil
-                bucketListStore.clear()
-                traveledStore.clear()
+                // IMPORTANT: do NOT clear local stores for guest users
             }
         } catch {
             print("🧪 forceRefreshAuthState error:", error)
             isAuthenticated = false
             userId = nil
-            bucketListStore.clear()
-            traveledStore.clear()
+            // Do not clear local stores on startup error
         }
     }
 
@@ -155,15 +191,13 @@ final class SessionManager: ObservableObject {
                 } else {
                     isAuthenticated = false
                     userId = nil
-                    bucketListStore.clear()
-                    traveledStore.clear()
+                    // Guest mode: keep local data
                 }
             } catch {
                 print("🧪 refreshFromCurrentSession error:", error)
                 isAuthenticated = false
                 userId = nil
-                bucketListStore.clear()
-                traveledStore.clear()
+                // Keep local data on startup error
             }
         }
     }
