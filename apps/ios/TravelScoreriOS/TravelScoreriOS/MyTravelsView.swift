@@ -9,6 +9,7 @@ import SwiftUI
 
 struct MyTravelsView: View {
     @EnvironmentObject private var traveled: TraveledStore
+    @EnvironmentObject private var sessionManager: SessionManager
     @State private var countries: [Country] = []
 
     private var visitedCountries: [Country] {
@@ -81,5 +82,12 @@ struct MyTravelsView: View {
     NavigationStack {
         MyTravelsView()
             .environmentObject(TraveledStore())
+            .environmentObject(
+                SessionManager(
+                    supabase: SupabaseManager.shared,
+                    bucketListStore: BucketListStore(),
+                    traveledStore: TraveledStore()
+                )
+            )
     }
 }
