@@ -251,14 +251,21 @@ final class SessionManager: ObservableObject {
             let guestBucket = self.bucketListStore.ids
             let guestTraveled = self.traveledStore.ids
 
+            let existingBucket = (try? await self.listSync.fetchBucketList(userId: uid)) ?? []
+            let existingTraveled = (try? await self.listSync.fetchTraveled(userId: uid)) ?? []
+
             // 1) Merge guest data first (only once)
             if !self.hasMergedGuestData && (!guestBucket.isEmpty || !guestTraveled.isEmpty) {
                 print("🧪 merging guest→account bucket=\(guestBucket.count) traveled=\(guestTraveled.count) user=\(uid)")
 
-                for id in guestBucket {
+                let bucketToInsert = guestBucket.subtracting(existingBucket)
+                let traveledToInsert = guestTraveled.subtracting(existingTraveled)
+
+                for id in bucketToInsert {
                     await self.listSync.setBucket(userId: uid, countryId: id, add: true)
                 }
-                for id in guestTraveled {
+
+                for id in traveledToInsert {
                     await self.listSync.setTraveled(userId: uid, countryId: id, add: true)
                 }
             }
