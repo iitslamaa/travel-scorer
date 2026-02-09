@@ -26,6 +26,7 @@ final class SessionManager: ObservableObject {
     private var guestTraveledSnapshot: Set<String> = []
 
     private var hasMergedGuestData = false
+    private var didEnsureProfile = false
 
     private var syncTask: Task<Void, Never>?
 
@@ -70,6 +71,7 @@ final class SessionManager: ObservableObject {
         bucketListStore.replace(with: guestBucketSnapshot)
         traveledStore.replace(with: guestTraveledSnapshot)
         hasMergedGuestData = false
+        didEnsureProfile = false
         syncTask?.cancel()
         syncTask = nil
         print("🧪 signOut → isAuthenticated=false")
@@ -139,6 +141,13 @@ final class SessionManager: ObservableObject {
                     print("🧪 session is valid → isAuthenticated=true")
                     isAuthenticated = true
                     userId = session.user.id
+
+                    if !didEnsureProfile {
+                        didEnsureProfile = true
+                        let profileService = ProfileService(supabase: supabase)
+                        try? await profileService.ensureProfileExists(userId: session.user.id)
+                    }
+
                     syncListsForAuthenticatedSession(session)
                 }
             } else {
@@ -200,6 +209,13 @@ final class SessionManager: ObservableObject {
                 if let session, !session.isExpired {
                     isAuthenticated = true
                     userId = session.user.id
+
+                    if !didEnsureProfile {
+                        didEnsureProfile = true
+                        let profileService = ProfileService(supabase: supabase)
+                        try? await profileService.ensureProfileExists(userId: session.user.id)
+                    }
+
                     syncListsForAuthenticatedSession(session)
                 } else {
                     isAuthenticated = false
