@@ -9,6 +9,18 @@ import Foundation
 import Supabase
 import PostgREST
 
+struct ProfileInsert: Encodable {
+    let id: UUID
+    let username: String?
+    let avatarUrl: String?
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case username
+        case avatarUrl = "avatar_url"
+    }
+}
+
 struct ProfileUpdate: Encodable {
     let username: String?
     let fullName: String?
@@ -50,6 +62,52 @@ final class ProfileService {
             .single()
             .execute()
             .value
+    }
+
+    func ensureProfileExists(
+        userId: UUID,
+        defaultUsername: String? = nil,
+        defaultAvatarUrl: String? = nil
+    ) async throws {
+        do {
+            // Attempt to fetch profile
+            _ = try await fetchMyProfile(userId: userId)
+        } catch {
+            // If not found, create it
+            let insert = ProfileInsert(
+                id: userId,
+                username: defaultUsername,
+                avatarUrl: defaultAvatarUrl
+            )
+
+            try await supabase.client
+                .from("profiles")
+                .insert(insert)
+                .execute()
+        }
+    }
+
+    func fetchOrCreateProfile(
+        userId: UUID,
+        defaultUsername: String? = nil,
+        defaultAvatarUrl: String? = nil
+    ) async throws -> Profile {
+        do {
+            return try await fetchMyProfile(userId: userId)
+        } catch {
+            let insert = ProfileInsert(
+                id: userId,
+                username: defaultUsername,
+                avatarUrl: defaultAvatarUrl
+            )
+
+            try await supabase.client
+                .from("profiles")
+                .insert(insert)
+                .execute()
+
+            return try await fetchMyProfile(userId: userId)
+        }
     }
 
     // MARK: - Update
