@@ -5,6 +5,8 @@
 //  Created by Lama Yassine on 11/11/25.
 //
 
+
+private let DEBUG_COUNTRY_LOGS = false
 import Foundation
 
 struct CountryDTO: Decodable {
@@ -257,16 +259,18 @@ struct CountryDTO: Decodable {
 
         // Debug (super useful right now)
         #if DEBUG
-        if let s = score {
-            print("🟢 score for \(name): \(s)")
-        } else {
-            print("🟡 no score found for \(name)")
-        }
-        if let seasonalityScore {
-            print("📅 seasonality for \(name): \(seasonalityScore) (\(seasonalityLabel ?? ""))")
-        }
-        if let visaEaseScore {
-            print("🛂 visa ease for \(name): \(visaEaseScore) type=\(visaType ?? "-")")
+        if DEBUG_COUNTRY_LOGS {
+            if let s = score {
+                print("🟢 score for \(name): \(s)")
+            } else {
+                print("🟡 no score found for \(name)")
+            }
+            if let seasonalityScore {
+                print("📅 seasonality for \(name): \(seasonalityScore) (\(seasonalityLabel ?? ""))")
+            }
+            if let visaEaseScore {
+                print("🛂 visa ease for \(name): \(visaEaseScore) type=\(visaType ?? "-")")
+            }
         }
         #endif
     }

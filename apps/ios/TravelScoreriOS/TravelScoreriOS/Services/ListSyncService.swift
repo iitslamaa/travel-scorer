@@ -28,6 +28,7 @@ final class ListSyncService {
             .execute()
             .value
 
+        print("🧪 fetched bucket from supabase:", rows)
         return Set(rows.compactMap { $0["country_id"] })
     }
 
@@ -39,6 +40,7 @@ final class ListSyncService {
             .execute()
             .value
 
+        print("🧪 fetched traveled from supabase:", rows)
         return Set(rows.compactMap { $0["country_id"] })
     }
 
@@ -49,21 +51,25 @@ final class ListSyncService {
         countryId: String,
         add: Bool
     ) async {
-        if add {
-            try? await supabase.client
-                .from("user_bucket_list")
-                .insert([
-                    "user_id": userId.uuidString,
-                    "country_id": countryId
-                ])
-                .execute()
-        } else {
-            try? await supabase.client
-                .from("user_bucket_list")
-                .delete()
-                .eq("user_id", value: userId.uuidString)
-                .eq("country_id", value: countryId)
-                .execute()
+        do {
+            if add {
+                try await supabase.client
+                    .from("user_bucket_list")
+                    .insert([
+                        "user_id": userId.uuidString,
+                        "country_id": countryId
+                    ])
+                    .execute()
+            } else {
+                try await supabase.client
+                    .from("user_bucket_list")
+                    .delete()
+                    .eq("user_id", value: userId.uuidString)
+                    .eq("country_id", value: countryId)
+                    .execute()
+            }
+        } catch {
+            print("❌ setBucket failed:", error)
         }
     }
 
@@ -72,21 +78,25 @@ final class ListSyncService {
         countryId: String,
         add: Bool
     ) async {
-        if add {
-            try? await supabase.client
-                .from("user_traveled")
-                .insert([
-                    "user_id": userId.uuidString,
-                    "country_id": countryId
-                ])
-                .execute()
-        } else {
-            try? await supabase.client
-                .from("user_traveled")
-                .delete()
-                .eq("user_id", value: userId.uuidString)
-                .eq("country_id", value: countryId)
-                .execute()
+        do {
+            if add {
+                try await supabase.client
+                    .from("user_traveled")
+                    .insert([
+                        "user_id": userId.uuidString,
+                        "country_id": countryId
+                    ])
+                    .execute()
+            } else {
+                try await supabase.client
+                    .from("user_traveled")
+                    .delete()
+                    .eq("user_id", value: userId.uuidString)
+                    .eq("country_id", value: countryId)
+                    .execute()
+            }
+        } catch {
+            print("❌ setTraveled failed:", error)
         }
     }
 }
