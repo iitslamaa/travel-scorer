@@ -25,6 +25,10 @@ final class SessionManager: ObservableObject {
     private var guestBucketSnapshot: Set<String> = []
     private var guestTraveledSnapshot: Set<String> = []
 
+    private var hasMergedGuestData = false
+
+    private var syncTask: Task<Void, Never>?
+
     // MARK: - Initializers
 
     init(
@@ -65,6 +69,9 @@ final class SessionManager: ObservableObject {
         userId = nil
         bucketListStore.replace(with: guestBucketSnapshot)
         traveledStore.replace(with: guestTraveledSnapshot)
+        hasMergedGuestData = false
+        syncTask?.cancel()
+        syncTask = nil
         print("🧪 signOut → isAuthenticated=false")
         bumpAuthScreen()
     }
@@ -123,27 +130,16 @@ final class SessionManager: ObservableObject {
 
             if let session {
                 if session.isExpired {
-                    print("🧪 session is expired → treating as logged out")
+                    print("🧪 session expired during refresh — staying in guest mode")
                     isAuthenticated = false
                     userId = nil
-                    bucketListStore.clear()
-                    traveledStore.clear()
+                    hasMergedGuestData = false
                     bumpAuthScreen()
                 } else {
                     print("🧪 session is valid → isAuthenticated=true")
                     isAuthenticated = true
                     userId = session.user.id
-                    Task {
-                        do {
-                            let bucket = try await listSync.fetchBucketList(userId: session.user.id)
-                            let traveled = try await listSync.fetchTraveled(userId: session.user.id)
-
-                            bucketListStore.replace(with: bucket)
-                            traveledStore.replace(with: traveled)
-                        } catch {
-                            print("🧪 list sync failed:", error)
-                        }
-                    }
+                    syncListsForAuthenticatedSession(session)
                 }
             } else {
                 print("🧪 no session → guest mode")
@@ -159,7 +155,34 @@ final class SessionManager: ObservableObject {
         }
     }
 
-    // MARK: - Auth observation
+    // MARK: - Private
+
+    private func mergeGuestDataIfNeeded(for userId: UUID) async {
+        guard !hasMergedGuestData else { return }
+        hasMergedGuestData = true
+
+        // Merge guest bucket list into account
+        for countryId in guestBucketSnapshot {
+            await listSync.setBucket(
+                userId: userId,
+                countryId: countryId,
+                add: true
+            )
+        }
+
+        // Merge guest traveled list into account
+        for countryId in guestTraveledSnapshot {
+            await listSync.setTraveled(
+                userId: userId,
+                countryId: countryId,
+                add: true
+            )
+        }
+
+        // Clear guest snapshots after successful merge
+        guestBucketSnapshot.removeAll()
+        guestTraveledSnapshot.removeAll()
+    }
 
     private func startAuthObservation() {
         refreshFromCurrentSession(source: "initial")
@@ -177,17 +200,7 @@ final class SessionManager: ObservableObject {
                 if let session, !session.isExpired {
                     isAuthenticated = true
                     userId = session.user.id
-                    Task {
-                        do {
-                            let bucket = try await listSync.fetchBucketList(userId: session.user.id)
-                            let traveled = try await listSync.fetchTraveled(userId: session.user.id)
-
-                            bucketListStore.replace(with: bucket)
-                            traveledStore.replace(with: traveled)
-                        } catch {
-                            print("🧪 list sync failed:", error)
-                        }
-                    }
+                    syncListsForAuthenticatedSession(session)
                 } else {
                     isAuthenticated = false
                     userId = nil
@@ -209,5 +222,59 @@ final class SessionManager: ObservableObject {
                 self?.refreshFromCurrentSession(source: "authEvent")
             }
             .store(in: &cancellables)
+    }
+
+    private func syncListsForAuthenticatedSession(_ session: Session) {
+        // Cancel any in-flight sync to avoid races
+        syncTask?.cancel()
+
+        syncTask = Task { [weak self] in
+            guard let self else { return }
+
+            let uid = session.user.id
+            let guestBucket = self.bucketListStore.ids
+            let guestTraveled = self.traveledStore.ids
+
+            // 1) Merge guest data first (only once)
+            if !self.hasMergedGuestData && (!guestBucket.isEmpty || !guestTraveled.isEmpty) {
+                print("🧪 merging guest→account bucket=\(guestBucket.count) traveled=\(guestTraveled.count) user=\(uid)")
+
+                for id in guestBucket {
+                    await self.listSync.setBucket(userId: uid, countryId: id, add: true)
+                }
+                for id in guestTraveled {
+                    await self.listSync.setTraveled(userId: uid, countryId: id, add: true)
+                }
+            }
+
+            // 2) Fetch from Supabase AFTER merge
+            do {
+                let bucket = try await self.listSync.fetchBucketList(userId: uid)
+                let traveled = try await self.listSync.fetchTraveled(userId: uid)
+
+                self.bucketListStore.replace(with: bucket)
+                self.traveledStore.replace(with: traveled)
+
+                print("🧪 hydrated from supabase bucket=\(bucket.count) traveled=\(traveled.count) user=\(uid)")
+
+                // 3) Mark merge complete only if fetched data contains guest snapshot
+                if !self.hasMergedGuestData && (!guestBucket.isEmpty || !guestTraveled.isEmpty) {
+                    let mergedOK =
+                        guestBucket.isSubset(of: bucket) &&
+                        guestTraveled.isSubset(of: traveled)
+
+                    if mergedOK {
+                        self.hasMergedGuestData = true
+                        self.guestBucketSnapshot.removeAll()
+                        self.guestTraveledSnapshot.removeAll()
+                        print("🧪 guest→account merge complete")
+                    } else {
+                        print("🧪 merge incomplete; will retry on next auth refresh")
+                    }
+                }
+            } catch {
+                print("🧪 supabase hydration failed:", error)
+            }
+        }
     }
 }
