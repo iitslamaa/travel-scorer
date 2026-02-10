@@ -11,117 +11,120 @@ struct ProfileView: View {
     @EnvironmentObject private var sessionManager: SessionManager
     @EnvironmentObject private var bucketList: BucketListStore
     @EnvironmentObject private var traveled: TraveledStore
+    @EnvironmentObject private var profileVM: ProfileViewModel
 
-    // Data placeholders (for now)
-    private var username: String? = nil
-    private var travelMode: String? = nil      // solo / group / solo+group
-    private var travelStyle: String? = nil     // budget / comfortable / in-between / both
-    private var homeCountryCodes: [String] = [] // ISO2 codes
-    private var languages: [String] = []        // e.g. "English (native)", "Lebanese Arabic (learning)"
-    private var nextDestinationCode: String? = nil // ISO2 code
+    // Computed properties bound to profileVM.profile
+    private var username: String? { profileVM.profile?.username }
+    private var travelMode: String? { profileVM.profile?.travelMode.first }
+    private var travelStyle: String? { profileVM.profile?.travelStyle.first }
+    private var homeCountryCodes: [String] { profileVM.profile?.livedCountries ?? [] }
+    private var languages: [String] { profileVM.profile?.languages ?? [] }
 
     var body: some View {
-        List {
-            header
+        Group {
+            if profileVM.isLoading && profileVM.profile == nil {
+                ProgressView("Loading profile…")
+            } else {
+                List {
+                    header
 
-            Section {
-                ReadOnlyRow(
-                    title: "Username",
-                    trailing: AnyView(
-                        Text(username.map { "@\($0)" } ?? "Not set")
-                            .foregroundColor(username == nil ? .secondary : .primary)
-                    )
-                )
+                    Section {
+                        ReadOnlyRow(
+                            title: "Username",
+                            trailing: AnyView(
+                                Text(username.map { "@\($0)" } ?? "Not set")
+                                    .foregroundColor(username == nil ? .secondary : .primary)
+                            )
+                        )
 
-                ReadOnlyRow(
-                    title: "Home",
-                    trailing: AnyView(FlagInline(flags: flags(for: Set(homeCountryCodes))))
-                )
+                        ReadOnlyRow(
+                            title: "Home",
+                            trailing: AnyView(
+                                FlagInline(flags: flags(for: Set(homeCountryCodes)))
+                            )
+                        )
 
-                ReadOnlyRow(
-                    title: "Traveled",
-                    trailing: AnyView(FlagInline(flags: flags(for: traveled.ids)))
-                )
+                        ReadOnlyRow(
+                            title: "Traveled",
+                            trailing: AnyView(
+                                FlagInline(flags: flags(for: traveled.ids))
+                            )
+                        )
 
-                ReadOnlyRow(
-                    title: "Want to visit",
-                    trailing: AnyView(FlagInline(flags: flags(for: bucketList.ids)))
-                )
+                        ReadOnlyRow(
+                            title: "Want to visit",
+                            trailing: AnyView(
+                                FlagInline(flags: flags(for: bucketList.ids))
+                            )
+                        )
 
-                ReadOnlyRow(
-                    title: "I’m a",
-                    trailing: AnyView(
-                        Text(travelModeDisplay ?? "Not set")
-                            .foregroundColor(travelMode == nil ? .secondary : .primary)
-                    )
-                )
+                        ReadOnlyRow(
+                            title: "I’m a",
+                            trailing: AnyView(
+                                Text(travelModeDisplay ?? "Not set")
+                                    .foregroundColor(travelMode == nil ? .secondary : .primary)
+                            )
+                        )
 
-                ReadOnlyRow(
-                    title: "I prefer",
-                    trailing: AnyView(
-                        Text(travelStyleDisplay ?? "Not set")
-                            .foregroundColor(travelStyle == nil ? .secondary : .primary)
-                    )
-                )
+                        ReadOnlyRow(
+                            title: "I prefer",
+                            trailing: AnyView(
+                                Text(travelStyleDisplay ?? "Not set")
+                                    .foregroundColor(travelStyle == nil ? .secondary : .primary)
+                            )
+                        )
 
-                HStack(alignment: .top, spacing: 10) {
-                    Text("Languages:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .frame(width: 120, alignment: .leading)
+                        HStack(alignment: .top, spacing: 10) {
+                            Text("Languages:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+                                .frame(width: 120, alignment: .leading)
 
-                    Text(languagesDisplay ?? "Not set")
-                        .font(.subheadline)
-                        .foregroundColor(languages.isEmpty ? .secondary : .primary)
-                        .lineLimit(nil)
+                            Text(languagesDisplay ?? "Not set")
+                                .font(.subheadline)
+                                .foregroundColor(languages.isEmpty ? .secondary : .primary)
+                                .lineLimit(nil)
 
-                    Spacer(minLength: 8)
-                }
-                .padding(.vertical, 4)
-
-                HStack(spacing: 10) {
-                    Text("Next destination:")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                        .frame(width: 120, alignment: .leading)
-
-                    if let nextDestinationCode {
-                        FlagInline(flags: flags(for: Set([nextDestinationCode])))
-                    } else {
-                        Text("—")
-                            .foregroundColor(.secondary)
+                            Spacer(minLength: 8)
+                        }
+                        .padding(.vertical, 4)
                     }
+                    .listSectionSeparator(.hidden)
 
-                    Spacer(minLength: 8)
+                    Section {
+                        NavigationLink {
+                            MyTravelsView()
+                        } label: {
+                            Label("My Travels", systemImage: "backpack.fill")
+                        }
+
+                        NavigationLink {
+                            BucketListView()
+                        } label: {
+                            Label("Bucket List", systemImage: "bookmark.fill")
+                        }
+                    }
                 }
-                .padding(.vertical, 4)
-            }
-            .listSectionSeparator(.hidden)
-
-            Section {
-                NavigationLink {
-                    MyTravelsView()
-                } label: {
-                    Label("My Travels", systemImage: "backpack.fill")
-                }
-
-                NavigationLink {
-                    BucketListView()
-                } label: {
-                    Label("Bucket List", systemImage: "bookmark.fill")
+                .navigationTitle("Profile")
+                .listStyle(.insetGrouped)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink {
+                            ProfileSettingsView(profileVM: profileVM)
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                    }
                 }
             }
         }
-        .navigationTitle("Profile")
-        .listStyle(.insetGrouped)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink {
-                    ProfileSettingsView()
-                } label: {
-                    Image(systemName: "gearshape")
-                }
+        .task {
+            if profileVM.profile == nil && !profileVM.isLoading {
+                await profileVM.load()
             }
+        }
+        .onReceive(profileVM.$profile) { newValue in
+            print("🟢 ProfileView observed profile change:", newValue as Any)
         }
     }
 
@@ -134,7 +137,7 @@ struct ProfileView: View {
                     .foregroundColor(.secondary)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Your name")
+                    Text(profileVM.profile?.fullName ?? "Your name")
                         .font(.largeTitle)
                         .fontWeight(.bold)
 
