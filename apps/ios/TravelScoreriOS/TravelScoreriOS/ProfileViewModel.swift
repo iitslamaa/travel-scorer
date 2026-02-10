@@ -6,6 +6,7 @@
 
 import Foundation
 import Combine
+import PostgREST
 
 enum RelationshipState {
     case selfProfile
@@ -77,36 +78,7 @@ final class ProfileViewModel: ObservableObject {
             
             print("📥 Loaded profile:", profile as Any)
 
-            // 🔍 Load relationship state
-            if let currentUserId = supabase.currentUserId {
-                // Viewing own profile
-                if currentUserId == userId {
-                    relationshipState = .selfProfile
-                    isFriend = false
-                    return
-                }
-
-                // Already friends?
-                if try await supabase.isFriend(
-                    currentUserId: currentUserId,
-                    otherUserId: userId
-                ) {
-                    relationshipState = .friends
-                    isFriend = true
-                    return
-                }
-
-                // Request already sent?
-                if try await friendRequestsVM.hasSentRequest(to: userId) {
-                    relationshipState = .requestSent
-                    isFriend = false
-                    return
-                }
-
-                // No relationship
-                relationshipState = .none
-                isFriend = false
-            }
+            try await refreshRelationshipState()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -166,6 +138,43 @@ final class ProfileViewModel: ObservableObject {
         return try profileService.publicAvatarURL(path: path)
     }
     
+    // MARK: - Relationship refresh
+
+    private func refreshRelationshipState() async throws {
+        guard
+            let userId,
+            let currentUserId = supabase.currentUserId
+        else { return }
+
+        // Viewing own profile
+        if currentUserId == userId {
+            relationshipState = .selfProfile
+            isFriend = false
+            return
+        }
+
+        // Friends?
+        if try await supabase.isFriend(
+            currentUserId: currentUserId,
+            otherUserId: userId
+        ) {
+            relationshipState = .friends
+            isFriend = true
+            return
+        }
+
+        // Request already sent?
+        if try await friendRequestsVM.hasSentRequest(to: userId) {
+            relationshipState = .requestSent
+            isFriend = false
+            return
+        }
+
+        // No relationship
+        relationshipState = .none
+        isFriend = false
+    }
+    
     // MARK: - Friend actions
 
     func toggleFriend() async {
@@ -177,17 +186,42 @@ final class ProfileViewModel: ObservableObject {
         do {
             switch relationshipState {
             case .none:
-                try await friendRequestsVM.sendFriendRequest(to: profileId)
-                relationshipState = .requestSent
-                print("📨 Friend request sent:", profileId)
+                do {
+                    try await friendRequestsVM.sendFriendRequest(to: profileId)
+                    print("📨 Friend request sent:", profileId)
+
+                    // Optimistic UI update
+                    relationshipState = .requestSent
+                    isFriend = false
+                } catch {
+                    // Handle duplicate request (already sent)
+                    if let pgError = error as? PostgrestError,
+                       pgError.code == "23505" {
+                        print("ℹ️ Friend request already exists — syncing state")
+
+                        // Still reflect correct UI state
+                        relationshipState = .requestSent
+                        isFriend = false
+                    } else {
+                        throw error
+                    }
+                }
+
+                // Refresh in background without breaking UI
+                Task {
+                    try? await refreshRelationshipState()
+                }
 
             case .friends:
                 try await supabase.removeFriend(friendId: profileId)
-                relationshipState = .none
-                isFriend = false
+                try await refreshRelationshipState()
                 print("➖ Removed friend:", profileId)
 
-            default:
+            case .requestSent:
+                // No-op: request already sent
+                print("ℹ️ Request already sent — no action")
+
+            case .selfProfile:
                 break
             }
         } catch {
