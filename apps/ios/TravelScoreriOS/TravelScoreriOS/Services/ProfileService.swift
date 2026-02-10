@@ -43,6 +43,14 @@ struct ProfileUpdate: Encodable {
     }
 }
 
+private struct CountryRow: Decodable {
+    let countryId: String
+
+    enum CodingKeys: String, CodingKey {
+        case countryId = "country_id"
+    }
+}
+
 @MainActor
 final class ProfileService {
 
@@ -152,51 +160,25 @@ final class ProfileService {
 
     // MARK: - Viewed user stats
 
-    /// Traveled countries for the currently authenticated user
-    func fetchMyTraveledCountries() async throws -> Set<String> {
-        guard let myUserId = supabase.currentUserId else { return [] }
-
-        let response: PostgrestResponse<[String]> = try await supabase.client
-            .from("traveled_countries")
-            .select("country_code")
-            .eq("user_id", value: myUserId.uuidString)
-            .execute()
-
-        return Set(response.value)
-    }
-
-    /// Bucket list countries for the currently authenticated user
-    func fetchMyBucketListCountries() async throws -> Set<String> {
-        guard let myUserId = supabase.currentUserId else { return [] }
-
-        let response: PostgrestResponse<[String]> = try await supabase.client
-            .from("bucket_list")
-            .select("country_code")
-            .eq("user_id", value: myUserId.uuidString)
-            .execute()
-
-        return Set(response.value)
-    }
-
     /// Traveled countries for any viewed user
     func fetchTraveledCountries(userId: UUID) async throws -> Set<String> {
-        let response: PostgrestResponse<[String]> = try await supabase.client
-            .from("traveled_countries")
-            .select("country_code")
+        let response: PostgrestResponse<[CountryRow]> = try await supabase.client
+            .from("user_traveled")
+            .select("country_id")
             .eq("user_id", value: userId.uuidString)
             .execute()
 
-        return Set(response.value)
+        return Set(response.value.map { $0.countryId })
     }
 
     /// Bucket list countries for any viewed user
     func fetchBucketListCountries(userId: UUID) async throws -> Set<String> {
-        let response: PostgrestResponse<[String]> = try await supabase.client
-            .from("bucket_list")
-            .select("country_code")
+        let response: PostgrestResponse<[CountryRow]> = try await supabase.client
+            .from("user_bucket_list")
+            .select("country_id")
             .eq("user_id", value: userId.uuidString)
             .execute()
 
-        return Set(response.value)
+        return Set(response.value.map { $0.countryId })
     }
 }

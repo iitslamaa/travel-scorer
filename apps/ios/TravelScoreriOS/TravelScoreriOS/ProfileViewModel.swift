@@ -48,6 +48,9 @@ final class ProfileViewModel: ObservableObject {
         userId = newUserId
         profile = nil
         errorMessage = nil
+        viewedTraveledCountries = []
+        viewedBucketListCountries = []
+        relationshipState = .none
 
         Task {
             await load()
@@ -56,12 +59,9 @@ final class ProfileViewModel: ObservableObject {
 
     // MARK: - Load
     func load() async {
+        defer { isLoading = false }
         guard let userId else {
             print("⚠️ load() skipped — no userId yet")
-            return
-        }
-        if profile != nil {
-            print("ℹ️ Profile already loaded — skipping fetch")
             return
         }
 
@@ -71,18 +71,9 @@ final class ProfileViewModel: ObservableObject {
         do {
             profile = try await profileService.fetchOrCreateProfile(userId: userId)
             
-            // 🔍 Load viewed user's stats
-            if let currentUserId = supabase.currentUserId {
-                if currentUserId == userId {
-                    // Viewing own profile — use local stores via ProfileService
-                    viewedTraveledCountries = try await profileService.fetchMyTraveledCountries()
-                    viewedBucketListCountries = try await profileService.fetchMyBucketListCountries()
-                } else {
-                    // Viewing someone else's profile — fetch their data
-                    viewedTraveledCountries = try await profileService.fetchTraveledCountries(userId: userId)
-                    viewedBucketListCountries = try await profileService.fetchBucketListCountries(userId: userId)
-                }
-            }
+            // 🔍 Load viewed user's stats (always by userId)
+            viewedTraveledCountries = try await profileService.fetchTraveledCountries(userId: userId)
+            viewedBucketListCountries = try await profileService.fetchBucketListCountries(userId: userId)
             
             print("📥 Loaded profile:", profile as Any)
 
@@ -119,8 +110,6 @@ final class ProfileViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
-
-        isLoading = false
     }
 
     // MARK: - Save (single source of truth)
