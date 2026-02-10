@@ -15,41 +15,42 @@ struct RootTabView: View {
     var body: some View {
         TabView {
 
-            // Scores / Countries
+            // Discovery
             NavigationStack {
-                CountryListView()
+                DiscoveryView()
             }
             .tabItem {
-                Label("Scores", systemImage: "chart.bar.fill")
+                Label("Discovery", systemImage: "globe.americas.fill")
             }
 
-            // When to Go
+            // When To Go
             NavigationStack {
                 WhenToGoView()
             }
             .tabItem {
-                Label("When to Go", systemImage: "calendar")
+                Label("When To Go", systemImage: "calendar")
             }
 
-            // Bucket List
+            // Lists
             NavigationStack {
-                BucketListView()
+                ListsView()
             }
             .tabItem {
-                Label("Bucket List", systemImage: "bookmark.fill")
+                Label("Lists", systemImage: "list.bullet.rectangle")
             }
 
-            // My Travels
+            // Profile
             NavigationStack {
-                MyTravelsView()
+                ProfileView()
+                    .environmentObject(sessionManager)
             }
             .tabItem {
-                Label("My Travels", systemImage: "backpack.fill")
+                Label("Profile", systemImage: "person.crop.circle")
             }
 
-            // More
+            // More (legal only)
             NavigationStack {
-                MoreView()
+                LegalView()
             }
             .tabItem {
                 Label("More", systemImage: "ellipsis")
@@ -58,40 +59,17 @@ struct RootTabView: View {
     }
 }
 
-// MARK: - More Tab
-
-struct MoreView: View {
-    @EnvironmentObject private var sessionManager: SessionManager
-
+struct ListsView: View {
     var body: some View {
         List {
-
-            NavigationLink("Profile") {
-                ProfileView()
-                    .environmentObject(sessionManager)
+            NavigationLink("Bucket List") {
+                BucketListView()
             }
 
-            NavigationLink("Legal & Disclaimers") {
-                LegalView()
-            }
-
-            if sessionManager.isAuthenticated {
-                Button(role: .destructive) {
-                    Task {
-                        await sessionManager.signOut()
-                    }
-                } label: {
-                    Text("Sign Out")
-                }
-            } else {
-                Button {
-                    // Exit guest mode → AuthGate will reveal AuthLandingView
-                    sessionManager.didContinueAsGuest = false
-                } label: {
-                    Text("Sign in from the home screen")
-                }
+            NavigationLink("Visited Countries") {
+                MyTravelsView()
             }
         }
-        .navigationTitle("More")
+        .navigationTitle("Lists")
     }
 }

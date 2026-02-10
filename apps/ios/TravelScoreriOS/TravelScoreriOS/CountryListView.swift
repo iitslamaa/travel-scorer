@@ -22,12 +22,19 @@ struct MapPlaceholderView: View {
 }
 
 struct CountryListView: View {
+    let showsSearchBar: Bool
+    let searchText: String
+
+    init(showsSearchBar: Bool = true, searchText: String = "") {
+        self.showsSearchBar = showsSearchBar
+        self.searchText = searchText
+    }
+
     @EnvironmentObject private var bucketList: BucketListStore
     @EnvironmentObject private var traveled: TraveledStore
 
     @State private var sort: CountrySort = .name
     @State private var sortOrder: SortOrder = .descending
-    @State private var search = ""
     @State private var countries: [Country] = []
     @State private var visibleCountries: [Country] = []
     @State private var showingMap = false
@@ -60,7 +67,7 @@ struct CountryListView: View {
 
         // Capture a snapshot of inputs to process off-main.
         let snapshotCountries = countries
-        let snapshotSearch = search
+        let snapshotSearch = searchText
         let snapshotSort = sort
         let snapshotSortOrder = sortOrder
 
@@ -176,7 +183,6 @@ struct CountryListView: View {
             }
         }
         .listStyle(.plain)
-        .searchable(text: $search, prompt: Text("Search countries"))
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 12) {
@@ -208,7 +214,6 @@ struct CountryListView: View {
         .sheet(isPresented: $showingMap) {
             MapPlaceholderView()
         }
-        .navigationTitle("Travel AF")
         .task {
             guard !hasLoaded else { return }
             hasLoaded = true
@@ -239,7 +244,7 @@ struct CountryListView: View {
             }
         }
         // Recompute visible list when inputs change
-        .onChange(of: search) { _, _ in
+        .onChange(of: searchText) { _, _ in
             scheduleRecomputeVisible()
         }
         .onChange(of: sort) { _, _ in
@@ -254,8 +259,22 @@ struct CountryListView: View {
     }
 }
 
+extension View {
+    @ViewBuilder
+    func `if`<Content: View>(
+        _ condition: Bool,
+        transform: (Self) -> Content
+    ) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
+}
+
 #Preview {
-    CountryListView()
+    CountryListView(showsSearchBar: true, searchText: "")
         .environmentObject(BucketListStore())
         .environmentObject(TraveledStore())
 }
