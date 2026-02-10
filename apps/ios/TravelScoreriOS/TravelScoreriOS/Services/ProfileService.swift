@@ -149,4 +149,54 @@ final class ProfileService {
             .getPublicURL(path: path)
             .absoluteString
     }
+
+    // MARK: - Viewed user stats
+
+    /// Traveled countries for the currently authenticated user
+    func fetchMyTraveledCountries() async throws -> Set<String> {
+        guard let myUserId = supabase.currentUserId else { return [] }
+
+        let response: PostgrestResponse<[String]> = try await supabase.client
+            .from("traveled_countries")
+            .select("country_code")
+            .eq("user_id", value: myUserId.uuidString)
+            .execute()
+
+        return Set(response.value)
+    }
+
+    /// Bucket list countries for the currently authenticated user
+    func fetchMyBucketListCountries() async throws -> Set<String> {
+        guard let myUserId = supabase.currentUserId else { return [] }
+
+        let response: PostgrestResponse<[String]> = try await supabase.client
+            .from("bucket_list")
+            .select("country_code")
+            .eq("user_id", value: myUserId.uuidString)
+            .execute()
+
+        return Set(response.value)
+    }
+
+    /// Traveled countries for any viewed user
+    func fetchTraveledCountries(userId: UUID) async throws -> Set<String> {
+        let response: PostgrestResponse<[String]> = try await supabase.client
+            .from("traveled_countries")
+            .select("country_code")
+            .eq("user_id", value: userId.uuidString)
+            .execute()
+
+        return Set(response.value)
+    }
+
+    /// Bucket list countries for any viewed user
+    func fetchBucketListCountries(userId: UUID) async throws -> Set<String> {
+        let response: PostgrestResponse<[String]> = try await supabase.client
+            .from("bucket_list")
+            .select("country_code")
+            .eq("user_id", value: userId.uuidString)
+            .execute()
+
+        return Set(response.value)
+    }
 }

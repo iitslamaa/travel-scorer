@@ -41,8 +41,11 @@ struct RootTabView: View {
 
             // Profile
             NavigationStack {
-                ProfileView()
-                    .environmentObject(sessionManager)
+                if let userId = sessionManager.userId {
+                    ProfileView(userId: userId)
+                } else {
+                    ProgressView()
+                }
             }
             .tabItem {
                 Label("Profile", systemImage: "person.crop.circle")

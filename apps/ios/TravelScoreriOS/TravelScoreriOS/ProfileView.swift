@@ -11,7 +11,18 @@ struct ProfileView: View {
     @EnvironmentObject private var sessionManager: SessionManager
     @EnvironmentObject private var bucketList: BucketListStore
     @EnvironmentObject private var traveled: TraveledStore
-    @EnvironmentObject private var profileVM: ProfileViewModel
+
+    @StateObject private var profileVM: ProfileViewModel
+    private let userId: UUID
+
+    init(userId: UUID) {
+        self.userId = userId
+        _profileVM = StateObject(
+            wrappedValue: ProfileViewModel(
+                profileService: ProfileService(supabase: SupabaseManager.shared)
+            )
+        )
+    }
 
     // Computed properties bound to profileVM.profile
     private var username: String { profileVM.profile?.username ?? "" }
@@ -70,7 +81,7 @@ struct ProfileView: View {
             }
         }
         .task {
-            await profileVM.load()
+            profileVM.setUserIdIfNeeded(userId)
         }
     }
 
@@ -179,12 +190,12 @@ struct ProfileView: View {
 
             ProfileCard(
                 title: "Countries Traveled",
-                flags: flags(for: traveled.ids)
+                flags: flags(for: profileVM.viewedTraveledCountries)
             )
 
             ProfileCard(
                 title: "Want to Visit",
-                flags: flags(for: bucketList.ids)
+                flags: flags(for: profileVM.viewedBucketListCountries)
             )
         }
     }
