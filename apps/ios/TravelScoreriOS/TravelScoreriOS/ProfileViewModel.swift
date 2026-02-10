@@ -70,7 +70,8 @@ final class ProfileViewModel: ObservableObject {
         homeCountries: [String]?,
         languages: [String]?,
         travelMode: String?,
-        travelStyle: String?
+        travelStyle: String?,
+        avatarUrl: String?
     ) async {
         guard let userId else {
             print("⚠️ saveProfile() skipped — no userId")
@@ -82,7 +83,7 @@ final class ProfileViewModel: ObservableObject {
             let payload = ProfileUpdate(
                 username: username,
                 fullName: firstName,
-                avatarUrl: nil,
+                avatarUrl: avatarUrl,
                 languages: languages,
                 livedCountries: homeCountries,
                 travelStyle: travelStyle.map { [$0] },
@@ -103,5 +104,16 @@ final class ProfileViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+    
+    func uploadAvatar(data: Data, fileName: String) async throws -> String {
+        let path = "\(fileName)"
+
+        try await profileService.uploadAvatar(
+            data: data,
+            path: path
+        )
+
+        return try profileService.publicAvatarURL(path: path)
     }
 }
