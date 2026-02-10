@@ -73,7 +73,11 @@ final class FriendRequestsViewModel: ObservableObject {
     func hasSentRequest(to userId: UUID) async throws -> Bool {
         guard let myUserId = supabase.currentUserId else { return false }
 
-        let response: PostgrestResponse<[String]> = try await supabase.client
+        struct RequestIDRow: Decodable {
+            let id: UUID
+        }
+
+        let response: PostgrestResponse<[RequestIDRow]> = try await supabase.client
             .from("friend_requests")
             .select("id")
             .eq("sender_id", value: myUserId.uuidString)
