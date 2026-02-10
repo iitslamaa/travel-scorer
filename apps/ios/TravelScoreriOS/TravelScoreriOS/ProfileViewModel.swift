@@ -2,8 +2,6 @@
 //  ProfileViewModel.swift
 //  TravelScoreriOS
 //
-//  Created by Lama Yassine on 2/9/26.
-//
 
 import Foundation
 import Combine
@@ -12,31 +10,52 @@ import Combine
 final class ProfileViewModel: ObservableObject {
 
     // MARK: - Published state
-
     @Published var profile: Profile?
     @Published var isLoading = false
     @Published var errorMessage: String?
 
     // MARK: - Dependencies
-
     private let profileService: ProfileService
-    private let userId: UUID
+    private var userId: UUID?
 
     // MARK: - Init
-
-    init(profileService: ProfileService, userId: UUID) {
+    init(profileService: ProfileService) {
         self.profileService = profileService
-        self.userId = userId
+    }
+
+    // MARK: - User binding
+
+    func setUserIdIfNeeded(_ newUserId: UUID) {
+        if userId == newUserId { return }
+
+        print("🔁 ProfileViewModel binding userId:", newUserId)
+
+        userId = newUserId
+        profile = nil
+        errorMessage = nil
+
+        Task {
+            await load()
+        }
     }
 
     // MARK: - Load
-
     func load() async {
+        guard let userId else {
+            print("⚠️ load() skipped — no userId yet")
+            return
+        }
+        if profile != nil {
+            print("ℹ️ Profile already loaded — skipping fetch")
+            return
+        }
+
         isLoading = true
         errorMessage = nil
 
         do {
             profile = try await profileService.fetchOrCreateProfile(userId: userId)
+            print("📥 Loaded profile:", profile as Any)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -45,7 +64,6 @@ final class ProfileViewModel: ObservableObject {
     }
 
     // MARK: - Save (single source of truth)
-
     func saveProfile(
         firstName: String?,
         username: String?,
@@ -54,6 +72,10 @@ final class ProfileViewModel: ObservableObject {
         travelMode: String?,
         travelStyle: String?
     ) async {
+        guard let userId else {
+            print("⚠️ saveProfile() skipped — no userId")
+            return
+        }
         errorMessage = nil
 
         do {
@@ -73,18 +95,10 @@ final class ProfileViewModel: ObservableObject {
                 payload: payload
             )
 
-            // Ensure we have a cached profile
-            if profile == nil {
-                profile = try await profileService.fetchMyProfile(userId: userId)
-            }
+            // 🔁 Re-fetch to guarantee consistency
+            profile = try await profileService.fetchMyProfile(userId: userId)
 
-            // Update local state for immediate UI refresh
-            profile?.username = username
-            profile?.fullName = firstName
-            profile?.languages = languages ?? []
-            profile?.livedCountries = homeCountries ?? []
-            profile?.travelStyle = travelStyle.map { [$0] } ?? []
-            profile?.travelMode = travelMode.map { [$0] } ?? []
+            print("💾 Saved + reloaded profile:", profile as Any)
 
         } catch {
             errorMessage = error.localizedDescription

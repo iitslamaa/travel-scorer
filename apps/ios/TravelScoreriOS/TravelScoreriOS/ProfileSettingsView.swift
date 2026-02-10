@@ -2,6 +2,11 @@ import SwiftUI
 
 struct ProfileSettingsView: View {
     @Environment(\.dismiss) private var dismiss
+    @ObservedObject private var profileVM: ProfileViewModel
+
+    init(profileVM: ProfileViewModel) {
+        self.profileVM = profileVM
+    }
 
     // MARK: - Draft state (UI only)
 
@@ -15,6 +20,8 @@ struct ProfileSettingsView: View {
     @State private var travelStyle: TravelStyle? = nil
 
     @State private var languages: [LanguageEntry] = []
+
+    @State private var hasLoadedProfile = false
 
     // Sheets / dialogs
     @State private var showTravelModeDialog = false
@@ -168,6 +175,27 @@ struct ProfileSettingsView: View {
                 .padding(.top, 90)
             }
         }
+        .onAppear {
+            guard !hasLoadedProfile else { return }
+            hasLoadedProfile = true
+
+            if let profile = profileVM.profile {
+                firstName = profile.fullName ?? ""
+                username = profile.username ?? ""
+
+                // livedCountries is NON-optional [String]
+                homeCountries = Set(profile.livedCountries)
+
+                // travelMode / travelStyle are [String]
+                travelMode = profile.travelMode.first.flatMap { TravelMode(rawValue: $0) }
+                travelStyle = profile.travelStyle.first.flatMap { TravelStyle(rawValue: $0) }
+
+                // languages is NON-optional [String]
+                languages = profile.languages.map {
+                    LanguageEntry(name: $0, proficiency: "native")
+                }
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -175,8 +203,17 @@ struct ProfileSettingsView: View {
             }
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
-                    // Persistence will be added in PR #6D
-                    dismiss()
+                    Task {
+                        await profileVM.saveProfile(
+                            firstName: firstName.isEmpty ? nil : firstName,
+                            username: username.isEmpty ? nil : username,
+                            homeCountries: Array(homeCountries),
+                            languages: languages.map { $0.name },
+                            travelMode: travelMode?.rawValue,
+                            travelStyle: travelStyle?.rawValue
+                        )
+                        dismiss()
+                    }
                 }
             }
         }

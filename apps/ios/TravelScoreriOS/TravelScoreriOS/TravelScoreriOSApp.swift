@@ -12,17 +12,28 @@ struct TravelScoreriOSApp: App {
     @StateObject private var bucketListStore = BucketListStore()
     @StateObject private var traveledStore = TraveledStore()
     @StateObject private var sessionManager: SessionManager
+    @StateObject private var profileViewModel: ProfileViewModel
 
     init() {
         let bucket = BucketListStore()
         let traveled = TraveledStore()
+
+        let session = SessionManager(
+            supabase: SupabaseManager.shared,
+            bucketListStore: bucket,
+            traveledStore: traveled
+        )
+
         _bucketListStore = StateObject(wrappedValue: bucket)
         _traveledStore = StateObject(wrappedValue: traveled)
-        _sessionManager = StateObject(
-            wrappedValue: SessionManager(
-                supabase: SupabaseManager.shared,
-                bucketListStore: bucket,
-                traveledStore: traveled
+        _sessionManager = StateObject(wrappedValue: session)
+
+        // IMPORTANT:
+        // Initialize with a placeholder UUID.
+        // The real userId will be injected once auth resolves.
+        _profileViewModel = StateObject(
+            wrappedValue: ProfileViewModel(
+                profileService: ProfileService(supabase: SupabaseManager.shared)
             )
         )
     }
@@ -33,6 +44,13 @@ struct TravelScoreriOSApp: App {
                 .environmentObject(sessionManager)
                 .environmentObject(bucketListStore)
                 .environmentObject(traveledStore)
+                .environmentObject(profileViewModel)
+                .onReceive(sessionManager.userIdDidChange) { userId in
+                    profileViewModel.setUserIdIfNeeded(userId)
+                    Task {
+                        await profileViewModel.load()
+                    }
+                }
         }
     }
 }

@@ -15,6 +15,9 @@ final class SessionManager: ObservableObject {
     @Published private(set) var userId: UUID? = nil
     @Published private(set) var authScreenNonce: UUID = UUID()
 
+    /// Emits whenever a *real* authenticated user id becomes available
+    let userIdDidChange = PassthroughSubject<UUID, Never>()
+
     private let supabase: SupabaseManager
     private var cancellables = Set<AnyCancellable>()
 
@@ -141,6 +144,7 @@ final class SessionManager: ObservableObject {
                     print("🧪 session is valid → isAuthenticated=true")
                     isAuthenticated = true
                     userId = session.user.id
+                    userIdDidChange.send(session.user.id)
 
                     if !didEnsureProfile {
                         didEnsureProfile = true
@@ -209,6 +213,7 @@ final class SessionManager: ObservableObject {
                 if let session, !session.isExpired {
                     isAuthenticated = true
                     userId = session.user.id
+                    userIdDidChange.send(session.user.id)
 
                     if !didEnsureProfile {
                         didEnsureProfile = true
