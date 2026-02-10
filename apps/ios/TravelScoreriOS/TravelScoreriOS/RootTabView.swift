@@ -31,12 +31,12 @@ struct RootTabView: View {
                 Label("When To Go", systemImage: "calendar")
             }
 
-            // Lists
+            // Friends
             NavigationStack {
-                ListsView()
+                FriendsView()
             }
             .tabItem {
-                Label("Lists", systemImage: "list.bullet.rectangle")
+                Label("Friends", systemImage: "person.2.fill")
             }
 
             // Profile
@@ -48,14 +48,29 @@ struct RootTabView: View {
                 Label("Profile", systemImage: "person.crop.circle")
             }
 
-            // More (legal only)
+            // More
             NavigationStack {
-                LegalView()
+                MoreView()
             }
             .tabItem {
                 Label("More", systemImage: "ellipsis")
             }
         }
+    }
+}
+
+struct MoreView: View {
+    var body: some View {
+        List {
+            NavigationLink("Lists") {
+                ListsView()
+            }
+
+            NavigationLink("Legal") {
+                LegalView()
+            }
+        }
+        .navigationTitle("More")
     }
 }
 

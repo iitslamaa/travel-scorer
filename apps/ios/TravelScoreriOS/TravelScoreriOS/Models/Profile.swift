@@ -10,8 +10,8 @@ import Foundation
 struct Profile: Codable, Identifiable {
     let id: UUID
 
-    var username: String?
-    var fullName: String?
+    var username: String
+    var fullName: String
     var avatarUrl: String?
 
     var languages: [String]
