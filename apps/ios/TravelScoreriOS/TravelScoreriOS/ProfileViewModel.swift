@@ -3,8 +3,16 @@
 //  TravelScoreriOS
 //
 
+
 import Foundation
 import Combine
+
+enum RelationshipState {
+    case selfProfile
+    case none
+    case requestSent
+    case friends
+}
 
 @MainActor
 final class ProfileViewModel: ObservableObject {
@@ -13,9 +21,14 @@ final class ProfileViewModel: ObservableObject {
     @Published var profile: Profile?
     @Published var isLoading = false
     @Published var errorMessage: String?
+    @Published var isFriend: Bool = false
+    @Published var isFriendLoading: Bool = false
+    @Published var relationshipState: RelationshipState = .none
 
     // MARK: - Dependencies
     private let profileService: ProfileService
+    private let supabase = SupabaseManager.shared
+    private let friendRequestsVM = FriendRequestsViewModel()
     private var userId: UUID?
 
     // MARK: - Init
@@ -56,6 +69,37 @@ final class ProfileViewModel: ObservableObject {
         do {
             profile = try await profileService.fetchOrCreateProfile(userId: userId)
             print("📥 Loaded profile:", profile as Any)
+
+            // 🔍 Load relationship state
+            if let currentUserId = supabase.currentUserId {
+                // Viewing own profile
+                if currentUserId == userId {
+                    relationshipState = .selfProfile
+                    isFriend = false
+                    return
+                }
+
+                // Already friends?
+                if try await supabase.isFriend(
+                    currentUserId: currentUserId,
+                    otherUserId: userId
+                ) {
+                    relationshipState = .friends
+                    isFriend = true
+                    return
+                }
+
+                // Request already sent?
+                if try await friendRequestsVM.hasSentRequest(to: userId) {
+                    relationshipState = .requestSent
+                    isFriend = false
+                    return
+                }
+
+                // No relationship
+                relationshipState = .none
+                isFriend = false
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -115,5 +159,35 @@ final class ProfileViewModel: ObservableObject {
         )
 
         return try profileService.publicAvatarURL(path: path)
+    }
+    
+    // MARK: - Friend actions
+
+    func toggleFriend() async {
+        guard let profileId = profile?.id else { return }
+
+        isFriendLoading = true
+        defer { isFriendLoading = false }
+
+        do {
+            switch relationshipState {
+            case .none:
+                try await friendRequestsVM.sendFriendRequest(to: profileId)
+                relationshipState = .requestSent
+                print("📨 Friend request sent:", profileId)
+
+            case .friends:
+                try await supabase.removeFriend(friendId: profileId)
+                relationshipState = .none
+                isFriend = false
+                print("➖ Removed friend:", profileId)
+
+            default:
+                break
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+            print("❌ Relationship action failed:", error)
+        }
     }
 }

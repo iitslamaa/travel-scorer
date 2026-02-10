@@ -14,7 +14,7 @@ struct ProfileView: View {
     @EnvironmentObject private var profileVM: ProfileViewModel
 
     // Computed properties bound to profileVM.profile
-    private var username: String? { profileVM.profile?.username }
+    private var username: String { profileVM.profile?.username ?? "" }
     private var travelMode: String? { profileVM.profile?.travelMode.first }
     private var travelStyle: String? { profileVM.profile?.travelStyle.first }
     private var homeCountryCodes: [String] { profileVM.profile?.livedCountries ?? [] }
@@ -105,13 +105,15 @@ struct ProfileView: View {
 
                 // Name + username inline
                 HStack(spacing: 6) {
-                    Text(profileVM.profile?.fullName ?? "Your name")
+                    Text(profileVM.profile?.fullName ?? "")
                         .font(.title2)
                         .fontWeight(.bold)
 
-                    Text(username.map { "(@\($0))" } ?? "")
-                        .font(.subheadline)
-                        .foregroundStyle(.black.opacity(0.6))
+                    if !username.isEmpty {
+                        Text("(@\(username))")
+                            .font(.subheadline)
+                            .foregroundStyle(.black.opacity(0.6))
+                    }
                 }
 
                 // Home countries under name
@@ -121,19 +123,48 @@ struct ProfileView: View {
                     spacing: 6
                 )
 
-                // Add Friend button
-                Button {
-                    // TODO: add friend action
-                } label: {
-                    Text("Add Friend")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(Color.black.opacity(0.08))
-                        )
+                // Relationship action button
+                if profileVM.relationshipState != .selfProfile {
+                    Button {
+                        Task {
+                            await profileVM.toggleFriend()
+                        }
+                    } label: {
+                        if profileVM.isFriendLoading {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        } else {
+                            switch profileVM.relationshipState {
+                            case .none:
+                                Text("Add Friend")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+
+                            case .requestSent:
+                                Text("Request Sent")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+
+                            case .friends:
+                                Text("Friends ✓")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+
+                            case .selfProfile:
+                                EmptyView()
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 6)
+                    .background(
+                        Capsule()
+                            .fill(Color.black.opacity(0.08))
+                    )
+                    .disabled(
+                        profileVM.isFriendLoading ||
+                        profileVM.relationshipState == .requestSent
+                    )
                 }
             }
 

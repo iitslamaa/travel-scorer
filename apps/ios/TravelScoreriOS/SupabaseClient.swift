@@ -56,4 +56,61 @@ final class SupabaseManager {
         try await client.auth.signOut()
         authStateSubject.send(())
     }
+
+    // MARK: - User + Friends Queries
+
+    /// Returns the currently authenticated user's ID
+    var currentUserId: UUID? {
+        client.auth.currentUser?.id
+    }
+
+    /// Search users by username (case-insensitive, partial match)
+    func searchUsers(byUsername query: String) async throws -> [Profile] {
+        let response: PostgrestResponse<[Profile]> = try await client
+            .from("profiles")
+            .select("*")
+            .ilike("username", pattern: "%\(query)%")
+            .limit(20)
+            .execute()
+
+        return response.value
+    }
+
+    /// Add a friend relationship (current user -> friend)
+    func addFriend(friendId: UUID) async throws {
+        guard let userId = currentUserId else { return }
+
+        try await client
+            .from("friends")
+            .insert([
+                "user_id": userId.uuidString,
+                "friend_id": friendId.uuidString
+            ])
+            .execute()
+    }
+
+    /// Remove a friend relationship (current user -> friend)
+    func removeFriend(friendId: UUID) async throws {
+        guard let userId = currentUserId else { return }
+
+        try await client
+            .from("friends")
+            .delete()
+            .eq("user_id", value: userId.uuidString)
+            .eq("friend_id", value: friendId.uuidString)
+            .execute()
+    }
+
+    /// Check whether the current user is friends with another user
+    func isFriend(currentUserId: UUID, otherUserId: UUID) async throws -> Bool {
+        let response = try await client
+            .from("friends")
+            .select("id", count: .exact)
+            .eq("user_id", value: currentUserId.uuidString)
+            .eq("friend_id", value: otherUserId.uuidString)
+            .limit(1)
+            .execute()
+
+        return (response.count ?? 0) > 0
+    }
 }
