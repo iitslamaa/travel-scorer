@@ -8,7 +8,6 @@
 import SwiftUI
 
 struct FriendsView: View {
-    @EnvironmentObject private var profileVM: ProfileViewModel
     @StateObject private var friendsVM = FriendsViewModel()
 
     var body: some View {
@@ -24,11 +23,7 @@ struct FriendsView: View {
                         Section("Results") {
                             ForEach(friendsVM.searchResults) { profile in
                                 NavigationLink {
-                                    // Navigate to someone else's profile
-                                    ProfileView()
-                                        .onAppear {
-                                            profileVM.setUserIdIfNeeded(profile.id)
-                                        }
+                                    ProfileView(userId: profile.id)
                                 } label: {
                                     HStack {
                                         VStack(alignment: .leading) {

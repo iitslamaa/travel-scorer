@@ -24,6 +24,8 @@ final class ProfileViewModel: ObservableObject {
     @Published var isFriend: Bool = false
     @Published var isFriendLoading: Bool = false
     @Published var relationshipState: RelationshipState = .none
+    @Published var viewedTraveledCountries: Set<String> = []
+    @Published var viewedBucketListCountries: Set<String> = []
 
     // MARK: - Dependencies
     private let profileService: ProfileService
@@ -68,6 +70,20 @@ final class ProfileViewModel: ObservableObject {
 
         do {
             profile = try await profileService.fetchOrCreateProfile(userId: userId)
+            
+            // 🔍 Load viewed user's stats
+            if let currentUserId = supabase.currentUserId {
+                if currentUserId == userId {
+                    // Viewing own profile — use local stores via ProfileService
+                    viewedTraveledCountries = try await profileService.fetchMyTraveledCountries()
+                    viewedBucketListCountries = try await profileService.fetchMyBucketListCountries()
+                } else {
+                    // Viewing someone else's profile — fetch their data
+                    viewedTraveledCountries = try await profileService.fetchTraveledCountries(userId: userId)
+                    viewedBucketListCountries = try await profileService.fetchBucketListCountries(userId: userId)
+                }
+            }
+            
             print("📥 Loaded profile:", profile as Any)
 
             // 🔍 Load relationship state
