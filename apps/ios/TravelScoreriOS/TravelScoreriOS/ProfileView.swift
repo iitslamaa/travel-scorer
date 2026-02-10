@@ -70,9 +70,7 @@ struct ProfileView: View {
             }
         }
         .task {
-            if profileVM.profile == nil && !profileVM.isLoading {
-                await profileVM.load()
-            }
+            await profileVM.load()
         }
     }
 
@@ -80,10 +78,28 @@ struct ProfileView: View {
         HStack(alignment: .center, spacing: 16) {
 
             // Large profile image on the left
-            Image(systemName: "person.crop.circle.fill")
-                .resizable()
-                .frame(width: 110, height: 110)
-                .foregroundStyle(.gray)
+            Group {
+                if let urlString = profileVM.profile?.avatarUrl,
+                   let url = URL(string: urlString) {
+                    AsyncImage(url: url) { phase in
+                        if let image = phase.image {
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } else {
+                            Image(systemName: "person.crop.circle.fill")
+                                .resizable()
+                                .foregroundStyle(.gray)
+                        }
+                    }
+                } else {
+                    Image(systemName: "person.crop.circle.fill")
+                        .resizable()
+                        .foregroundStyle(.gray)
+                }
+            }
+            .frame(width: 110, height: 110)
+            .clipShape(Circle())
 
             VStack(alignment: .leading, spacing: 8) {
 
@@ -124,7 +140,7 @@ struct ProfileView: View {
             Spacer()
         }
         .padding(.horizontal)
-        .padding(.top, 12)
+        .padding(.top, 8)
     }
 
     private var infoCards: some View {

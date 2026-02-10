@@ -1,4 +1,5 @@
 import SwiftUI
+import PhotosUI
 
 struct ProfileSettingsView: View {
     @Environment(\.dismiss) private var dismiss
@@ -22,6 +23,11 @@ struct ProfileSettingsView: View {
     @State private var languages: [LanguageEntry] = []
 
     @State private var hasLoadedProfile = false
+
+    // Avatar picker state
+    @State private var selectedPhotoItem: PhotosPickerItem? = nil
+    @State private var selectedUIImage: UIImage? = nil
+    @State private var isUploadingAvatar = false
 
     // Sheets / dialogs
     @State private var showTravelModeDialog = false
@@ -53,6 +59,50 @@ struct ProfileSettingsView: View {
 
             ScrollView {
                 VStack(spacing: 20) {
+
+                    // Avatar picker section
+                    SectionCard {
+                        VStack(spacing: 12) {
+                            ZStack {
+                                if let image = selectedUIImage {
+                                    Image(uiImage: image)
+                                        .resizable()
+                                        .scaledToFill()
+                                } else if let urlString = profileVM.profile?.avatarUrl,
+                                          let url = URL(string: urlString) {
+                                    AsyncImage(url: url) { phase in
+                                        if let image = phase.image {
+                                            image.resizable().scaledToFill()
+                                        } else {
+                                            Image(systemName: "person.crop.circle.fill")
+                                                .resizable()
+                                                .foregroundColor(.gray)
+                                        }
+                                    }
+                                } else {
+                                    Image(systemName: "person.crop.circle.fill")
+                                        .resizable()
+                                        .foregroundColor(.gray)
+                                }
+                            }
+                            .frame(width: 110, height: 110)
+                            .clipShape(Circle())
+
+                            PhotosPicker(
+                                selection: $selectedPhotoItem,
+                                matching: .images
+                            ) {
+                                Text("Change profile photo")
+                                    .font(.subheadline)
+                                    .foregroundColor(.blue)
+                            }
+
+                            if isUploadingAvatar {
+                                ProgressView()
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
 
                     SectionCard {
                         TextField(
@@ -196,6 +246,18 @@ struct ProfileSettingsView: View {
                 }
             }
         }
+        .onChange(of: selectedPhotoItem) { _, newItem in
+            guard let newItem else { return }
+
+            Task {
+                if let data = try? await newItem.loadTransferable(type: Data.self),
+                   let uiImage = UIImage(data: data) {
+                    await MainActor.run {
+                        selectedUIImage = uiImage
+                    }
+                }
+            }
+        }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -204,13 +266,16 @@ struct ProfileSettingsView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
                     Task {
+                        let avatarURL = await uploadAvatarIfNeeded()
+
                         await profileVM.saveProfile(
                             firstName: firstName.isEmpty ? nil : firstName,
                             username: username.isEmpty ? nil : username,
                             homeCountries: Array(homeCountries),
                             languages: languages.map { $0.name },
                             travelMode: travelMode?.rawValue,
-                            travelStyle: travelStyle?.rawValue
+                            travelStyle: travelStyle?.rawValue,
+                            avatarUrl: avatarURL
                         )
                         dismiss()
                     }
@@ -276,6 +341,32 @@ struct ProfileSettingsView: View {
             .compactMap { UnicodeScalar(base + $0.value) }
             .map { String($0) }
             .joined()
+    }
+
+    // MARK: - Avatar upload helper
+    private func uploadAvatarIfNeeded() async -> String? {
+        guard let image = selectedUIImage,
+              let userId = profileVM.profile?.id,
+              let data = image.jpegData(compressionQuality: 0.85)
+        else {
+            return nil
+        }
+
+        isUploadingAvatar = true
+        defer { isUploadingAvatar = false }
+
+        let fileName = "\(userId).jpg"
+
+        do {
+            let publicURL = try await profileVM.uploadAvatar(
+                data: data,
+                fileName: fileName
+            )
+            return publicURL
+        } catch {
+            print("🔴 Avatar upload failed:", error)
+            return nil
+        }
     }
 }
 
@@ -504,3 +595,4 @@ private struct AddLanguageView: View {
         }
     }
 }
+

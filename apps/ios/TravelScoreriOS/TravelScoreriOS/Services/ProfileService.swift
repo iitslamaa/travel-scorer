@@ -122,4 +122,31 @@ final class ProfileService {
             .eq("id", value: userId.uuidString)
             .execute()
     }
+
+    // MARK: - Avatar Storage
+
+    func uploadAvatar(
+        data: Data,
+        path: String
+    ) async throws {
+
+        try await supabase.client.storage
+            .from("avatars")
+            .upload(
+                path: path,
+                file: data,
+                options: FileOptions(
+                    cacheControl: "3600",
+                    contentType: "image/jpeg",
+                    upsert: true
+                )
+            )
+    }
+
+    func publicAvatarURL(path: String) throws -> String {
+        try supabase.client.storage
+            .from("avatars")
+            .getPublicURL(path: path)
+            .absoluteString
+    }
 }
