@@ -4,6 +4,7 @@ import PhotosUI
 struct ProfileSettingsView: View {
     @Environment(\.dismiss) private var dismiss
     @ObservedObject private var profileVM: ProfileViewModel
+    @EnvironmentObject private var sessionManager: SessionManager
 
     init(profileVM: ProfileViewModel) {
         self.profileVM = profileVM
@@ -216,6 +217,23 @@ struct ProfileSettingsView: View {
                                     .foregroundColor(nextDestination == nil ? .secondary : .primary)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+
+                    SectionCard {
+                        Button(role: .destructive) {
+                            Task {
+                                await sessionManager.signOut()
+                                dismiss()
+                            }
+                        } label: {
+                            HStack {
+                                Image(systemName: "arrow.backward.square")
+                                Text("Sign Out")
+                                    .fontWeight(.semibold)
+                                Spacer()
+                            }
+                            .foregroundColor(.red)
                         }
                     }
 
