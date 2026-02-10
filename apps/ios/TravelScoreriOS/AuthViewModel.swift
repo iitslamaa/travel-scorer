@@ -48,8 +48,9 @@ final class AuthViewModel: ObservableObject {
                 type: .email
             )
 
-            // 🔑 Force session resolution (this triggers auth observers)
             _ = try await supabase.client.auth.session
+            try await ensureProfileExists()
+
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -77,8 +78,9 @@ final class AuthViewModel: ObservableObject {
                 credentials: credentials
             )
 
-            // 🔑 Force session resolution so SessionManager sees the login
             _ = try await supabase.client.auth.session
+            try await ensureProfileExists()
+
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -98,12 +100,35 @@ final class AuthViewModel: ObservableObject {
                 redirectTo: URL(string: "travelscorer://login-callback")
             )
 
-            // 🔑 Force session resolution so SessionManager sees the login
             _ = try await supabase.client.auth.session
+            try await ensureProfileExists()
+
         } catch {
             errorMessage = error.localizedDescription
         }
 
         isLoading = false
+    }
+
+    // MARK: - Profile Management
+
+    private func ensureProfileExists() async throws {
+        guard let user = supabase.client.auth.currentUser else { return }
+
+        let result = try await supabase.client
+            .from("profiles")
+            .select("id")
+            .eq("id", value: user.id.uuidString)
+            .execute()
+
+        if result.data.isEmpty {
+            _ = try await supabase.client
+                .from("profiles")
+                .insert([
+                    "id": user.id.uuidString,
+                    "email": user.email ?? ""
+                ])
+                .execute()
+        }
     }
 }
