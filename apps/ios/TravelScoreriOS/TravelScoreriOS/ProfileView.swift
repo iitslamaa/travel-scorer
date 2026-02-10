@@ -21,100 +21,51 @@ struct ProfileView: View {
     private var languages: [String] { profileVM.profile?.languages ?? [] }
 
     var body: some View {
-        Group {
+        ZStack {
+            // Background image
+            Image("profile_background")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+
+            // Subtle overlay for readability (keeps clouds visible)
+            LinearGradient(
+                colors: [
+                    Color.white.opacity(0.12),
+                    Color.white.opacity(0.30),
+                    Color.white.opacity(0.12)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
             if profileVM.isLoading && profileVM.profile == nil {
                 ProgressView("Loading profile…")
             } else {
-                List {
-                    header
+                ScrollView {
+                    VStack(spacing: 24) {
 
-                    Section {
-                        ReadOnlyRow(
-                            title: "Username",
-                            trailing: AnyView(
-                                Text(username.map { "@\($0)" } ?? "Not set")
-                                    .foregroundColor(username == nil ? .secondary : .primary)
-                            )
-                        )
+                        profileHeader
 
-                        ReadOnlyRow(
-                            title: "Home",
-                            trailing: AnyView(
-                                FlagInline(flags: flags(for: Set(homeCountryCodes)))
-                            )
-                        )
+                        languagesCard
 
-                        ReadOnlyRow(
-                            title: "Traveled",
-                            trailing: AnyView(
-                                FlagInline(flags: flags(for: traveled.ids))
-                            )
-                        )
-
-                        ReadOnlyRow(
-                            title: "Want to visit",
-                            trailing: AnyView(
-                                FlagInline(flags: flags(for: bucketList.ids))
-                            )
-                        )
-
-                        ReadOnlyRow(
-                            title: "I’m a",
-                            trailing: AnyView(
-                                Text(travelModeDisplay ?? "Not set")
-                                    .foregroundColor(travelMode == nil ? .secondary : .primary)
-                            )
-                        )
-
-                        ReadOnlyRow(
-                            title: "I prefer",
-                            trailing: AnyView(
-                                Text(travelStyleDisplay ?? "Not set")
-                                    .foregroundColor(travelStyle == nil ? .secondary : .primary)
-                            )
-                        )
-
-                        HStack(alignment: .top, spacing: 10) {
-                            Text("Languages:")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .frame(width: 120, alignment: .leading)
-
-                            Text(languagesDisplay ?? "Not set")
-                                .font(.subheadline)
-                                .foregroundColor(languages.isEmpty ? .secondary : .primary)
-                                .lineLimit(nil)
-
-                            Spacer(minLength: 8)
-                        }
-                        .padding(.vertical, 4)
+                        infoCards
                     }
-                    .listSectionSeparator(.hidden)
-
-                    Section {
-                        NavigationLink {
-                            MyTravelsView()
-                        } label: {
-                            Label("My Travels", systemImage: "backpack.fill")
-                        }
-
-                        NavigationLink {
-                            BucketListView()
-                        } label: {
-                            Label("Bucket List", systemImage: "bookmark.fill")
-                        }
-                    }
+                    .padding()
                 }
-                .navigationTitle("Profile")
-                .listStyle(.insetGrouped)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink {
-                            ProfileSettingsView(profileVM: profileVM)
-                        } label: {
-                            Image(systemName: "gearshape")
-                        }
-                    }
+            }
+        }
+        .foregroundStyle(.black)
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    ProfileSettingsView(profileVM: profileVM)
+                } label: {
+                    Image(systemName: "gearshape")
                 }
             }
         }
@@ -123,35 +74,96 @@ struct ProfileView: View {
                 await profileVM.load()
             }
         }
-        .onReceive(profileVM.$profile) { newValue in
-            print("🟢 ProfileView observed profile change:", newValue as Any)
+    }
+
+    private var profileHeader: some View {
+        HStack(alignment: .center, spacing: 16) {
+
+            // Large profile image on the left
+            Image(systemName: "person.crop.circle.fill")
+                .resizable()
+                .frame(width: 110, height: 110)
+                .foregroundStyle(.gray)
+
+            VStack(alignment: .leading, spacing: 8) {
+
+                // Name + username inline
+                HStack(spacing: 6) {
+                    Text(profileVM.profile?.fullName ?? "Your name")
+                        .font(.title2)
+                        .fontWeight(.bold)
+
+                    Text(username.map { "(@\($0))" } ?? "")
+                        .font(.subheadline)
+                        .foregroundStyle(.black.opacity(0.6))
+                }
+
+                // Home countries under name
+                FlagStrip(
+                    flags: flags(for: Set(homeCountryCodes)),
+                    fontSize: 28,
+                    spacing: 6
+                )
+
+                // Add Friend button
+                Button {
+                    // TODO: add friend action
+                } label: {
+                    Text("Add Friend")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(Color.black.opacity(0.08))
+                        )
+                }
+            }
+
+            Spacer()
+        }
+        .padding(.horizontal)
+        .padding(.top, 12)
+    }
+
+    private var infoCards: some View {
+        VStack(spacing: 12) {
+
+            ProfileCard(
+                title: "Countries Traveled",
+                flags: flags(for: traveled.ids)
+            )
+
+            ProfileCard(
+                title: "Want to Visit",
+                flags: flags(for: bucketList.ids)
+            )
         }
     }
 
-    private var header: some View {
-        Section {
-            HStack(spacing: 12) {
-                Image(systemName: "person.crop.circle.fill")
-                    .resizable()
-                    .frame(width: 56, height: 56)
-                    .foregroundColor(.secondary)
+    private var languagesCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
 
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(profileVM.profile?.fullName ?? "Your name")
-                        .font(.largeTitle)
-                        .fontWeight(.bold)
+            Text("Languages")
+                .font(.subheadline)
+                .fontWeight(.semibold)
 
-                    Text(username.map { "@\($0)" } ?? "@not-set")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
-                }
-
-                Spacer()
+            if languages.isEmpty {
+                Text("Not set")
+                    .font(.caption)
+                    .foregroundStyle(.black.opacity(0.6))
+            } else {
+                Text(languages.joined(separator: " · "))
+                    .font(.subheadline)
             }
-            .padding(.vertical, 6)
         }
-        .listRowBackground(Color.clear)
-        .listSectionSeparator(.hidden)
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.75))
+        )
     }
 
     private var travelModeDisplay: String? {
@@ -199,44 +211,59 @@ struct ProfileView: View {
     }
 }
 
-// MARK: - Compact rows
-
-private struct ReadOnlyRow: View {
+private struct ProfileCard: View {
     let title: String
-    let trailing: AnyView
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Text("\(title):")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-                .frame(width: 120, alignment: .leading)
-
-            Spacer(minLength: 8)
-
-            trailing
-        }
-        .padding(.vertical, 4)
-    }
-}
-
-// MARK: - Flags inline
-
-private struct FlagInline: View {
     let flags: [String]
 
     var body: some View {
-        HStack(spacing: 6) {
-            ForEach(flags.prefix(10), id: \.self) { flag in
-                Text(flag)
-                    .font(.title3)
-            }
-            if flags.count > 10 {
-                Text("+\(flags.count - 10)")
+        VStack(alignment: .leading, spacing: 8) {
+
+            HStack {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+
+                Spacer()
+
+                Text("\(flags.count)")
                     .font(.caption)
-                    .foregroundColor(.secondary)
+                    .foregroundStyle(.black.opacity(0.6))
+            }
+
+            if flags.isEmpty {
+                Text("None yet")
+                    .font(.caption)
+                    .foregroundStyle(.black.opacity(0.6))
+                    .padding(.vertical, 4)
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    FlagStrip(flags: flags, fontSize: 30, spacing: 10)
+                        .padding(.vertical, 2)
+                }
             }
         }
-        .lineLimit(1)
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.75))
+        )
+    }
+}
+
+private struct FlagStrip: View {
+    let flags: [String]
+    let fontSize: CGFloat
+    let spacing: CGFloat
+
+    var body: some View {
+        LazyHStack(spacing: spacing) {
+            ForEach(flags, id: \.self) { flag in
+                Text(flag)
+                    .font(.system(size: fontSize))
+                    .fixedSize() // prevents emoji clipping
+            }
+        }
+        .padding(.horizontal, 2)
     }
 }
