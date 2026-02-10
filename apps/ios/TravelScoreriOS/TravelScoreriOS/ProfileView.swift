@@ -188,15 +188,22 @@ struct ProfileView: View {
     private var infoCards: some View {
         VStack(spacing: 12) {
 
-            ProfileCard(
-                title: "Countries Traveled",
-                flags: flags(for: profileVM.viewedTraveledCountries)
-            )
+            if profileVM.relationshipState == .selfProfile ||
+               profileVM.relationshipState == .friends {
 
-            ProfileCard(
-                title: "Want to Visit",
-                flags: flags(for: profileVM.viewedBucketListCountries)
-            )
+                ProfileCard(
+                    title: "Countries Traveled",
+                    flags: flags(for: profileVM.viewedTraveledCountries)
+                )
+
+                ProfileCard(
+                    title: "Want to Visit",
+                    flags: flags(for: profileVM.viewedBucketListCountries)
+                )
+
+            } else {
+                lockedProfileMessage
+            }
         }
     }
 
@@ -248,6 +255,27 @@ struct ProfileView: View {
     private var languagesDisplay: String? {
         guard !languages.isEmpty else { return nil }
         return languages.joined(separator: " · ")
+    }
+
+
+    private var lockedProfileMessage: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "lock.fill")
+                .font(.title2)
+                .foregroundColor(.secondary)
+
+            Text("Learn more about this user by adding them as a friend!")
+                .font(.subheadline)
+                .foregroundColor(.black)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+        }
+        .padding(.vertical, 24)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.white.opacity(0.75))
+        )
     }
 
     // MARK: - Helpers
