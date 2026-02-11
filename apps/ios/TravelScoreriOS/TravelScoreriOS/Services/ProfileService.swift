@@ -43,6 +43,13 @@ struct ProfileUpdate: Encodable {
     }
 }
 
+struct ProfileCreate: Encodable {
+    let id: String
+    let username: String
+    let avatar_url: String
+    let full_name: String
+}
+
 private struct CountryRow: Decodable {
     let countryId: String
 
@@ -63,13 +70,21 @@ final class ProfileService {
     // MARK: - Fetch
 
     func fetchMyProfile(userId: UUID) async throws -> Profile {
-        try await supabase.client
+        let response: PostgrestResponse<[Profile]> = try await supabase.client
             .from("profiles")
             .select()
             .eq("id", value: userId.uuidString)
-            .single()
             .execute()
-            .value
+
+        guard let profile = response.value.first else {
+            throw NSError(
+                domain: "ProfileService",
+                code: 404,
+                userInfo: [NSLocalizedDescriptionKey: "Profile not found"]
+            )
+        }
+
+        return profile
     }
 
     func ensureProfileExists(
@@ -77,22 +92,43 @@ final class ProfileService {
         defaultUsername: String? = nil,
         defaultAvatarUrl: String? = nil
     ) async throws {
-        do {
-            // Attempt to fetch profile
-            _ = try await fetchMyProfile(userId: userId)
-        } catch {
-            // If not found, create it
-            let insert = ProfileInsert(
-                id: userId,
-                username: defaultUsername,
-                avatarUrl: defaultAvatarUrl
-            )
 
-            try await supabase.client
-                .from("profiles")
-                .insert(insert)
-                .execute()
+        // Try fetch first
+        do {
+            _ = try await fetchMyProfile(userId: userId)
+            return
+        } catch {
+            print("🟡 Profile missing, creating one for:", userId)
         }
+
+        guard let user = supabase.client.auth.currentUser else {
+            throw NSError(
+                domain: "ProfileService",
+                code: 0,
+                userInfo: [NSLocalizedDescriptionKey: "No auth user found"]
+            )
+        }
+
+        let metadata = user.userMetadata
+
+        let fullName =
+            metadata["full_name"]?.stringValue ??
+            metadata["name"]?.stringValue ??
+            "User"
+
+        let createPayload = ProfileCreate(
+            id: userId.uuidString,
+            username: defaultUsername ?? "",
+            avatar_url: defaultAvatarUrl ?? "",
+            full_name: fullName
+        )
+
+        try await supabase.client
+            .from("profiles")
+            .insert(createPayload)
+            .execute()
+
+        print("✅ Profile created with full_name:", fullName)
     }
 
     func fetchOrCreateProfile(
@@ -100,20 +136,15 @@ final class ProfileService {
         defaultUsername: String? = nil,
         defaultAvatarUrl: String? = nil
     ) async throws -> Profile {
+
         do {
             return try await fetchMyProfile(userId: userId)
         } catch {
-            let insert = ProfileInsert(
-                id: userId,
-                username: defaultUsername,
-                avatarUrl: defaultAvatarUrl
+            try await ensureProfileExists(
+                userId: userId,
+                defaultUsername: defaultUsername,
+                defaultAvatarUrl: defaultAvatarUrl
             )
-
-            try await supabase.client
-                .from("profiles")
-                .insert(insert)
-                .execute()
-
             return try await fetchMyProfile(userId: userId)
         }
     }

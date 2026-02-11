@@ -42,9 +42,10 @@ final class ProfileViewModel: ObservableObject {
     // MARK: - User binding
 
     func setUserIdIfNeeded(_ newUserId: UUID) {
-        if userId == newUserId { return }
+        // 🔥 Prevent infinite rebinding loop
+        guard userId != newUserId else { return }
 
-        print("🔁 ProfileViewModel binding userId:", newUserId)
+        print("🔁 Binding profileVM to:", newUserId)
 
         userId = newUserId
         profile = nil
@@ -52,6 +53,8 @@ final class ProfileViewModel: ObservableObject {
         viewedTraveledCountries = []
         viewedBucketListCountries = []
         relationshipState = .none
+        isFriend = false
+        isFriendLoading = false
 
         Task {
             await load()
@@ -61,25 +64,34 @@ final class ProfileViewModel: ObservableObject {
     // MARK: - Load
     func load() async {
         defer { isLoading = false }
+
         guard let userId else {
-            print("⚠️ load() skipped — no userId yet")
+            print("❌ load() — userId is nil")
             return
         }
+
+        print("🚀 load() called for userId:", userId)
 
         isLoading = true
         errorMessage = nil
 
         do {
             profile = try await profileService.fetchOrCreateProfile(userId: userId)
-            
-            // 🔍 Load viewed user's stats (always by userId)
-            viewedTraveledCountries = try await profileService.fetchTraveledCountries(userId: userId)
-            viewedBucketListCountries = try await profileService.fetchBucketListCountries(userId: userId)
-            
-            print("📥 Loaded profile:", profile as Any)
+
+            print("✅ profile fetched:", profile as Any)
+            print("➡️ fullName:", profile?.fullName as Any)
+            print("➡️ username:", profile?.username as Any)
+
+            viewedTraveledCountries =
+                try await profileService.fetchTraveledCountries(userId: userId)
+
+            viewedBucketListCountries =
+                try await profileService.fetchBucketListCountries(userId: userId)
 
             try await refreshRelationshipState()
+
         } catch {
+            print("❌ load() failed:", error)
             errorMessage = error.localizedDescription
         }
     }
@@ -117,8 +129,9 @@ final class ProfileViewModel: ObservableObject {
                 payload: payload
             )
 
-            // 🔁 Re-fetch to guarantee consistency
+            // 🔁 Re-fetch profile row directly (avoid wiping with fetchOrCreateProfile)
             profile = try await profileService.fetchMyProfile(userId: userId)
+            try await refreshRelationshipState()
 
             print("💾 Saved + reloaded profile:", profile as Any)
 

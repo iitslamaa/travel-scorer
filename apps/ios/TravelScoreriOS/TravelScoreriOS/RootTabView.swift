@@ -40,11 +40,15 @@ struct RootTabView: View {
             }
 
             // Profile
-            NavigationStack {
+            Group {
                 if let userId = sessionManager.userId {
-                    ProfileView(userId: userId)
+                    NavigationStack {
+                        ProfileView(userId: userId)
+                    }
                 } else {
-                    ProgressView()
+                    NavigationStack {
+                        ProgressView()
+                    }
                 }
             }
             .tabItem {
