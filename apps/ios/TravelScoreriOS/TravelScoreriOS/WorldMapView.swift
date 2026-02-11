@@ -5,7 +5,6 @@
 //  Created by Lama Yassine on 2/11/26.
 //
 
-import Foundation
 import SwiftUI
 import MapKit
 
@@ -22,12 +21,11 @@ struct WorldMapView: UIViewRepresentable {
         mapView.showsScale = false
         mapView.delegate = context.coordinator
 
-        let region = MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 20, longitude: 0),
-            span: MKCoordinateSpan(latitudeDelta: 140, longitudeDelta: 360)
+        mapView.setVisibleMapRect(
+            MKMapRect.world,
+            edgePadding: UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20),
+            animated: false
         )
-
-        mapView.setRegion(region, animated: false)
 
         let polygons = WorldGeoJSONLoader.loadPolygons()
         mapView.addOverlays(polygons)
@@ -37,7 +35,19 @@ struct WorldMapView: UIViewRepresentable {
 
     func updateUIView(_ uiView: MKMapView, context: Context) {
         context.coordinator.highlightedCountryCodes = highlightedCountryCodes
-        uiView.setNeedsDisplay()
+
+        for overlay in uiView.overlays {
+            if let renderer = uiView.renderer(for: overlay) as? MKPolygonRenderer,
+               let polygon = overlay as? CountryPolygon,
+               let iso = polygon.isoCode {
+
+                if highlightedCountryCodes.contains(iso) {
+                    renderer.fillColor = UIColor.systemYellow.withAlphaComponent(0.6)
+                } else {
+                    renderer.fillColor = UIColor.systemGray.withAlphaComponent(0.2)
+                }
+            }
+        }
     }
 
     func makeCoordinator() -> Coordinator {
@@ -53,16 +63,20 @@ struct WorldMapView: UIViewRepresentable {
         }
 
         func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
-            guard let polygon = overlay as? MKPolygon else {
+
+            guard let polygon = overlay as? CountryPolygon else {
                 return MKOverlayRenderer(overlay: overlay)
             }
 
             let renderer = MKPolygonRenderer(polygon: polygon)
-
             renderer.strokeColor = UIColor.clear
 
-            // Basic highlight logic placeholder
-            renderer.fillColor = UIColor.systemGray.withAlphaComponent(0.2)
+            if let iso = polygon.isoCode,
+               highlightedCountryCodes.contains(iso) {
+                renderer.fillColor = UIColor.systemYellow.withAlphaComponent(0.6)
+            } else {
+                renderer.fillColor = UIColor.systemGray.withAlphaComponent(0.2)
+            }
 
             return renderer
         }
