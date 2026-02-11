@@ -33,7 +33,11 @@ struct RootTabView: View {
 
             // Friends
             NavigationStack {
-                FriendsView()
+                if let userId = sessionManager.userId {
+                    FriendsView(userId: userId)
+                } else {
+                    ProgressView()
+                }
             }
             .tabItem {
                 Label("Friends", systemImage: "person.2.fill")
