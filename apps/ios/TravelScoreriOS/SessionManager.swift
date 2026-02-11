@@ -155,16 +155,12 @@ final class SessionManager: ObservableObject {
                     syncListsForAuthenticatedSession(session)
                 }
             } else {
-                print("🧪 no session → guest mode")
-                isAuthenticated = false
-                userId = nil
-                // IMPORTANT: do NOT clear local stores for guest users
+                print("⚠️ no session during refresh — preserving existing auth state")
+                // 🔥 DO NOT clear userId or isAuthenticated here
             }
         } catch {
-            print("🧪 forceRefreshAuthState error:", error)
-            isAuthenticated = false
-            userId = nil
-            // Do not clear local stores on startup error
+            print("⚠️ forceRefreshAuthState transient error:", error)
+            // 🔥 DO NOT clear userId or isAuthenticated on transient error
         }
     }
 
@@ -223,15 +219,12 @@ final class SessionManager: ObservableObject {
 
                     syncListsForAuthenticatedSession(session)
                 } else {
-                    isAuthenticated = false
-                    userId = nil
-                    // Guest mode: keep local data
+                    print("⚠️ refresh returned no session — preserving existing auth state")
+                    // 🔥 DO NOT clear userId or isAuthenticated here
                 }
             } catch {
-                print("🧪 refreshFromCurrentSession error:", error)
-                isAuthenticated = false
-                userId = nil
-                // Keep local data on startup error
+                print("⚠️ refreshFromCurrentSession transient error:", error)
+                // 🔥 DO NOT clear userId or isAuthenticated on transient error
             }
         }
     }

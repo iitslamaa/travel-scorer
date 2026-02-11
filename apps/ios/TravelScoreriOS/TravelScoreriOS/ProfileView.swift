@@ -12,16 +12,11 @@ struct ProfileView: View {
     @EnvironmentObject private var bucketList: BucketListStore
     @EnvironmentObject private var traveled: TraveledStore
 
-    @StateObject private var profileVM: ProfileViewModel
+    @EnvironmentObject private var profileVM: ProfileViewModel
     private let userId: UUID
 
     init(userId: UUID) {
         self.userId = userId
-        _profileVM = StateObject(
-            wrappedValue: ProfileViewModel(
-                profileService: ProfileService(supabase: SupabaseManager.shared)
-            )
-        )
     }
 
     // Computed properties bound to profileVM.profile
@@ -72,15 +67,20 @@ struct ProfileView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(.hidden, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                NavigationLink {
-                    ProfileSettingsView(profileVM: profileVM)
-                } label: {
-                    Image(systemName: "gearshape")
+            if SupabaseManager.shared.currentUserId == userId {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink {
+                        ProfileSettingsView(
+                            profileVM: profileVM,
+                            viewedUserId: userId
+                        )
+                    } label: {
+                        Image(systemName: "gearshape")
+                    }
                 }
             }
         }
-        .task {
+        .onAppear {
             profileVM.setUserIdIfNeeded(userId)
         }
     }

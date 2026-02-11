@@ -6,8 +6,11 @@ struct ProfileSettingsView: View {
     @ObservedObject private var profileVM: ProfileViewModel
     @EnvironmentObject private var sessionManager: SessionManager
 
-    init(profileVM: ProfileViewModel) {
+    private let viewedUserId: UUID
+
+    init(profileVM: ProfileViewModel, viewedUserId: UUID) {
         self.profileVM = profileVM
+        self.viewedUserId = viewedUserId
     }
 
     // MARK: - Draft state (UI only)
@@ -38,6 +41,19 @@ struct ProfileSettingsView: View {
     @State private var showAddLanguage = false
 
     var body: some View {
+        Group {
+            if SupabaseManager.shared.currentUserId != viewedUserId {
+                Color.clear
+                    .onAppear {
+                        dismiss()
+                    }
+            } else {
+                settingsContent
+            }
+        }
+    }
+
+    private var settingsContent: some View {
         ZStack {
             Image("profile_settings_background")
                 .resizable()
