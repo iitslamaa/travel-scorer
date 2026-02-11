@@ -389,14 +389,11 @@ private struct CollapsibleCountrySection: View {
                         }
                     }
 
-                    // Placeholder for future map
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.gray.opacity(0.15))
-                        .frame(height: 220)
-                        .overlay(
-                            Text("Interactive map coming soon")
-                                .font(.caption)
-                                .foregroundColor(.black.opacity(0.5))
+                    // World Map
+                    WorldMapView(highlightedCountryCodes: countryCodes)
+                        .frame(height: 240)
+                        .clipShape(
+                            RoundedRectangle(cornerRadius: 16)
                         )
                 }
                 .padding(.top, 8)
