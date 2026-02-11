@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+extension Notification.Name {
+    static let friendshipUpdated = Notification.Name("friendshipUpdated")
+}
+
 struct ProfileView: View {
     @EnvironmentObject private var sessionManager: SessionManager
     @EnvironmentObject private var bucketList: BucketListStore
@@ -14,6 +18,8 @@ struct ProfileView: View {
 
     @EnvironmentObject private var profileVM: ProfileViewModel
     private let userId: UUID
+
+    @State private var showUnfriendConfirmation = false
 
     init(userId: UUID) {
         self.userId = userId
@@ -83,6 +89,12 @@ struct ProfileView: View {
         .onAppear {
             profileVM.setUserIdIfNeeded(userId)
         }
+        .onReceive(NotificationCenter.default.publisher(for: .friendshipUpdated)) { _ in
+            Task {
+                await profileVM.loadFriendCount()
+                try? await profileVM.refreshRelationshipState()
+            }
+        }
     }
 
     private var profileHeader: some View {
@@ -134,6 +146,17 @@ struct ProfileView: View {
                     spacing: 6
                 )
 
+                if profileVM.friendCount > 0 {
+                    NavigationLink {
+                        FriendsView(userId: userId)
+                    } label: {
+                        Text("\(profileVM.friendCount) Friends")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.blue)
+                    }
+                }
+
                 // Relationship action button
                 if profileVM.relationshipState != .selfProfile {
                     Button {
@@ -157,9 +180,12 @@ struct ProfileView: View {
                                     .fontWeight(.semibold)
 
                             case .friends:
-                                Text("Friends ✓")
+                                Text("Unfriend")
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
+                                    .onTapGesture {
+                                        showUnfriendConfirmation = true
+                                    }
 
                             case .selfProfile:
                                 EmptyView()
@@ -176,6 +202,14 @@ struct ProfileView: View {
                         profileVM.isFriendLoading ||
                         profileVM.relationshipState == .requestSent
                     )
+                    .alert("Unfriend this user?", isPresented: $showUnfriendConfirmation) {
+                        Button("Unfriend", role: .destructive) {
+                            Task {
+                                await profileVM.toggleFriend()
+                            }
+                        }
+                        Button("Cancel", role: .cancel) { }
+                    }
                 }
             }
 

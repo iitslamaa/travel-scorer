@@ -5,15 +5,28 @@
 //  Created by Lama Yassine on 2/10/26.
 //
 
+
 import SwiftUI
+import Supabase
+import PostgREST
 
 struct FriendsView: View {
+    private let userId: UUID
     @StateObject private var friendsVM = FriendsViewModel()
+    @State private var displayName: String = ""
+
+    init(userId: UUID) {
+        self.userId = userId
+    }
 
     var body: some View {
         NavigationStack {
             contentView
-                .navigationTitle("Friends")
+                .navigationTitle(
+                    displayName.isEmpty
+                    ? "Friends"
+                    : "\(displayName)'s Friends"
+                )
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         NavigationLink {
@@ -38,7 +51,24 @@ struct FriendsView: View {
                     Text(friendsVM.errorMessage ?? "")
                 }
                 .task {
-                    await friendsVM.loadFriends()
+                    await friendsVM.loadFriends(for: userId)
+
+                    do {
+                        let response: PostgrestResponse<Profile> = try await SupabaseManager.shared.client
+                            .from("profiles")
+                            .select("*")
+                            .eq("id", value: userId.uuidString)
+                            .single()
+                            .execute()
+
+                        displayName = response.value.fullName
+                    } catch {
+                        displayName = ""
+                    }
+
+                    if SupabaseManager.shared.currentUserId == userId {
+                        await friendsVM.loadIncomingRequestCount()
+                    }
                 }
         }
     }
@@ -57,7 +87,11 @@ struct FriendsView: View {
     private var resultsList: some View {
         List {
             if !friendsVM.friends.isEmpty {
-                Section("Your Friends") {
+                Section(
+                    SupabaseManager.shared.currentUserId == userId
+                    ? "Your Friends"
+                    : "\(displayName)'s Friends"
+                ) {
                     ForEach(friendsVM.friends) { profile in
                         NavigationLink {
                             ProfileView(userId: profile.id)

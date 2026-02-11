@@ -80,6 +80,7 @@ struct FriendRequestsView: View {
                                                 print("❌ accept failed:", error)
                                             }
                                             await vm.loadIncomingRequests()
+                                            NotificationCenter.default.post(name: .friendshipUpdated, object: nil)
                                         }
                                     }
                                     .buttonStyle(.borderedProminent)
