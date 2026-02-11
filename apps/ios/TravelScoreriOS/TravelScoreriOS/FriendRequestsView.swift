@@ -73,7 +73,12 @@ struct FriendRequestsView: View {
                                 HStack(spacing: 8) {
                                     Button("Accept") {
                                         Task {
-                                            try? await vm.acceptRequest(from: profile.id)
+                                            do {
+                                                try await vm.acceptRequest(from: profile.id)
+                                                print("✅ friendship insert attempted")
+                                            } catch {
+                                                print("❌ accept failed:", error)
+                                            }
                                             await vm.loadIncomingRequests()
                                         }
                                     }
