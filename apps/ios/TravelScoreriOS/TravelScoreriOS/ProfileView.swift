@@ -7,6 +7,10 @@
 
 import SwiftUI
 
+extension Color {
+    static let gold = Color(red: 0.85, green: 0.68, blue: 0.15)
+}
+
 extension Notification.Name {
     static let friendshipUpdated = Notification.Name("friendshipUpdated")
 }
@@ -124,7 +128,7 @@ struct ProfileView: View {
             .frame(width: 110, height: 110)
             .clipShape(Circle())
 
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
 
                 // Name + username inline
                 HStack(spacing: 6) {
@@ -143,7 +147,8 @@ struct ProfileView: View {
                 FlagStrip(
                     flags: flags(for: Set(homeCountryCodes)),
                     fontSize: 28,
-                    spacing: 6
+                    spacing: 6,
+                    showsTooltip: true
                 )
 
                 if profileVM.friendCount > 0 {
@@ -225,14 +230,16 @@ struct ProfileView: View {
             if profileVM.relationshipState == .selfProfile ||
                profileVM.relationshipState == .friends {
 
-                ProfileCard(
+                CollapsibleCountrySection(
                     title: "Countries Traveled",
-                    flags: flags(for: profileVM.viewedTraveledCountries)
+                    countryCodes: flags(for: profileVM.viewedTraveledCountries),
+                    highlightColor: .gold
                 )
 
-                ProfileCard(
+                CollapsibleCountrySection(
                     title: "Want to Visit",
-                    flags: flags(for: profileVM.viewedBucketListCountries)
+                    countryCodes: flags(for: profileVM.viewedBucketListCountries),
+                    highlightColor: .blue
                 )
 
             } else {
@@ -318,7 +325,6 @@ struct ProfileView: View {
         ids
             .map { $0.uppercased() }
             .sorted()
-            .map { countryCodeToFlag($0) }
     }
 
     private func countryCodeToFlag(_ code: String) -> String {
@@ -331,38 +337,73 @@ struct ProfileView: View {
     }
 }
 
-private struct ProfileCard: View {
+private struct CollapsibleCountrySection: View {
     let title: String
-    let flags: [String]
+    let countryCodes: [String]
+    let highlightColor: Color
+
+    @State private var isExpanded = false
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 12) {
 
-            HStack {
-                Text(title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+            Button {
+                withAnimation(.easeInOut(duration: 0.25)) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack(spacing: 10) {
+                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                        .foregroundColor(.black)
+                        .padding(.trailing, 2)
 
-                Spacer()
+                    Text("\(title): ")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
 
-                Text("\(flags.count)")
-                    .font(.caption)
-                    .foregroundStyle(.black.opacity(0.6))
-            }
+                    Text("#\(countryCodes.count)")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundColor(highlightColor)
 
-            if flags.isEmpty {
-                Text("None yet")
-                    .font(.caption)
-                    .foregroundStyle(.black.opacity(0.6))
-                    .padding(.vertical, 4)
-            } else {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    FlagStrip(flags: flags, fontSize: 30, spacing: 10)
-                        .padding(.vertical, 2)
+                    Spacer()
                 }
             }
+
+            if isExpanded {
+                VStack(spacing: 16) {
+
+                    // Flags
+                    if countryCodes.isEmpty {
+                        Text("None yet")
+                            .font(.caption)
+                            .foregroundStyle(.black.opacity(0.6))
+                    } else {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            FlagStrip(
+                                flags: countryCodes,
+                                fontSize: 30,
+                                spacing: 10,
+                                showsTooltip: false
+                            )
+                        }
+                    }
+
+                    // Placeholder for future map
+                    RoundedRectangle(cornerRadius: 16)
+                        .fill(Color.gray.opacity(0.15))
+                        .frame(height: 220)
+                        .overlay(
+                            Text("Interactive map coming soon")
+                                .font(.caption)
+                                .foregroundColor(.black.opacity(0.5))
+                        )
+                }
+                .padding(.top, 8)
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
         }
-        .padding(12)
+        .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: 16)
@@ -372,18 +413,92 @@ private struct ProfileCard: View {
 }
 
 private struct FlagStrip: View {
-    let flags: [String]
+    let flags: [String] // country codes
     let fontSize: CGFloat
     let spacing: CGFloat
+    let showsTooltip: Bool
+
+    init(
+        flags: [String],
+        fontSize: CGFloat,
+        spacing: CGFloat,
+        showsTooltip: Bool = false
+    ) {
+        self.flags = flags
+        self.fontSize = fontSize
+        self.spacing = spacing
+        self.showsTooltip = showsTooltip
+    }
+
+    @State private var selectedCode: String? = nil
+    @State private var hideWorkItem: DispatchWorkItem? = nil
+
+    private var itemWidth: CGFloat { fontSize + 8 }
 
     var body: some View {
         LazyHStack(spacing: spacing) {
-            ForEach(flags, id: \.self) { flag in
-                Text(flag)
+            ForEach(flags, id: \.self) { code in
+                Text(flagEmoji(from: code))
                     .font(.system(size: fontSize))
-                    .fixedSize() // prevents emoji clipping
+                    .frame(width: itemWidth, height: fontSize) // fixed size prevents horizontal reflow
+                    .fixedSize()
+                    .contentShape(Rectangle())
+                    .overlay(alignment: .bottom) {
+                        if showsTooltip && selectedCode == code {
+                            Text(countryName(from: code))
+                                .font(.caption)
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Color.gray.opacity(0.92))
+                                )
+                                .fixedSize()
+                                .offset(y: 18) // appears right under the flag without changing layout
+                                .transition(.opacity)
+                                .zIndex(1)
+                        }
+                    }
+                    .onTapGesture {
+                        if showsTooltip {
+                            showTooltip(for: code)
+                        }
+                    }
             }
         }
         .padding(.horizontal, 2)
+    }
+
+    private func showTooltip(for code: String) {
+        hideWorkItem?.cancel()
+
+        withAnimation(.easeInOut(duration: 0.15)) {
+            selectedCode = code
+        }
+
+        let work = DispatchWorkItem {
+            withAnimation(.easeInOut(duration: 0.15)) {
+                if selectedCode == code {
+                    selectedCode = nil
+                }
+            }
+        }
+        hideWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.4, execute: work)
+    }
+
+    private func flagEmoji(from countryCode: String) -> String {
+        countryCode
+            .uppercased()
+            .unicodeScalars
+            .map { 127397 + $0.value }
+            .compactMap(UnicodeScalar.init)
+            .map(String.init)
+            .joined()
+    }
+
+    private func countryName(from code: String) -> String {
+        Locale.current.localizedString(forRegionCode: code) ?? code
     }
 }
