@@ -106,15 +106,55 @@ final class FriendService {
         return response.value.count
     }
 
-    func sendFriendRequest(from myUserId: UUID, to otherUserId: UUID) async throws {
-        try await supabase.client
+    func hasIncomingRequest(from otherUserId: UUID, to myUserId: UUID) async throws -> Bool {
+        struct RequestIDRow: Decodable { let id: UUID }
+
+        let response: PostgrestResponse<[RequestIDRow]> = try await supabase.client
             .from("friend_requests")
-            .insert([
-                "sender_id": myUserId.uuidString,
-                "receiver_id": otherUserId.uuidString,
-                "status": "pending"
-            ])
+            .select("id")
+            .eq("sender_id", value: otherUserId.uuidString)
+            .eq("receiver_id", value: myUserId.uuidString)
+            .eq("status", value: "pending")
+            .limit(1)
             .execute()
+
+        return !response.value.isEmpty
+    }
+
+    func sendFriendRequest(from myUserId: UUID, to otherUserId: UUID) async throws {
+        // 1) Prevent self-request
+        guard myUserId != otherUserId else { return }
+
+        // 2) Already friends → no-op
+        if try await isFriend(currentUserId: myUserId, otherUserId: otherUserId) {
+            return
+        }
+
+        // 3) If they already requested you → no-op (could auto-accept later)
+        if try await hasIncomingRequest(from: otherUserId, to: myUserId) {
+            return
+        }
+
+        // 4) If you already sent request → no-op
+        if try await hasSentRequest(from: myUserId, to: otherUserId) {
+            return
+        }
+
+        do {
+            try await supabase.client
+                .from("friend_requests")
+                .insert([
+                    "sender_id": myUserId.uuidString,
+                    "receiver_id": otherUserId.uuidString,
+                    "status": "pending"
+                ])
+                .execute()
+        } catch {
+            if let pgError = error as? PostgrestError, pgError.code == "23505" {
+                return
+            }
+            throw error
+        }
     }
 
     func hasSentRequest(from myUserId: UUID, to otherUserId: UUID) async throws -> Bool {
@@ -133,30 +173,38 @@ final class FriendService {
     }
 
     func acceptRequest(myUserId: UUID, from otherUserId: UUID) async throws {
-        // delete request
-        try await supabase.client
+        // 1) Delete pending request (ignore if missing)
+        _ = try? await supabase.client
             .from("friend_requests")
             .delete()
             .eq("sender_id", value: otherUserId.uuidString)
             .eq("receiver_id", value: myUserId.uuidString)
             .execute()
 
-        // insert both directions
-        try await supabase.client
-            .from("friends")
-            .insert([
-                "user_id": myUserId.uuidString,
-                "friend_id": otherUserId.uuidString
-            ])
-            .execute()
+        // 2) Insert both directions (ignore duplicate constraint errors)
+        do {
+            try await supabase.client
+                .from("friends")
+                .insert([
+                    "user_id": myUserId.uuidString,
+                    "friend_id": otherUserId.uuidString
+                ])
+                .execute()
+        } catch {
+            if let pgError = error as? PostgrestError, pgError.code != "23505" { throw error }
+        }
 
-        try await supabase.client
-            .from("friends")
-            .insert([
-                "user_id": otherUserId.uuidString,
-                "friend_id": myUserId.uuidString
-            ])
-            .execute()
+        do {
+            try await supabase.client
+                .from("friends")
+                .insert([
+                    "user_id": otherUserId.uuidString,
+                    "friend_id": myUserId.uuidString
+                ])
+                .execute()
+        } catch {
+            if let pgError = error as? PostgrestError, pgError.code != "23505" { throw error }
+        }
     }
 
     func rejectRequest(myUserId: UUID, from otherUserId: UUID) async throws {
