@@ -348,7 +348,7 @@ private struct CollapsibleCountrySection: View {
         VStack(alignment: .leading, spacing: 12) {
 
             Button {
-                withAnimation(.easeInOut(duration: 0.25)) {
+                withAnimation(.easeInOut(duration: 0.18)) {
                     isExpanded.toggle()
                 }
             } label: {
@@ -397,7 +397,7 @@ private struct CollapsibleCountrySection: View {
                         )
                 }
                 .padding(.top, 8)
-                .transition(.opacity.combined(with: .move(edge: .top)))
+                .transition(.opacity)
             }
         }
         .padding(16)

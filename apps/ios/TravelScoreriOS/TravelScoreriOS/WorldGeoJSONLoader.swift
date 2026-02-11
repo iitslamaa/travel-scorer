@@ -14,13 +14,17 @@ class CountryPolygon: MKPolygon {
 
 struct WorldGeoJSONLoader {
 
+    // 🔥 Cache polygons so we decode only once
+    private static var cachedPolygons: [CountryPolygon]?
+
     static func loadPolygons() -> [CountryPolygon] {
 
-        guard let url = Bundle.main.url(forResource: "countries", withExtension: "geojson") else {
-            return []
+        if let cached = cachedPolygons {
+            return cached
         }
 
-        guard let data = try? Data(contentsOf: url) else {
+        guard let url = Bundle.main.url(forResource: "countries", withExtension: "geojson"),
+              let data = try? Data(contentsOf: url) else {
             return []
         }
 
@@ -31,19 +35,13 @@ struct WorldGeoJSONLoader {
             for object in geoObjects {
                 if let feature = object as? MKGeoJSONFeature {
 
-                    var iso: String? = nil
+                    var iso: String?
 
                     if let propertiesData = feature.properties,
                        let jsonObject = try? JSONSerialization.jsonObject(with: propertiesData) as? [String: Any] {
 
-                        // Try Alpha-2 first
-                        if let alpha2 = jsonObject["ISO3166-1-Alpha-2"] as? String {
-                            iso = alpha2
-                        }
-                        // Fallback to ISO_A2 (for other datasets)
-                        else if let isoA2 = jsonObject["ISO_A2"] as? String {
-                            iso = isoA2
-                        }
+                        iso = (jsonObject["ISO3166-1-Alpha-2"] as? String)
+                            ?? (jsonObject["ISO_A2"] as? String)
                     }
 
                     for geometry in feature.geometry {
@@ -66,6 +64,7 @@ struct WorldGeoJSONLoader {
             }
         }
 
+        cachedPolygons = countryPolygons
         return countryPolygons
     }
 }
