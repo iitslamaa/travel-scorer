@@ -34,14 +34,10 @@ final class FriendRequestsViewModel: ObservableObject {
                 .select("""
                     id,
                     sender_id,
-                    profiles!friend_requests_sender_id_fkey (
-                        id,
-                        username,
-                        full_name,
-                        avatar_url
-                    )
+                    profiles!friend_requests_sender_id_fkey (*)
                 """)
                 .eq("receiver_id", value: myUserId.uuidString)
+                .eq("status", value: "pending")
                 .execute()
 
             incomingRequests = response.value.map { $0.profile }
@@ -62,7 +58,8 @@ final class FriendRequestsViewModel: ObservableObject {
             .from("friend_requests")
             .insert([
                 "sender_id": myUserId.uuidString,
-                "receiver_id": userId.uuidString
+                "receiver_id": userId.uuidString,
+                "status": "pending"
             ])
             .execute()
     }
@@ -82,6 +79,7 @@ final class FriendRequestsViewModel: ObservableObject {
             .select("id")
             .eq("sender_id", value: myUserId.uuidString)
             .eq("receiver_id", value: userId.uuidString)
+            .eq("status", value: "pending")
             .limit(1)
             .execute()
 
