@@ -4,11 +4,6 @@ import Foundation
 import Combine
 import Supabase
 
-private struct FriendRow: Decodable {
-    let user_id: UUID
-    let friend_id: UUID
-}
-
 /// Low-level Supabase wrapper.
 /// ❗️Not MainActor. Not UI. No SwiftUI state.
 final class SupabaseManager {
@@ -64,7 +59,7 @@ final class SupabaseManager {
         authStateSubject.send(())
     }
 
-    // MARK: - User + Friends Queries
+    // MARK: - User Queries
 
     /// Returns the currently authenticated user's ID
     var currentUserId: UUID? {
@@ -81,75 +76,5 @@ final class SupabaseManager {
             .execute()
 
         return response.value
-    }
-
-    /// Add a friend relationship (current user -> friend)
-    func addFriend(friendId: UUID) async throws {
-        guard let userId = currentUserId else { return }
-
-        try await client
-            .from("friends")
-            .insert([
-                "user_id": userId.uuidString,
-                "friend_id": friendId.uuidString
-            ])
-            .execute()
-    }
-
-    /// Remove a friend relationship (current user -> friend)
-    func removeFriend(friendId: UUID) async throws {
-        guard let userId = currentUserId else { return }
-
-        try await client
-            .from("friends")
-            .delete()
-            .eq("user_id", value: userId.uuidString)
-            .eq("friend_id", value: friendId.uuidString)
-            .execute()
-    }
-
-    /// Check whether two users are friends (bidirectional)
-    func isFriend(currentUserId: UUID, otherUserId: UUID) async throws -> Bool {
-        let a = currentUserId.uuidString
-        let b = otherUserId.uuidString
-
-        let response = try await client
-            .from("friends")
-            .select("id", count: .exact)
-            .or("and(user_id.eq.\(a),friend_id.eq.\(b)),and(user_id.eq.\(b),friend_id.eq.\(a))")
-            .limit(1)
-            .execute()
-
-        return (response.count ?? 0) > 0
-    }
-
-    /// Fetch all friends for a user
-    func fetchFriends(for userId: UUID) async throws -> [Profile] {
-        let uid = userId.uuidString
-
-        // 1️⃣ Fetch all friendship rows involving this user
-        let response: PostgrestResponse<[FriendRow]> = try await client
-            .from("friends")
-            .select("user_id, friend_id")
-            .or("user_id.eq.\(uid),friend_id.eq.\(uid)")
-            .execute()
-
-        let rows = response.value
-
-        // 2️⃣ Extract the OTHER user id in each row (compare as UUID, not String)
-        let friendIds: [String] = rows.map { row in
-            row.user_id == userId ? row.friend_id.uuidString : row.user_id.uuidString
-        }
-
-        if friendIds.isEmpty { return [] }
-
-        // 3️⃣ Fetch profiles for those ids
-        let profilesResponse: PostgrestResponse<[Profile]> = try await client
-            .from("profiles")
-            .select("*")
-            .in("id", values: friendIds)
-            .execute()
-
-        return profilesResponse.value
     }
 }

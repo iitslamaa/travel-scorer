@@ -24,6 +24,7 @@ final class FriendsViewModel: ObservableObject {
 
     // MARK: - Dependencies
     private let supabase = SupabaseManager.shared
+    private let friendService = FriendService()
 
     // MARK: - Load Friends
 
@@ -32,7 +33,7 @@ final class FriendsViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            friends = try await supabase.fetchFriends(for: userId)
+            friends = try await friendService.fetchFriends(for: userId)
         } catch {
             errorMessage = error.localizedDescription
             friends = []
@@ -47,14 +48,7 @@ final class FriendsViewModel: ObservableObject {
         guard let userId = supabase.currentUserId else { return }
 
         do {
-            let response: PostgrestResponse<[UUID]> = try await supabase.client
-                .from("friend_requests")
-                .select("id")
-                .eq("receiver_id", value: userId.uuidString)
-                .eq("status", value: "pending")
-                .execute()
-
-            incomingRequestCount = response.value.count
+            incomingRequestCount = try await friendService.incomingRequestCount(for: userId)
         } catch {
             incomingRequestCount = 0
         }
