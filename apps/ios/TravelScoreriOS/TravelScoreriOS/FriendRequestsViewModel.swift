@@ -19,6 +19,7 @@ final class FriendRequestsViewModel: ObservableObject {
 
     // MARK: - Dependencies
     private let supabase = SupabaseManager.shared
+    private let friendService = FriendService()
 
     // MARK: - Fetch incoming requests
 
@@ -29,18 +30,7 @@ final class FriendRequestsViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            let response: PostgrestResponse<[FriendRequestRow]> = try await supabase.client
-                .from("friend_requests")
-                .select("""
-                    id,
-                    sender_id,
-                    profiles!friend_requests_sender_id_fkey (*)
-                """)
-                .eq("receiver_id", value: myUserId.uuidString)
-                .eq("status", value: "pending")
-                .execute()
-
-            incomingRequests = response.value.map { $0.profile }
+            incomingRequests = try await friendService.fetchIncomingRequests(for: myUserId)
         } catch {
             errorMessage = error.localizedDescription
             incomingRequests = []
@@ -53,15 +43,7 @@ final class FriendRequestsViewModel: ObservableObject {
 
     func sendFriendRequest(to userId: UUID) async throws {
         guard let myUserId = supabase.currentUserId else { return }
-
-        try await supabase.client
-            .from("friend_requests")
-            .insert([
-                "sender_id": myUserId.uuidString,
-                "receiver_id": userId.uuidString,
-                "status": "pending"
-            ])
-            .execute()
+        try await friendService.sendFriendRequest(from: myUserId, to: userId)
     }
 
     // MARK: - Request state helpers
@@ -69,76 +51,20 @@ final class FriendRequestsViewModel: ObservableObject {
     /// Returns true if the current user has already sent a friend request to the given user
     func hasSentRequest(to userId: UUID) async throws -> Bool {
         guard let myUserId = supabase.currentUserId else { return false }
-
-        struct RequestIDRow: Decodable {
-            let id: UUID
-        }
-
-        let response: PostgrestResponse<[RequestIDRow]> = try await supabase.client
-            .from("friend_requests")
-            .select("id")
-            .eq("sender_id", value: myUserId.uuidString)
-            .eq("receiver_id", value: userId.uuidString)
-            .eq("status", value: "pending")
-            .limit(1)
-            .execute()
-
-        return !response.value.isEmpty
+        return try await friendService.hasSentRequest(from: myUserId, to: userId)
     }
 
     // MARK: - Accept request
 
     func acceptRequest(from userId: UUID) async throws {
         guard let myUserId = supabase.currentUserId else { return }
-
-        // 1️⃣ Delete the pending request
-        try await supabase.client
-            .from("friend_requests")
-            .delete()
-            .eq("sender_id", value: userId.uuidString)
-            .eq("receiver_id", value: myUserId.uuidString)
-            .execute()
-
-        // 2️⃣ Create friendship BOTH directions (bidirectional)
-        // Insert (me → them)
-        try await supabase.client
-            .from("friends")
-            .insert([
-                "user_id": myUserId.uuidString,
-                "friend_id": userId.uuidString
-            ])
-            .execute()
-
-        // Insert (them → me)
-        try await supabase.client
-            .from("friends")
-            .insert([
-                "user_id": userId.uuidString,
-                "friend_id": myUserId.uuidString
-            ])
-            .execute()
+        try await friendService.acceptRequest(myUserId: myUserId, from: userId)
     }
 
     // MARK: - Reject request
 
     func rejectRequest(from userId: UUID) async throws {
         guard let myUserId = supabase.currentUserId else { return }
-
-        try await supabase.client
-            .from("friend_requests")
-            .delete()
-            .eq("sender_id", value: userId.uuidString)
-            .eq("receiver_id", value: myUserId.uuidString)
-            .execute()
-    }
-}
-
-// MARK: - Private DTOs
-
-private struct FriendRequestRow: Decodable {
-    let profile: Profile
-
-    enum CodingKeys: String, CodingKey {
-        case profile = "profiles"
+        try await friendService.rejectRequest(myUserId: myUserId, from: userId)
     }
 }

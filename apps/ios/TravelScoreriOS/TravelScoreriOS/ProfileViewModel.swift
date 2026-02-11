@@ -32,7 +32,7 @@ final class ProfileViewModel: ObservableObject {
     // MARK: - Dependencies
     private let profileService: ProfileService
     private let supabase = SupabaseManager.shared
-    private let friendRequestsVM = FriendRequestsViewModel()
+    private let friendService = FriendService()
     private var userId: UUID?
 
     // MARK: - Init
@@ -169,7 +169,7 @@ final class ProfileViewModel: ObservableObject {
         }
 
         // Friends?
-        if try await supabase.isFriend(
+        if try await friendService.isFriend(
             currentUserId: currentUserId,
             otherUserId: userId
         ) {
@@ -179,7 +179,7 @@ final class ProfileViewModel: ObservableObject {
         }
 
         // Request already sent?
-        if try await friendRequestsVM.hasSentRequest(to: userId) {
+        if try await friendService.hasSentRequest(from: currentUserId, to: userId) {
             relationshipState = .requestSent
             isFriend = false
             return
@@ -196,7 +196,7 @@ final class ProfileViewModel: ObservableObject {
         guard let userId else { return }
 
         do {
-            let friends = try await supabase.fetchFriends(for: userId)
+            let friends = try await friendService.fetchFriends(for: userId)
             friendCount = friends.count
         } catch {
             print("❌ failed to load friend count:", error)
@@ -216,7 +216,8 @@ final class ProfileViewModel: ObservableObject {
             switch relationshipState {
             case .none:
                 do {
-                    try await friendRequestsVM.sendFriendRequest(to: profileId)
+                    guard let currentUserId = supabase.currentUserId else { return }
+                    try await friendService.sendFriendRequest(from: currentUserId, to: profileId)
                     print("📨 Friend request sent:", profileId)
 
                     // Optimistic UI update
@@ -242,7 +243,8 @@ final class ProfileViewModel: ObservableObject {
                 }
 
             case .friends:
-                try await supabase.removeFriend(friendId: profileId)
+                guard let currentUserId = supabase.currentUserId else { return }
+                try await friendService.removeFriend(myUserId: currentUserId, otherUserId: profileId)
                 try await refreshRelationshipState()
                 print("➖ Removed friend:", profileId)
 
