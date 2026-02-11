@@ -27,6 +27,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var relationshipState: RelationshipState = .none
     @Published var viewedTraveledCountries: Set<String> = []
     @Published var viewedBucketListCountries: Set<String> = []
+    @Published var friendCount: Int = 0
 
     // MARK: - Dependencies
     private let profileService: ProfileService
@@ -89,6 +90,7 @@ final class ProfileViewModel: ObservableObject {
                 try await profileService.fetchBucketListCountries(userId: userId)
 
             try await refreshRelationshipState()
+            await loadFriendCount()
 
         } catch {
             print("❌ load() failed:", error)
@@ -153,7 +155,7 @@ final class ProfileViewModel: ObservableObject {
     
     // MARK: - Relationship refresh
 
-    private func refreshRelationshipState() async throws {
+    func refreshRelationshipState() async throws {
         guard
             let userId,
             let currentUserId = supabase.currentUserId
@@ -186,6 +188,20 @@ final class ProfileViewModel: ObservableObject {
         // No relationship
         relationshipState = .none
         isFriend = false
+    }
+    
+    // MARK: - Friend Count
+
+    func loadFriendCount() async {
+        guard let userId else { return }
+
+        do {
+            let friends = try await supabase.fetchFriends(for: userId)
+            friendCount = friends.count
+        } catch {
+            print("❌ failed to load friend count:", error)
+            friendCount = 0
+        }
     }
     
     // MARK: - Friend actions

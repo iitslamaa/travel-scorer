@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 import SwiftUI
+import PostgREST
+import Supabase
 
 @MainActor
 final class FriendsViewModel: ObservableObject {
@@ -18,15 +20,14 @@ final class FriendsViewModel: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
     @Published var friends: [Profile] = []
+    @Published var incomingRequestCount: Int = 0
 
     // MARK: - Dependencies
     private let supabase = SupabaseManager.shared
 
     // MARK: - Load Friends
 
-    func loadFriends() async {
-        guard let userId = supabase.currentUserId else { return }
-
+    func loadFriends(for userId: UUID) async {
         isLoading = true
         errorMessage = nil
 
@@ -38,6 +39,25 @@ final class FriendsViewModel: ObservableObject {
         }
 
         isLoading = false
+    }
+
+    // MARK: - Incoming Requests Count
+
+    func loadIncomingRequestCount() async {
+        guard let userId = supabase.currentUserId else { return }
+
+        do {
+            let response: PostgrestResponse<[UUID]> = try await supabase.client
+                .from("friend_requests")
+                .select("id")
+                .eq("receiver_id", value: userId.uuidString)
+                .eq("status", value: "pending")
+                .execute()
+
+            incomingRequestCount = response.value.count
+        } catch {
+            incomingRequestCount = 0
+        }
     }
 
     // MARK: - Search
