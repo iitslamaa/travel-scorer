@@ -91,7 +91,7 @@ final class FriendRequestsViewModel: ObservableObject {
     func acceptRequest(from userId: UUID) async throws {
         guard let myUserId = supabase.currentUserId else { return }
 
-        // 1. Delete request
+        // 1️⃣ Delete the pending request
         try await supabase.client
             .from("friend_requests")
             .delete()
@@ -99,12 +99,22 @@ final class FriendRequestsViewModel: ObservableObject {
             .eq("receiver_id", value: myUserId.uuidString)
             .execute()
 
-        // 2. Create friendship (single row)
+        // 2️⃣ Create friendship BOTH directions (bidirectional)
+        // Insert (me → them)
         try await supabase.client
             .from("friends")
             .insert([
                 "user_id": myUserId.uuidString,
                 "friend_id": userId.uuidString
+            ])
+            .execute()
+
+        // Insert (them → me)
+        try await supabase.client
+            .from("friends")
+            .insert([
+                "user_id": userId.uuidString,
+                "friend_id": myUserId.uuidString
             ])
             .execute()
     }
