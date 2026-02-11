@@ -37,6 +37,9 @@ struct FriendsView: View {
                 } message: {
                     Text(friendsVM.errorMessage ?? "")
                 }
+                .task {
+                    await friendsVM.loadFriends()
+                }
         }
     }
 
@@ -53,6 +56,25 @@ struct FriendsView: View {
 
     private var resultsList: some View {
         List {
+            if !friendsVM.friends.isEmpty {
+                Section("Your Friends") {
+                    ForEach(friendsVM.friends) { profile in
+                        NavigationLink {
+                            ProfileView(userId: profile.id)
+                        } label: {
+                            VStack(alignment: .leading) {
+                                Text(profile.fullName)
+                                    .fontWeight(.medium)
+
+                                Text("@\(profile.username)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                }
+            }
+
             if !friendsVM.searchResults.isEmpty {
                 Section("Results") {
                     ForEach(friendsVM.searchResults) { profile in

@@ -99,12 +99,12 @@ final class FriendRequestsViewModel: ObservableObject {
             .eq("receiver_id", value: myUserId.uuidString)
             .execute()
 
-        // 2. Create mutual friendship
+        // 2. Create friendship (single row)
         try await supabase.client
             .from("friends")
             .insert([
-                ["user_id": myUserId.uuidString, "friend_id": userId.uuidString],
-                ["user_id": userId.uuidString, "friend_id": myUserId.uuidString]
+                "user_id": myUserId.uuidString,
+                "friend_id": userId.uuidString
             ])
             .execute()
     }

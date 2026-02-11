@@ -17,9 +17,28 @@ final class FriendsViewModel: ObservableObject {
     @Published var searchResults: [Profile] = []
     @Published var isLoading: Bool = false
     @Published var errorMessage: String?
+    @Published var friends: [Profile] = []
 
     // MARK: - Dependencies
     private let supabase = SupabaseManager.shared
+
+    // MARK: - Load Friends
+
+    func loadFriends() async {
+        guard let userId = supabase.currentUserId else { return }
+
+        isLoading = true
+        errorMessage = nil
+
+        do {
+            friends = try await supabase.fetchFriends(for: userId)
+        } catch {
+            errorMessage = error.localizedDescription
+            friends = []
+        }
+
+        isLoading = false
+    }
 
     // MARK: - Search
 
