@@ -30,6 +30,19 @@ struct ProfileView: View {
     private var homeCountryCodes: [String] { profileVM.profile?.livedCountries ?? [] }
     private var languages: [String] { profileVM.profile?.languages ?? [] }
 
+    private var buttonTitle: String {
+        switch profileVM.relationshipState {
+        case .none:
+            return "Add Friend"
+        case .requestSent:
+            return "Request Sent"
+        case .friends:
+            return "Friends"
+        case .selfProfile:
+            return ""
+        }
+    }
+
     var body: some View {
         ZStack {
             Image("profile_background")
@@ -81,6 +94,7 @@ struct ProfileView: View {
         }
         .onAppear {
             profileVM.setUserIdIfNeeded(userId)
+            Task { try? await profileVM.refreshRelationshipState() }
         }
     }
 
@@ -137,6 +151,43 @@ struct ProfileView: View {
                             .font(.subheadline)
                             .fontWeight(.semibold)
                             .foregroundStyle(.blue)
+                    }
+                }
+
+                // Friend action button (small grey rectangle like original design)
+                if profileVM.relationshipState != .selfProfile {
+                    Button {
+                        if profileVM.relationshipState == .friends {
+                            showUnfriendConfirmation = true
+                        } else {
+                            Task {
+                                await profileVM.toggleFriend()
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 6) {
+                            if profileVM.relationshipState == .friends {
+                                Image(systemName: "checkmark")
+                            }
+                            Text(buttonTitle)
+                        }
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(.gray)
+                    .disabled(profileVM.relationshipState == .requestSent)
+                    .alert("Unfriend?", isPresented: $showUnfriendConfirmation) {
+                        Button("Cancel", role: .cancel) {}
+                        Button("Confirm", role: .destructive) {
+                            Task {
+                                await profileVM.toggleFriend()
+                            }
+                        }
+                    } message: {
+                        Text("Are you sure you want to remove this friend?")
                     }
                 }
             }
