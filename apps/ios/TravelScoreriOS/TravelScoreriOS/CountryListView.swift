@@ -37,7 +37,6 @@ struct CountryListView: View {
     @State private var sortOrder: SortOrder = .descending
     @State private var countries: [Country] = []
     @State private var visibleCountries: [Country] = []
-    @State private var showingMap = false
     @State private var hasLoaded = false
 
     // Keep a handle to the latest recompute task so we can cancel stale work
@@ -202,17 +201,14 @@ struct CountryListView: View {
                         Image(systemName: sortOrder == .ascending ? "arrow.up" : "arrow.down")
                     }
 
-                    // 🗺️ Map button (future global map view)
-                    Button {
-                        showingMap = true
+                    // 🗺️ Score Map button
+                    NavigationLink {
+                        ScoreWorldMapView(countries: countries)
                     } label: {
                         Text("🗺️")
                     }
                 }
             }
-        }
-        .sheet(isPresented: $showingMap) {
-            MapPlaceholderView()
         }
         .task {
             guard !hasLoaded else { return }
