@@ -29,6 +29,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var viewedBucketListCountries: Set<String> = []
     @Published var friendCount: Int = 0
     @Published var mutualBucketCountries: [String] = []
+    @Published var mutualTraveledCountries: [String] = []
     
     // MARK: - Dependencies
     private let profileService: ProfileService
@@ -55,6 +56,7 @@ final class ProfileViewModel: ObservableObject {
         viewedTraveledCountries = []
         viewedBucketListCountries = []
         mutualBucketCountries = []
+        mutualTraveledCountries = []
         relationshipState = .none
         isFriend = false
         isFriendLoading = false
@@ -102,8 +104,19 @@ final class ProfileViewModel: ObservableObject {
                 let viewedSet = viewedBucketListCountries
                 
                 mutualBucketCountries = Array(currentSet.intersection(viewedSet)).sorted()
+                
+                // Compute mutual traveled countries
+                let currentUserTraveled =
+                    try await profileService.fetchTraveledCountries(userId: currentUserId)
+                
+                let currentTraveledSet = Set(currentUserTraveled)
+                let viewedTraveledSet = viewedTraveledCountries
+                
+                mutualTraveledCountries =
+                    Array(currentTraveledSet.intersection(viewedTraveledSet)).sorted()
             } else {
                 mutualBucketCountries = []
+                mutualTraveledCountries = []
             }
             
             try await refreshRelationshipState()
@@ -293,6 +306,24 @@ final class ProfileViewModel: ObservableObject {
     var orderedBucketListCountries: [String] {
         let all = viewedBucketListCountries
         let mutualSet = Set(mutualBucketCountries)
+
+        return all.sorted {
+            let lhsIsMutual = mutualSet.contains($0)
+            let rhsIsMutual = mutualSet.contains($1)
+
+            if lhsIsMutual != rhsIsMutual {
+                return lhsIsMutual
+            }
+
+            return $0 < $1
+        }
+    }
+
+    // MARK: - Ordered Traveled Countries (Mutuals First)
+
+    var orderedTraveledCountries: [String] {
+        let all = viewedTraveledCountries
+        let mutualSet = Set(mutualTraveledCountries)
 
         return all.sorted {
             let lhsIsMutual = mutualSet.contains($0)
