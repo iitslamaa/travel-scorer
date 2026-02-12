@@ -32,7 +32,20 @@ struct FriendsView: View {
                         NavigationLink {
                             FriendRequestsView()
                         } label: {
-                            Image(systemName: "person.crop.circle.badge.plus")
+                            ZStack(alignment: .topTrailing) {
+                                Image(systemName: "person.crop.circle.badge.plus")
+                                    .font(.title3)
+
+                                if friendsVM.incomingRequestCount > 0 {
+                                    Text("\(friendsVM.incomingRequestCount)")
+                                        .font(.caption2)
+                                        .foregroundColor(.white)
+                                        .padding(6)
+                                        .background(Color.red)
+                                        .clipShape(Circle())
+                                        .offset(x: 10, y: -8)
+                                }
+                            }
                         }
                         .accessibilityLabel("Friend Requests")
                     }
