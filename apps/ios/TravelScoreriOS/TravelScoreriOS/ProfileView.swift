@@ -200,8 +200,7 @@ struct ProfileView: View {
 
     private var infoCards: some View {
         VStack(spacing: 12) {
-            if profileVM.relationshipState == .selfProfile ||
-               profileVM.relationshipState == .friends {
+            if profileVM.relationshipState == .selfProfile {
 
                 CollapsibleCountrySection(
                     title: "Countries Traveled",
@@ -214,6 +213,34 @@ struct ProfileView: View {
                     countryCodes: flags(for: profileVM.viewedBucketListCountries),
                     highlightColor: .blue
                 )
+
+            } else if profileVM.relationshipState == .friends {
+
+                CollapsibleCountrySection(
+                    title: "Countries Traveled",
+                    countryCodes: flags(for: profileVM.viewedTraveledCountries),
+                    highlightColor: .gold
+                )
+
+                // Mutual Bucket List
+                VStack(alignment: .leading, spacing: 12) {
+
+                    CollapsibleCountrySection(
+                        title: "Mutual Want to Visit",
+                        countryCodes: flags(for: Set(profileVM.mutualBucketCountries)),
+                        highlightColor: .blue
+                    )
+
+                    NavigationLink {
+                        FullBucketListView(userId: userId)
+                    } label: {
+                        Text("View Full Bucket List")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                            .foregroundStyle(.blue)
+                    }
+                    .padding(.horizontal, 4)
+                }
 
             } else {
                 lockedProfileMessage
@@ -268,7 +295,7 @@ struct ProfileView: View {
     }
 }
 
-private struct CollapsibleCountrySection: View {
+struct CollapsibleCountrySection: View {
     let title: String
     let countryCodes: [String]
     let highlightColor: Color
@@ -354,7 +381,7 @@ private struct CollapsibleCountrySection: View {
     }
 }
 
-private struct FlagStrip: View {
+struct FlagStrip: View {
     let flags: [String]
     let fontSize: CGFloat
     let spacing: CGFloat
