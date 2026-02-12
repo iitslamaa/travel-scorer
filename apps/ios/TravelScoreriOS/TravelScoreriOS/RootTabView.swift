@@ -11,6 +11,7 @@ struct RootTabView: View {
     @EnvironmentObject private var sessionManager: SessionManager
     @EnvironmentObject private var bucketList: BucketListStore
     @EnvironmentObject private var traveled: TraveledStore
+    @EnvironmentObject private var profileVM: ProfileViewModel
 
     var body: some View {
         TabView {
@@ -42,6 +43,7 @@ struct RootTabView: View {
             .tabItem {
                 Label("Friends", systemImage: "person.2.fill")
             }
+            .badge(profileVM.pendingRequestCount)
 
             // Profile
             Group {
