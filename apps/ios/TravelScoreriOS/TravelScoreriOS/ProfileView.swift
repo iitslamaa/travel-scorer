@@ -330,22 +330,20 @@ private struct FlagStrip: View {
     var body: some View {
         LazyHStack(spacing: spacing) {
             ForEach(flags, id: \.self) { code in
-                Text(flagEmoji(from: code))
+                let flag = flagEmoji(from: code)
+
+                Text(flag)
                     .font(.system(size: fontSize))
                     .padding(6)
                     .background(
-                        selectedISO == code
-                        ? Color.gold.opacity(0.15)
-                        : Color.clear
+                        RoundedRectangle(cornerRadius: 8)
+                            .fill(selectedISO == code ? Color.gold.opacity(0.25) : Color.clear)
                     )
-                    .clipShape(Capsule())
                     .overlay(
-                        Capsule()
-                            .stroke(
-                                selectedISO == code ? Color.gold : Color.clear,
-                                lineWidth: 2
-                            )
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(selectedISO == code ? Color.gold : Color.clear, lineWidth: 2)
                     )
+                    .contentShape(Rectangle())
                     .onTapGesture {
                         onFlagTap?(code)
                     }
