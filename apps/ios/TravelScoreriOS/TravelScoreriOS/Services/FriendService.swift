@@ -96,7 +96,11 @@ final class FriendService {
     }
 
     func incomingRequestCount(for myUserId: UUID) async throws -> Int {
-        let response: PostgrestResponse<[UUID]> = try await supabase.client
+        struct RequestIDRow: Decodable {
+            let id: UUID
+        }
+
+        let response: PostgrestResponse<[RequestIDRow]> = try await supabase.client
             .from("friend_requests")
             .select("id")
             .eq("receiver_id", value: myUserId.uuidString)
@@ -104,6 +108,13 @@ final class FriendService {
             .execute()
 
         return response.value.count
+    }
+
+    // MARK: - Pending Count (For Global Badge Usage)
+
+    /// Convenience wrapper for global badge usage (RootTabView, push notifications, etc.)
+    func fetchPendingRequestCount(for userId: UUID) async throws -> Int {
+        return try await incomingRequestCount(for: userId)
     }
 
     func hasIncomingRequest(from otherUserId: UUID, to myUserId: UUID) async throws -> Bool {

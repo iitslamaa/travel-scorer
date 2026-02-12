@@ -30,6 +30,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var friendCount: Int = 0
     @Published var mutualBucketCountries: [String] = []
     @Published var mutualTraveledCountries: [String] = []
+    @Published var pendingRequestCount: Int = 0
     
     // MARK: - Dependencies
     private let profileService: ProfileService
@@ -121,6 +122,7 @@ final class ProfileViewModel: ObservableObject {
             
             try await refreshRelationshipState()
             await loadFriendCount()
+            await loadPendingRequestCount()
             
         } catch {
             print("❌ load() failed:", error)
@@ -231,6 +233,20 @@ final class ProfileViewModel: ObservableObject {
         } catch {
             print("❌ failed to load friend count:", error)
             friendCount = 0
+        }
+    }
+
+    // MARK: - Pending Friend Request Count
+
+    func loadPendingRequestCount() async {
+        guard let userId else { return }
+
+        do {
+            pendingRequestCount = try await friendService.fetchPendingRequestCount(for: userId)
+            print("🔔 Pending requests:", pendingRequestCount)
+        } catch {
+            print("❌ failed to load pending request count:", error)
+            pendingRequestCount = 0
         }
     }
     
