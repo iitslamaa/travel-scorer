@@ -23,15 +23,19 @@ struct ScoreWorldMapView: View {
             )
             .edgesIgnoringSafeArea(.all)
             
-            if let iso = selectedCountryISO,
-               let country = countries.first(where: { $0.iso2.uppercased() == iso.uppercased() }) {
-                
-                ScoreCountryDrawerView(
-                    country: country,
-                    onDismiss: { selectedCountryISO = nil }
-                )
-                .transition(.move(edge: .bottom))
-                .animation(.easeInOut, value: selectedCountryISO)
+            if let iso = selectedCountryISO {
+                let matchedCountry =
+                    countries.first { $0.iso2.uppercased() == iso.uppercased() }
+                    ?? countries.first { $0.name == iso }
+
+                if let country = matchedCountry {
+                    ScoreCountryDrawerView(
+                        country: country,
+                        onDismiss: { selectedCountryISO = nil }
+                    )
+                    .transition(.move(edge: .bottom))
+                    .animation(.easeInOut, value: selectedCountryISO)
+                }
             }
         }
     }
@@ -77,23 +81,44 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
         for overlay in uiView.overlays {
             guard let polygon = overlay as? CountryPolygon,
                   let renderer = uiView.renderer(for: overlay) as? MKPolygonRenderer else { continue }
-            
+
             let iso = polygon.isoCode
-            let isSelected = iso == selectedCountryISO
-            
-            if let iso,
-               let country = countries.first(where: { $0.iso2.uppercased() == iso.uppercased() }) {
+            let identifier: String? = {
+                if let iso, iso != "-99" {
+                    return iso
+                }
+                return polygon.countryName
+            }()
+
+            let isSelected = identifier == selectedCountryISO
+
+            var matchedCountry: Country?
+
+            if let iso {
+                matchedCountry = countries.first {
+                    $0.iso2.uppercased() == iso.uppercased()
+                }
+            }
+
+            if matchedCountry == nil,
+               let polygonName = polygon.countryName {
+                matchedCountry = countries.first {
+                    $0.name == polygonName
+                }
+            }
+
+            if let country = matchedCountry {
                 renderer.fillColor = UIColor(
                     ScoreColor.background(for: country.score)
                 ).withAlphaComponent(0.6)
             } else {
                 renderer.fillColor = UIColor.systemGray.withAlphaComponent(0.15)
             }
-            
+
             renderer.strokeColor = isSelected
                 ? UIColor.systemYellow
                 : UIColor.black.withAlphaComponent(0.2)
-            
+
             renderer.lineWidth = isSelected ? 2.5 : 0.5
         }
     }
@@ -126,10 +151,16 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
                 let point = renderer.point(for: mapPoint)
                 
                 if let path = renderer.path,
-                   path.contains(point),
-                   let iso = polygon.isoCode {
-                    
-                    selectedCountryISO = iso
+                   path.contains(point) {
+
+                    let identifier: String? = {
+                        if let iso = polygon.isoCode, iso != "-99" {
+                            return iso
+                        }
+                        return polygon.countryName
+                    }()
+
+                    selectedCountryISO = identifier
                     break
                 }
             }
