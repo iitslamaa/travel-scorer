@@ -287,4 +287,22 @@ final class ProfileViewModel: ObservableObject {
         let viewedSet = Set(viewedUserCountries)
         mutualBucketCountries = Array(currentSet.intersection(viewedSet)).sorted()
     }
+
+    // MARK: - Ordered Bucket List (Mutuals First)
+
+    var orderedBucketListCountries: [String] {
+        let all = viewedBucketListCountries
+        let mutualSet = Set(mutualBucketCountries)
+
+        return all.sorted {
+            let lhsIsMutual = mutualSet.contains($0)
+            let rhsIsMutual = mutualSet.contains($1)
+
+            if lhsIsMutual != rhsIsMutual {
+                return lhsIsMutual
+            }
+
+            return $0 < $1
+        }
+    }
 }

@@ -222,25 +222,12 @@ struct ProfileView: View {
                     highlightColor: .gold
                 )
 
-                // Mutual Bucket List
-                VStack(alignment: .leading, spacing: 12) {
-
-                    CollapsibleCountrySection(
-                        title: "Mutual Want to Visit",
-                        countryCodes: flags(for: Set(profileVM.mutualBucketCountries)),
-                        highlightColor: .blue
-                    )
-
-                    NavigationLink {
-                        FullBucketListView(userId: userId)
-                    } label: {
-                        Text("View Full Bucket List")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.blue)
-                    }
-                    .padding(.horizontal, 4)
-                }
+                CollapsibleCountrySection(
+                    title: "Want to Visit",
+                    countryCodes: profileVM.orderedBucketListCountries,
+                    highlightColor: .blue,
+                    mutualCountries: Set(profileVM.mutualBucketCountries)
+                )
 
             } else {
                 lockedProfileMessage
@@ -299,9 +286,22 @@ struct CollapsibleCountrySection: View {
     let title: String
     let countryCodes: [String]
     let highlightColor: Color
+    let mutualCountries: Set<String>?
 
     @State private var isExpanded = false
     @State private var selectedCountryISO: String? = nil
+
+    init(
+        title: String,
+        countryCodes: [String],
+        highlightColor: Color,
+        mutualCountries: Set<String>? = nil
+    ) {
+        self.title = title
+        self.countryCodes = countryCodes
+        self.highlightColor = highlightColor
+        self.mutualCountries = mutualCountries
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -334,7 +334,8 @@ struct CollapsibleCountrySection: View {
                             spacing: 10,
                             showsTooltip: false,
                             selectedISO: selectedCountryISO,
-                            onFlagTap: { selectedCountryISO = $0 }
+                            onFlagTap: { selectedCountryISO = $0 },
+                            mutualCountries: mutualCountries
                         )
                     }
 
@@ -388,6 +389,7 @@ struct FlagStrip: View {
     let showsTooltip: Bool
     let selectedISO: String?
     let onFlagTap: ((String) -> Void)?
+    let mutualCountries: Set<String>?
 
     init(
         flags: [String],
@@ -395,7 +397,8 @@ struct FlagStrip: View {
         spacing: CGFloat,
         showsTooltip: Bool = false,
         selectedISO: String? = nil,
-        onFlagTap: ((String) -> Void)? = nil
+        onFlagTap: ((String) -> Void)? = nil,
+        mutualCountries: Set<String>? = nil
     ) {
         self.flags = flags
         self.fontSize = fontSize
@@ -403,23 +406,34 @@ struct FlagStrip: View {
         self.showsTooltip = showsTooltip
         self.selectedISO = selectedISO
         self.onFlagTap = onFlagTap
+        self.mutualCountries = mutualCountries
     }
 
     var body: some View {
         LazyHStack(spacing: spacing) {
             ForEach(flags, id: \.self) { code in
                 let flag = flagEmoji(from: code)
+                let isMutual = mutualCountries?.contains(code) ?? false
+                let isSelected = selectedISO == code
 
                 Text(flag)
                     .font(.system(size: fontSize))
-                    .padding(6)
+                    .padding(8)
                     .background(
-                        RoundedRectangle(cornerRadius: 8)
-                            .fill(selectedISO == code ? Color.gold.opacity(0.25) : Color.clear)
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(
+                                isMutual
+                                ? Color.gold.opacity(0.35)
+                                : (isSelected ? Color.blue.opacity(0.25) : Color.clear)
+                            )
                     )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(selectedISO == code ? Color.gold : Color.clear, lineWidth: 2)
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(
+                                isSelected ? Color.blue :
+                                (isMutual ? Color.gold : Color.clear),
+                                lineWidth: 2
+                            )
                     )
                     .contentShape(Rectangle())
                     .onTapGesture {
