@@ -218,8 +218,9 @@ struct ProfileView: View {
 
                 CollapsibleCountrySection(
                     title: "Countries Traveled",
-                    countryCodes: flags(for: profileVM.viewedTraveledCountries),
-                    highlightColor: .gold
+                    countryCodes: profileVM.orderedTraveledCountries,
+                    highlightColor: .gold,
+                    mutualCountries: Set(profileVM.mutualTraveledCountries)
                 )
 
                 CollapsibleCountrySection(
