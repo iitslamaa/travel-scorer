@@ -10,6 +10,7 @@ import MapKit
 
 class CountryPolygon: MKPolygon {
     var isoCode: String?
+    var countryName: String?
 }
 
 struct WorldGeoJSONLoader {
@@ -36,9 +37,12 @@ struct WorldGeoJSONLoader {
                 if let feature = object as? MKGeoJSONFeature {
 
                     var iso: String?
+                    var name: String?
 
                     if let propertiesData = feature.properties,
                        let jsonObject = try? JSONSerialization.jsonObject(with: propertiesData) as? [String: Any] {
+
+                        name = jsonObject["name"] as? String
 
                         iso = (jsonObject["ISO3166-1-Alpha-2"] as? String)
                             ?? (jsonObject["ISO_A2"] as? String)
@@ -49,6 +53,7 @@ struct WorldGeoJSONLoader {
                         if let polygon = geometry as? MKPolygon {
                             let countryPolygon = CountryPolygon(points: polygon.points(), count: polygon.pointCount)
                             countryPolygon.isoCode = iso
+                            countryPolygon.countryName = name
                             countryPolygons.append(countryPolygon)
                         }
 
@@ -56,6 +61,7 @@ struct WorldGeoJSONLoader {
                             for polygon in multiPolygon.polygons {
                                 let countryPolygon = CountryPolygon(points: polygon.points(), count: polygon.pointCount)
                                 countryPolygon.isoCode = iso
+                                countryPolygon.countryName = name
                                 countryPolygons.append(countryPolygon)
                             }
                         }
