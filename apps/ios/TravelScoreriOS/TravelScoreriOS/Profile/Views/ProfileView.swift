@@ -101,6 +101,7 @@ struct ProfileView: View {
                         ProfileHeaderView(
                             profile: profileVM.profile,
                             username: username,
+                            homeCountryCodes: homeCountryCodes,
                             relationshipState: profileVM.relationshipState,
                             friendCount: profileVM.friendCount,
                             userId: userId,
