@@ -42,11 +42,20 @@ final class AuthViewModel: ObservableObject {
         errorMessage = nil
 
         do {
-            try await supabase.client.auth.verifyOTP(
-                email: email,
-                token: otp,
-                type: .email
-            )
+            // If input is 6-digit numeric → treat as OTP
+            if otp.count == 6 && otp.allSatisfy({ $0.isNumber }) {
+                try await supabase.client.auth.verifyOTP(
+                    email: email,
+                    token: otp,
+                    type: .email
+                )
+            } else {
+                // Otherwise treat input as password
+                try await supabase.client.auth.signIn(
+                    email: email,
+                    password: otp
+                )
+            }
 
             _ = try await supabase.client.auth.session
             try await ensureProfileExists()
