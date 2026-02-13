@@ -12,6 +12,7 @@ struct ProfileHeaderView: View {
     
     let profile: Profile?
     let username: String
+    let homeCountryCodes: [String]
     let relationshipState: RelationshipState
     let friendCount: Int
     let userId: UUID
@@ -112,6 +113,18 @@ struct ProfileHeaderView: View {
                     .fontWeight(.semibold)
             }
             
+            if !homeCountryCodes.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 6) {
+                        ForEach(homeCountryCodes, id: \.self) { code in
+                            Text(flagEmoji(for: code))
+                                .font(.title3)
+                        }
+                    }
+                }
+                .padding(.top, 4)
+            }
+            
             if relationshipState != .selfProfile {
                 friendButton
             }
@@ -151,5 +164,14 @@ struct ProfileHeaderView: View {
                 Task { await onToggleFriend() }
             }
         }
+    }
+    
+    private func flagEmoji(for countryCode: String) -> String {
+        countryCode
+            .uppercased()
+            .unicodeScalars
+            .compactMap { UnicodeScalar(127397 + $0.value) }
+            .map { String($0) }
+            .joined()
     }
 }
