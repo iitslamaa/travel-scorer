@@ -1,0 +1,180 @@
+//
+//  CollapsibleCountrySection.swift
+//  TravelScoreriOS
+//
+//  Created by Lama Yassine on 2/13/26.
+//
+
+import Foundation
+import SwiftUI
+
+struct CollapsibleCountrySection: View {
+    let title: String
+    let countryCodes: [String]
+    let highlightColor: Color
+    let mutualCountries: Set<String>?
+
+    @State private var isExpanded = false
+    @State private var selectedCountryISO: String? = nil
+
+    init(
+        title: String,
+        countryCodes: [String],
+        highlightColor: Color,
+        mutualCountries: Set<String>? = nil
+    ) {
+        self.title = title
+        self.countryCodes = countryCodes
+        self.highlightColor = highlightColor
+        self.mutualCountries = mutualCountries
+    }
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+
+            Button {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
+                    isExpanded.toggle()
+                }
+            } label: {
+                HStack {
+                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                    Text("\(title): ")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                    Text("#\(countryCodes.count)")
+                        .font(.subheadline)
+                        .fontWeight(.bold)
+                        .foregroundColor(highlightColor)
+                    Spacer()
+                }
+            }
+
+            if isExpanded {
+                VStack(spacing: 16) {
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        FlagStrip(
+                            flags: countryCodes,
+                            fontSize: 30,
+                            spacing: 10,
+                            showsTooltip: false,
+                            selectedISO: selectedCountryISO,
+                            onFlagTap: { selectedCountryISO = $0 },
+                            mutualCountries: mutualCountries
+                        )
+                    }
+
+                    ZStack(alignment: .bottom) {
+
+                        WorldMapView(
+                            highlightedCountryCodes: countryCodes,
+                            selectedCountryISO: $selectedCountryISO
+                        )
+                        .frame(height: 240)
+                        .clipShape(RoundedRectangle(cornerRadius: 16))
+
+                        if let iso = selectedCountryISO {
+                            HStack(spacing: 8) {
+                                Text(flagEmoji(from: iso))
+                                Text(Locale.current.localizedString(forRegionCode: iso) ?? iso)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Capsule())
+                            .padding(.bottom, 12)
+                        }
+                    }
+                }
+                .padding(.top, 8)
+            }
+        }
+        .padding(16)
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
+    }
+
+    private func flagEmoji(from code: String) -> String {
+        code.uppercased().unicodeScalars
+            .map { 127397 + $0.value }
+            .compactMap(UnicodeScalar.init)
+            .map(String.init)
+            .joined()
+    }
+}
+
+struct FlagStrip: View {
+    let flags: [String]
+    let fontSize: CGFloat
+    let spacing: CGFloat
+    let showsTooltip: Bool
+    let selectedISO: String?
+    let onFlagTap: ((String) -> Void)?
+    let mutualCountries: Set<String>?
+
+    init(
+        flags: [String],
+        fontSize: CGFloat,
+        spacing: CGFloat,
+        showsTooltip: Bool = false,
+        selectedISO: String? = nil,
+        onFlagTap: ((String) -> Void)? = nil,
+        mutualCountries: Set<String>? = nil
+    ) {
+        self.flags = flags
+        self.fontSize = fontSize
+        self.spacing = spacing
+        self.showsTooltip = showsTooltip
+        self.selectedISO = selectedISO
+        self.onFlagTap = onFlagTap
+        self.mutualCountries = mutualCountries
+    }
+
+    var body: some View {
+        LazyHStack(spacing: spacing) {
+            ForEach(flags, id: \.self) { code in
+                let flag = flagEmoji(from: code)
+                let isMutual = mutualCountries?.contains(code) ?? false
+                let isSelected = selectedISO == code
+
+                Text(flag)
+                    .font(.system(size: fontSize))
+                    .padding(8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(
+                                isMutual
+                                ? Color.gold.opacity(0.35)
+                                : (isSelected ? Color.blue.opacity(0.25) : Color.clear)
+                            )
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(
+                                isSelected ? Color.blue :
+                                (isMutual ? Color.gold : Color.clear),
+                                lineWidth: 2
+                            )
+                    )
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        onFlagTap?(code)
+                    }
+            }
+        }
+    }
+
+    private func flagEmoji(from code: String) -> String {
+        code.uppercased().unicodeScalars
+            .map { 127397 + $0.value }
+            .compactMap(UnicodeScalar.init)
+            .map(String.init)
+            .joined()
+    }
+}
