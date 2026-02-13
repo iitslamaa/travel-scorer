@@ -205,6 +205,19 @@ struct EmailAuthView: View {
                             }
                             .buttonStyle(.borderedProminent)
                             .disabled(vm.email.isEmpty || cooldownSeconds > 0)
+
+                            Button {
+                                guard !vm.email.isEmpty else { return }
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    step = .enterCode
+                                    focusedField = .code
+                                }
+                            } label: {
+                                Text("Use password instead")
+                                    .font(.footnote)
+                                    .foregroundColor(.white.opacity(0.8))
+                            }
+                            .padding(.top, 4)
                         }
                     }
                     .transition(.move(edge: .trailing).combined(with: .opacity))
@@ -222,12 +235,12 @@ struct EmailAuthView: View {
                                 Spacer()
                             }
 
-                            Text("Check your email for the 6-digit code")
+                            Text("Enter the 6-digit code sent to your email, or enter your password")
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
 
-                            TextField("6-digit code", text: $vm.otp)
-                                .keyboardType(.numberPad)
+                            TextField("6-digit code or password", text: $vm.otp)
+                                .keyboardType(.default)
                                 .padding(12)
                                 .background(
                                     RoundedRectangle(cornerRadius: 8)
@@ -252,7 +265,7 @@ struct EmailAuthView: View {
                                 }
                             }
                             .buttonStyle(.borderedProminent)
-                            .disabled(vm.otp.count < 6)
+                            .disabled(vm.otp.isEmpty)
                         }
                     }
                     .transition(.move(edge: .trailing).combined(with: .opacity))
