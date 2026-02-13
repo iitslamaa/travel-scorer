@@ -22,6 +22,7 @@ struct ProfileView: View {
 
     private let userId: UUID
     @State private var showUnfriendConfirmation = false
+    @State private var headerMinY: CGFloat = 0
 
     init(userId: UUID) {
         self.userId = userId
@@ -53,6 +54,29 @@ struct ProfileView: View {
     private var navigationTitle: String {
         "\(firstName)’s Profile"
     }
+    
+    private var miniAvatar: some View {
+        Group {
+            if let urlString = profileVM.profile?.avatarUrl,
+               let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    if let image = phase.image {
+                        image.resizable().scaledToFill()
+                    } else {
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .scaledToFill()
+                            .foregroundStyle(.gray)
+                    }
+                }
+            } else {
+                Image(systemName: "person.crop.circle.fill")
+                    .resizable()
+                    .scaledToFill()
+                    .foregroundStyle(.gray)
+            }
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -66,7 +90,14 @@ struct ProfileView: View {
                 ScrollView {
                     VStack(spacing: 0) {
 
-                        // Stretchy header should NOT be padded horizontally
+                        GeometryReader { geo in
+                            Color.clear
+                                .onChange(of: geo.frame(in: .global).minY) { newValue in
+                                    headerMinY = newValue
+                                }
+                        }
+                        .frame(height: 0)
+
                         ProfileHeaderView(
                             profile: profileVM.profile,
                             username: username,
@@ -74,6 +105,7 @@ struct ProfileView: View {
                             friendCount: profileVM.friendCount,
                             userId: userId,
                             buttonTitle: buttonTitle,
+                            headerMinY: headerMinY,
                             onToggleFriend: {
                                 await profileVM.toggleFriend()
                             }
@@ -91,9 +123,40 @@ struct ProfileView: View {
                         )
                     }
                 }
-                .coordinateSpace(name: "SCROLL")
-                .scrollIndicators(.hidden)
-                .scrollBounceBehavior(.basedOnSize)
+                .overlay(alignment: .top) {
+                    let progress = min(max((165 - headerMinY) / 80, 0), 1)
+
+                    HStack(spacing: 10) {
+                        miniAvatar
+                            .frame(width: 34, height: 34)
+                            .clipShape(Circle())
+
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(profileVM.profile?.fullName ?? "")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                                .lineLimit(1)
+
+                            if !username.isEmpty {
+                                Text("@\(username)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(1)
+                            }
+                        }
+
+                        Spacer()
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .shadow(color: .black.opacity(0.08), radius: 10, y: 6)
+                    .padding(.horizontal, 12)
+                    .padding(.top, 8)
+                    .opacity(progress)
+                    .animation(.easeInOut(duration: 0.18), value: progress)
+                }
             }
         }
         .navigationTitle(navigationTitle)
