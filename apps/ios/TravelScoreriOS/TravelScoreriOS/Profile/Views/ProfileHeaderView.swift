@@ -9,56 +9,59 @@ import Foundation
 import SwiftUI
 
 struct ProfileHeaderView: View {
-
+    
     let profile: Profile?
     let username: String
     let relationshipState: RelationshipState
     let friendCount: Int
     let userId: UUID
     let buttonTitle: String
+    let headerMinY: CGFloat
     let onToggleFriend: () async -> Void
-
+    
     @State private var isUnfriendAlertPresented = false
     @State private var selectedCountryISO: String? = nil
-
+    
     @Environment(\.colorScheme) private var colorScheme
-
+    
     var body: some View {
-        GeometryReader { geo in
-            let minY = geo.frame(in: .global).minY
-            let pull = max(minY, 0)
+        let pull = max(headerMinY - 165, 0)
+        let cappedPull = min(pull, 120)
 
-            let baseHeight: CGFloat = 220
-            let dynamicHeight = baseHeight + pull
+        let baseHeight: CGFloat = 180
+        let dynamicHeight = baseHeight + cappedPull
 
-            VStack {
-                Spacer()
+        VStack {
 
-                HStack(alignment: .center, spacing: 18) {
+            HStack(alignment: .center, spacing: 20 + cappedPull * 0.05) {
 
-                    avatarView
-                        .frame(width: 120 + pull * 0.25,
-                               height: 120 + pull * 0.25)
-                        .animation(.spring(response: 0.35, dampingFraction: 0.8),
-                                   value: pull)
+                avatarView
+                    .frame(
+                        width: 120 + cappedPull * 0.30,
+                        height: 120 + cappedPull * 0.30
+                    )
+                    .shadow(
+                        color: .black.opacity(0.18 + cappedPull * 0.001),
+                        radius: 12 + cappedPull * 0.08,
+                        y: 6 + cappedPull * 0.04
+                    )
+                    .animation(.spring(response: 0.4, dampingFraction: 0.85), value: cappedPull)
 
-                    profileTextContent
-                        .scaleEffect(1 + pull / 600)
-                        .animation(.spring(response: 0.35, dampingFraction: 0.8),
-                                   value: pull)
+                profileTextContent
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .offset(y: -cappedPull * 0.08)
+                    .scaleEffect(1 + cappedPull / 900)
+                    .animation(.spring(response: 0.4, dampingFraction: 0.9), value: cappedPull)
 
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 24)
             }
-            .frame(height: dynamicHeight)
-            .background(Color(.systemBackground))
-            .offset(y: pull > 0 ? -pull : 0)
-        }
-        .frame(height: 220)
-    }
+            .padding(.horizontal, 20)
+            .padding(.bottom, 16 + cappedPull * 0.08)
 
+        }
+        .frame(height: dynamicHeight)
+        .background(Color(.systemBackground))
+    }
+    
     private var avatarView: some View {
         Group {
             if let urlString = profile?.avatarUrl,
@@ -87,34 +90,34 @@ struct ProfileHeaderView: View {
         )
         .shadow(color: .black.opacity(0.15), radius: 12, y: 6)
     }
-
+    
     private var profileTextContent: some View {
         VStack(alignment: .leading, spacing: 6) {
-
+            
             HStack(spacing: 6) {
                 Text(profile?.fullName ?? "")
                     .font(.title2)
                     .fontWeight(.bold)
-
+                
                 if !username.isEmpty {
                     Text("(@\(username))")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
             }
-
+            
             if friendCount > 0 {
                 Text("\(friendCount) Friends")
                     .font(.subheadline)
                     .fontWeight(.semibold)
             }
-
+            
             if relationshipState != .selfProfile {
                 friendButton
             }
         }
     }
-
+    
     private var friendButton: some View {
         Button {
             if relationshipState == .friends {
