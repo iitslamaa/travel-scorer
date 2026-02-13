@@ -18,6 +18,7 @@ struct ProfileView: View {
     @EnvironmentObject private var bucketList: BucketListStore
     @EnvironmentObject private var traveled: TraveledStore
     @EnvironmentObject private var profileVM: ProfileViewModel
+    @Environment(\.colorScheme) private var colorScheme
 
     private let userId: UUID
     @State private var showUnfriendConfirmation = false
@@ -42,42 +43,48 @@ struct ProfileView: View {
             return ""
         }
     }
+    
+    private var firstName: String {
+        let raw = (profileVM.profile?.fullName ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if raw.isEmpty { return "Profile" }
+        return raw.split(separator: " ").first.map(String.init) ?? "Profile"
+    }
+
+    private var navigationTitle: String {
+        "\(firstName)’s Profile"
+    }
 
     var body: some View {
         ZStack {
-            Image("profile_background")
-                .resizable()
-                .scaledToFill()
+            // Premium clean native background
+            Color(.systemBackground)
                 .ignoresSafeArea()
-
-            LinearGradient(
-                colors: [
-                    Color.white.opacity(0.12),
-                    Color.white.opacity(0.30),
-                    Color.white.opacity(0.12)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .ignoresSafeArea()
 
             if profileVM.isLoading && profileVM.profile == nil {
                 ProgressView("Loading profile…")
             } else {
                 ScrollView {
-                    VStack(spacing: 24) {
-                        profileHeader
-                        languagesCard
-                        infoCards
+                    VStack(spacing: 0) {
+
+                        // Stretchy header should NOT be padded horizontally
+                        stretchyHeader
+
+                        VStack(spacing: 28) {
+                            languagesCard
+                            infoCards
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.top, 28)
+                        .padding(.bottom, 32)
                     }
-                    .padding()
                 }
+                .coordinateSpace(name: "SCROLL")
+                .scrollIndicators(.hidden)
+                .scrollBounceBehavior(.basedOnSize)
             }
         }
-        .foregroundStyle(.black)
-        .navigationTitle("")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(.hidden, for: .navigationBar)
+        .navigationTitle(navigationTitle)
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             if SupabaseManager.shared.currentUserId == userId {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -88,6 +95,8 @@ struct ProfileView: View {
                         )
                     } label: {
                         Image(systemName: "gearshape")
+                            .symbolRenderingMode(.hierarchical)
+                            .font(.system(size: 18, weight: .semibold))
                     }
                 }
             }
@@ -97,105 +106,157 @@ struct ProfileView: View {
             Task { try? await profileVM.refreshRelationshipState() }
         }
     }
+    private var stretchyHeader: some View {
+        GeometryReader { geo in
+            let minY = geo.frame(in: .named("SCROLL")).minY
+            let pull = max(minY, 0)
 
-    private var profileHeader: some View {
-        HStack(alignment: .center, spacing: 16) {
+            // Base header height
+            let baseHeight: CGFloat = 220
+            let dynamicHeight = baseHeight + pull
 
-            Group {
-                if let urlString = profileVM.profile?.avatarUrl,
-                   let url = URL(string: urlString) {
-                    AsyncImage(url: url) { phase in
-                        if let image = phase.image {
-                            image.resizable().scaledToFill()
-                        } else {
-                            Image(systemName: "person.crop.circle.fill")
-                                .resizable()
-                                .foregroundStyle(.gray)
-                        }
-                    }
-                } else {
-                    Image(systemName: "person.crop.circle.fill")
-                        .resizable()
-                        .foregroundStyle(.gray)
+            VStack {
+                Spacer()
+
+                HStack(alignment: .center, spacing: 18) {
+
+                    avatarView
+                        .frame(width: 120 + pull * 0.25,
+                               height: 120 + pull * 0.25)
+                        .animation(.spring(response: 0.35, dampingFraction: 0.8),
+                                   value: pull)
+
+                    profileTextContent
+                        .scaleEffect(1 + pull / 600)
+                        .animation(.spring(response: 0.35, dampingFraction: 0.8),
+                                   value: pull)
+
+                    Spacer()
                 }
+                .padding(.horizontal, 20)
+                .padding(.bottom, 24)
             }
-            .frame(width: 110, height: 110)
-            .clipShape(Circle())
-
-            VStack(alignment: .leading, spacing: 4) {
-
-                HStack(spacing: 6) {
-                    Text(profileVM.profile?.fullName ?? "")
-                        .font(.title2)
-                        .fontWeight(.bold)
-
-                    if !username.isEmpty {
-                        Text("(@\(username))")
-                            .font(.subheadline)
-                            .foregroundStyle(.black.opacity(0.6))
-                    }
-                }
-
-                FlagStrip(
-                    flags: flags(for: Set(homeCountryCodes)),
-                    fontSize: 28,
-                    spacing: 6,
-                    showsTooltip: true
-                )
-
-                if profileVM.friendCount > 0 {
-                    NavigationLink {
-                        FriendsView(userId: userId)
-                    } label: {
-                        Text("\(profileVM.friendCount) Friends")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                            .foregroundStyle(.blue)
-                    }
-                }
-
-                // Friend action button (small grey rectangle like original design)
-                if profileVM.relationshipState != .selfProfile {
-                    Button {
-                        if profileVM.relationshipState == .friends {
-                            showUnfriendConfirmation = true
-                        } else {
-                            Task {
-                                await profileVM.toggleFriend()
-                            }
-                        }
-                    } label: {
-                        HStack(spacing: 6) {
-                            if profileVM.relationshipState == .friends {
-                                Image(systemName: "checkmark")
-                            }
-                            Text(buttonTitle)
-                        }
-                        .font(.caption)
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                    }
-                    .buttonStyle(.bordered)
-                    .tint(.gray)
-                    .disabled(profileVM.relationshipState == .requestSent)
-                    .alert("Unfriend?", isPresented: $showUnfriendConfirmation) {
-                        Button("Cancel", role: .cancel) {}
-                        Button("Confirm", role: .destructive) {
-                            Task {
-                                await profileVM.toggleFriend()
-                            }
-                        }
-                    } message: {
-                        Text("Are you sure you want to remove this friend?")
-                    }
-                }
-            }
-
-            Spacer()
+            .frame(height: dynamicHeight)
+            .background(
+                Color(.systemBackground)
+                    .shadow(color: .black.opacity(0.06),
+                            radius: pull > 0 ? 0 : 8,
+                            y: 6)
+            )
+            .offset(y: pull > 0 ? -pull : 0)
         }
-        .padding(.horizontal)
-        .padding(.top, 8)
+        .frame(height: 220)
+    }
+
+
+    private var avatarView: some View {
+        Group {
+            if let urlString = profileVM.profile?.avatarUrl,
+               let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    if let image = phase.image {
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .scaledToFill()
+                            .foregroundStyle(.gray)
+                    }
+                }
+            } else {
+                Image(systemName: "person.crop.circle.fill")
+                    .resizable()
+                    .scaledToFill()
+                    .foregroundStyle(.gray)
+            }
+        }
+        .frame(width: 120, height: 120)
+        .clipShape(Circle())
+        .overlay(
+            Circle()
+                .stroke(Color.white.opacity(0.9), lineWidth: 3)
+        )
+        .shadow(color: .black.opacity(0.15), radius: 12, y: 6)
+        .layoutPriority(1)
+    }
+
+    private var profileTextContent: some View {
+        VStack(alignment: .leading, spacing: 6) {
+
+            HStack(spacing: 6) {
+                Text(profileVM.profile?.fullName ?? "")
+                    .font(.title2)
+                    .fontWeight(.bold)
+
+                if !username.isEmpty {
+                    Text("(@\(username))")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            FlagStrip(
+                flags: flags(for: Set(homeCountryCodes)),
+                fontSize: 26,
+                spacing: 6,
+                showsTooltip: true
+            )
+
+            if profileVM.friendCount > 0 {
+                NavigationLink {
+                    FriendsView(userId: userId)
+                } label: {
+                    Text("\(profileVM.friendCount) Friends")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.blue)
+                }
+            }
+
+            if profileVM.relationshipState != .selfProfile {
+                friendButton
+            }
+        }
+    }
+
+    private var friendButton: some View {
+        Button {
+            if profileVM.relationshipState == .friends {
+                showUnfriendConfirmation = true
+            } else {
+                Task { await profileVM.toggleFriend() }
+            }
+        } label: {
+            HStack(spacing: 6) {
+                if profileVM.relationshipState == .friends {
+                    Image(systemName: "checkmark")
+                }
+                Text(buttonTitle)
+            }
+            .font(.caption)
+            .fontWeight(.semibold)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+        }
+        .background(
+            Capsule()
+                .fill(profileVM.relationshipState == .friends ? Color.green.opacity(0.15) : Color.blue.opacity(0.15))
+        )
+        .overlay(
+            Capsule()
+                .stroke(profileVM.relationshipState == .friends ? Color.green : Color.blue, lineWidth: 1.5)
+        )
+        .disabled(profileVM.relationshipState == .requestSent)
+        .alert("Unfriend?", isPresented: $showUnfriendConfirmation) {
+            Button("Cancel", role: .cancel) {}
+            Button("Confirm", role: .destructive) {
+                Task { await profileVM.toggleFriend() }
+            }
+        } message: {
+            Text("Are you sure you want to remove this friend?")
+        }
     }
 
     private var infoCards: some View {
@@ -253,10 +314,9 @@ struct ProfileView: View {
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.75))
-        )
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
 
     private var lockedProfileMessage: some View {
@@ -272,10 +332,9 @@ struct ProfileView: View {
         }
         .padding(.vertical, 24)
         .frame(maxWidth: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.75))
-        )
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
 
     private func flags(for ids: Set<String>) -> [String] {
@@ -283,172 +342,4 @@ struct ProfileView: View {
     }
 }
 
-struct CollapsibleCountrySection: View {
-    let title: String
-    let countryCodes: [String]
-    let highlightColor: Color
-    let mutualCountries: Set<String>?
 
-    @State private var isExpanded = false
-    @State private var selectedCountryISO: String? = nil
-
-    init(
-        title: String,
-        countryCodes: [String],
-        highlightColor: Color,
-        mutualCountries: Set<String>? = nil
-    ) {
-        self.title = title
-        self.countryCodes = countryCodes
-        self.highlightColor = highlightColor
-        self.mutualCountries = mutualCountries
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-
-            Button {
-                withAnimation(.easeInOut(duration: 0.18)) {
-                    isExpanded.toggle()
-                }
-            } label: {
-                HStack {
-                    Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
-                    Text("\(title): ")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-                    Text("#\(countryCodes.count)")
-                        .font(.subheadline)
-                        .fontWeight(.bold)
-                        .foregroundColor(highlightColor)
-                    Spacer()
-                }
-            }
-
-            if isExpanded {
-                VStack(spacing: 16) {
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        FlagStrip(
-                            flags: countryCodes,
-                            fontSize: 30,
-                            spacing: 10,
-                            showsTooltip: false,
-                            selectedISO: selectedCountryISO,
-                            onFlagTap: { selectedCountryISO = $0 },
-                            mutualCountries: mutualCountries
-                        )
-                    }
-
-                    ZStack(alignment: .bottom) {
-
-                        WorldMapView(
-                            highlightedCountryCodes: countryCodes,
-                            selectedCountryISO: $selectedCountryISO
-                        )
-                        .frame(height: 240)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-
-                        if let iso = selectedCountryISO {
-                            HStack(spacing: 8) {
-                                Text(flagEmoji(from: iso))
-                                Text(Locale.current.localizedString(forRegionCode: iso) ?? iso)
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Capsule())
-                            .padding(.bottom, 12)
-                        }
-                    }
-                }
-                .padding(.top, 8)
-            }
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.75))
-        )
-    }
-
-    private func flagEmoji(from code: String) -> String {
-        code.uppercased().unicodeScalars
-            .map { 127397 + $0.value }
-            .compactMap(UnicodeScalar.init)
-            .map(String.init)
-            .joined()
-    }
-}
-
-struct FlagStrip: View {
-    let flags: [String]
-    let fontSize: CGFloat
-    let spacing: CGFloat
-    let showsTooltip: Bool
-    let selectedISO: String?
-    let onFlagTap: ((String) -> Void)?
-    let mutualCountries: Set<String>?
-
-    init(
-        flags: [String],
-        fontSize: CGFloat,
-        spacing: CGFloat,
-        showsTooltip: Bool = false,
-        selectedISO: String? = nil,
-        onFlagTap: ((String) -> Void)? = nil,
-        mutualCountries: Set<String>? = nil
-    ) {
-        self.flags = flags
-        self.fontSize = fontSize
-        self.spacing = spacing
-        self.showsTooltip = showsTooltip
-        self.selectedISO = selectedISO
-        self.onFlagTap = onFlagTap
-        self.mutualCountries = mutualCountries
-    }
-
-    var body: some View {
-        LazyHStack(spacing: spacing) {
-            ForEach(flags, id: \.self) { code in
-                let flag = flagEmoji(from: code)
-                let isMutual = mutualCountries?.contains(code) ?? false
-                let isSelected = selectedISO == code
-
-                Text(flag)
-                    .font(.system(size: fontSize))
-                    .padding(8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(
-                                isMutual
-                                ? Color.gold.opacity(0.35)
-                                : (isSelected ? Color.blue.opacity(0.25) : Color.clear)
-                            )
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(
-                                isSelected ? Color.blue :
-                                (isMutual ? Color.gold : Color.clear),
-                                lineWidth: 2
-                            )
-                    )
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        onFlagTap?(code)
-                    }
-            }
-        }
-    }
-
-    private func flagEmoji(from code: String) -> String {
-        code.uppercased().unicodeScalars
-            .map { 127397 + $0.value }
-            .compactMap(UnicodeScalar.init)
-            .map(String.init)
-            .joined()
-    }
-}
