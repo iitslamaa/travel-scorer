@@ -55,11 +55,11 @@ struct ProfileSettingsView: View {
 
     private var settingsContent: some View {
         ZStack {
-            Image("profile_settings_background")
-                .resizable()
-                .scaledToFill()
+            Color(.systemBackground)
                 .ignoresSafeArea()
+
             ProfileSettingsHeader()
+
             ScrollView {
                 VStack(spacing: 20) {
 
@@ -110,12 +110,13 @@ struct ProfileSettingsView: View {
                                     .fontWeight(.semibold)
                                 Spacer()
                             }
-                            .foregroundColor(.red)
+                            .foregroundStyle(.red)
                         }
                     }
 
                     Spacer(minLength: 40)
                 }
+                .foregroundStyle(.primary)
                 .padding(.horizontal, 16)
                 .padding(.top, 90)
             }
@@ -324,7 +325,7 @@ private struct CountryMultiSelectView: View {
                         dismiss()
                     } label: {
                         Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(hasChanges ? .blue : .gray)
+                            .foregroundStyle(hasChanges ? .blue : .secondary)
                     }
                     .disabled(!hasChanges)
                 }

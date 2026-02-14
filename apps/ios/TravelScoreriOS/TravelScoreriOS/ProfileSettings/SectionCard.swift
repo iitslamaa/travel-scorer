@@ -30,6 +30,6 @@ struct SectionCard<Content: View>: View {
         .padding(16)
         .background(.ultraThinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 24))
-        .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
+        .shadow(color: Color.primary.opacity(0.06), radius: 8, y: 4)
     }
 }
