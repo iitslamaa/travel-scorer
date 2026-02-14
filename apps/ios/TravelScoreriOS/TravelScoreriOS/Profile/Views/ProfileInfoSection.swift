@@ -18,12 +18,16 @@ struct ProfileInfoSection: View {
     let mutualTraveledCountries: [String]
     let mutualBucketCountries: [String]
     let languages: [String]
+    let travelPreferences: [String] = []
+    let nextDestination: String? = nil
 
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         VStack(spacing: 28) {
             languagesCard
+            travelPreferencesCard
+            nextDestinationCard
             infoCards
         }
         .padding(.horizontal, 20)
@@ -84,6 +88,52 @@ struct ProfileInfoSection: View {
                 Text(languages.joined(separator: " · "))
                     .font(.subheadline)
                     .foregroundStyle(.primary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
+    }
+
+    private var travelPreferencesCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Travel Preferences")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+
+            if travelPreferences.isEmpty {
+                Text("Not set")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                Text(travelPreferences.joined(separator: " · "))
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
+    }
+
+    private var nextDestinationCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Next Destination")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+
+            if let destination = nextDestination, !destination.isEmpty {
+                Text(destination)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+            } else {
+                Text("Not set")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(12)
