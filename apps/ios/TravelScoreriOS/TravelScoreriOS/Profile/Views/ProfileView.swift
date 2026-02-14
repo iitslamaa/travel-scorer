@@ -112,7 +112,11 @@ struct ProfileView: View {
                             buttonTitle: buttonTitle,
                             headerMinY: headerMinY,
                             onToggleFriend: {
-                                await profileVM.toggleFriend()
+                                if profileVM.relationshipState == .friends {
+                                    showUnfriendConfirmation = true
+                                } else {
+                                    await profileVM.toggleFriend()
+                                }
                             }
                         )
 
@@ -162,8 +166,26 @@ struct ProfileView: View {
                     .opacity(progress)
                     .animation(.easeInOut(duration: 0.18), value: progress)
                 }
+            
+            if showUnfriendConfirmation {
+                FriendsActionSheetView(
+                    username: username,
+                    onConfirm: {
+                        Task {
+                            await profileVM.toggleFriend()
+                            showUnfriendConfirmation = false
+                        }
+                    },
+                    onCancel: {
+                        showUnfriendConfirmation = false
+                    }
+                )
+                .transition(.move(edge: .bottom))
+                .zIndex(10)
+            }
             }
         }
+        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: showUnfriendConfirmation)
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
