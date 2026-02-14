@@ -45,7 +45,7 @@ struct ProfileHeaderView: View {
                         height: 120 + cappedPull * 0.30
                     )
                     .shadow(
-                        color: .black.opacity(0.18 + cappedPull * 0.001),
+                        color: Color.primary.opacity(0.14 + cappedPull * 0.001),
                         radius: 12 + cappedPull * 0.08,
                         y: 6 + cappedPull * 0.04
                     )
@@ -90,9 +90,9 @@ struct ProfileHeaderView: View {
         .clipShape(Circle())
         .overlay(
             Circle()
-                .stroke(Color.white.opacity(0.9), lineWidth: 3)
+                .stroke(Color(.systemBackground), lineWidth: 3)
         )
-        .shadow(color: .black.opacity(0.15), radius: 12, y: 6)
+        .shadow(color: Color.primary.opacity(0.12), radius: 12, y: 6)
     }
     
     private var profileTextContent: some View {
@@ -212,7 +212,7 @@ struct ProfileHeaderView: View {
         }
         .clipShape(Circle())
         .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 2))
-        .shadow(color: .black.opacity(0.10), radius: 4, y: 2)
+        .shadow(color: Color.primary.opacity(0.08), radius: 4, y: 2)
     }
 
     private var friendDrawer: some View {
@@ -265,7 +265,7 @@ struct ProfileHeaderView: View {
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
                                 .fill(Color.blue)
                         )
-                        .foregroundColor(.white)
+                        .foregroundStyle(.white)
                     }
                     .scaleEffect(isPressed ? 0.94 : 1.0)
                     .simultaneousGesture(
