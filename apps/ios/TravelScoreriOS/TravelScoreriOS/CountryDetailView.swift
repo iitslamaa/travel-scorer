@@ -56,149 +56,153 @@ struct CountryDetailView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .padding(.horizontal)
 
-                // Travel advisory section — web-style factor card
-                if country.advisoryLevel != nil || country.advisorySummary != nil {
-                    VStack(alignment: .leading, spacing: 12) {
-                        // Title row
-                        HStack {
-                            Text("Travel advisory")
-                                .font(.headline)
-                            Spacer()
-                            Text("U.S. Dept. of State · 10%")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                        }
-
-                        // Score pill + level + description
-                        HStack(spacing: 12) {
-                            if let advisoryScore = country.advisoryScore {
-                                Text("\(advisoryScore)")
-                                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 6)
-                                    .background(
-                                        Capsule()
-                                            .fill(scoreBackgroundColor(for: advisoryScore))
-                                    )
-                                    .overlay(
-                                        Capsule()
-                                            .stroke(scoreBorderColor(for: advisoryScore), lineWidth: 1)
-                                    )
-                            }
-
-                            VStack(alignment: .leading, spacing: 4) {
-                                if let level = country.advisoryLevel {
-                                    Text(level)
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                }
-
-                                if let rawSummary = country.advisorySummary, !rawSummary.isEmpty {
-                                    let advisoryText = cleanAdvisory(rawSummary)
-
-                                    Text(advisoryText)
-                                        .font(.footnote)
-                                        .foregroundStyle(.secondary)
-                                        .lineLimit(showFullAdvisory ? nil : 3)
-                                        .fixedSize(horizontal: false, vertical: true)
-
-                                    if advisoryText.count > 200 {
-                                        Button(action: {
-                                            withAnimation {
-                                                showFullAdvisory.toggle()
-                                            }
-                                        }) {
-                                            Text(showFullAdvisory ? "Show less" : "Show more")
-                                                .font(.footnote)
-                                                .fontWeight(.semibold)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if let updated = country.advisoryUpdatedAt, !updated.isEmpty {
-                            Text("Last updated: \(updated)")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                        }
-
-                        if let url = country.advisoryUrl {
-                            Link("View official advisory", destination: url)
-                                .font(.footnote)
-                        }
-
-                        // Footer row with weight info
-                        if let advisoryScore = country.advisoryScore {
-                            HStack(spacing: 12) {
-                                Text("Normalized: \(advisoryScore)")
-                                Text("Weight: 10%")
-                            }
-                            .font(.caption)
+                // Travel advisory section — web-style factor card (always rendered with neutral fallback)
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Travel advisory")
+                            .font(.headline)
+                        Spacer()
+                        Text("U.S. Dept. of State · 10%")
+                            .font(.footnote)
                             .foregroundStyle(.secondary)
-                        }
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.thinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .padding(.horizontal)
-                }
-                
-                // Travel safety section — web-style factor card
-                if let safety = country.travelSafeScore {
-                    VStack(alignment: .leading, spacing: 12) {
-                        // Title row
-                        HStack {
-                            Text("Travel safety")
-                                .font(.headline)
-                            Spacer()
-                            Text("TravelSafe · 15%")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
-                        }
 
-                        // Score pill + description
-                        HStack(spacing: 12) {
-                            Text("\(safety)")
-                                .font(.system(size: 22, weight: .bold, design: .rounded))
-                                .padding(.horizontal, 14)
-                                .padding(.vertical, 6)
-                                .background(
-                                    Capsule()
-                                        .fill(scoreBackgroundColor(for: safety))
-                                )
-                                .overlay(
-                                    Capsule()
-                                        .stroke(scoreBorderColor(for: safety), lineWidth: 1)
-                                )
+                    let advisoryScore = country.advisoryScore ?? 50
 
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(travelSafeHeadline(for: country))
+                    HStack(spacing: 12) {
+                        Text("\(advisoryScore)")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(scoreBackgroundColor(for: country.advisoryScore))
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(scoreBorderColor(for: country.advisoryScore), lineWidth: 1)
+                            )
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            if let level = country.advisoryLevel {
+                                Text(level)
                                     .font(.subheadline)
                                     .fontWeight(.semibold)
+                            } else {
+                                Text("Advisory information is limited")
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                            }
 
-                                Text(travelSafeBody(for: country))
+                            if let rawSummary = country.advisorySummary, !rawSummary.isEmpty {
+                                let advisoryText = cleanAdvisory(rawSummary)
+
+                                Text(advisoryText)
+                                    .font(.footnote)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(showFullAdvisory ? nil : 3)
+                                    .fixedSize(horizontal: false, vertical: true)
+
+                                if advisoryText.count > 200 {
+                                    Button(action: {
+                                        withAnimation {
+                                            showFullAdvisory.toggle()
+                                        }
+                                    }) {
+                                        Text(showFullAdvisory ? "Show less" : "Show more")
+                                            .font(.footnote)
+                                            .fontWeight(.semibold)
+                                    }
+                                }
+                            } else {
+                                Text("Official advisory data is currently unavailable for this destination. Check official sources before travel.")
                                     .font(.footnote)
                                     .foregroundStyle(.secondary)
                                     .fixedSize(horizontal: false, vertical: true)
                             }
                         }
-
-                        // Footer row with weight info
-                        HStack(spacing: 12) {
-                            Text("Normalized: \(safety)")
-                            Text("Weight: 15%")
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                     }
-                    .padding()
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .background(.thinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                    .padding(.horizontal)
+
+                    if let updated = country.advisoryUpdatedAt, !updated.isEmpty {
+                        Text("Last updated: \(updated)")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    if let url = country.advisoryUrl {
+                        Link("View official advisory", destination: url)
+                            .font(.footnote)
+                    }
+
+                    HStack(spacing: 12) {
+                        Text("Normalized: \(advisoryScore)")
+                        Text("Weight: 10%")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
                 }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.thinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .padding(.horizontal)
+                
+                // Travel safety section — web-style factor card (always rendered with neutral fallback)
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Text("Travel safety")
+                            .font(.headline)
+                        Spacer()
+                        Text("TravelSafe · 15%")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+
+                    let safety = country.travelSafeScore ?? 50
+
+                    HStack(spacing: 12) {
+                        Text("\(safety)")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(scoreBackgroundColor(for: country.travelSafeScore))
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(scoreBorderColor(for: country.travelSafeScore), lineWidth: 1)
+                            )
+
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(travelSafeHeadline(for: country))
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+
+                            Text(travelSafeBody(for: country))
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+
+                    if let url = country.travelSafeSourceUrl {
+                        Link("View TravelSafe source", destination: url)
+                            .font(.footnote)
+                    }
+
+                    HStack(spacing: 12) {
+                        Text("Normalized: \(safety)")
+                        Text("Weight: 15%")
+                    }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.thinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .padding(.horizontal)
 
                 // Seasonality section — web-style factor card
                 if let seasonalityScore = country.seasonalityScore {

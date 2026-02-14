@@ -41,6 +41,7 @@ const ADVISORY_FALLBACK_BY_ISO2: Record<string, { level: 1|2|3|4; summary: strin
 type FactsExtraServer = Partial<CountryFacts> & {
   advisoryLevel?: 1 | 2 | 3 | 4;
   travelSafeOverall?: number;
+  travelSafeUrl?: string;
   soloFemaleIndex?: number;
   redditComposite?: number;
   seasonality?: number;
@@ -102,6 +103,15 @@ function normalizeName(s: string): string {
     .replace(/[^a-z0-9]+/g, ' ')                     // collapse punctuation
     .trim()
     .replace(/\s+/g, ' ');                           // collapse spaces
+}
+
+// --- Slug helper for country names (for TravelSafe URLs) ---
+function slugifyCountryName(name: string): string {
+  return name
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
 function decodeHtmlEntitiesServer(input?: string): string | undefined {
@@ -594,6 +604,15 @@ export async function GET() {
       if (themesMap[keyUpper]?.length) extra.redditThemes = themesMap[keyUpper];
 
       row.facts = facts ? { ...facts, ...extra } as CountryFacts : (extra as CountryFacts);
+
+      // --- Attach TravelSafe source URL (deterministic pattern)
+      try {
+        const fxFacts = row.facts as unknown as FactsExtraServer;
+        if (typeof fxFacts.travelSafeOverall === 'number') {
+          const slug = slugifyCountryName(row.name);
+          fxFacts.travelSafeUrl = `https://www.travelsafe-abroad.com/${slug}/`;
+        }
+      } catch {}
 
       // --- Compute daily spend (hotel traveler) from provider (preferred), fallback to estimator
       try {

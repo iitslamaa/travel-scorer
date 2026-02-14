@@ -86,7 +86,8 @@ enum CountryAPI {
                 dailySpendHotelUsd: dto.dailySpendHotelUsd,
                 dailySpendFoodUsd: dto.dailySpendFoodUsd,
                 dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd,
-                travelSafeScore: dto.travelSafeScore
+                travelSafeScore: dto.travelSafeScore,
+                travelSafeSourceUrl: dto.travelSafeUrl
             )
         }
 
@@ -131,7 +132,8 @@ extension CountryAPI {
                     dailySpendHotelUsd: dto.dailySpendHotelUsd,
                     dailySpendFoodUsd: dto.dailySpendFoodUsd,
                     dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd,
-                    travelSafeScore: dto.travelSafeScore
+                    travelSafeScore: dto.travelSafeScore,
+                    travelSafeSourceUrl: dto.travelSafeUrl
                 )
             }
         } catch {
@@ -210,7 +212,8 @@ extension CountryAPI {
                     dailySpendHotelUsd: dto.dailySpendHotelUsd,
                     dailySpendFoodUsd: dto.dailySpendFoodUsd,
                     dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd,
-                    travelSafeScore: dto.travelSafeScore
+                    travelSafeScore: dto.travelSafeScore,
+                    travelSafeSourceUrl: dto.travelSafeUrl
                 )
             }
 

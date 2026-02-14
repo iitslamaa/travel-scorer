@@ -16,6 +16,7 @@ export type CountryFacts = {
   // Safety and sentiment
   advisoryLevel?: 1 | 2 | 3 | 4;
   travelSafeOverall?: number;   // 0–100
+  travelSafeUrl?: string;       // TravelSafe Abroad source URL
   soloFemaleIndex?: number;     // 0–100
   redditComposite?: number;     // 0–100
   redditN?: number;             // sample size

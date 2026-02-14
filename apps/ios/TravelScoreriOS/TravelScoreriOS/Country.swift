@@ -18,6 +18,8 @@ struct Country: Identifiable, Hashable {
     let advisoryLevel: String?
     
     let travelSafeScore: Int?
+    /// TravelSafe source URL (from API)
+    let travelSafeSourceUrl: URL?
 
     // Extra details from API
     let advisorySummary: String?
@@ -101,7 +103,8 @@ struct Country: Identifiable, Hashable {
         dailySpendHotelUsd: Double? = nil,
         dailySpendFoodUsd: Double? = nil,
         dailySpendActivitiesUsd: Double? = nil,
-        travelSafeScore: Int? = nil
+        travelSafeScore: Int? = nil,
+        travelSafeSourceUrl: URL? = nil
     ) {
         self.iso2 = iso2
         self.name = name
@@ -127,6 +130,7 @@ struct Country: Identifiable, Hashable {
         self.dailySpendFoodUsd = dailySpendFoodUsd
         self.dailySpendActivitiesUsd = dailySpendActivitiesUsd
         self.travelSafeScore = travelSafeScore
+        self.travelSafeSourceUrl = travelSafeSourceUrl
     }
 
     var flagEmoji: String {

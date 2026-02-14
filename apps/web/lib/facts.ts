@@ -21,6 +21,7 @@ export type CountryFacts = {
   advisorySummary?: string;
   advisoryUrl?: string;
   travelSafeOverall?: number;   // 0..100
+  travelSafeUrl?: string;       // TravelSafe Abroad source URL (attached in API layer)
   soloFemaleIndex?: number;     // 0..100
   redditComposite?: number;     // 0..100
   redditN?: number;             // sample size

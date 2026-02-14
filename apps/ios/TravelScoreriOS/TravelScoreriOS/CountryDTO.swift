@@ -21,6 +21,9 @@ struct CountryDTO: Decodable {
     /// TravelSafe / crime & safety index (0...100, higher = safer)
     let travelSafeScore: Int?
     
+    /// TravelSafe source URL (from API facts.travelSafeUrl)
+    let travelSafeUrl: URL?
+    
     /// From advisory.level (1–4)
     let advisoryLevelNumber: Int?
     let advisorySummary: String?
@@ -87,6 +90,7 @@ struct CountryDTO: Decodable {
         
         // safety
         let travelSafeOverall: Double?
+        let travelSafeUrl: String?
 
         // seasonality
         let seasonality: Double?
@@ -201,6 +205,14 @@ struct CountryDTO: Decodable {
             self.travelSafeScore = Int(ts.rounded())
         } else {
             self.travelSafeScore = nil
+        }
+        
+        // TravelSafe source URL
+        if let urlString = facts?.travelSafeUrl,
+           let url = URL(string: urlString) {
+            self.travelSafeUrl = url
+        } else {
+            self.travelSafeUrl = nil
         }
 
         // nested advisory.level (API)
