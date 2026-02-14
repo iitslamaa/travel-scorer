@@ -45,11 +45,18 @@ struct ScoreWorldMapView: View {
 
 struct ScoreWorldMapRepresentable: UIViewRepresentable {
     
+    private static var cachedPolygons: [MKOverlay]?
+    
     let countries: [Country]
     @Binding var selectedCountryISO: String?
     
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
+        let config = MKStandardMapConfiguration(elevationStyle: .flat)
+        mapView.showsBuildings = false
+        mapView.pointOfInterestFilter = .excludingAll
+        mapView.preferredConfiguration = config
+        
         mapView.mapType = .mutedStandard
         mapView.isRotateEnabled = false
         mapView.isPitchEnabled = false
@@ -63,8 +70,13 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
             animated: false
         )
         
-        let polygons = WorldGeoJSONLoader.loadPolygons()
-        mapView.addOverlays(polygons)
+        if ScoreWorldMapRepresentable.cachedPolygons == nil {
+            ScoreWorldMapRepresentable.cachedPolygons = WorldGeoJSONLoader.loadPolygons()
+        }
+
+        if let polygons = ScoreWorldMapRepresentable.cachedPolygons {
+            mapView.addOverlays(polygons)
+        }
         
         context.coordinator.mapView = mapView
         
@@ -78,61 +90,44 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: MKMapView, context: Context) {
+        context.coordinator.selectedCountryISO = selectedCountryISO
+        
         for overlay in uiView.overlays {
-            guard let polygon = overlay as? CountryPolygon,
-                  let renderer = uiView.renderer(for: overlay) as? MKPolygonRenderer else { continue }
-
-            let iso = polygon.isoCode
-            let identifier: String? = {
-                if let iso, iso != "-99" {
-                    return iso
-                }
-                return polygon.countryName
-            }()
-
-            let isSelected = identifier == selectedCountryISO
-
-            var matchedCountry: Country?
-
-            if let iso {
-                matchedCountry = countries.first {
-                    $0.iso2.uppercased() == iso.uppercased()
-                }
+            if let renderer = uiView.renderer(for: overlay) as? MKPolygonRenderer {
+                renderer.setNeedsDisplay()
             }
-
-            if matchedCountry == nil,
-               let polygonName = polygon.countryName {
-                matchedCountry = countries.first {
-                    $0.name == polygonName
-                }
-            }
-
-            if let country = matchedCountry {
-                renderer.fillColor = UIColor(
-                    ScoreColor.background(for: country.score)
-                ).withAlphaComponent(0.6)
-            } else {
-                renderer.fillColor = UIColor.systemGray.withAlphaComponent(0.15)
-            }
-
-            renderer.strokeColor = isSelected
-                ? UIColor.systemYellow
-                : UIColor.black.withAlphaComponent(0.2)
-
-            renderer.lineWidth = isSelected ? 2.5 : 0.5
         }
     }
     
+    static func dismantleUIView(_ uiView: MKMapView, coordinator: Coordinator) {
+        uiView.delegate = nil
+        uiView.removeOverlays(uiView.overlays)
+        uiView.gestureRecognizers?.forEach { uiView.removeGestureRecognizer($0) }
+    }
+    
     func makeCoordinator() -> Coordinator {
-        Coordinator(selectedCountryISO: $selectedCountryISO)
+        Coordinator(
+            countries: countries,
+            selectedCountryISO: $selectedCountryISO
+        )
     }
     
     class Coordinator: NSObject, MKMapViewDelegate {
         
+        let countryLookup: [String: Country]
         @Binding var selectedCountryISO: String?
         weak var mapView: MKMapView?
         
-        init(selectedCountryISO: Binding<String?>) {
+        init(
+            countries: [Country],
+            selectedCountryISO: Binding<String?>
+        ) {
+            var lookup: [String: Country] = [:]
+            for country in countries {
+                lookup[country.iso2.uppercased()] = country
+                lookup[country.name] = country
+            }
+            self.countryLookup = lookup
             self._selectedCountryISO = selectedCountryISO
         }
         
@@ -173,11 +168,41 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
             }
             
             let renderer = MKPolygonRenderer(polygon: polygon)
+            
+            renderer.lineJoin = .round
+            renderer.lineCap = .round
+            
             renderer.strokeColor = UIColor.black.withAlphaComponent(0.2)
             renderer.lineWidth = 0.5
-            renderer.fillColor = UIColor.systemGray.withAlphaComponent(0.15)
+            
+            renderer.fillColor = fillColor(for: polygon)
             
             return renderer
+        }
+        
+        private func fillColor(for polygon: CountryPolygon) -> UIColor {
+            let identifier: String? = {
+                if let iso = polygon.isoCode, iso != "-99" {
+                    return iso.uppercased()
+                }
+                return polygon.countryName
+            }()
+            
+            let isSelected = identifier == selectedCountryISO
+            
+            if let id = identifier,
+               let country = countryLookup[id] {
+                
+                let baseColor = UIColor(
+                    ScoreColor.background(for: country.score)
+                )
+                
+                return isSelected
+                    ? baseColor.withAlphaComponent(0.85)
+                    : baseColor.withAlphaComponent(0.6)
+            }
+            
+            return UIColor.systemGray.withAlphaComponent(0.15)
         }
     }
 }
