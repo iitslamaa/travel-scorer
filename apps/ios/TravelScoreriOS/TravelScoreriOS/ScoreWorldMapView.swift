@@ -13,15 +13,51 @@ struct ScoreWorldMapView: View {
     
     let countries: [Country]
     @State private var selectedCountryISO: String? = nil
+    @State private var isLoadingMap: Bool = true
+    @State private var shouldMountMap: Bool = false
     
     var body: some View {
         ZStack(alignment: .bottom) {
             
-            ScoreWorldMapRepresentable(
-                countries: countries,
-                selectedCountryISO: $selectedCountryISO
-            )
-            .edgesIgnoringSafeArea(.all)
+            if shouldMountMap {
+                ScoreWorldMapRepresentable(
+                    countries: countries,
+                    selectedCountryISO: $selectedCountryISO,
+                    isLoading: $isLoadingMap
+                )
+                .edgesIgnoringSafeArea(.all)
+                .allowsHitTesting(!isLoadingMap)
+            } else {
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+            }
+            
+            if isLoadingMap {
+                ZStack {
+                    Rectangle()
+                        .fill(.ultraThinMaterial)
+                        .ignoresSafeArea()
+
+                    VStack(spacing: 18) {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .scaleEffect(1.1)
+
+                        Text("Preparing your world…")
+                            .font(.subheadline)
+                            .fontWeight(.medium)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(28)
+                    .background(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .fill(.regularMaterial)
+                    )
+                    .shadow(radius: 20)
+                }
+                .transition(.opacity)
+                .animation(.easeInOut(duration: 0.25), value: isLoadingMap)
+            }
             
             if let iso = selectedCountryISO {
                 let matchedCountry =
@@ -38,6 +74,11 @@ struct ScoreWorldMapView: View {
                 }
             }
         }
+        .onAppear {
+            DispatchQueue.main.async {
+                shouldMountMap = true
+            }
+        }
     }
 }
 
@@ -49,8 +90,11 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     
     let countries: [Country]
     @Binding var selectedCountryISO: String?
+    @Binding var isLoading: Bool
     
     func makeUIView(context: Context) -> MKMapView {
+        let startTime = CFAbsoluteTimeGetCurrent()
+        // print("🟢 Map makeUIView started")
         let mapView = MKMapView()
         let config = MKStandardMapConfiguration(elevationStyle: .flat)
         mapView.showsBuildings = false
@@ -70,12 +114,25 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
             animated: false
         )
         
-        if ScoreWorldMapRepresentable.cachedPolygons == nil {
-            ScoreWorldMapRepresentable.cachedPolygons = WorldGeoJSONLoader.loadPolygons()
-        }
-
         if let polygons = ScoreWorldMapRepresentable.cachedPolygons {
             mapView.addOverlays(polygons)
+            isLoading = false
+        } else {
+            DispatchQueue.global(qos: .userInitiated).async {
+                let polygons = WorldGeoJSONLoader.loadPolygons()
+
+                DispatchQueue.main.async {
+                    ScoreWorldMapRepresentable.cachedPolygons = polygons
+                    mapView.addOverlays(polygons)
+
+                    let totalTime = CFAbsoluteTimeGetCurrent() - startTime
+                    // print("🟢 Map setup total time:", totalTime)
+
+                    withAnimation(.easeInOut(duration: 0.3)) {
+                        isLoading = false
+                    }
+                }
+            }
         }
         
         context.coordinator.mapView = mapView
