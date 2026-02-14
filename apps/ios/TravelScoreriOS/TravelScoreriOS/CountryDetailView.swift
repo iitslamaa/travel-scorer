@@ -56,35 +56,63 @@ struct CountryDetailView: View {
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 .padding(.horizontal)
 
-                // Travel advisory section
+                // Travel advisory section — web-style factor card
                 if country.advisoryLevel != nil || country.advisorySummary != nil {
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("Travel advisory")
-                            .font(.headline)
-
-                        if let level = country.advisoryLevel {
-                            Text(level)
-                                .font(.subheadline)
-                                .bold()
+                        // Title row
+                        HStack {
+                            Text("Travel advisory")
+                                .font(.headline)
+                            Spacer()
+                            Text("U.S. Dept. of State · 10%")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
                         }
 
-                        if let rawSummary = country.advisorySummary, !rawSummary.isEmpty {
-                            let advisoryText = cleanAdvisory(rawSummary)
+                        // Score pill + level + description
+                        HStack(spacing: 12) {
+                            if let advisoryScore = country.advisoryScore {
+                                Text("\(advisoryScore)")
+                                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        Capsule()
+                                            .fill(scoreBackgroundColor(for: advisoryScore))
+                                    )
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(scoreBorderColor(for: advisoryScore), lineWidth: 1)
+                                    )
+                            }
 
-                            Text(advisoryText)
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(showFullAdvisory ? nil : 3)
-
-                            if advisoryText.count > 200 {
-                                Button(action: {
-                                    withAnimation {
-                                        showFullAdvisory.toggle()
-                                    }
-                                }) {
-                                    Text(showFullAdvisory ? "Show less" : "Show more")
-                                        .font(.footnote)
+                            VStack(alignment: .leading, spacing: 4) {
+                                if let level = country.advisoryLevel {
+                                    Text(level)
+                                        .font(.subheadline)
                                         .fontWeight(.semibold)
+                                }
+
+                                if let rawSummary = country.advisorySummary, !rawSummary.isEmpty {
+                                    let advisoryText = cleanAdvisory(rawSummary)
+
+                                    Text(advisoryText)
+                                        .font(.footnote)
+                                        .foregroundStyle(.secondary)
+                                        .lineLimit(showFullAdvisory ? nil : 3)
+                                        .fixedSize(horizontal: false, vertical: true)
+
+                                    if advisoryText.count > 200 {
+                                        Button(action: {
+                                            withAnimation {
+                                                showFullAdvisory.toggle()
+                                            }
+                                        }) {
+                                            Text(showFullAdvisory ? "Show less" : "Show more")
+                                                .font(.footnote)
+                                                .fontWeight(.semibold)
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -98,6 +126,16 @@ struct CountryDetailView: View {
                         if let url = country.advisoryUrl {
                             Link("View official advisory", destination: url)
                                 .font(.footnote)
+                        }
+
+                        // Footer row with weight info
+                        if let advisoryScore = country.advisoryScore {
+                            HStack(spacing: 12) {
+                                Text("Normalized: \(advisoryScore)")
+                                Text("Weight: 10%")
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                         }
                     }
                     .padding()
