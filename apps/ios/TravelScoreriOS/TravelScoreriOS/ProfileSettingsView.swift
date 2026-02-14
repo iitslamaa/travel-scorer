@@ -59,182 +59,43 @@ struct ProfileSettingsView: View {
                 .resizable()
                 .scaledToFill()
                 .ignoresSafeArea()
-
-            VStack {
-                HStack {
-                    Text("Profile Settings")
-                        .font(.system(size: 34, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.top, 24)
-
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-
-                Spacer()
-            }
-
+            ProfileSettingsHeader()
             ScrollView {
                 VStack(spacing: 20) {
 
-                    // Avatar picker section
-                    SectionCard {
-                        VStack(spacing: 12) {
-                            ZStack {
-                                if let image = selectedUIImage {
-                                    Image(uiImage: image)
-                                        .resizable()
-                                        .scaledToFill()
-                                } else if let urlString = profileVM.profile?.avatarUrl,
-                                          let url = URL(string: urlString) {
-                                    AsyncImage(url: url) { phase in
-                                        if let image = phase.image {
-                                            image.resizable().scaledToFill()
-                                        } else {
-                                            Image(systemName: "person.crop.circle.fill")
-                                                .resizable()
-                                                .foregroundColor(.gray)
-                                        }
-                                    }
-                                } else {
-                                    Image(systemName: "person.crop.circle.fill")
-                                        .resizable()
-                                        .foregroundColor(.gray)
-                                }
-                            }
-                            .frame(width: 110, height: 110)
-                            .clipShape(Circle())
+                    ProfileSettingsAvatarSection(
+                        selectedUIImage: selectedUIImage,
+                        profileVM: profileVM,
+                        selectedPhotoItem: $selectedPhotoItem,
+                        isUploadingAvatar: isUploadingAvatar
+                    )
 
-                            PhotosPicker(
-                                selection: $selectedPhotoItem,
-                                matching: .images
-                            ) {
-                                Text("Change profile photo")
-                                    .font(.subheadline)
-                                    .foregroundColor(.blue)
-                            }
+                    ProfileSettingsAccountSection(
+                        firstName: $firstName,
+                        username: $username
+                    )
 
-                            if isUploadingAvatar {
-                                ProgressView()
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
+                    ProfileSettingsBackgroundSection(
+                        homeCountries: homeCountries,
+                        showHomePicker: $showHomePicker
+                    )
 
-                    SectionCard {
-                        TextField(
-                            "",
-                            text: $firstName,
-                            prompt: Text("First name")
-                                .foregroundColor(.gray.opacity(0.7))
-                        )
-                        .padding(12)
-                        .background(Color.white.opacity(0.95))
-                        .cornerRadius(10)
-                        .foregroundColor(.black)
-                        .tint(.gray)
+                    ProfileSettingsTravelSection(
+                        travelMode: $travelMode,
+                        travelStyle: $travelStyle,
+                        showTravelModeDialog: $showTravelModeDialog,
+                        showTravelStyleDialog: $showTravelStyleDialog
+                    )
 
-                        HStack(spacing: 6) {
-                            Text("@")
-                                .font(.body)
-                                .foregroundColor(.black)
+                    ProfileSettingsLanguagesSection(
+                        languages: languages,
+                        showAddLanguage: $showAddLanguage
+                    )
 
-                            TextField(
-                                "",
-                                text: $username,
-                                prompt: Text("username")
-                                    .foregroundColor(.gray.opacity(0.7))
-                            )
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled(true)
-                            .foregroundColor(.black)
-                            .tint(.gray)
-                        }
-                        .padding(12)
-                        .background(Color.white.opacity(0.95))
-                        .cornerRadius(10)
-                    }
-
-                    SectionCard(title: "Your background") {
-                        Button {
-                            showHomePicker = true
-                        } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("Which countries do you consider home?")
-                                    .foregroundColor(.blue)
-                                if !homeCountries.isEmpty {
-                                    HStack(spacing: 8) {
-                                        ForEach(homeCountries.sorted(), id: \.self) { code in
-                                            Text(countryCodeToFlag(code))
-                                                .font(.largeTitle)
-                                        }
-                                    }
-                                }
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-
-                    SectionCard(title: "Travel preferences") {
-                        Button {
-                            showTravelModeDialog = true
-                        } label: {
-                            HStack {
-                                Text("Travel mode")
-                                    .foregroundColor(.blue)
-                                Spacer()
-                                Text(travelMode?.label ?? "Not set")
-                                    .foregroundColor(travelMode == nil ? .secondary : .primary)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-
-                        Button {
-                            showTravelStyleDialog = true
-                        } label: {
-                            HStack {
-                                Text("Travel style")
-                                    .foregroundColor(.blue)
-                                Spacer()
-                                Text(travelStyle?.label ?? "Not set")
-                                    .foregroundColor(travelStyle == nil ? .secondary : .primary)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-
-                    SectionCard(title: "Languages spoken") {
-                        if languages.isEmpty {
-                            Text("Add languages you speak or are learning")
-                                .foregroundColor(.secondary)
-                        } else {
-                            ForEach(languages) { entry in
-                                Text(entry.display)
-                            }
-                        }
-
-                        Button {
-                            showAddLanguage = true
-                        } label: {
-                            Label("Add language", systemImage: "plus")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-
-                    SectionCard {
-                        Button {
-                            showNextDestinationPicker = true
-                        } label: {
-                            HStack {
-                                Text("Next destination")
-                                    .foregroundColor(.blue)
-                                Spacer()
-                                Text(nextDestinationDisplay)
-                                    .foregroundColor(nextDestination == nil ? .secondary : .primary)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
+                    ProfileSettingsNextDestinationSection(
+                        nextDestination: nextDestination,
+                        showNextDestinationPicker: $showNextDestinationPicker
+                    )
 
                     SectionCard {
                         Button(role: .destructive) {
@@ -404,71 +265,7 @@ struct ProfileSettingsView: View {
     }
 }
 
-private struct SectionCard<Content: View>: View {
-    let title: String?
-    let content: Content
 
-    init(title: String? = nil, @ViewBuilder content: () -> Content) {
-        self.title = title
-        self.content = content()
-    }
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            if let title {
-                Text(title)
-                    .font(.headline)
-                    .foregroundColor(.blue)
-            }
-
-            content
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(
-            Color.white.opacity(0.9)
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 24))
-        .shadow(color: .black.opacity(0.08), radius: 10, y: 4)
-    }
-}
-
-// MARK: - Models
-
-private enum TravelMode: String, CaseIterable, Identifiable {
-    case solo, group, both
-    var id: String { rawValue }
-    var label: String {
-        switch self {
-        case .solo: return "Solo"
-        case .group: return "Group"
-        case .both: return "Solo + Group"
-        }
-    }
-}
-
-private enum TravelStyle: String, CaseIterable, Identifiable {
-    case budget, comfortable, inBetween, both
-    var id: String { rawValue }
-    var label: String {
-        switch self {
-        case .budget: return "BUDGET"
-        case .comfortable: return "COMFORTABLE"
-        case .inBetween: return "IN‑between"
-        case .both: return "Both on occasion"
-        }
-    }
-}
-
-private struct LanguageEntry: Identifiable {
-    let id = UUID()
-    let name: String
-    let proficiency: String   // native / fluent / learning
-
-    var display: String {
-        "\(name) (\(proficiency))"
-    }
-}
 
 // MARK: - Temporary picker views (UI only)
 
