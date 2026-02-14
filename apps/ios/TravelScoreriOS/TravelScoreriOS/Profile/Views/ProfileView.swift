@@ -102,6 +102,10 @@ struct ProfileView: View {
                             profile: profileVM.profile,
                             username: username,
                             homeCountryCodes: homeCountryCodes,
+                            mutualFriends: profileVM.mutualFriends,
+                            onCancelRequest: {
+                                await profileVM.cancelFriendRequest()
+                            },
                             relationshipState: profileVM.relationshipState,
                             friendCount: profileVM.friendCount,
                             userId: userId,

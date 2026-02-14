@@ -31,6 +31,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var mutualBucketCountries: [String] = []
     @Published var mutualTraveledCountries: [String] = []
     @Published var pendingRequestCount: Int = 0
+    @Published var mutualFriends: [Profile] = []
     
     // MARK: - Dependencies
     private let profileService: ProfileService
@@ -58,6 +59,7 @@ final class ProfileViewModel: ObservableObject {
         viewedBucketListCountries = []
         mutualBucketCountries = []
         mutualTraveledCountries = []
+        mutualFriends = []
         relationshipState = .none
         isFriend = false
         isFriendLoading = false
@@ -123,6 +125,7 @@ final class ProfileViewModel: ObservableObject {
             try await refreshRelationshipState()
             await loadFriendCount()
             await loadPendingRequestCount()
+            await loadMutualFriends()
             
         } catch {
             print("❌ load() failed:", error)
@@ -249,6 +252,29 @@ final class ProfileViewModel: ObservableObject {
             pendingRequestCount = 0
         }
     }
+
+    // MARK: - Mutual Friends
+
+    func loadMutualFriends() async {
+        guard
+            let viewedUserId = userId,
+            let currentUserId = supabase.currentUserId,
+            currentUserId != viewedUserId
+        else {
+            mutualFriends = []
+            return
+        }
+
+        do {
+            mutualFriends = try await friendService.fetchMutualFriends(
+                currentUserId: currentUserId,
+                otherUserId: viewedUserId
+            )
+        } catch {
+            print("❌ failed to load mutual friends:", error)
+            mutualFriends = []
+        }
+    }
     
     // MARK: - Friend actions
     
@@ -304,6 +330,26 @@ final class ProfileViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
             print("❌ Relationship action failed:", error)
+        }
+    }
+
+    func cancelFriendRequest() async {
+        guard let profileId = profile?.id,
+              let currentUserId = supabase.currentUserId else { return }
+
+        do {
+            try await friendService.cancelRequest(
+                from: currentUserId,
+                to: profileId
+            )
+
+            relationshipState = .none
+            isFriend = false
+
+            print("❌ Friend request cancelled:", profileId)
+        } catch {
+            errorMessage = error.localizedDescription
+            print("❌ Cancel request failed:", error)
         }
     }
     // MARK: - Mutual Bucket Logic

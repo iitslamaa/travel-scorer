@@ -13,6 +13,8 @@ struct ProfileHeaderView: View {
     let profile: Profile?
     let username: String
     let homeCountryCodes: [String]
+    let mutualFriends: [Profile]
+    let onCancelRequest: () async -> Void
     let relationshipState: RelationshipState
     let friendCount: Int
     let userId: UUID
@@ -21,7 +23,7 @@ struct ProfileHeaderView: View {
     let onToggleFriend: () async -> Void
     
     @State private var isUnfriendAlertPresented = false
-    @State private var selectedCountryISO: String? = nil
+    @State private var showFriendDrawer = false
     
     @Environment(\.colorScheme) private var colorScheme
     
@@ -107,12 +109,6 @@ struct ProfileHeaderView: View {
                 }
             }
             
-            if friendCount > 0 {
-                Text("\(friendCount) Friends")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-            }
-            
             if !homeCountryCodes.isEmpty {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 6) {
@@ -126,43 +122,174 @@ struct ProfileHeaderView: View {
             }
             
             if relationshipState != .selfProfile {
-                friendButton
+                headerFriendCTA
             }
         }
     }
     
-    private var friendButton: some View {
+    private var isFriends: Bool {
+        relationshipState == .friends
+    }
+
+    private var headerFriendCTA: some View {
         Button {
-            if relationshipState == .friends {
-                isUnfriendAlertPresented = true
-            } else {
-                Task { await onToggleFriend() }
-            }
+            showFriendDrawer = true
         } label: {
-            HStack(spacing: 6) {
-                if relationshipState == .friends {
-                    Image(systemName: "checkmark")
+            ZStack(alignment: .leading) {
+
+                mutualFriendsFan
+                    .offset(x: 4)
+                    .opacity(mutualFriends.isEmpty ? 0 : 1)
+
+                HStack(spacing: 6) {
+                    if isFriends {
+                        Image(systemName: "checkmark")
+                            .font(.caption.weight(.bold))
+                    }
+
+                    Text(friendButtonLabel)
+                        .font(.caption)
+                        .fontWeight(.semibold)
                 }
-                Text(buttonTitle)
+                .padding(.leading, mutualFriends.isEmpty ? 12 : 54)
+                .padding(.trailing, 12)
+                .padding(.vertical, 8)
+                .background(
+                    Capsule()
+                        .fill(Color.blue.opacity(isFriends ? 0.16 : 0.10))
+                )
+                .overlay(
+                    Capsule()
+                        .stroke(Color.blue, lineWidth: isFriends ? 1.6 : 1.2)
+                )
             }
-            .font(.caption)
-            .fontWeight(.semibold)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
         }
-        .background(
-            Capsule()
-                .fill(relationshipState == .friends ? Color.green.opacity(0.15) : Color.blue.opacity(0.15))
-        )
-        .overlay(
-            Capsule()
-                .stroke(relationshipState == .friends ? Color.green : Color.blue, lineWidth: 1.5)
-        )
+        .buttonStyle(.plain)
+        .sheet(isPresented: $showFriendDrawer) {
+            friendDrawer
+                .presentationDetents([.medium])
+        }
         .alert("Unfriend?", isPresented: $isUnfriendAlertPresented) {
             Button("Cancel", role: .cancel) {}
             Button("Confirm", role: .destructive) {
                 Task { await onToggleFriend() }
             }
+        }
+    }
+
+    private var mutualFriendsFan: some View {
+        let shown = Array(mutualFriends.prefix(3))
+        return ZStack {
+            ForEach(Array(shown.enumerated()), id: \.element.id) { index, friend in
+                mutualAvatar(urlString: friend.avatarUrl)
+                    .frame(width: 28, height: 28)
+                    .offset(x: CGFloat(index) * 14)
+                    .zIndex(Double(10 - index))
+            }
+        }
+    }
+
+    private func mutualAvatar(urlString: String?) -> some View {
+        Group {
+            if let urlString, let url = URL(string: urlString) {
+                AsyncImage(url: url) { phase in
+                    if let image = phase.image {
+                        image.resizable().scaledToFill()
+                    } else {
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .scaledToFill()
+                            .foregroundStyle(.gray)
+                    }
+                }
+            } else {
+                Image(systemName: "person.crop.circle.fill")
+                    .resizable()
+                    .scaledToFill()
+                    .foregroundStyle(.gray)
+            }
+        }
+        .clipShape(Circle())
+        .overlay(Circle().stroke(Color(.systemBackground), lineWidth: 2))
+        .shadow(color: .black.opacity(0.10), radius: 4, y: 2)
+    }
+
+    private var friendDrawer: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+
+                NavigationLink {
+                    FriendsView(userId: userId)
+                } label: {
+                    HStack {
+                        Text("View \(firstName)’s friends")
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding()
+                    .background(Color(.secondarySystemBackground))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                }
+
+                if relationshipState == .none {
+                    Button {
+                        Task { await onToggleFriend() }
+                    } label: {
+                        Text("Add Friend")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(.blue)
+                }
+
+                if relationshipState == .requestSent {
+                    Button(role: .destructive) {
+                        Task { await onCancelRequest() }
+                    } label: {
+                        Text("Cancel Friend Request")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
+
+                if relationshipState == .friends {
+                    Button(role: .destructive) {
+                        isUnfriendAlertPresented = true
+                    } label: {
+                        Text("Unfriend")
+                            .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
+                }
+
+                Spacer()
+            }
+            .padding()
+            .navigationTitle("Friends")
+        }
+    }
+
+    private var firstName: String {
+        let raw = (profile?.fullName ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        if raw.isEmpty { return "their" }
+        return raw.split(separator: " ").first.map(String.init) ?? "their"
+    }
+    
+    private var friendButtonLabel: String {
+        switch relationshipState {
+        case .friends:
+            if friendCount == 1 {
+                return "1 Friend"
+            } else {
+                return "\(friendCount) Friends"
+            }
+        case .none:
+            return "Add Friend"
+        case .requestSent:
+            return "Request Sent"
+        case .selfProfile:
+            return ""
         }
     }
     

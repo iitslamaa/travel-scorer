@@ -27,29 +27,6 @@ struct FriendsView: View {
                     ? "Friends"
                     : "\(displayName)'s Friends"
                 )
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink {
-                            FriendRequestsView()
-                        } label: {
-                            ZStack(alignment: .topTrailing) {
-                                Image(systemName: "person.crop.circle.badge.plus")
-                                    .font(.title3)
-
-                                if friendsVM.incomingRequestCount > 0 {
-                                    Text("\(friendsVM.incomingRequestCount)")
-                                        .font(.caption2)
-                                        .foregroundColor(.white)
-                                        .padding(6)
-                                        .background(Color.red)
-                                        .clipShape(Circle())
-                                        .offset(x: 10, y: -8)
-                                }
-                            }
-                        }
-                        .accessibilityLabel("Friend Requests")
-                    }
-                }
                 .searchable(text: $friendsVM.searchText, prompt: "Search by username")
                 .onChange(of: friendsVM.searchText) { _ in
                     Task {
@@ -100,11 +77,7 @@ struct FriendsView: View {
     private var resultsList: some View {
         List {
             if !friendsVM.friends.isEmpty {
-                Section(
-                    SupabaseManager.shared.currentUserId == userId
-                    ? "Your Friends"
-                    : "\(displayName)'s Friends"
-                ) {
+                Section {
                     ForEach(friendsVM.friends) { profile in
                         NavigationLink {
                             ProfileView(userId: profile.id)

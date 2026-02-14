@@ -78,6 +78,20 @@ final class FriendService {
             .execute()
     }
 
+    func fetchMutualFriends(currentUserId: UUID, otherUserId: UUID) async throws -> [Profile] {
+        // Fetch both friend lists
+        let currentFriends = try await fetchFriends(for: currentUserId)
+        let otherFriends = try await fetchFriends(for: otherUserId)
+
+        let currentSet = Set(currentFriends.map { $0.id })
+        let mutual = otherFriends.filter { currentSet.contains($0.id) }
+
+        // Stable ordering (alphabetical fallback)
+        return mutual.sorted {
+            ($0.username ?? "") < ($1.username ?? "")
+        }
+    }
+
     // MARK: - Requests
 
     func fetchIncomingRequests(for myUserId: UUID) async throws -> [Profile] {
@@ -181,6 +195,16 @@ final class FriendService {
             .execute()
 
         return !response.value.isEmpty
+    }
+
+    func cancelRequest(from myUserId: UUID, to otherUserId: UUID) async throws {
+        try await supabase.client
+            .from("friend_requests")
+            .delete()
+            .eq("sender_id", value: myUserId.uuidString)
+            .eq("receiver_id", value: otherUserId.uuidString)
+            .eq("status", value: "pending")
+            .execute()
     }
 
     func acceptRequest(myUserId: UUID, from otherUserId: UUID) async throws {
