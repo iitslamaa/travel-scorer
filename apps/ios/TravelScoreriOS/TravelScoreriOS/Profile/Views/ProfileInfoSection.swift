@@ -38,13 +38,13 @@ struct ProfileInfoSection: View {
 
                 CollapsibleCountrySection(
                     title: "Countries Traveled",
-                    countryCodes: flags(for: viewedTraveledCountries),
+                    countryCodes: orderedTraveledCountries,
                     highlightColor: .gold
                 )
 
                 CollapsibleCountrySection(
                     title: "Want to Visit",
-                    countryCodes: flags(for: viewedBucketListCountries),
+                    countryCodes: orderedBucketListCountries,
                     highlightColor: .blue
                 )
 
@@ -110,7 +110,4 @@ struct ProfileInfoSection: View {
         .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
 
-    private func flags(for ids: Set<String>) -> [String] {
-        ids.map { $0.uppercased() }.sorted()
-    }
 }

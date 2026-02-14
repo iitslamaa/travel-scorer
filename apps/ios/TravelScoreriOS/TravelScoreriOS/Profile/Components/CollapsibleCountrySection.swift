@@ -35,12 +35,11 @@ struct CollapsibleCountrySection: View {
         VStack(alignment: .leading, spacing: 12) {
 
             Button {
-                withAnimation(.spring(response: 0.35, dampingFraction: 0.75)) {
-                    isExpanded.toggle()
-                }
+                isExpanded.toggle()
             } label: {
                 HStack {
                     Image(systemName: isExpanded ? "chevron.down" : "chevron.right")
+                        .animation(.spring(response: 0.35, dampingFraction: 0.75), value: isExpanded)
                     Text("\(title): ")
                         .font(.subheadline)
                         .fontWeight(.semibold)
@@ -52,47 +51,51 @@ struct CollapsibleCountrySection: View {
                 }
             }
 
-            if isExpanded {
-                VStack(spacing: 16) {
+            VStack(spacing: 16) {
 
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        FlagStrip(
-                            flags: countryCodes,
-                            fontSize: 30,
-                            spacing: 10,
-                            showsTooltip: false,
-                            selectedISO: selectedCountryISO,
-                            onFlagTap: { selectedCountryISO = $0 },
-                            mutualCountries: mutualCountries
-                        )
+                ScrollView(.horizontal, showsIndicators: false) {
+                    FlagStrip(
+                        flags: countryCodes,
+                        fontSize: 30,
+                        spacing: 10,
+                        showsTooltip: false,
+                        selectedISO: selectedCountryISO,
+                        onFlagTap: { selectedCountryISO = $0 },
+                        mutualCountries: mutualCountries
+                    )
+                }
+
+                ZStack(alignment: .bottom) {
+
+                    WorldMapView(
+                        highlightedCountryCodes: countryCodes,
+                        selectedCountryISO: $selectedCountryISO
+                    )
+                    .transaction { transaction in
+                        transaction.animation = nil
                     }
+                    .frame(height: 240)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
 
-                    ZStack(alignment: .bottom) {
-
-                        WorldMapView(
-                            highlightedCountryCodes: countryCodes,
-                            selectedCountryISO: $selectedCountryISO
-                        )
-                        .frame(height: 240)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-
-                        if let iso = selectedCountryISO {
-                            HStack(spacing: 8) {
-                                Text(flagEmoji(from: iso))
-                                Text(Locale.current.localizedString(forRegionCode: iso) ?? iso)
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(.ultraThinMaterial)
-                            .clipShape(Capsule())
-                            .padding(.bottom, 12)
+                    if let iso = selectedCountryISO {
+                        HStack(spacing: 8) {
+                            Text(flagEmoji(from: iso))
+                            Text(Locale.current.localizedString(forRegionCode: iso) ?? iso)
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(.ultraThinMaterial)
+                        .clipShape(Capsule())
+                        .padding(.bottom, 12)
                     }
                 }
-                .padding(.top, 8)
             }
+            .padding(.top, 8)
+            .opacity(isExpanded ? 1 : 0)
+            .frame(height: isExpanded ? nil : 0)
+            .clipped()
         }
         .padding(16)
         .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
