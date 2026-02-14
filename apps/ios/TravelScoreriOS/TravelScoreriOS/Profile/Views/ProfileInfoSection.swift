@@ -18,8 +18,8 @@ struct ProfileInfoSection: View {
     let mutualTraveledCountries: [String]
     let mutualBucketCountries: [String]
     let languages: [String]
-    let travelPreferences: [String] = []
-    let nextDestination: String? = nil
+    let travelPreferences: [String]
+    let nextDestination: String?
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -147,7 +147,7 @@ struct ProfileInfoSection: View {
         VStack(spacing: 8) {
             Image(systemName: "lock.fill")
                 .font(.title2)
-                .foregroundColor(.secondary)
+                .foregroundStyle(.secondary)
 
             Text("Learn more about this user by adding them as a friend!")
                 .font(.subheadline)

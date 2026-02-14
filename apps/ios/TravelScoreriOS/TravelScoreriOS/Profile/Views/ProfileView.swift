@@ -32,6 +32,31 @@ struct ProfileView: View {
     private var homeCountryCodes: [String] { profileVM.profile?.livedCountries ?? [] }
     private var languages: [String] { profileVM.profile?.languages ?? [] }
 
+    private var travelPreferences: [String] {
+        let modeRaw = profileVM.profile?.travelMode ?? []
+        let styleRaw = profileVM.profile?.travelStyle ?? []
+
+        let modeLabels = modeRaw.compactMap { TravelMode(rawValue: $0)?.label }
+        let styleLabels = styleRaw.compactMap { TravelStyle(rawValue: $0)?.label }
+
+        return modeLabels + styleLabels
+    }
+
+    private var nextDestination: String? {
+        guard let code = profileVM.profile?.nextDestination,
+              code.count == 2 else {
+            return nil
+        }
+
+        let base: UInt32 = 127397
+        return code
+            .uppercased()
+            .unicodeScalars
+            .compactMap { UnicodeScalar(base + $0.value) }
+            .map { String($0) }
+            .joined()
+    }
+
     private var buttonTitle: String {
         switch profileVM.relationshipState {
         case .none:
@@ -128,7 +153,9 @@ struct ProfileView: View {
                             orderedBucketListCountries: profileVM.orderedBucketListCountries,
                             mutualTraveledCountries: profileVM.mutualTraveledCountries,
                             mutualBucketCountries: profileVM.mutualBucketCountries,
-                            languages: languages
+                            languages: languages,
+                            travelPreferences: travelPreferences,
+                            nextDestination: nextDestination
                         )
                     }
                 }
