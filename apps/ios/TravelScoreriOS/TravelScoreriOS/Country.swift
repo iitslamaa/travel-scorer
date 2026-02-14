@@ -59,6 +59,23 @@ struct Country: Identifiable, Hashable {
         }
     }
     
+    // Convert advisory level string (e.g. "Level 1") into a normalized numeric score
+    var advisoryScore: Int? {
+        guard let levelString = advisoryLevel else { return nil }
+
+        if levelString.contains("1") {
+            return 90
+        } else if levelString.contains("2") {
+            return 70
+        } else if levelString.contains("3") {
+            return 40
+        } else if levelString.contains("4") {
+            return 10
+        }
+
+        return nil
+    }
+
     // Custom initializer to maintain compatibility
     init(
         iso2: String,
