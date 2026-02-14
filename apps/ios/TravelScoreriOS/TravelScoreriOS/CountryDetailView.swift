@@ -146,7 +146,7 @@ struct CountryDetailView: View {
                 }
                 
                 // Travel safety section — web-style factor card
-                if let safety = country.travelSafeScore {
+                if false, let safety = country.travelSafeScore {
                     VStack(alignment: .leading, spacing: 12) {
                         // Title row
                         HStack {
