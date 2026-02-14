@@ -42,10 +42,34 @@ struct WorldGeoJSONLoader {
                     if let propertiesData = feature.properties,
                        let jsonObject = try? JSONSerialization.jsonObject(with: propertiesData) as? [String: Any] {
 
-                        name = jsonObject["name"] as? String
+                        // Try multiple possible name keys
+                        name =
+                            (jsonObject["name"] as? String)
+                            ?? (jsonObject["ADMIN"] as? String)
+                            ?? (jsonObject["NAME"] as? String)
 
-                        iso = (jsonObject["ISO3166-1-Alpha-2"] as? String)
+                        // Try multiple possible ISO keys
+                        iso =
+                            (jsonObject["ISO3166-1-Alpha-2"] as? String)
                             ?? (jsonObject["ISO_A2"] as? String)
+                            ?? (jsonObject["iso_a2"] as? String)
+
+                        // Normalize ISO
+                        if let isoValue = iso?.trimmingCharacters(in: .whitespacesAndNewlines),
+                           isoValue != "-99",
+                           isoValue.count == 2 {
+                            iso = isoValue.uppercased()
+                        } else {
+                            iso = nil
+                        }
+
+                        // 🔥 Special handling for Taiwan (many datasets use -99)
+                        if let countryName = name?.lowercased() {
+                            if countryName.contains("taiwan") {
+                                iso = "TW"
+                                name = "Taiwan"
+                            }
+                        }
                     }
 
                     for geometry in feature.geometry {
