@@ -136,6 +136,9 @@ struct ProfileSettingsView: View {
                 travelMode = profile.travelMode.first.flatMap { TravelMode(rawValue: $0) }
                 travelStyle = profile.travelStyle.first.flatMap { TravelStyle(rawValue: $0) }
 
+                // next destination
+                nextDestination = profile.nextDestination
+
                 // languages is NON-optional [String]
                 languages = profile.languages.map {
                     LanguageEntry(name: $0, proficiency: "native")
@@ -171,6 +174,7 @@ struct ProfileSettingsView: View {
                             languages: languages.map { $0.name },
                             travelMode: travelMode?.rawValue,
                             travelStyle: travelStyle?.rawValue,
+                            nextDestination: nextDestination,
                             avatarUrl: avatarURL
                         )
                         dismiss()
@@ -427,4 +431,3 @@ private struct AddLanguageView: View {
         }
     }
 }
-

@@ -18,6 +18,7 @@ struct Profile: Codable, Identifiable {
     var livedCountries: [String]
     var travelStyle: [String]
     var travelMode: [String]
+    var nextDestination: String?
 
     var onboardingCompleted: Bool?
 
@@ -30,6 +31,7 @@ struct Profile: Codable, Identifiable {
         case livedCountries = "lived_countries"
         case travelStyle = "travel_style"
         case travelMode = "travel_mode"
+        case nextDestination = "next_destination"
         case onboardingCompleted = "onboarding_completed"
     }
 }

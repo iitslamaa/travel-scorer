@@ -145,6 +145,7 @@ final class ProfileViewModel: ObservableObject {
         languages: [String]?,
         travelMode: String?,
         travelStyle: String?,
+        nextDestination: String?,
         avatarUrl: String?
     ) async {
         guard let userId else {
@@ -162,6 +163,7 @@ final class ProfileViewModel: ObservableObject {
                 livedCountries: homeCountries,
                 travelStyle: travelStyle.map { [$0] },
                 travelMode: travelMode.map { [$0] },
+                nextDestination: nextDestination,
                 onboardingCompleted: true
             )
             

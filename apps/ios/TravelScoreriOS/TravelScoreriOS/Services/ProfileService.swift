@@ -29,6 +29,7 @@ struct ProfileUpdate: Encodable {
     let livedCountries: [String]?
     let travelStyle: [String]?
     let travelMode: [String]?
+    let nextDestination: String?
     let onboardingCompleted: Bool?
 
     enum CodingKeys: String, CodingKey {
@@ -39,6 +40,7 @@ struct ProfileUpdate: Encodable {
         case livedCountries = "lived_countries"
         case travelStyle = "travel_style"
         case travelMode = "travel_mode"
+        case nextDestination = "next_destination"
         case onboardingCompleted = "onboarding_completed"
     }
 }
