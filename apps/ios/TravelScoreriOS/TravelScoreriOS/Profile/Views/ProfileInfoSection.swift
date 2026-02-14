@@ -79,10 +79,11 @@ struct ProfileInfoSection: View {
             if languages.isEmpty {
                 Text("Not set")
                     .font(.caption)
-                    .foregroundStyle(.black.opacity(0.6))
+                    .foregroundStyle(.secondary)
             } else {
                 Text(languages.joined(separator: " · "))
                     .font(.subheadline)
+                    .foregroundStyle(.primary)
             }
         }
         .padding(12)
