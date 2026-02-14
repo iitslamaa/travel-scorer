@@ -24,6 +24,7 @@ struct ProfileHeaderView: View {
     
     @State private var isUnfriendAlertPresented = false
     @State private var showFriendDrawer = false
+    @State private var isPressed = false
     
     @Environment(\.colorScheme) private var colorScheme
     
@@ -221,46 +222,102 @@ struct ProfileHeaderView: View {
                 NavigationLink {
                     FriendsView(userId: userId)
                 } label: {
-                    HStack {
+                    HStack(spacing: 12) {
+                        Image(systemName: "person.2.fill")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundStyle(.blue)
+                            .frame(width: 36, height: 36)
+                            .background(
+                                Circle()
+                                    .fill(Color.blue.opacity(0.12))
+                            )
+
                         Text("View \(firstName)’s friends")
+                            .font(.headline)
+
                         Spacer()
+
                         Image(systemName: "chevron.right")
+                            .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(.secondary)
                     }
-                    .padding()
-                    .background(Color(.secondarySystemBackground))
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .fill(.ultraThinMaterial)
+                    )
                 }
 
                 if relationshipState == .none {
                     Button {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         Task { await onToggleFriend() }
                     } label: {
-                        Text("Add Friend")
-                            .frame(maxWidth: .infinity)
+                        HStack {
+                            Image(systemName: "person.badge.plus")
+                                .font(.system(size: 16, weight: .semibold))
+                            Text("Add Friend")
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(Color.blue)
+                        )
+                        .foregroundColor(.white)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.blue)
+                    .scaleEffect(isPressed ? 0.94 : 1.0)
+                    .simultaneousGesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { _ in isPressed = true }
+                            .onEnded { _ in isPressed = false }
+                    )
+                    .animation(.easeOut(duration: 0.15), value: isPressed)
                 }
 
                 if relationshipState == .requestSent {
                     Button(role: .destructive) {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         Task { await onCancelRequest() }
                     } label: {
-                        Text("Cancel Friend Request")
-                            .frame(maxWidth: .infinity)
+                        HStack {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 16, weight: .semibold))
+                            Text("Cancel Friend Request")
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(Color.red.opacity(0.12))
+                        )
+                        .foregroundStyle(.red)
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(PressableScaleStyle())
                 }
 
                 if relationshipState == .friends {
                     Button(role: .destructive) {
+                        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         isUnfriendAlertPresented = true
                     } label: {
-                        Text("Unfriend")
-                            .frame(maxWidth: .infinity)
+                        HStack {
+                            Image(systemName: "person.crop.circle.badge.minus")
+                                .font(.system(size: 16, weight: .semibold))
+                            Text("Unfriend")
+                                .font(.headline)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(Color.red.opacity(0.14))
+                        )
+                        .foregroundStyle(.red)
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(PressableScaleStyle())
                 }
 
                 Spacer()
@@ -300,5 +357,13 @@ struct ProfileHeaderView: View {
             .compactMap { UnicodeScalar(127397 + $0.value) }
             .map { String($0) }
             .joined()
+    }
+    
+    private struct PressableScaleStyle: ButtonStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+                .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+        }
     }
 }
