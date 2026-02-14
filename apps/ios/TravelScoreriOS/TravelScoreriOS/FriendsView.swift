@@ -27,6 +27,30 @@ struct FriendsView: View {
                     ? "Friends"
                     : "\(displayName)'s Friends"
                 )
+                .toolbar {
+                    if SupabaseManager.shared.currentUserId == userId {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            NavigationLink {
+                                FriendRequestsView()
+                            } label: {
+                                ZStack(alignment: .topTrailing) {
+                                    Image(systemName: "person.crop.circle.badge.plus")
+                                        .font(.system(size: 18, weight: .semibold))
+
+                                    if friendsVM.incomingRequestCount > 0 {
+                                        Text("\(friendsVM.incomingRequestCount)")
+                                            .font(.caption2)
+                                            .foregroundColor(.white)
+                                            .padding(4)
+                                            .background(Color.red)
+                                            .clipShape(Circle())
+                                            .offset(x: 8, y: -8)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 .searchable(text: $friendsVM.searchText, prompt: "Search by username")
                 .onChange(of: friendsVM.searchText) { _ in
                     Task {
@@ -82,14 +106,43 @@ struct FriendsView: View {
                         NavigationLink {
                             ProfileView(userId: profile.id)
                         } label: {
-                            VStack(alignment: .leading) {
-                                Text(profile.fullName)
-                                    .fontWeight(.medium)
+                            HStack(spacing: 12) {
+                                Group {
+                                    if let urlString = profile.avatarUrl,
+                                       let url = URL(string: urlString) {
+                                        AsyncImage(url: url) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .clipped()
+                                        } placeholder: {
+                                            Image(systemName: "person.crop.circle.fill")
+                                                .resizable()
+                                                .scaledToFill()
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    } else {
+                                        Image(systemName: "person.crop.circle.fill")
+                                            .resizable()
+                                            .scaledToFill()
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                .frame(width: 44, height: 44)
+                                .clipShape(Circle())
 
-                                Text("@\(profile.username)")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                VStack(alignment: .leading) {
+                                    Text(profile.fullName)
+                                        .fontWeight(.medium)
+
+                                    Text("@\(profile.username)")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+
+                                Spacer()
                             }
+                            .padding(.vertical, 4)
                         }
                     }
                 }
@@ -101,20 +154,57 @@ struct FriendsView: View {
                         NavigationLink {
                             ProfileView(userId: profile.id)
                         } label: {
-                            VStack(alignment: .leading) {
-                                Text(profile.fullName)
-                                    .fontWeight(.medium)
+                            HStack(spacing: 12) {
+                                Group {
+                                    if let urlString = profile.avatarUrl,
+                                       let url = URL(string: urlString) {
+                                        AsyncImage(url: url) { image in
+                                            image
+                                                .resizable()
+                                                .scaledToFill()
+                                                .clipped()
+                                        } placeholder: {
+                                            Image(systemName: "person.crop.circle.fill")
+                                                .resizable()
+                                                .scaledToFill()
+                                                .foregroundStyle(.secondary)
+                                        }
+                                    } else {
+                                        Image(systemName: "person.crop.circle.fill")
+                                            .resizable()
+                                            .scaledToFill()
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                .frame(width: 44, height: 44)
+                                .clipShape(Circle())
 
-                                Text("@\(profile.username)")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                                VStack(alignment: .leading) {
+                                    Text(profile.fullName)
+                                        .fontWeight(.medium)
+
+                                    Text("@\(profile.username)")
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+
+                                Spacer()
                             }
+                            .padding(.vertical, 4)
                         }
                     }
                 }
             } else if !friendsVM.searchText.isEmpty && !friendsVM.isLoading {
                 Text("No users found")
                     .foregroundStyle(.secondary)
+            }
+            if friendsVM.searchText.isEmpty {
+                Section {
+                    Text("\(friendsVM.friends.count) \(friendsVM.friends.count == 1 ? "Friend" : "Friends")")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
             }
         }
         .listStyle(.insetGrouped)
