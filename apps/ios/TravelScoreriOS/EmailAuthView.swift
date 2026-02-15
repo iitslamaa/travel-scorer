@@ -213,7 +213,7 @@ struct EmailAuthView: View {
                                     focusedField = .code
                                 }
                             } label: {
-                                Text("Use password instead")
+                                Text("Use Bypass Code")
                                     .font(.footnote)
                                     .foregroundColor(.white.opacity(0.8))
                             }
