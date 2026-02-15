@@ -48,6 +48,9 @@ final class PlayerUIView: UIView {
     }
 
     func load(videoName: String, videoType: String, loop: Bool) {
+        // Allow background music (Spotify/Apple Music) to continue playing
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
         let key = "\(videoName).\(videoType)-loop:\(loop)"
         currentKey = key
 
