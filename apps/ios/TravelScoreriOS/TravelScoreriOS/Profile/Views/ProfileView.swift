@@ -49,18 +49,7 @@ struct ProfileView: View {
     }
 
     private var nextDestination: String? {
-        guard let code = profileVM.profile?.nextDestination,
-              code.count == 2 else {
-            return nil
-        }
-
-        let base: UInt32 = 127397
-        return code
-            .uppercased()
-            .unicodeScalars
-            .compactMap { UnicodeScalar(base + $0.value) }
-            .map { String($0) }
-            .joined()
+        profileVM.profile?.nextDestination
     }
 
     private var buttonTitle: String {
