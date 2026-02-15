@@ -32,14 +32,20 @@ struct ProfileView: View {
     private var homeCountryCodes: [String] { profileVM.profile?.livedCountries ?? [] }
     private var languages: [String] { profileVM.profile?.languages ?? [] }
 
-    private var travelPreferences: [String] {
-        let modeRaw = profileVM.profile?.travelMode ?? []
-        let styleRaw = profileVM.profile?.travelStyle ?? []
+    private var travelModeLabel: String? {
+        guard let raw = profileVM.profile?.travelMode.first,
+              let mode = TravelMode(rawValue: raw) else {
+            return nil
+        }
+        return mode.label
+    }
 
-        let modeLabels = modeRaw.compactMap { TravelMode(rawValue: $0)?.label }
-        let styleLabels = styleRaw.compactMap { TravelStyle(rawValue: $0)?.label }
-
-        return modeLabels + styleLabels
+    private var travelStyleLabel: String? {
+        guard let raw = profileVM.profile?.travelStyle.first,
+              let style = TravelStyle(rawValue: raw) else {
+            return nil
+        }
+        return style.label
     }
 
     private var nextDestination: String? {
@@ -154,7 +160,8 @@ struct ProfileView: View {
                             mutualTraveledCountries: profileVM.mutualTraveledCountries,
                             mutualBucketCountries: profileVM.mutualBucketCountries,
                             languages: languages,
-                            travelPreferences: travelPreferences,
+                            travelMode: travelModeLabel,
+                            travelStyle: travelStyleLabel,
                             nextDestination: nextDestination
                         )
                     }

@@ -18,7 +18,8 @@ struct ProfileInfoSection: View {
     let mutualTraveledCountries: [String]
     let mutualBucketCountries: [String]
     let languages: [String]
-    let travelPreferences: [String]
+    let travelMode: String?
+    let travelStyle: String?
     let nextDestination: String?
 
     @Environment(\.colorScheme) private var colorScheme
@@ -26,7 +27,8 @@ struct ProfileInfoSection: View {
     var body: some View {
         VStack(spacing: 28) {
             languagesCard
-            travelPreferencesCard
+            travelModeCard
+            travelStyleCard
             nextDestinationCard
             infoCards
         }
@@ -97,20 +99,43 @@ struct ProfileInfoSection: View {
         .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
 
-    private var travelPreferencesCard: some View {
+    private var travelModeCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Travel Preferences")
+            Text("Travel Mode")
                 .font(.subheadline)
                 .fontWeight(.semibold)
 
-            if travelPreferences.isEmpty {
+            if let travelMode, !travelMode.isEmpty {
+                Text(travelMode)
+                    .font(.subheadline)
+                    .foregroundStyle(.primary)
+            } else {
                 Text("Not set")
                     .font(.caption)
                     .foregroundStyle(.secondary)
-            } else {
-                Text(travelPreferences.joined(separator: " · "))
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
+    }
+
+    private var travelStyleCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Travel Style")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+
+            if let travelStyle, !travelStyle.isEmpty {
+                Text(travelStyle)
                     .font(.subheadline)
                     .foregroundStyle(.primary)
+            } else {
+                Text("Not set")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
         .padding(12)
