@@ -47,7 +47,7 @@ struct CollapsibleCountrySection: View {
                     Text("\(title): ")
                         .font(.subheadline)
                         .fontWeight(.semibold)
-                    Text("#\(countryCodes.count)")
+                    Text("\(countryCodes.count)")
                         .font(.subheadline)
                         .fontWeight(.bold)
                         .foregroundColor(highlightColor)
