@@ -40,14 +40,33 @@ struct FriendRequestsView: View {
                                 Group {
                                     if let urlString = profile.avatarUrl,
                                        let url = URL(string: urlString) {
-                                        AsyncImage(url: url) { phase in
-                                            if let image = phase.image {
+                                        AsyncImage(
+                                            url: url,
+                                            transaction: Transaction(animation: .easeInOut(duration: 0.2))
+                                        ) { phase in
+                                            switch phase {
+                                            case .success(let image):
                                                 image
                                                     .resizable()
                                                     .scaledToFill()
-                                            } else {
+                                                    .transition(.opacity)
+
+                                            case .failure(_):
                                                 Image(systemName: "person.crop.circle.fill")
+                                                    .resizable()
+                                                    .scaledToFill()
                                                     .foregroundStyle(.secondary)
+
+                                            case .empty:
+                                                ZStack {
+                                                    Circle()
+                                                        .fill(Color.gray.opacity(0.15))
+                                                    ProgressView()
+                                                        .scaleEffect(0.7)
+                                                }
+
+                                            @unknown default:
+                                                EmptyView()
                                             }
                                         }
                                     } else {

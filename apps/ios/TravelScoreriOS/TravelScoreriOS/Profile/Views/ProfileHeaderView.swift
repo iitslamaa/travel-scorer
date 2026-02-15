@@ -70,14 +70,33 @@ struct ProfileHeaderView: View {
         Group {
             if let urlString = profile?.avatarUrl,
                let url = URL(string: urlString) {
-                AsyncImage(url: url) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFill()
-                    } else {
+                AsyncImage(
+                    url: url,
+                    transaction: Transaction(animation: .easeInOut(duration: 0.2))
+                ) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .transition(.opacity)
+
+                    case .failure(_):
                         Image(systemName: "person.crop.circle.fill")
                             .resizable()
                             .scaledToFill()
                             .foregroundStyle(.gray)
+
+                    case .empty:
+                        ZStack {
+                            Circle()
+                                .fill(Color.gray.opacity(0.15))
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        }
+
+                    @unknown default:
+                        EmptyView()
                     }
                 }
             } else {
@@ -195,14 +214,33 @@ struct ProfileHeaderView: View {
     private func mutualAvatar(urlString: String?) -> some View {
         Group {
             if let urlString, let url = URL(string: urlString) {
-                AsyncImage(url: url) { phase in
-                    if let image = phase.image {
-                        image.resizable().scaledToFill()
-                    } else {
+                AsyncImage(
+                    url: url,
+                    transaction: Transaction(animation: .easeInOut(duration: 0.2))
+                ) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .transition(.opacity)
+
+                    case .failure(_):
                         Image(systemName: "person.crop.circle.fill")
                             .resizable()
                             .scaledToFill()
                             .foregroundStyle(.gray)
+
+                    case .empty:
+                        ZStack {
+                            Circle()
+                                .fill(Color.gray.opacity(0.15))
+                            ProgressView()
+                                .scaleEffect(0.8)
+                        }
+
+                    @unknown default:
+                        EmptyView()
                     }
                 }
             } else {
