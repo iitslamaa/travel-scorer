@@ -101,7 +101,7 @@ struct ProfileInfoSection: View {
 
     private var travelModeCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Travel Mode")
+            Text("Travel Mode: Solo or Group?")
                 .font(.subheadline)
                 .fontWeight(.semibold)
 
@@ -124,7 +124,7 @@ struct ProfileInfoSection: View {
 
     private var travelStyleCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Travel Style")
+            Text("Travel Style: Budget, Comfortable, or In Between?")
                 .font(.subheadline)
                 .fontWeight(.semibold)
 
