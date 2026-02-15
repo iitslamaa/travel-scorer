@@ -98,15 +98,17 @@ struct ProfileHeaderView: View {
     private var profileTextContent: some View {
         VStack(alignment: .leading, spacing: 6) {
             
-            HStack(spacing: 6) {
+            VStack(alignment: .leading, spacing: 2) {
                 Text(profile?.fullName ?? "")
                     .font(.title2)
                     .fontWeight(.bold)
-                
+
                 if !username.isEmpty {
-                    Text("(@\(username))")
+                    Text("@\(username)")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                        .truncationMode(.tail)
                 }
             }
             
