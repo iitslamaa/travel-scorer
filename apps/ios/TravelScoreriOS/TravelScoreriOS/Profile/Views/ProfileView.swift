@@ -175,7 +175,9 @@ struct ProfileView: View {
                     }
                 }
                 .overlay(alignment: .top) {
-                    let progress = min(max((165 - headerMinY) / 80, 0), 1)
+                    let activationThreshold: CGFloat = 80
+                    let fadeDistance: CGFloat = 45
+                    let progress = min(max((-headerMinY - activationThreshold) / fadeDistance, 0), 1)
 
                     HStack(spacing: 10) {
                         miniAvatar
