@@ -3,38 +3,19 @@ import SwiftUI
 struct AuthLandingView: View {
     @EnvironmentObject private var sessionManager: SessionManager
 
-    // MARK: - State
-    @State private var phase: Phase = .intro
     @State private var showAuthUI = false
-    @State private var hasStarted = false
-
-    enum Phase {
-        case intro
-        case loop
-    }
 
     var body: some View {
         ZStack {
-            // MARK: - Video layer (always mounted, NO animation)
-            ZStack {
-                VideoBackgroundView(
-                    videoName: "intro",
-                    videoType: "mp4",
-                    loop: false
-                )
-                .ignoresSafeArea()
-                .opacity(phase == .intro ? 1 : 0)
+            // MARK: - Background video (loop only, no intro phase)
+            VideoBackgroundView(
+                videoName: "auth_loop",
+                videoType: "mp4",
+                loop: true
+            )
+            .ignoresSafeArea()
 
-                VideoBackgroundView(
-                    videoName: "auth_loop",
-                    videoType: "mp4",
-                    loop: true
-                )
-                .ignoresSafeArea()
-                .opacity(phase == .intro ? 0 : 1)
-            }
-
-            // MARK: - Auth UI (smooth + fast)
+            // MARK: - Auth UI
             if !sessionManager.isAuthenticated && !sessionManager.didContinueAsGuest {
                 VStack {
                     Spacer()
@@ -59,20 +40,7 @@ struct AuthLandingView: View {
             }
         }
         .onAppear {
-            guard !hasStarted else { return }
-            hasStarted = true
-
-            Task { @MainActor in
-                // 1️⃣ Intro plays (4s)
-                try? await Task.sleep(nanoseconds: 4_000_000_000)
-
-                // 2️⃣ Instantly switch to loop
-                phase = .loop
-
-                // 3️⃣ Show auth UI almost immediately (0.2s)
-                try? await Task.sleep(nanoseconds: 200_000_000)
-                showAuthUI = true
-            }
+            showAuthUI = true
         }
         .onChange(of: sessionManager.isAuthenticated) { isAuthed in
             if isAuthed {
