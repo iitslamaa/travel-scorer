@@ -197,6 +197,14 @@ struct ProfileView: View {
                         }
 
                         Spacer()
+
+                        if !profileVM.orderedTraveledCountries.isEmpty {
+                            Text("\(profileVM.orderedTraveledCountries.count) 🌍")
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(1)
+                        }
                     }
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
