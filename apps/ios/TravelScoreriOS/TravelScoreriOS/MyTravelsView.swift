@@ -2,19 +2,16 @@
 //  MyTravelsView.swift
 //  TravelScoreriOS
 //
-//  Created by Lama Yassine on 1/24/26.
-//
 
 import SwiftUI
 
 struct MyTravelsView: View {
-    @EnvironmentObject private var traveled: TraveledStore
-    @EnvironmentObject private var sessionManager: SessionManager
+    @EnvironmentObject private var profileVM: ProfileViewModel
     @State private var countries: [Country] = []
 
     private var visitedCountries: [Country] {
         countries
-            .filter { traveled.ids.contains($0.id) }
+            .filter { profileVM.orderedTraveledCountries.contains($0.id) }
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
@@ -59,18 +56,23 @@ struct MyTravelsView: View {
             CountryDetailView(country: country)
         }
         .task {
+            // Ensure profileVM is bound to current user
+            if let id = SupabaseManager.shared.currentUserId {
+                profileVM.setUserIdIfNeeded(id)
+            }
+
             // 1) Show cached data immediately (fast/offline)
             if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
                 countries = cached
             }
 
-            // 2) Try to refresh from API (skips if refreshed recently)
+            // 2) Try to refresh from API
             if let fresh = await CountryAPI.refreshCountriesIfNeeded(minInterval: 60), !fresh.isEmpty {
                 countries = fresh
                 return
             }
 
-            // 3) If we still have nothing, fall back to bundled data
+            // 3) Fallback to bundled data
             if countries.isEmpty {
                 countries = DataLoader.loadCountriesFromBundle()
             }
@@ -81,12 +83,9 @@ struct MyTravelsView: View {
 #Preview {
     NavigationStack {
         MyTravelsView()
-            .environmentObject(TraveledStore())
             .environmentObject(
-                SessionManager(
-                    supabase: SupabaseManager.shared,
-                    bucketListStore: BucketListStore(),
-                    traveledStore: TraveledStore()
+                ProfileViewModel(
+                    profileService: ProfileService(supabase: SupabaseManager.shared)
                 )
             )
     }

@@ -233,7 +233,6 @@ struct ProfileView: View {
         }
         .onAppear {
             profileVM.setUserIdIfNeeded(userId)
-            Task { try? await profileVM.refreshRelationshipState() }
         }
     }
   

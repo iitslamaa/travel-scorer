@@ -2,18 +2,16 @@
 //  BucketListView.swift
 //  TravelScoreriOS
 //
-//  Created by Lama Yassine on 1/24/26.
-//
 
 import SwiftUI
 
 struct BucketListView: View {
-    @EnvironmentObject private var bucketList: BucketListStore
+    @EnvironmentObject private var profileVM: ProfileViewModel
     @State private var countries: [Country] = []
 
     private var bucketedCountries: [Country] {
         countries
-            .filter { bucketList.ids.contains($0.id) }
+            .filter { profileVM.viewedBucketListCountries.contains($0.id) }
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
@@ -63,13 +61,17 @@ struct BucketListView: View {
                 countries = cached
             }
 
-            // 2) Try to refresh from API (skips if refreshed recently)
+            // 2) Try to refresh from API
             if let fresh = await CountryAPI.refreshCountriesIfNeeded(minInterval: 60), !fresh.isEmpty {
                 countries = fresh
-                return
             }
 
-            // 3) If we still have nothing, fall back to bundled data
+            // DEBUG PRINTS
+            print("🟢 Bucket ISO codes:", profileVM.orderedBucketListCountries)
+            print("🟢 First 20 Country IDs from dataset:", countries.map { $0.id }.prefix(20))
+            print("🟢 All dataset IDs:", countries.map { $0.id })
+
+            // 3) Fallback to bundled data
             if countries.isEmpty {
                 countries = DataLoader.loadCountriesFromBundle()
             }
@@ -80,6 +82,6 @@ struct BucketListView: View {
 #Preview {
     NavigationStack {
         BucketListView()
-            .environmentObject(BucketListStore())
+            .environmentObject(ProfileViewModel(profileService: ProfileService(supabase: SupabaseManager.shared)))
     }
 }

@@ -45,12 +45,6 @@ struct TravelScoreriOSApp: App {
                 .environmentObject(bucketListStore)
                 .environmentObject(traveledStore)
                 .environmentObject(profileViewModel)
-                .onReceive(sessionManager.userIdDidChange) { userId in
-                    profileViewModel.setUserIdIfNeeded(userId)
-                    Task {
-                        await profileViewModel.load()
-                    }
-                }
         }
     }
 }

@@ -137,6 +137,10 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
+    func refreshProfile() async {
+        await load()
+    }
+    
     // MARK: - Save (single source of truth)
     func saveProfile(
         firstName: String?,
@@ -172,11 +176,10 @@ final class ProfileViewModel: ObservableObject {
                 payload: payload
             )
             
-            // 🔁 Re-fetch profile row directly (avoid wiping with fetchOrCreateProfile)
-            profile = try await profileService.fetchMyProfile(userId: userId)
-            try await refreshRelationshipState()
-            
-            print("💾 Saved + reloaded profile:", profile as Any)
+            // 🔁 Reload full profile state (profile + traveled + bucket + mutuals)
+            await load()
+
+            print("💾 Saved + fully reloaded profile state")
             
         } catch {
             errorMessage = error.localizedDescription
@@ -358,6 +361,52 @@ final class ProfileViewModel: ObservableObject {
             print("❌ Cancel request failed:", error)
         }
     }
+    // MARK: - Bucket Toggle
+
+    func toggleBucket(_ countryId: String) async {
+        guard let currentUserId = supabase.currentUserId else {
+            print("❌ toggleBucket: No current user")
+            return
+        }
+
+        let wasInBucket = viewedBucketListCountries.contains(countryId)
+
+        // Optimistic UI update
+        if wasInBucket {
+            viewedBucketListCountries.remove(countryId)
+        } else {
+            viewedBucketListCountries.insert(countryId)
+        }
+
+        computeOrderedLists()
+
+        do {
+            if wasInBucket {
+                try await profileService.removeFromBucketList(
+                    userId: currentUserId,
+                    countryCode: countryId
+                )
+            } else {
+                try await profileService.addToBucketList(
+                    userId: currentUserId,
+                    countryCode: countryId
+                )
+            }
+        } catch {
+            // Rollback if server write fails
+            if wasInBucket {
+                viewedBucketListCountries.insert(countryId)
+            } else {
+                viewedBucketListCountries.remove(countryId)
+            }
+
+            computeOrderedLists()
+
+            print("❌ toggleBucket rolled back due to error:", error)
+            errorMessage = error.localizedDescription
+        }
+    }
+
     // MARK: - Mutual Bucket Logic
     
     func computeMutualBucketList(
