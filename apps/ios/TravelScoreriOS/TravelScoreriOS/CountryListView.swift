@@ -30,8 +30,7 @@ struct CountryListView: View {
         self.searchText = searchText
     }
 
-    @EnvironmentObject private var bucketList: BucketListStore
-    @EnvironmentObject private var traveled: TraveledStore
+    @EnvironmentObject private var profileVM: ProfileViewModel
 
     @State private var sort: CountrySort = .name
     @State private var sortOrder: SortOrder = .descending
@@ -147,18 +146,30 @@ struct CountryListView: View {
                 .padding(.vertical, 6)
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button {
-                        bucketList.toggle(idStr)
-                        flashConfirm(.bucket, for: idStr)
+                        Task {
+                            await profileVM.toggleBucket(idStr)
+                            flashConfirm(.bucket, for: idStr)
+                        }
                     } label: {
-                        Text(bucketList.contains(idStr) ? "🪣 Unbucket" : "🪣 Bucket")
+                        Text(
+                            profileVM.viewedBucketListCountries.contains(idStr)
+                            ? "🪣 Unbucket"
+                            : "🪣 Bucket"
+                        )
                     }
                     .tint(.blue)
 
                     Button {
-                        traveled.toggle(idStr)
-                        flashConfirm(.visited, for: idStr)
+                        Task {
+                            await profileVM.toggleTraveled(idStr)
+                            flashConfirm(.visited, for: idStr)
+                        }
                     } label: {
-                        Text(traveled.contains(idStr) ? "📝 Unvisit" : "📝 Visited")
+                        Text(
+                            profileVM.viewedTraveledCountries.contains(idStr)
+                            ? "📝 Unvisit"
+                            : "📝 Visited"
+                        )
                     }
                     .tint(.green)
                 }
@@ -272,5 +283,4 @@ extension View {
 #Preview {
     CountryListView(showsSearchBar: true, searchText: "")
         .environmentObject(BucketListStore())
-        .environmentObject(TraveledStore())
 }
