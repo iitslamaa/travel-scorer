@@ -59,6 +59,16 @@ final class SupabaseManager {
         authStateSubject.send(())
     }
 
+    /// Deletes the currently authenticated user account via Edge Function
+    func deleteAccount() async throws {
+        // Call the deployed edge function
+        _ = try await client.functions.invoke("delete-account")
+
+        // Sign out locally after backend deletion
+        try await client.auth.signOut()
+        authStateSubject.send(())
+    }
+
     // MARK: - User Queries
 
     /// Returns the currently authenticated user's ID

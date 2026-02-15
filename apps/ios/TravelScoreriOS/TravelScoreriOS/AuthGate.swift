@@ -5,8 +5,9 @@ struct AuthGate: View {
 
     var body: some View {
         ZStack {
-            if sessionManager.isAuthenticated || sessionManager.didContinueAsGuest {
+            if sessionManager.isAuthenticated {
                 RootTabView()
+                    .id(sessionManager.authScreenNonce)
                     .transition(.opacity)
             } else {
                 AuthLandingView()
@@ -15,6 +16,6 @@ struct AuthGate: View {
             }
         }
         .animation(.easeInOut(duration: 0.25), value: sessionManager.isAuthenticated)
-        .animation(.easeInOut(duration: 0.25), value: sessionManager.didContinueAsGuest)
+        .animation(.easeInOut(duration: 0.25), value: sessionManager.authScreenNonce)
     }
 }

@@ -14,6 +14,7 @@ final class SessionManager: ObservableObject {
     @Published var didContinueAsGuest: Bool = false
     @Published private(set) var userId: UUID? = nil
     @Published private(set) var authScreenNonce: UUID = UUID()
+    @Published private(set) var isAuthSuppressed: Bool = false
 
 
     private let supabase: SupabaseManager
@@ -58,6 +59,7 @@ final class SessionManager: ObservableObject {
     // MARK: - Public API
 
     func continueAsGuest() {
+        isAuthSuppressed = false
         didContinueAsGuest = true
         isAuthenticated = false
         print("🧪 continueAsGuest → didContinueAsGuest=true")
@@ -66,6 +68,7 @@ final class SessionManager: ObservableObject {
 
     func signOut() async {
         try? await supabase.signOut()
+        isAuthSuppressed = false
         didContinueAsGuest = false
         isAuthenticated = false
         userId = nil
@@ -83,15 +86,39 @@ final class SessionManager: ObservableObject {
         authScreenNonce = UUID()
     }
 
+    /// Use this after a successful account deletion to force the UI back to auth,
+    /// even if a stale local session token still exists briefly.
+    func handleAccountDeleted() {
+        isAuthSuppressed = true
+        didContinueAsGuest = false
+        isAuthenticated = false
+        userId = nil
+        hasMergedGuestData = false
+        didEnsureProfile = false
+        syncTask?.cancel()
+        syncTask = nil
+        bumpAuthScreen()
+    }
+
     /// Call this after ANY auth attempt (Apple / Google / Email)
     /// to deterministically update UI state.
     func forceRefreshAuthState(source: String = "manual") async {
+        // If we just deleted an account, keep UI in logged-out state until a fresh login occurs.
+        if isAuthSuppressed {
+            print("🧪 forceRefreshAuthState(\(source)) suppressed → staying logged out")
+            isAuthenticated = false
+            userId = nil
+            bumpAuthScreen()
+            return
+        }
         do {
             let session = try await supabase.fetchCurrentSession()
 
             print("🧪 forceRefreshAuthState(\(source)) session:", session as Any)
 
             if let session {
+                // Fresh valid session observed — allow auth again
+                isAuthSuppressed = false
                 if session.isExpired {
                     print("🧪 session expired during refresh — staying in guest mode")
                     isAuthenticated = false
@@ -110,8 +137,12 @@ final class SessionManager: ObservableObject {
                     }
                 }
             } else {
-                print("⚠️ no session during refresh — preserving existing auth state")
-                // 🔥 DO NOT clear userId or isAuthenticated here
+                print("🧪 no session during refresh — clearing auth state")
+                isAuthenticated = false
+                userId = nil
+                hasMergedGuestData = false
+                didEnsureProfile = false
+                bumpAuthScreen()
             }
         } catch {
             print("⚠️ forceRefreshAuthState transient error:", error)
@@ -157,6 +188,13 @@ final class SessionManager: ObservableObject {
 
     private func refreshFromCurrentSession(source: String) {
         Task {
+            if self.isAuthSuppressed {
+                print("🧪 refreshFromCurrentSession(\(source)) suppressed → staying logged out")
+                self.isAuthenticated = false
+                self.userId = nil
+                self.bumpAuthScreen()
+                return
+            }
             do {
                 let session = try await supabase.fetchCurrentSession()
                 print("🧪 refreshFromCurrentSession(\(source)):", session as Any)
@@ -171,8 +209,12 @@ final class SessionManager: ObservableObject {
                         try? await profileService.ensureProfileExists(userId: session.user.id)
                     }
                 } else {
-                    print("⚠️ refresh returned no session — preserving existing auth state")
-                    // 🔥 DO NOT clear userId or isAuthenticated here
+                    print("🧪 refresh returned no session — clearing auth state")
+                    isAuthenticated = false
+                    userId = nil
+                    hasMergedGuestData = false
+                    didEnsureProfile = false
+                    bumpAuthScreen()
                 }
             } catch {
                 print("⚠️ refreshFromCurrentSession transient error:", error)
