@@ -49,7 +49,7 @@ struct ProfileInfoSection: View {
                 )
 
                 CollapsibleCountrySection(
-                    title: "Want to Visit",
+                    title: "Bucket List",
                     countryCodes: orderedBucketListCountries,
                     highlightColor: .blue
                 )
@@ -64,7 +64,7 @@ struct ProfileInfoSection: View {
                 )
 
                 CollapsibleCountrySection(
-                    title: "Want to Visit",
+                    title: "Bucket List",
                     countryCodes: orderedBucketListCountries,
                     highlightColor: .blue,
                     mutualCountries: Set(mutualBucketCountries)
