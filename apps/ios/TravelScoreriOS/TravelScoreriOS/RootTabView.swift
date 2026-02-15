@@ -32,12 +32,36 @@ struct RootTabView: View {
                 Label("When To Go", systemImage: "calendar")
             }
 
-            // Friends
+            // Friends (auth required)
             NavigationStack {
-                if let userId = sessionManager.userId {
+                if sessionManager.isAuthenticated,
+                   let userId = sessionManager.userId {
                     FriendsView(userId: userId)
                 } else {
-                    ProgressView()
+                    VStack(spacing: 20) {
+                        Spacer()
+
+                        Text("Create an account to add your friends!")
+                            .font(.headline)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+
+                        Button {
+                            sessionManager.didContinueAsGuest = false
+                            sessionManager.bumpAuthScreen()
+                        } label: {
+                            Text("Create Account / Log In")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
+                        .padding(.horizontal, 40)
+
+                        Spacer()
+                    }
                 }
             }
             .tabItem {
@@ -45,15 +69,35 @@ struct RootTabView: View {
             }
             .badge(profileVM.pendingRequestCount)
 
-            // Profile
-            Group {
-                if let userId = sessionManager.userId {
-                    NavigationStack {
-                        ProfileView(userId: userId)
-                    }
+            // Profile (auth required)
+            NavigationStack {
+                if sessionManager.isAuthenticated,
+                   let userId = sessionManager.userId {
+                    ProfileView(userId: userId)
                 } else {
-                    NavigationStack {
-                        ProgressView()
+                    VStack(spacing: 20) {
+                        Spacer()
+
+                        Text("Create an account to customize your profile!")
+                            .font(.headline)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal)
+
+                        Button {
+                            sessionManager.didContinueAsGuest = false
+                            sessionManager.bumpAuthScreen()
+                        } label: {
+                            Text("Create Account / Log In")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.blue)
+                                .foregroundColor(.white)
+                                .cornerRadius(12)
+                        }
+                        .padding(.horizontal, 40)
+
+                        Spacer()
                     }
                 }
             }
