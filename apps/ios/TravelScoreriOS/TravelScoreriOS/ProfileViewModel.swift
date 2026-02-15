@@ -7,6 +7,7 @@
 import Foundation
 import Combine
 import PostgREST
+import Supabase
 
 enum RelationshipState {
     case selfProfile
@@ -403,6 +404,57 @@ final class ProfileViewModel: ObservableObject {
             computeOrderedLists()
 
             print("❌ toggleBucket rolled back due to error:", error)
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    // MARK: - Traveled Toggle
+
+    func toggleTraveled(_ countryId: String) async {
+        guard let currentUserId = userId else {
+            print("❌ toggleTraveled: No bound userId")
+            return
+        }
+
+        let wasVisited = viewedTraveledCountries.contains(countryId)
+
+        // Optimistic UI update
+        if wasVisited {
+            viewedTraveledCountries.remove(countryId)
+        } else {
+            viewedTraveledCountries.insert(countryId)
+        }
+
+        computeOrderedLists()
+
+        do {
+            if wasVisited {
+                try await supabase.client
+                    .from("user_traveled")
+                    .delete()
+                    .eq("user_id", value: currentUserId.uuidString)
+                    .eq("country_id", value: countryId)
+                    .execute()
+            } else {
+                try await supabase.client
+                    .from("user_traveled")
+                    .insert([
+                        "user_id": currentUserId.uuidString,
+                        "country_id": countryId
+                    ])
+                    .execute()
+            }
+        } catch {
+            // Rollback on failure
+            if wasVisited {
+                viewedTraveledCountries.insert(countryId)
+            } else {
+                viewedTraveledCountries.remove(countryId)
+            }
+
+            computeOrderedLists()
+
+            print("❌ toggleTraveled rolled back due to error:", error)
             errorMessage = error.localizedDescription
         }
     }

@@ -18,7 +18,6 @@ struct CountryDetailView: View {
                 CountryHeaderCard(country: country)
                     .padding(.horizontal)
 
-
                 CountryAdvisoryCard(country: country)
                     .padding(.horizontal)
                 
