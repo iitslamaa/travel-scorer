@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct CountryDetailView: View {
+    private let isTravelSafetyEnabled = false
     @State var country: Country
     @EnvironmentObject private var profileVM: ProfileViewModel
 
@@ -21,8 +22,10 @@ struct CountryDetailView: View {
                 CountryAdvisoryCard(country: country)
                     .padding(.horizontal)
                 
-                CountryTravelSafeCard(country: country)
-                    .padding(.horizontal)
+                if isTravelSafetyEnabled {
+                    CountryTravelSafeCard(country: country)
+                        .padding(.horizontal)
+                }
 
                 CountrySeasonalityCard(country: country)
                     .padding(.horizontal)
