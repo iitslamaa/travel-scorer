@@ -40,6 +40,13 @@ struct ProfileSettingsView: View {
     @State private var showNextDestinationPicker = false
     @State private var showAddLanguage = false
 
+    // Delete account state
+    @State private var showDeleteConfirm = false
+    @State private var showDeleteSheet = false
+    @State private var deleteText = ""
+    @State private var isDeleting = false
+    @State private var deleteError: String? = nil
+
     var body: some View {
         Group {
             if SupabaseManager.shared.currentUserId != viewedUserId {
@@ -107,6 +114,20 @@ struct ProfileSettingsView: View {
                             HStack {
                                 Image(systemName: "arrow.backward.square")
                                 Text("Sign Out")
+                                    .fontWeight(.semibold)
+                                Spacer()
+                            }
+                            .foregroundStyle(.red)
+                        }
+                    }
+
+                    SectionCard {
+                        Button(role: .destructive) {
+                            showDeleteConfirm = true
+                        } label: {
+                            HStack {
+                                Image(systemName: "trash")
+                                Text("Delete Account")
                                     .fontWeight(.semibold)
                                 Spacer()
                             }
@@ -198,6 +219,14 @@ struct ProfileSettingsView: View {
             }
             Button("Cancel", role: .cancel) {}
         }
+        .alert("Delete Account?", isPresented: $showDeleteConfirm) {
+            Button("Continue", role: .destructive) {
+                showDeleteSheet = true
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("This action cannot be undone.")
+        }
 
         // MARK: - Sheets (temporary pickers)
 
@@ -218,6 +247,47 @@ struct ProfileSettingsView: View {
         .sheet(isPresented: $showAddLanguage) {
             AddLanguageView { entry in
                 languages.append(entry)
+            }
+        }
+        .sheet(isPresented: $showDeleteSheet) {
+            NavigationStack {
+                VStack(spacing: 20) {
+                    Text("Type DELETE to confirm")
+                        .font(.headline)
+
+                    TextField("DELETE", text: $deleteText)
+                        .textInputAutocapitalization(.characters)
+                        .autocorrectionDisabled()
+                        .textFieldStyle(.roundedBorder)
+
+                    if let deleteError {
+                        Text(deleteError)
+                            .foregroundColor(.red)
+                            .font(.footnote)
+                    }
+
+                    Button(role: .destructive) {
+                        Task { await handleDelete() }
+                    } label: {
+                        if isDeleting {
+                            ProgressView()
+                        } else {
+                            Text("Permanently Delete")
+                        }
+                    }
+                    .disabled(deleteText.uppercased() != "DELETE" || isDeleting)
+
+                    Spacer()
+                }
+                .padding()
+                .navigationTitle("Delete Account")
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Close") {
+                            showDeleteSheet = false
+                        }
+                    }
+                }
             }
         }
     }
@@ -267,6 +337,25 @@ struct ProfileSettingsView: View {
             print("🔴 Avatar upload failed:", error)
             return nil
         }
+    }
+
+    private func handleDelete() async {
+        isDeleting = true
+        deleteError = nil
+
+        do {
+            try await SupabaseManager.shared.deleteAccount()
+            showDeleteSheet = false
+
+            // Force app back to auth screen even if a stale local session briefly exists
+            sessionManager.handleAccountDeleted()
+
+            dismiss()
+        } catch {
+            deleteError = "Failed to delete account. Please try again."
+        }
+
+        isDeleting = false
     }
 }
 
