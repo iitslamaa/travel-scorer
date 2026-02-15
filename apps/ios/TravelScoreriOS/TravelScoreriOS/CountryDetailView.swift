@@ -10,6 +10,7 @@ import SwiftUI
 struct CountryDetailView: View {
     @State var country: Country
     @State private var showFullAdvisory = false
+    @EnvironmentObject private var profileVM: ProfileViewModel
 
     var body: some View {
         ScrollView {
@@ -54,6 +55,15 @@ struct CountryDetailView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(.ultraThinMaterial)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                .padding(.horizontal)
+
+                // Bucket toggle row
+                HStack {
+                    Spacer()
+                    BucketToggleButton(countryId: country.id)
+                        .environmentObject(profileVM)
+                        .font(.title2)
+                }
                 .padding(.horizontal)
 
                 // Travel advisory section — web-style factor card
@@ -373,6 +383,11 @@ struct CountryDetailView: View {
         }
         .navigationTitle(country.name)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            if let id = SupabaseManager.shared.currentUserId {
+                profileVM.setUserIdIfNeeded(id)
+            }
+        }
     }
 
     // MARK: - Factor helpers

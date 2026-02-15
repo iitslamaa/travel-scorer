@@ -15,8 +15,6 @@ final class SessionManager: ObservableObject {
     @Published private(set) var userId: UUID? = nil
     @Published private(set) var authScreenNonce: UUID = UUID()
 
-    /// Emits whenever a *real* authenticated user id becomes available
-    let userIdDidChange = PassthroughSubject<UUID, Never>()
 
     private let supabase: SupabaseManager
     private var cancellables = Set<AnyCancellable>()
@@ -85,46 +83,6 @@ final class SessionManager: ObservableObject {
         authScreenNonce = UUID()
     }
 
-    func toggleBucket(_ countryId: String) {
-        // 1. Update local store first (optimistic UI)
-        bucketListStore.toggle(countryId)
-
-        if !isAuthenticated {
-            guestBucketSnapshot = bucketListStore.ids
-        }
-
-        // 2. If authenticated, write-through to Supabase
-        guard let userId = userId else { return }
-
-        Task {
-            await listSync.setBucket(
-                userId: userId,
-                countryId: countryId,
-                add: bucketListStore.contains(countryId)
-            )
-        }
-    }
-
-    func toggleTraveled(_ countryId: String) {
-        // 1. Update local store first (optimistic UI)
-        traveledStore.toggle(countryId)
-
-        if !isAuthenticated {
-            guestTraveledSnapshot = traveledStore.ids
-        }
-
-        // 2. If authenticated, write-through to Supabase
-        guard let userId = userId else { return }
-
-        Task {
-            await listSync.setTraveled(
-                userId: userId,
-                countryId: countryId,
-                add: traveledStore.contains(countryId)
-            )
-        }
-    }
-
     /// Call this after ANY auth attempt (Apple / Google / Email)
     /// to deterministically update UI state.
     func forceRefreshAuthState(source: String = "manual") async {
@@ -144,15 +102,12 @@ final class SessionManager: ObservableObject {
                     print("🧪 session is valid → isAuthenticated=true")
                     isAuthenticated = true
                     userId = session.user.id
-                    userIdDidChange.send(session.user.id)
 
                     if !didEnsureProfile {
                         didEnsureProfile = true
                         let profileService = ProfileService(supabase: supabase)
                         try? await profileService.ensureProfileExists(userId: session.user.id)
                     }
-
-                    syncListsForAuthenticatedSession(session)
                 }
             } else {
                 print("⚠️ no session during refresh — preserving existing auth state")
@@ -209,15 +164,12 @@ final class SessionManager: ObservableObject {
                 if let session, !session.isExpired {
                     isAuthenticated = true
                     userId = session.user.id
-                    userIdDidChange.send(session.user.id)
 
                     if !didEnsureProfile {
                         didEnsureProfile = true
                         let profileService = ProfileService(supabase: supabase)
                         try? await profileService.ensureProfileExists(userId: session.user.id)
                     }
-
-                    syncListsForAuthenticatedSession(session)
                 } else {
                     print("⚠️ refresh returned no session — preserving existing auth state")
                     // 🔥 DO NOT clear userId or isAuthenticated here
@@ -236,66 +188,5 @@ final class SessionManager: ObservableObject {
                 self?.refreshFromCurrentSession(source: "authEvent")
             }
             .store(in: &cancellables)
-    }
-
-    private func syncListsForAuthenticatedSession(_ session: Session) {
-        // Cancel any in-flight sync to avoid races
-        syncTask?.cancel()
-
-        syncTask = Task { [weak self] in
-            guard let self else { return }
-
-            let uid = session.user.id
-            let guestBucket = self.bucketListStore.ids
-            let guestTraveled = self.traveledStore.ids
-
-            let existingBucket = (try? await self.listSync.fetchBucketList(userId: uid)) ?? []
-            let existingTraveled = (try? await self.listSync.fetchTraveled(userId: uid)) ?? []
-
-            // 1) Merge guest data first (only once)
-            if !self.hasMergedGuestData && (!guestBucket.isEmpty || !guestTraveled.isEmpty) {
-                print("🧪 merging guest→account bucket=\(guestBucket.count) traveled=\(guestTraveled.count) user=\(uid)")
-
-                let bucketToInsert = guestBucket.subtracting(existingBucket)
-                let traveledToInsert = guestTraveled.subtracting(existingTraveled)
-
-                for id in bucketToInsert {
-                    await self.listSync.setBucket(userId: uid, countryId: id, add: true)
-                }
-
-                for id in traveledToInsert {
-                    await self.listSync.setTraveled(userId: uid, countryId: id, add: true)
-                }
-            }
-
-            // 2) Fetch from Supabase AFTER merge
-            do {
-                let bucket = try await self.listSync.fetchBucketList(userId: uid)
-                let traveled = try await self.listSync.fetchTraveled(userId: uid)
-
-                self.bucketListStore.replace(with: bucket)
-                self.traveledStore.replace(with: traveled)
-
-                print("🧪 hydrated from supabase bucket=\(bucket.count) traveled=\(traveled.count) user=\(uid)")
-
-                // 3) Mark merge complete only if fetched data contains guest snapshot
-                if !self.hasMergedGuestData && (!guestBucket.isEmpty || !guestTraveled.isEmpty) {
-                    let mergedOK =
-                        guestBucket.isSubset(of: bucket) &&
-                        guestTraveled.isSubset(of: traveled)
-
-                    if mergedOK {
-                        self.hasMergedGuestData = true
-                        self.guestBucketSnapshot.removeAll()
-                        self.guestTraveledSnapshot.removeAll()
-                        print("🧪 guest→account merge complete")
-                    } else {
-                        print("🧪 merge incomplete; will retry on next auth refresh")
-                    }
-                }
-            } catch {
-                print("🧪 supabase hydration failed:", error)
-            }
-        }
     }
 }

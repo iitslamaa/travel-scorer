@@ -214,4 +214,44 @@ final class ProfileService {
 
         return Set(response.value.map { $0.countryId })
     }
+
+    // MARK: - Bucket List Mutations
+
+    func addToBucketList(
+        userId: UUID,
+        countryCode: String
+    ) async throws {
+
+        struct InsertRow: Encodable {
+            let user_id: String
+            let country_id: String
+        }
+
+        let payload = InsertRow(
+            user_id: userId.uuidString,
+            country_id: countryCode
+        )
+
+        print("📡 INSERT user:", userId.uuidString, "country:", countryCode)
+        try await supabase.client
+            .from("user_bucket_list")
+            .insert(payload)
+            .execute()
+        print("✅ INSERT completed for:", countryCode)
+    }
+
+    func removeFromBucketList(
+        userId: UUID,
+        countryCode: String
+    ) async throws {
+
+        print("📡 DELETE user:", userId.uuidString, "country:", countryCode)
+        try await supabase.client
+            .from("user_bucket_list")
+            .delete()
+            .eq("user_id", value: userId.uuidString)
+            .eq("country_id", value: countryCode)
+            .execute()
+        print("✅ DELETE completed for:", countryCode)
+    }
 }
