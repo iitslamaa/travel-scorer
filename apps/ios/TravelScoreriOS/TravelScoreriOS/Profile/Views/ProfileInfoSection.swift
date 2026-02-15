@@ -147,17 +147,19 @@ struct ProfileInfoSection: View {
 
     private var nextDestinationCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Next Destination")
-                .font(.subheadline)
-                .fontWeight(.semibold)
+            if let code = nextDestination, !code.isEmpty {
+                let upper = code.uppercased()
+                let flag = flagEmoji(for: upper)
+                let name = countryName(for: upper)
 
-            if let destination = nextDestination, !destination.isEmpty {
-                Text(destination)
+                Text("Next Destination: \(name) \(flag)")
                     .font(.subheadline)
-                    .foregroundStyle(.primary)
+                    .fontWeight(.semibold)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
             } else {
-                Text("Not set")
-                    .font(.caption)
+                Text("Next Destination: Not set")
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
         }
@@ -166,6 +168,21 @@ struct ProfileInfoSection: View {
         .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
+    }
+
+    private func flagEmoji(for countryCode: String) -> String {
+        countryCode
+            .uppercased()
+            .unicodeScalars
+            .compactMap { UnicodeScalar(127397 + $0.value) }
+            .map { String($0) }
+            .joined()
+    }
+
+    private func countryName(for countryCode: String) -> String {
+        let upper = countryCode.uppercased()
+        let locale = Locale(identifier: "en_US")
+        return locale.localizedString(forRegionCode: upper) ?? upper
     }
 
     private var lockedProfileMessage: some View {
