@@ -24,10 +24,10 @@ enum TravelStyle: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var label: String {
         switch self {
-        case .budget: return "BUDGET"
-        case .comfortable: return "COMFORTABLE"
-        case .inBetween: return "IN-between"
-        case .both: return "Both on occasion"
+        case .budget: return "Budget"
+        case .comfortable: return "Comfortable"
+        case .inBetween: return "In Between"
+        case .both: return "Both on Occasion"
         }
     }
 }
