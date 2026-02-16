@@ -29,6 +29,7 @@ export function useCountries() {
         const text = await res.text();
 
         const data = JSON.parse(text);
+        console.log('SAMPLE COUNTRY:', Array.isArray(data) ? data[0] : data);
 
         const mapped = Array.isArray(data)
           ? data.map((c: any) => ({
