@@ -8,13 +8,25 @@ export function useCountries() {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
+        console.log('Starting countries fetch...');
+
         const res = await fetch(
-          'https://travel-scorer.vercel.app/api/countries'
+          'https://travel-scorer.vercel.app/api/countries',
+          {
+            headers: {
+              Accept: 'application/json',
+            },
+          }
         );
 
-        const data = await res.json();
+        console.log('Fetch response status:', res.status);
 
-        console.log('Countries fetch:', data);
+        const text = await res.text();
+        console.log('Raw response length:', text.length);
+
+        const data = JSON.parse(text);
+
+        console.log('Parsed countries count:', Array.isArray(data) ? data.length : 'not array');
 
         setCountries(data);
       } catch (error) {
