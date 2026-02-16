@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, useColorScheme } from 'react-native';
 import { lightColors, darkColors } from '../../../../theme/colors';
+import ScorePill from '../../../../components/ScorePill';
 
 type Props = {
   score: number;
@@ -34,10 +35,6 @@ export default function SeasonalityCard({
   const scheme = useColorScheme();
   const theme = scheme === 'dark' ? darkColors : lightColors;
 
-  const pillBg = theme.greenBg;
-  const pillBorder = theme.greenBorder;
-  const pillText = theme.greenText;
-
   return (
     <View style={[styles.card, { backgroundColor: theme.card }]}>
       <View style={styles.headerRow}>
@@ -46,9 +43,7 @@ export default function SeasonalityCard({
       </View>
 
       <View style={styles.metricRow}>
-        <View style={[styles.metricPill, { backgroundColor: pillBg, borderColor: pillBorder }]}>
-          <Text style={[styles.metricPillText, { color: pillText }]}>{score}</Text>
-        </View>
+        <ScorePill score={Math.round(score)} size="lg" />
 
         <View style={{ flex: 1 }}>
           <Text style={[styles.metricTitle, { color: theme.textPrimary }]}>
@@ -121,20 +116,6 @@ const styles = StyleSheet.create({
   metricRow: {
     flexDirection: 'row',
     gap: 16,
-  },
-
-  metricPill: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1.5,
-  },
-
-  metricPillText: {
-    fontSize: 20,
-    fontWeight: '800',
   },
 
   metricTitle: {
