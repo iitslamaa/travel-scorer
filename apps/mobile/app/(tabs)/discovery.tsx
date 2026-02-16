@@ -10,6 +10,7 @@ import {
   Keyboard,
   useWindowDimensions,
 } from 'react-native';
+import { router } from 'expo-router';
 import { useState, useMemo } from 'react';
 import AuthGate from '../../components/AuthGate';
 import { useCountries } from '../../hooks/useCountries';
@@ -150,7 +151,18 @@ export default function DiscoveryScreen() {
               </View>
             }
             renderItem={({ item }) => (
-              <CountryRow country={item} />
+              <Pressable
+                onPress={() =>
+                  router.push({
+                    pathname: '/country/[iso2]',
+                    params: { iso2: item.iso2 },
+                  })
+                }
+                android_ripple={{ color: '#E0E0E0' }}
+                style={{ borderRadius: 12 }}
+              >
+                <CountryRow country={item} />
+              </Pressable>
             )}
           />
         )}

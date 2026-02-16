@@ -1,0 +1,180 @@
+import { View, Text, StyleSheet, Pressable, Linking, useColorScheme } from 'react-native';
+import { useMemo, useState } from 'react';
+import { lightColors, darkColors } from '../../../../theme/colors';
+
+type Props = {
+  score: number;
+  level: number | string;
+  summary?: string;
+  updatedAtLabel?: string;
+  url?: string;
+  normalizedLabel?: string;
+  weightOnlyLabel?: string;
+  weightLabel?: string;
+};
+
+export default function AdvisoryCard({
+  score,
+  level,
+  summary,
+  updatedAtLabel,
+  url,
+  normalizedLabel,
+  weightOnlyLabel,
+  weightLabel = 'U.S. Dept. of State · 10%',
+}: Props) {
+  const [expanded, setExpanded] = useState(false);
+
+  const scheme = useColorScheme();
+  const theme = scheme === 'dark' ? darkColors : lightColors;
+
+  const { preview, canExpand } = useMemo(() => {
+    const clean = (summary ?? '').trim();
+    const max = 130;
+    if (clean.length <= max) return { preview: clean, canExpand: false };
+    return { preview: clean.slice(0, max).trim() + '…', canExpand: true };
+  }, [summary]);
+
+  const body = expanded ? summary : preview;
+
+  return (
+    <View style={[styles.card, { backgroundColor: theme.card }]}>
+      <View style={styles.headerRow}>
+        <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>Travel advisory</Text>
+        <Text style={[styles.weightText, { color: theme.textSecondary }]}>{weightLabel}</Text>
+      </View>
+
+      <View style={styles.metricRow}>
+        <View style={[styles.metricPill, { backgroundColor: theme.greenBg, borderColor: theme.greenBorder }]}>
+          <Text style={[styles.metricPillText, { color: theme.greenText }]}>{Math.round(score)}</Text>
+        </View>
+
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.metricTitle, { color: theme.textPrimary }]}>Level {level}</Text>
+
+          {!!summary && (
+            <Text style={[styles.metricDescription, { color: theme.textSecondary }]}>{body}</Text>
+          )}
+
+          {canExpand && (
+            <Pressable onPress={() => setExpanded(v => !v)}>
+              <Text style={styles.showMore}>
+                {expanded ? 'Show less' : 'Show more'}
+              </Text>
+            </Pressable>
+          )}
+
+          {!!updatedAtLabel && (
+            <Text style={[styles.metaText, { color: theme.textMuted }]}>{updatedAtLabel}</Text>
+          )}
+
+          {!!url && (
+            <Pressable onPress={() => Linking.openURL(url)}>
+              <Text style={styles.link}>View official advisory</Text>
+            </Pressable>
+          )}
+
+          {(!!normalizedLabel || !!weightOnlyLabel) && (
+            <View style={styles.footerRow}>
+              {!!normalizedLabel && (
+                <Text style={[styles.footerText, { color: theme.textMuted }]}>{normalizedLabel}</Text>
+              )}
+              {!!weightOnlyLabel && (
+                <Text style={[styles.footerText, { color: theme.textMuted }]}>{weightOnlyLabel}</Text>
+              )}
+            </View>
+          )}
+        </View>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    borderRadius: 22,
+    padding: 16,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
+
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+  },
+
+  weightText: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
+  metricRow: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+
+  metricPill: {
+    borderWidth: 1.5,
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  metricPillText: {
+    fontSize: 20,
+    fontWeight: '800',
+  },
+
+  metricTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    marginBottom: 6,
+  },
+
+  metricDescription: {
+    fontSize: 14,
+    lineHeight: 19,
+  },
+
+  showMore: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#2563EB',
+    fontWeight: '700',
+  },
+
+  metaText: {
+    marginTop: 8,
+    fontSize: 12.5,
+    fontWeight: '600',
+  },
+
+  link: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#2563EB',
+    fontWeight: '800',
+  },
+
+  footerRow: {
+    marginTop: 12,
+    flexDirection: 'row',
+    gap: 16,
+  },
+
+  footerText: {
+    fontSize: 12,
+    fontWeight: '700',
+  },
+});
