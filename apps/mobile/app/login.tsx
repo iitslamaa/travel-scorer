@@ -5,34 +5,26 @@ import {
   StyleSheet,
   Pressable,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { useState } from 'react';
 import { useRouter } from 'expo-router';
-import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { session } = useAuth();
 
-  useEffect(() => {
-    if (session) {
-      router.replace('/home');
-    }
-  }, [session]);
-
-  const handleLogin = async () => {
+  const handleEmailLogin = async () => {
     if (!email) return;
 
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: {
-        shouldCreateUser: true,
-      },
+      options: { shouldCreateUser: true },
     });
 
     setLoading(false);
@@ -48,36 +40,49 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={styles.container}
+    >
+      <View style={styles.inner}>
+        <Text style={styles.title}>Enter your email</Text>
 
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
+        <TextInput
+          placeholder="Email address"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          placeholderTextColor="#999"
+        />
 
-      <Pressable style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>
-          {loading ? 'Sending...' : 'Send Magic Link'}
-        </Text>
-      </Pressable>
+        <Pressable
+          style={[styles.button, loading && { opacity: 0.6 }]}
+          onPress={handleEmailLogin}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Sending...' : 'Send Code'}
+          </Text>
+        </Pressable>
 
-      <Pressable onPress={() => router.back()}>
-        <Text style={styles.link}>Back</Text>
-      </Pressable>
-    </View>
+        <Pressable onPress={() => router.back()}>
+          <Text style={styles.link}>Back</Text>
+        </Pressable>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
     justifyContent: 'center',
+    backgroundColor: '#F8F8F8',
+  },
+  inner: {
+    padding: 24,
   },
   title: {
     fontSize: 28,
@@ -85,24 +90,26 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 12,
-    borderRadius: 8,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
     marginBottom: 16,
   },
   button: {
     backgroundColor: 'black',
-    padding: 14,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
   },
   buttonText: {
     color: 'white',
     fontWeight: '600',
+    fontSize: 16,
   },
   link: {
-    marginTop: 16,
     textAlign: 'center',
+    marginTop: 16,
+    color: '#666',
   },
 });
