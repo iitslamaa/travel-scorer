@@ -5,6 +5,8 @@ import {
   StyleSheet,
   Pressable,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useState } from 'react';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -37,52 +39,80 @@ export default function VerifyScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Enter Code</Text>
-
-      <TextInput
-        placeholder="6-digit code"
-        value={code}
-        onChangeText={setCode}
-        style={styles.input}
-        keyboardType="number-pad"
-      />
-
-      <Pressable style={styles.button} onPress={handleVerify}>
-        <Text style={styles.buttonText}>
-          {loading ? 'Verifying...' : 'Verify'}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={styles.container}
+    >
+      <View style={styles.inner}>
+        <Text style={styles.title}>Enter Code</Text>
+        <Text style={styles.subtitle}>
+          We sent a 6-digit code to {email}
         </Text>
-      </Pressable>
-    </View>
+
+        <TextInput
+          placeholder="••••••"
+          value={code}
+          onChangeText={setCode}
+          style={styles.input}
+          keyboardType="number-pad"
+          maxLength={6}
+          placeholderTextColor="#999"
+        />
+
+        <Pressable
+          style={[
+            styles.button,
+            loading && { opacity: 0.6 },
+          ]}
+          onPress={handleVerify}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? 'Verifying...' : 'Verify'}
+          </Text>
+        </Pressable>
+      </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 24,
     justifyContent: 'center',
+    backgroundColor: '#F8F8F8',
+  },
+  inner: {
+    padding: 24,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '600',
-    marginBottom: 24,
+    fontSize: 30,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#666',
+    marginBottom: 32,
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 16,
+    backgroundColor: 'white',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 18,
+    letterSpacing: 6,
+    textAlign: 'center',
+    marginBottom: 24,
   },
   button: {
     backgroundColor: 'black',
-    padding: 14,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 12,
     alignItems: 'center',
   },
   buttonText: {
     color: 'white',
     fontWeight: '600',
+    fontSize: 16,
   },
 });
