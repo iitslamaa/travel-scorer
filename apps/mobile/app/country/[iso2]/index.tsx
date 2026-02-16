@@ -33,6 +33,7 @@ export default function CountryDetailScreen() {
 
   if (!countries) return null;
   if (!country) return null;
+  console.log('FLAG EMOJI:', (country as any).flagEmoji);
 
   const score = country.facts?.scoreTotal ?? 0;
   const advisoryLevel = country.facts?.advisoryLevel ?? '—';

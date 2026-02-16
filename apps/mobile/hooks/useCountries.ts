@@ -1,6 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Country } from '../types/Country';
 
+function iso2ToFlagEmoji(iso2?: string) {
+  if (!iso2 || iso2.length !== 2) return undefined;
+  return iso2
+    .toUpperCase()
+    .split('')
+    .map(char => String.fromCodePoint(127397 + char.charCodeAt(0)))
+    .join('');
+}
+
 export function useCountries() {
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
@@ -8,8 +17,6 @@ export function useCountries() {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        console.log('Starting countries fetch...');
-
         const res = await fetch(
           'https://travel-scorer.vercel.app/api/countries',
           {
@@ -19,16 +26,18 @@ export function useCountries() {
           }
         );
 
-        console.log('Fetch response status:', res.status);
-
         const text = await res.text();
-        console.log('Raw response length:', text.length);
 
         const data = JSON.parse(text);
 
-        console.log('Parsed countries count:', Array.isArray(data) ? data.length : 'not array');
+        const mapped = Array.isArray(data)
+          ? data.map((c: any) => ({
+              ...c,
+              flagEmoji: iso2ToFlagEmoji(c.iso2),
+            }))
+          : [];
 
-        setCountries(data);
+        setCountries(mapped);
       } catch (error) {
         console.log('Countries fetch error:', error);
       } finally {

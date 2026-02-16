@@ -24,12 +24,15 @@ export default function HeaderCard({
     subregion && region ? `${subregion}, ${region}` : (region ?? subregion ?? '');
 
   return (
-    <View style={[styles.card, { backgroundColor: theme.card }]}>
+    <View style={[styles.card, { backgroundColor: theme.card }]}> 
       <View style={styles.left}>
-        {!!flagEmoji && <Text style={styles.flag}>{flagEmoji}</Text>}
-        <Text style={[styles.title, { color: theme.textPrimary }]}>
-          {name}
-        </Text>
+        <View style={styles.titleRow}>
+          {!!flagEmoji && <Text style={styles.flag}>{flagEmoji}</Text>}
+          <Text style={[styles.title, { color: theme.textPrimary }]}>
+            {name}
+          </Text>
+        </View>
+
         {!!locationLine && (
           <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
             {locationLine}
@@ -58,17 +61,24 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
 
-  left: { flex: 1 },
+  left: {
+    flex: 1,
+  },
+
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
 
   flag: {
-    fontSize: 34,
-    marginBottom: 4,
+    fontSize: 28,
+    marginRight: 8,
   },
 
   title: {
     fontSize: 24,
     fontWeight: '800',
-    marginBottom: 4,
   },
 
   subtitle: {
