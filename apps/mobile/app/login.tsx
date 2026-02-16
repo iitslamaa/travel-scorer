@@ -1,12 +1,27 @@
-import { View, Text, TextInput, StyleSheet, Pressable, Alert } from 'react-native';
-import { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Pressable,
+  Alert,
+} from 'react-native';
+import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useRouter } from 'expo-router';
+import { useAuth } from '../context/AuthContext';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { session } = useAuth();
+
+  useEffect(() => {
+    if (session) {
+      router.replace('/home');
+    }
+  }, [session]);
 
   const handleLogin = async () => {
     if (!email) return;
@@ -15,6 +30,9 @@ export default function LoginScreen() {
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
+      options: {
+        shouldCreateUser: true,
+      },
     });
 
     setLoading(false);
@@ -22,7 +40,10 @@ export default function LoginScreen() {
     if (error) {
       Alert.alert('Login Error', error.message);
     } else {
-      Alert.alert('Check your email', 'We sent you a login link.');
+      router.push({
+        pathname: '/verify',
+        params: { email },
+      });
     }
   };
 
