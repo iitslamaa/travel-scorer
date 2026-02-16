@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, useColorScheme } from 'react-native';
 import { lightColors, darkColors } from '../../../../theme/colors';
+import ScorePill from '../../../../components/ScorePill';
 
 type Props = {
   name: string;
@@ -8,28 +9,6 @@ type Props = {
   score: number;
   flagEmoji?: string;
 };
-
-function getScoreColors(score: number, theme: typeof lightColors) {
-  if (score >= 80) {
-    return {
-      bg: theme.greenBg,
-      border: theme.greenBorder,
-      text: theme.greenText,
-    };
-  }
-  if (score >= 50) {
-    return {
-      bg: theme.yellowBg,
-      border: theme.yellowBorder,
-      text: theme.yellowText,
-    };
-  }
-  return {
-    bg: theme.redBg,
-    border: theme.redBorder,
-    text: theme.redText,
-  };
-}
 
 export default function HeaderCard({
   name,
@@ -43,8 +22,6 @@ export default function HeaderCard({
 
   const locationLine =
     subregion && region ? `${subregion}, ${region}` : (region ?? subregion ?? '');
-
-  const colors = getScoreColors(score, theme);
 
   return (
     <View style={[styles.card, { backgroundColor: theme.card }]}>
@@ -60,19 +37,7 @@ export default function HeaderCard({
         )}
       </View>
 
-      <View
-        style={[
-          styles.scorePill,
-          {
-            backgroundColor: colors.bg,
-            borderColor: colors.border,
-          },
-        ]}
-      >
-        <Text style={[styles.scoreText, { color: colors.text }]}>
-          {Math.round(score)}
-        </Text>
-      </View>
+      <ScorePill score={Math.round(score)} size="lg" />
     </View>
   );
 }
@@ -109,19 +74,5 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     fontWeight: '600',
-  },
-
-  scorePill: {
-    borderWidth: 1.5,
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-    borderRadius: 999,
-    minWidth: 64,
-    alignItems: 'center',
-  },
-
-  scoreText: {
-    fontSize: 18,
-    fontWeight: '800',
   },
 });

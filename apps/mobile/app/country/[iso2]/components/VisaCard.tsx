@@ -1,11 +1,11 @@
 import { View, Text, StyleSheet, Pressable, Linking, useColorScheme } from 'react-native';
-
 import { lightColors, darkColors } from '../../../../theme/colors';
+import ScorePill from '../../../../components/ScorePill';
 
 type Props = {
   score: number;
-  weightLabel?: string;     // "US passport · 5%"
-  visaType?: string;        // "visa_free" | "evisa" | ...
+  weightLabel?: string;
+  visaType?: string;
   allowedDays?: number;
   notes?: string;
   sourceUrl?: string;
@@ -41,10 +41,6 @@ export default function VisaCard({
   const scheme = useColorScheme();
   const theme = scheme === 'dark' ? darkColors : lightColors;
 
-  const pillBg = theme.greenBg;
-  const pillBorder = theme.greenBorder;
-  const pillText = theme.greenText;
-
   return (
     <View style={[styles.card, { backgroundColor: theme.card }]}>
       <View style={styles.headerRow}>
@@ -53,9 +49,7 @@ export default function VisaCard({
       </View>
 
       <View style={styles.metricRow}>
-        <View style={[styles.metricPill, { backgroundColor: pillBg, borderColor: pillBorder }]}>
-          <Text style={[styles.metricPillText, { color: pillText }]}>{Math.round(score)}</Text>
-        </View>
+        <ScorePill score={Math.round(score)} size="lg" />
 
         <View style={{ flex: 1 }}>
           <Text style={[styles.metricTitle, { color: theme.textPrimary }]}>
@@ -74,8 +68,16 @@ export default function VisaCard({
 
           {(!!normalizedLabel || !!weightOnlyLabel) && (
             <View style={styles.footerRow}>
-              {!!normalizedLabel && <Text style={[styles.footerText, { color: theme.textMuted }]}>{normalizedLabel}</Text>}
-              {!!weightOnlyLabel && <Text style={[styles.footerText, { color: theme.textMuted }]}>{weightOnlyLabel}</Text>}
+              {!!normalizedLabel && (
+                <Text style={[styles.footerText, { color: theme.textMuted }]}>
+                  {normalizedLabel}
+                </Text>
+              )}
+              {!!weightOnlyLabel && (
+                <Text style={[styles.footerText, { color: theme.textMuted }]}>
+                  {weightOnlyLabel}
+                </Text>
+              )}
             </View>
           )}
         </View>
@@ -86,20 +88,16 @@ export default function VisaCard({
 
 const styles = StyleSheet.create({
   card: { borderRadius: 22, padding: 18, marginBottom: 18 },
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
   cardTitle: { fontSize: 18, fontWeight: '800' },
   weightText: { fontSize: 13, fontWeight: '600' },
 
   metricRow: { flexDirection: 'row', gap: 16 },
-  metricPill: {
-    borderWidth: 1.5,
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  metricPillText: { fontSize: 20, fontWeight: '800' },
 
   metricTitle: { fontSize: 16, fontWeight: '800', marginBottom: 6 },
   metricDescription: { fontSize: 14, lineHeight: 20 },

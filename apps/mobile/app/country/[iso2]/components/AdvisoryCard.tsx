@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Pressable, Linking, useColorScheme } from 'react-native';
 import { useMemo, useState } from 'react';
 import { lightColors, darkColors } from '../../../../theme/colors';
+import ScorePill from '../../../../components/ScorePill';
 
 type Props = {
   score: number;
@@ -45,9 +46,7 @@ export default function AdvisoryCard({
       </View>
 
       <View style={styles.metricRow}>
-        <View style={[styles.metricPill, { backgroundColor: theme.greenBg, borderColor: theme.greenBorder }]}>
-          <Text style={[styles.metricPillText, { color: theme.greenText }]}>{Math.round(score)}</Text>
-        </View>
+        <ScorePill score={Math.round(score)} size="lg" />
 
         <View style={{ flex: 1 }}>
           <Text style={[styles.metricTitle, { color: theme.textPrimary }]}>Level {level}</Text>
@@ -120,20 +119,6 @@ const styles = StyleSheet.create({
   metricRow: {
     flexDirection: 'row',
     gap: 16,
-  },
-
-  metricPill: {
-    borderWidth: 1.5,
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  metricPillText: {
-    fontSize: 20,
-    fontWeight: '800',
   },
 
   metricTitle: {
