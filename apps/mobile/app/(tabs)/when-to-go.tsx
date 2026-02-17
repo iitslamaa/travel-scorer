@@ -58,12 +58,14 @@ export default function WhenToGoScreen() {
         title="Peak season"
         description="Best weather and overall conditions — usually the busiest and priciest."
         countries={peak}
+        selectedMonth={selectedMonth}
       />
 
       <SeasonSection
         title="Shoulder season"
         description="Still good conditions, often fewer crowds and better value."
         countries={shoulder}
+        selectedMonth={selectedMonth}
       />
     </ScrollView>
   );
