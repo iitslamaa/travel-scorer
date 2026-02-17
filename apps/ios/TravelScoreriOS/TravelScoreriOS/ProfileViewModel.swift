@@ -29,6 +29,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var viewedTraveledCountries: Set<String> = []
     @Published var viewedBucketListCountries: Set<String> = []
     @Published var friendCount: Int = 0
+    @Published var friends: [Profile] = []
     @Published var mutualBucketCountries: [String] = []
     @Published var mutualTraveledCountries: [String] = []
     @Published var pendingRequestCount: Int = 0
@@ -62,6 +63,7 @@ final class ProfileViewModel: ObservableObject {
         viewedBucketListCountries = []
         mutualBucketCountries = []
         mutualTraveledCountries = []
+        friends = []
         mutualFriends = []
         relationshipState = .none
         isFriend = false
@@ -88,7 +90,8 @@ final class ProfileViewModel: ObservableObject {
         
         do {
             profile = try await profileService.fetchOrCreateProfile(userId: userId)
-            
+            friends = try await friendService.fetchFriends(for: userId)
+            print("👀 friends loaded:", friends)
             print("✅ profile fetched:", profile as Any)
             print("➡️ fullName:", profile?.fullName as Any)
             print("➡️ username:", profile?.username as Any)

@@ -64,7 +64,7 @@ struct ProfileView: View {
             return ""
         }
     }
-    
+
     private var firstName: String {
         let raw = (profileVM.profile?.fullName ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         if raw.isEmpty { return "Profile" }
@@ -74,7 +74,7 @@ struct ProfileView: View {
     private var navigationTitle: String {
         "\(firstName)’s Profile"
     }
-    
+
     private var miniAvatar: some View {
         Group {
             if let urlString = profileVM.profile?.avatarUrl,
@@ -119,9 +119,7 @@ struct ProfileView: View {
 
     var body: some View {
         ZStack {
-            // Premium clean native background
-            Color(.systemBackground)
-                .ignoresSafeArea()
+            Color(.systemBackground).ignoresSafeArea()
 
             if profileVM.isLoading && profileVM.profile == nil {
                 ProgressView("Loading profile…")
@@ -142,9 +140,7 @@ struct ProfileView: View {
                             username: username,
                             homeCountryCodes: homeCountryCodes,
                             mutualFriends: profileVM.mutualFriends,
-                            onCancelRequest: {
-                                await profileVM.cancelFriendRequest()
-                            },
+                            onCancelRequest: { await profileVM.cancelFriendRequest() },
                             relationshipState: profileVM.relationshipState,
                             friendCount: profileVM.friendCount,
                             userId: userId,
@@ -218,23 +214,21 @@ struct ProfileView: View {
                     .opacity(progress)
                     .animation(.easeInOut(duration: 0.18), value: progress)
                 }
-            
-            if showUnfriendConfirmation {
-                FriendsActionSheetView(
-                    username: username,
-                    onConfirm: {
-                        Task {
-                            await profileVM.toggleFriend()
-                            showUnfriendConfirmation = false
-                        }
-                    },
-                    onCancel: {
-                        showUnfriendConfirmation = false
-                    }
-                )
-                .transition(.move(edge: .bottom))
-                .zIndex(10)
-            }
+
+                if showUnfriendConfirmation {
+                    FriendsActionSheetView(
+                        username: username,
+                        onConfirm: {
+                            Task {
+                                await profileVM.toggleFriend()
+                                showUnfriendConfirmation = false
+                            }
+                        },
+                        onCancel: { showUnfriendConfirmation = false }
+                    )
+                    .transition(.move(edge: .bottom))
+                    .zIndex(10)
+                }
             }
         }
         .animation(.spring(response: 0.4, dampingFraction: 0.85), value: showUnfriendConfirmation)
@@ -244,10 +238,7 @@ struct ProfileView: View {
             if SupabaseManager.shared.currentUserId == userId {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink {
-                        ProfileSettingsView(
-                            profileVM: profileVM,
-                            viewedUserId: userId
-                        )
+                        ProfileSettingsView(profileVM: profileVM, viewedUserId: userId)
                     } label: {
                         Image(systemName: "gearshape")
                             .symbolRenderingMode(.hierarchical)
@@ -260,5 +251,4 @@ struct ProfileView: View {
             profileVM.setUserIdIfNeeded(userId)
         }
     }
-  
 }

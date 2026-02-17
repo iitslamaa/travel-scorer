@@ -2,8 +2,6 @@
 //  Profile.swift
 //  TravelScoreriOS
 //
-//  Created by Lama Yassine on 2/6/26.
-//
 
 import Foundation
 
@@ -33,5 +31,34 @@ struct Profile: Codable, Identifiable {
         case travelMode = "travel_mode"
         case nextDestination = "next_destination"
         case onboardingCompleted = "onboarding_completed"
+    }
+
+    private struct LanguageObject: Decodable {
+        let name: String
+        let proficiency: String?
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(UUID.self, forKey: .id)
+        username = try container.decode(String.self, forKey: .username)
+        fullName = try container.decodeIfPresent(String.self, forKey: .fullName) ?? ""
+        avatarUrl = try container.decodeIfPresent(String.self, forKey: .avatarUrl)
+
+        // 🔥 Flexible language decoding
+        if let stringArray = try? container.decode([String].self, forKey: .languages) {
+            languages = stringArray
+        } else if let objectArray = try? container.decode([LanguageObject].self, forKey: .languages) {
+            languages = objectArray.map { $0.name }
+        } else {
+            languages = []
+        }
+
+        livedCountries = try container.decodeIfPresent([String].self, forKey: .livedCountries) ?? []
+        travelStyle = try container.decodeIfPresent([String].self, forKey: .travelStyle) ?? []
+        travelMode = try container.decodeIfPresent([String].self, forKey: .travelMode) ?? []
+        nextDestination = try container.decodeIfPresent(String.self, forKey: .nextDestination)
+        onboardingCompleted = try container.decodeIfPresent(Bool.self, forKey: .onboardingCompleted)
     }
 }

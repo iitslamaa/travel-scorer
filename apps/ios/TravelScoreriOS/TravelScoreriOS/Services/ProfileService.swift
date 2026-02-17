@@ -46,7 +46,7 @@ struct ProfileUpdate: Encodable {
 }
 
 struct ProfileCreate: Encodable {
-    let id: String
+    let id: UUID
     let username: String
     let avatar_url: String
     let full_name: String
@@ -75,7 +75,7 @@ final class ProfileService {
         let response: PostgrestResponse<[Profile]> = try await supabase.client
             .from("profiles")
             .select()
-            .eq("id", value: userId.uuidString)
+            .eq("id", value: userId)
             .execute()
 
         guard let profile = response.value.first else {
@@ -99,8 +99,14 @@ final class ProfileService {
         do {
             _ = try await fetchMyProfile(userId: userId)
             return
-        } catch {
-            print("🟡 Profile missing, creating one for:", userId)
+        } catch let error as NSError {
+            // Only create profile if it's truly 404 (not found)
+            if error.code == 404 {
+                print("🟡 Profile truly missing, creating one for:", userId)
+            } else {
+                // Rethrow network / decoding / timeout errors
+                throw error
+            }
         }
 
         guard let user = supabase.client.auth.currentUser else {
@@ -119,7 +125,7 @@ final class ProfileService {
             "User"
 
         let createPayload = ProfileCreate(
-            id: userId.uuidString,
+            id: userId,
             username: defaultUsername ?? "",
             avatar_url: defaultAvatarUrl ?? "",
             full_name: fullName
@@ -160,7 +166,7 @@ final class ProfileService {
         try await supabase.client
             .from("profiles")
             .update(payload)
-            .eq("id", value: userId.uuidString)
+            .eq("id", value: userId)
             .execute()
     }
 
