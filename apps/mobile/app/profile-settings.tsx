@@ -20,52 +20,52 @@ export default function ProfileSettingsScreen() {
       contentContainerStyle={{ paddingBottom: 120 }}
     >
       <View style={styles.container}>
-        <Text style={[styles.title, { color: colors.text }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>
           Profile Settings
         </Text>
 
         <View
           style={[
             styles.card,
-            { backgroundColor: colors.card, borderColor: colors.border },
+            { backgroundColor: colors.card, borderColor: colors.textMuted },
           ]}
         >
           <Pressable style={styles.row}>
-            <Text style={[styles.label, { color: colors.text }]}>
+            <Text style={[styles.label, { color: colors.textPrimary }]}>
               Change profile photo
             </Text>
           </Pressable>
 
           <Pressable style={styles.row}>
-            <Text style={[styles.label, { color: colors.text }]}>Edit name</Text>
+            <Text style={[styles.label, { color: colors.textPrimary }]}>Edit name</Text>
           </Pressable>
 
           <Pressable style={styles.row}>
-            <Text style={[styles.label, { color: colors.text }]}>
+            <Text style={[styles.label, { color: colors.textPrimary }]}>
               Edit username
             </Text>
           </Pressable>
         </View>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary ?? colors.textMuted }]}>
             Travel Preferences
           </Text>
 
           <View
             style={[
               styles.card,
-              { backgroundColor: colors.card, borderColor: colors.border },
+              { backgroundColor: colors.card, borderColor: colors.textMuted },
             ]}
           >
             <Pressable style={styles.row}>
-              <Text style={[styles.label, { color: colors.text }]}>
+              <Text style={[styles.label, { color: colors.textPrimary }]}>
                 Travel mode
               </Text>
             </Pressable>
 
             <Pressable style={styles.row}>
-              <Text style={[styles.label, { color: colors.text }]}>
+              <Text style={[styles.label, { color: colors.textPrimary }]}>
                 Travel style
               </Text>
             </Pressable>
@@ -75,7 +75,7 @@ export default function ProfileSettingsScreen() {
         <View
           style={[
             styles.card,
-            { backgroundColor: colors.card, borderColor: colors.border },
+            { backgroundColor: colors.card, borderColor: colors.textMuted },
           ]}
         >
           <Pressable style={styles.row}>
