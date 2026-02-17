@@ -11,11 +11,11 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   // Not logged in and not guest -> must be on landing/login flow
   useEffect(() => {
     if (!loading && !session && !isGuest) {
-      if (pathname !== '/' && pathname !== '/login' && pathname !== '/verify') {
+      if (pathname !== '/' && pathname !== '/verify') {
         router.replace('/');
       }
     }
-  }, [loading, session, isGuest, pathname]);
+  }, [loading, session, isGuest, pathname, router]);
 
   // Logged in -> enforce onboarding gate (guest bypasses)
   useEffect(() => {

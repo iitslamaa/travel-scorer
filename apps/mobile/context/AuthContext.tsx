@@ -20,6 +20,7 @@ type AuthContextType = {
 
   isGuest: boolean;
   continueAsGuest: () => void;
+  exitGuest: () => void;
 
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
@@ -92,6 +93,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfile(null);
   };
 
+  const exitGuest = () => {
+    setIsGuest(false);
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
     setSession(null);
@@ -107,6 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       profileLoading,
       isGuest,
       continueAsGuest,
+      exitGuest,
       refreshProfile,
       signOut,
     }),

@@ -26,10 +26,14 @@ export default function LandingScreen() {
   const buttonsOpacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (session || isGuest) {
+    if (session) {
       router.replace('/home');
     }
-  }, [session, isGuest]);
+
+    if (isGuest) {
+      router.replace('/home');
+    }
+  }, [session, isGuest, router]);
 
   const handleGoogleLogin = async () => {
     setLoadingGoogle(true);
