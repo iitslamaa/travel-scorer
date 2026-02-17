@@ -67,10 +67,12 @@ final class FriendService {
 
     func isFriend(currentUserId: UUID, otherUserId: UUID) async throws -> Bool {
 
+        let filter = "and(user_id.eq.\(currentUserId.uuidString),friend_id.eq.\(otherUserId.uuidString)),and(user_id.eq.\(otherUserId.uuidString),friend_id.eq.\(currentUserId.uuidString))"
+
         let response = try await supabase.client
             .from("friends")
             .select("id", count: .exact)
-            .or("and(user_id.eq.\(currentUserId),friend_id.eq.\(otherUserId)),and(user_id.eq.\(otherUserId),friend_id.eq.\(currentUserId))")
+            .or(filter)
             .limit(1)
             .execute()
 
@@ -79,11 +81,15 @@ final class FriendService {
 
     func removeFriend(myUserId: UUID, otherUserId: UUID) async throws {
 
+        let filter = "and(user_id.eq.\(myUserId.uuidString),friend_id.eq.\(otherUserId.uuidString)),and(user_id.eq.\(otherUserId.uuidString),friend_id.eq.\(myUserId.uuidString))"
+
         try await supabase.client
             .from("friends")
             .delete()
-            .or("and(user_id.eq.\(myUserId),friend_id.eq.\(otherUserId)),and(user_id.eq.\(otherUserId),friend_id.eq.\(myUserId))")
+            .or(filter)
             .execute()
+
+        print("🗑 Removed friendship between:", myUserId, "and", otherUserId)
     }
 
     func fetchMutualFriends(currentUserId: UUID, otherUserId: UUID) async throws -> [Profile] {
@@ -204,26 +210,20 @@ final class FriendService {
 
     func acceptRequest(myUserId: UUID, from otherUserId: UUID) async throws {
 
-        _ = try? await supabase.client
+        // Remove pending request
+        try await supabase.client
             .from("friend_requests")
             .delete()
             .eq("sender_id", value: otherUserId)
             .eq("receiver_id", value: myUserId)
             .execute()
 
+        // Insert ONE friendship row
         try await supabase.client
             .from("friends")
             .insert([
                 "user_id": myUserId,
                 "friend_id": otherUserId
-            ])
-            .execute()
-
-        try await supabase.client
-            .from("friends")
-            .insert([
-                "user_id": otherUserId,
-                "friend_id": myUserId
             ])
             .execute()
     }
