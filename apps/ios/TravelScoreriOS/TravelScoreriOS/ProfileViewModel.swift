@@ -187,6 +187,7 @@ final class ProfileViewModel: ObservableObject {
             
         } catch {
             errorMessage = error.localizedDescription
+            print("❌ saveProfile failed:", error)
         }
     }
     
