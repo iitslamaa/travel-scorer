@@ -5,7 +5,9 @@ import {
   View,
   Text,
   useColorScheme,
+  Pressable,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
@@ -73,16 +75,28 @@ export default function ProfileScreen() {
       ]}
       showsVerticalScrollIndicator={false}
     >
-      <Text style={[styles.title, isDark && styles.titleDark]}>
-        {profile?.display_name ?? profile?.username ?? 'Your Profile'}
-      </Text>
+      <View style={styles.topRow}>
+        <Text style={[styles.title, isDark && styles.titleDark]}>
+          {profile?.display_name ?? profile?.username ?? 'Your Profile'}
+        </Text>
+
+        <Pressable
+          onPress={() => router.push('/profile-settings')}
+          style={styles.settingsIcon}
+        >
+          <Ionicons
+            name="settings-outline"
+            size={22}
+            color={isDark ? '#F9FAFB' : '#111827'}
+          />
+        </Pressable>
+      </View>
 
       <HeaderCard
         name={profile?.display_name ?? profile?.username ?? 'User'}
         handle={profile?.username ? `@${profile.username}` : ''}
         avatarUrl={profile?.avatar_url ?? undefined}
         flags={[]}
-        onPressSettings={() => router.push('/profile-settings')}
       />
 
       <View style={styles.section}>
@@ -105,10 +119,22 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 18,
   },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 18,
+  },
+  settingsIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   title: {
     fontSize: 32,
     fontWeight: '800',
-    marginBottom: 18,
     color: '#111827',
   },
   titleDark: {
