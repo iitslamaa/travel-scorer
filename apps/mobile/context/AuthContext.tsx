@@ -9,6 +9,8 @@ export type Profile = {
   onboarding_completed: boolean | null;
   avatar_url?: string | null;
   next_destination?: string | null;
+  travel_mode?: string | null;
+  travel_style?: string | null;
 };
 
 type AuthContextType = {
@@ -23,6 +25,7 @@ type AuthContextType = {
   exitGuest: () => void;
 
   refreshProfile: () => Promise<void>;
+  updateProfile: (patch: Partial<Profile>) => Promise<void>;
   signOut: () => Promise<void>;
 };
 
@@ -41,7 +44,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfileLoading(true);
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username, display_name, onboarding_completed, avatar_url, next_destination')
+      .select('id, username, display_name, onboarding_completed, avatar_url, next_destination, travel_mode, travel_style')
       .eq('id', userId)
       .single();
 
@@ -53,6 +56,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshProfile = async () => {
     const userId = session?.user?.id;
     if (!userId) return;
+    await fetchProfile(userId);
+  };
+
+  const updateProfile = async (patch: Partial<Profile>) => {
+    const userId = session?.user?.id;
+    if (!userId) return;
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(patch)
+      .eq('id', userId);
+
+    if (error) throw error;
+
+    // Optimistically update local state
+    setProfile(prev =>
+      prev ? ({ ...prev, ...patch } as Profile) : prev
+    );
+
+    // Re-fetch to ensure server truth
     await fetchProfile(userId);
   };
 
@@ -114,6 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       continueAsGuest,
       exitGuest,
       refreshProfile,
+      updateProfile,
       signOut,
     }),
     [session, loading, profile, profileLoading, isGuest]
