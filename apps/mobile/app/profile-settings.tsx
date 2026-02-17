@@ -52,22 +52,36 @@ export default function ProfileSettingsScreen() {
   const [newLanguage, setNewLanguage] = useState('');
   const [newProficiency, setNewProficiency] = useState<'Native' | 'Fluent' | 'Learning'>('Fluent');
 
-  useEffect(() => {
-    console.log('PROFILE LANGUAGES:', profile?.languages);
-    setDraftMode(profile?.travel_mode ?? null);
-    setDraftStyle(profile?.travel_style ?? null);
-    setDraftNextDestination(profile?.next_destination ?? null);
-    if (profile?.languages && Array.isArray(profile.languages)) {
-      setDraftLanguages(profile.languages);
-    } else {
-      setDraftLanguages([]);
-    }
-    if (profile?.lived_countries && Array.isArray(profile.lived_countries)) {
-      setDraftLivedCountries(profile.lived_countries);
-    } else {
-      setDraftLivedCountries([]);
-    }
-  }, [profile]);
+useEffect(() => {
+  console.log('PROFILE LANGUAGES:', profile?.languages);
+
+  setDraftMode(profile?.travel_mode ?? null);
+  setDraftStyle(profile?.travel_style ?? null);
+  setDraftNextDestination(profile?.next_destination ?? null);
+
+  // 🔥 Normalize languages: support both string[] and { name, proficiency }[]
+  if (profile?.languages && Array.isArray(profile.languages)) {
+    const normalized = profile.languages.map((l: any) => {
+      if (typeof l === 'string') {
+        return { name: l, proficiency: 'Fluent' };
+      }
+      return {
+        name: l?.name ?? '',
+        proficiency: l?.proficiency ?? 'Fluent',
+      };
+    });
+
+    setDraftLanguages(normalized);
+  } else {
+    setDraftLanguages([]);
+  }
+
+  if (profile?.lived_countries && Array.isArray(profile.lived_countries)) {
+    setDraftLivedCountries(profile.lived_countries);
+  } else {
+    setDraftLivedCountries([]);
+  }
+}, [profile]);
 
   const hasChanges =
     draftMode !== profile?.travel_mode ||
@@ -114,7 +128,7 @@ export default function ProfileSettingsScreen() {
     const apply = (index: number) => {
       if (index === cancelButtonIndex) return;
       const selected = sorted[index];
-      setDraftNextDestination(selected.name);
+      setDraftNextDestination(selected.iso2);
     };
 
     if (Platform.OS === 'ios') {
@@ -373,9 +387,7 @@ export default function ProfileSettingsScreen() {
               draftNextDestination
                 ? (() => {
                     const match = countries?.find(
-                      c =>
-                        c.name === draftNextDestination ||
-                        c.iso2 === draftNextDestination
+                      c => c.iso2 === draftNextDestination
                     );
                     return match
                       ? `${match.flagEmoji ?? ''} ${match.name}`

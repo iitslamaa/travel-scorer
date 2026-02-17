@@ -2,8 +2,6 @@
 //  FriendService.swift
 //  TravelScoreriOS
 //
-//  Created by Lama Yassine on 2/11/26.
-//
 
 import Foundation
 import Supabase
@@ -13,7 +11,6 @@ private struct FriendRow: Decodable {
     let user_id: UUID
     let friend_id: UUID
 }
-
 
 @MainActor
 final class FriendService {
@@ -27,21 +24,35 @@ final class FriendService {
     // MARK: - Friends
 
     func fetchFriends(for userId: UUID) async throws -> [Profile] {
-        let uid = userId.uuidString
 
-        let response: PostgrestResponse<[FriendRow]> = try await supabase.client
+        // Query 1: user_id = me (use UUID directly, NOT uuidString)
+        let sentResponse: PostgrestResponse<[FriendRow]> = try await supabase.client
             .from("friends")
             .select("user_id, friend_id")
-            .or("user_id.eq.\(uid),friend_id.eq.\(uid)")
+            .eq("user_id", value: userId)
             .execute()
 
-        let rows = response.value
+        // Query 2: friend_id = me (use UUID directly)
+        let receivedResponse: PostgrestResponse<[FriendRow]> = try await supabase.client
+            .from("friends")
+            .select("user_id, friend_id")
+            .eq("friend_id", value: userId)
+            .execute()
 
-        let friendIds: [String] = rows.map { row in
-            row.user_id == userId ? row.friend_id.uuidString : row.user_id.uuidString
+        let rows = sentResponse.value + receivedResponse.value
+
+        print("👀 raw friend rows:", rows)
+
+        let friendIds: [UUID] = rows.map { row in
+            row.user_id == userId ? row.friend_id : row.user_id
         }
 
-        if friendIds.isEmpty { return [] }
+        if friendIds.isEmpty {
+            print("👀 friendIds empty")
+            return []
+        }
+
+        print("👀 friend IDs:", friendIds)
 
         let profilesResponse: PostgrestResponse<[Profile]> = try await supabase.client
             .from("profiles")
@@ -49,46 +60,41 @@ final class FriendService {
             .in("id", values: friendIds)
             .execute()
 
+        print("👀 friend profiles:", profilesResponse.value)
+
         return profilesResponse.value
     }
 
     func isFriend(currentUserId: UUID, otherUserId: UUID) async throws -> Bool {
-        let a = currentUserId.uuidString
-        let b = otherUserId.uuidString
 
         let response = try await supabase.client
             .from("friends")
             .select("id", count: .exact)
-            .or("and(user_id.eq.\(a),friend_id.eq.\(b)),and(user_id.eq.\(b),friend_id.eq.\(a))")
+            .or("and(user_id.eq.\(currentUserId),friend_id.eq.\(otherUserId)),and(user_id.eq.\(otherUserId),friend_id.eq.\(currentUserId))")
             .limit(1)
             .execute()
 
         return (response.count ?? 0) > 0
     }
 
-    /// Unfriend: remove BOTH directions
     func removeFriend(myUserId: UUID, otherUserId: UUID) async throws {
-        let a = myUserId.uuidString
-        let b = otherUserId.uuidString
 
         try await supabase.client
             .from("friends")
             .delete()
-            .or("and(user_id.eq.\(a),friend_id.eq.\(b)),and(user_id.eq.\(b),friend_id.eq.\(a))")
+            .or("and(user_id.eq.\(myUserId),friend_id.eq.\(otherUserId)),and(user_id.eq.\(otherUserId),friend_id.eq.\(myUserId))")
             .execute()
     }
 
     func fetchMutualFriends(currentUserId: UUID, otherUserId: UUID) async throws -> [Profile] {
-        // Fetch both friend lists
         let currentFriends = try await fetchFriends(for: currentUserId)
         let otherFriends = try await fetchFriends(for: otherUserId)
 
         let currentSet = Set(currentFriends.map { $0.id })
         let mutual = otherFriends.filter { currentSet.contains($0.id) }
 
-        // Stable ordering (alphabetical fallback)
         return mutual.sorted {
-            ($0.username ?? "") < ($1.username ?? "")
+            $0.username < $1.username
         }
     }
 
@@ -102,7 +108,7 @@ final class FriendService {
                 sender_id,
                 profiles!friend_requests_sender_id_fkey (*)
             """)
-            .eq("receiver_id", value: myUserId.uuidString)
+            .eq("receiver_id", value: myUserId)
             .eq("status", value: "pending")
             .execute()
 
@@ -110,35 +116,48 @@ final class FriendService {
     }
 
     func incomingRequestCount(for myUserId: UUID) async throws -> Int {
-        struct RequestIDRow: Decodable {
-            let id: UUID
-        }
+
+        struct RequestIDRow: Decodable { let id: UUID }
 
         let response: PostgrestResponse<[RequestIDRow]> = try await supabase.client
             .from("friend_requests")
             .select("id")
-            .eq("receiver_id", value: myUserId.uuidString)
+            .eq("receiver_id", value: myUserId)
             .eq("status", value: "pending")
             .execute()
 
         return response.value.count
     }
 
-    // MARK: - Pending Count (For Global Badge Usage)
-
-    /// Convenience wrapper for global badge usage (RootTabView, push notifications, etc.)
     func fetchPendingRequestCount(for userId: UUID) async throws -> Int {
-        return try await incomingRequestCount(for: userId)
+        try await incomingRequestCount(for: userId)
     }
 
     func hasIncomingRequest(from otherUserId: UUID, to myUserId: UUID) async throws -> Bool {
+
         struct RequestIDRow: Decodable { let id: UUID }
 
         let response: PostgrestResponse<[RequestIDRow]> = try await supabase.client
             .from("friend_requests")
             .select("id")
-            .eq("sender_id", value: otherUserId.uuidString)
-            .eq("receiver_id", value: myUserId.uuidString)
+            .eq("sender_id", value: otherUserId)
+            .eq("receiver_id", value: myUserId)
+            .eq("status", value: "pending")
+            .limit(1)
+            .execute()
+
+        return !response.value.isEmpty
+    }
+
+    func hasSentRequest(from myUserId: UUID, to otherUserId: UUID) async throws -> Bool {
+
+        struct RequestIDRow: Decodable { let id: UUID }
+
+        let response: PostgrestResponse<[RequestIDRow]> = try await supabase.client
+            .from("friend_requests")
+            .select("id")
+            .eq("sender_id", value: myUserId)
+            .eq("receiver_id", value: otherUserId)
             .eq("status", value: "pending")
             .limit(1)
             .execute()
@@ -147,112 +166,78 @@ final class FriendService {
     }
 
     func sendFriendRequest(from myUserId: UUID, to otherUserId: UUID) async throws {
-        // 1) Prevent self-request
+
         guard myUserId != otherUserId else { return }
 
-        // 2) Already friends → no-op
-        if try await isFriend(currentUserId: myUserId, otherUserId: otherUserId) {
-            return
+        if try await isFriend(currentUserId: myUserId, otherUserId: otherUserId) { return }
+        if try await hasIncomingRequest(from: otherUserId, to: myUserId) { return }
+        if try await hasSentRequest(from: myUserId, to: otherUserId) { return }
+
+        struct FriendRequestInsert: Encodable {
+            let sender_id: UUID
+            let receiver_id: UUID
+            let status: String
         }
 
-        // 3) If they already requested you → no-op (could auto-accept later)
-        if try await hasIncomingRequest(from: otherUserId, to: myUserId) {
-            return
-        }
+        let payload = FriendRequestInsert(
+            sender_id: myUserId,
+            receiver_id: otherUserId,
+            status: "pending"
+        )
 
-        // 4) If you already sent request → no-op
-        if try await hasSentRequest(from: myUserId, to: otherUserId) {
-            return
-        }
-
-        do {
-            try await supabase.client
-                .from("friend_requests")
-                .insert([
-                    "sender_id": myUserId.uuidString,
-                    "receiver_id": otherUserId.uuidString,
-                    "status": "pending"
-                ])
-                .execute()
-        } catch {
-            if let pgError = error as? PostgrestError, pgError.code == "23505" {
-                return
-            }
-            throw error
-        }
-    }
-
-    func hasSentRequest(from myUserId: UUID, to otherUserId: UUID) async throws -> Bool {
-        struct RequestIDRow: Decodable { let id: UUID }
-
-        let response: PostgrestResponse<[RequestIDRow]> = try await supabase.client
+        try await supabase.client
             .from("friend_requests")
-            .select("id")
-            .eq("sender_id", value: myUserId.uuidString)
-            .eq("receiver_id", value: otherUserId.uuidString)
-            .eq("status", value: "pending")
-            .limit(1)
+            .insert(payload)
             .execute()
-
-        return !response.value.isEmpty
     }
 
     func cancelRequest(from myUserId: UUID, to otherUserId: UUID) async throws {
+
         try await supabase.client
             .from("friend_requests")
             .delete()
-            .eq("sender_id", value: myUserId.uuidString)
-            .eq("receiver_id", value: otherUserId.uuidString)
+            .eq("sender_id", value: myUserId)
+            .eq("receiver_id", value: otherUserId)
             .eq("status", value: "pending")
             .execute()
     }
 
     func acceptRequest(myUserId: UUID, from otherUserId: UUID) async throws {
-        // 1) Delete pending request (ignore if missing)
+
         _ = try? await supabase.client
             .from("friend_requests")
             .delete()
-            .eq("sender_id", value: otherUserId.uuidString)
-            .eq("receiver_id", value: myUserId.uuidString)
+            .eq("sender_id", value: otherUserId)
+            .eq("receiver_id", value: myUserId)
             .execute()
 
-        // 2) Insert both directions (ignore duplicate constraint errors)
-        do {
-            try await supabase.client
-                .from("friends")
-                .insert([
-                    "user_id": myUserId.uuidString,
-                    "friend_id": otherUserId.uuidString
-                ])
-                .execute()
-        } catch {
-            if let pgError = error as? PostgrestError, pgError.code != "23505" { throw error }
-        }
+        try await supabase.client
+            .from("friends")
+            .insert([
+                "user_id": myUserId,
+                "friend_id": otherUserId
+            ])
+            .execute()
 
-        do {
-            try await supabase.client
-                .from("friends")
-                .insert([
-                    "user_id": otherUserId.uuidString,
-                    "friend_id": myUserId.uuidString
-                ])
-                .execute()
-        } catch {
-            if let pgError = error as? PostgrestError, pgError.code != "23505" { throw error }
-        }
+        try await supabase.client
+            .from("friends")
+            .insert([
+                "user_id": otherUserId,
+                "friend_id": myUserId
+            ])
+            .execute()
     }
 
     func rejectRequest(myUserId: UUID, from otherUserId: UUID) async throws {
+
         try await supabase.client
             .from("friend_requests")
             .delete()
-            .eq("sender_id", value: otherUserId.uuidString)
-            .eq("receiver_id", value: myUserId.uuidString)
+            .eq("sender_id", value: otherUserId)
+            .eq("receiver_id", value: myUserId)
             .execute()
     }
 }
-
-// MARK: - DTO for joined incoming request row
 
 private struct IncomingRequestJoinedRow: Decodable {
     let profile: Profile
