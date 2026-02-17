@@ -4,17 +4,14 @@ import {
   Text,
   StyleSheet,
   Image,
-  TouchableOpacity,
   useColorScheme,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 type Props = {
   name: string;
   handle: string;
   avatarUrl?: string;
   flags?: string[];
-  onPressSettings?: () => void;
 };
 
 export default function HeaderCard({
@@ -22,24 +19,12 @@ export default function HeaderCard({
   handle,
   avatarUrl,
   flags = [],
-  onPressSettings,
 }: Props) {
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
 
   return (
     <View style={[styles.card, isDark && styles.cardDark]}>
-      <TouchableOpacity
-        style={styles.settingsButton}
-        onPress={onPressSettings}
-      >
-        <Ionicons
-          name="settings-outline"
-          size={22}
-          color={isDark ? '#F9FAFB' : '#111827'}
-        />
-      </TouchableOpacity>
-
       <View style={styles.row}>
         <View style={styles.avatarWrapper}>
           {avatarUrl ? (
@@ -84,16 +69,6 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  settingsButton: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   avatarWrapper: {
     marginRight: 16,
