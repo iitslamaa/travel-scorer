@@ -40,6 +40,7 @@ export default function ProfileSettingsScreen() {
 
   const { countries } = useCountries();
   const [draftNextDestination, setDraftNextDestination] = useState<string | null>(null);
+  const [draftLivedCountries, setDraftLivedCountries] = useState<string[]>([]);
 
   type LanguageEntry = {
     name: string;
@@ -61,13 +62,19 @@ export default function ProfileSettingsScreen() {
     } else {
       setDraftLanguages([]);
     }
+    if (profile?.lived_countries && Array.isArray(profile.lived_countries)) {
+      setDraftLivedCountries(profile.lived_countries);
+    } else {
+      setDraftLivedCountries([]);
+    }
   }, [profile]);
 
   const hasChanges =
     draftMode !== profile?.travel_mode ||
     draftStyle !== profile?.travel_style ||
     draftNextDestination !== profile?.next_destination ||
-    JSON.stringify(draftLanguages) !== JSON.stringify(profile?.languages ?? []);
+    JSON.stringify(draftLanguages) !== JSON.stringify(profile?.languages ?? []) ||
+    JSON.stringify(draftLivedCountries) !== JSON.stringify(profile?.lived_countries ?? []);
 
   const saveAll = async () => {
     try {
@@ -76,6 +83,7 @@ export default function ProfileSettingsScreen() {
         travel_style: draftStyle,
         next_destination: draftNextDestination,
         languages: draftLanguages,
+        lived_countries: draftLivedCountries,
       });
       router.back();
     } catch (e: any) {
@@ -88,6 +96,7 @@ export default function ProfileSettingsScreen() {
     setDraftStyle(profile?.travel_style ?? null);
     setDraftNextDestination(profile?.next_destination ?? null);
     setDraftLanguages(profile?.languages ?? []);
+    setDraftLivedCountries(profile?.lived_countries ?? []);
     router.back();
   };
   const pickNextDestination = () => {
@@ -375,6 +384,74 @@ export default function ProfileSettingsScreen() {
                 : '—'
             }
             onPress={pickNextDestination}
+          />
+        </View>
+
+        {/* Home Countries */}
+        <Text
+          style={[styles.sectionTitle, { color: colors.textSecondary }]}
+        >
+          Home Countries
+        </Text>
+
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Row
+            label="Which countries do you consider home?"
+            value={
+              draftLivedCountries.length > 0
+                ? draftLivedCountries
+                    .map(code => {
+                      const match = countries?.find(c => c.iso2 === code);
+                      return match ? `${match.flagEmoji ?? ''} ${match.name}` : code;
+                    })
+                    .join(', ')
+                : '—'
+            }
+            onPress={() => {
+              if (!countries || countries.length === 0) return;
+
+              const sorted = [...countries].sort((a, b) =>
+                a.name.localeCompare(b.name)
+              );
+
+              const options = sorted.map(c => {
+                const selected = draftLivedCountries.includes(c.iso2);
+                return `${selected ? '✓ ' : ''}${c.flagEmoji ?? ''} ${c.name}`;
+              });
+
+              options.push('Done');
+              const doneIndex = options.length - 1;
+
+              const apply = (index: number) => {
+                if (index === doneIndex) return;
+
+                const selectedCountry = sorted[index];
+                setDraftLivedCountries(prev => {
+                  if (prev.includes(selectedCountry.iso2)) {
+                    return prev.filter(c => c !== selectedCountry.iso2);
+                  }
+                  return [...prev, selectedCountry.iso2];
+                });
+              };
+
+              if (Platform.OS === 'ios') {
+                ActionSheetIOS.showActionSheetWithOptions(
+                  { options, cancelButtonIndex: doneIndex },
+                  apply
+                );
+              } else {
+                Alert.alert(
+                  'Select Home Countries',
+                  '',
+                  sorted
+                    .map((c, i) => ({
+                      text: `${draftLivedCountries.includes(c.iso2) ? '✓ ' : ''}${c.flagEmoji ?? ''} ${c.name}`,
+                      onPress: () => apply(i),
+                    }))
+                    .concat([{ text: 'Done', style: 'cancel' }])
+                );
+              }
+            }}
           />
         </View>
 
