@@ -12,6 +12,7 @@ export type Profile = {
   travel_mode?: string | null;
   travel_style?: string | null;
   languages?: any[] | null; // <-- ADD THIS
+  lived_countries?: string[] | null;
 };
 
 type AuthContextType = {
@@ -45,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setProfileLoading(true);
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username, display_name, onboarding_completed, avatar_url, next_destination, travel_mode, travel_style, languages')
+      .select('id, username, display_name, onboarding_completed, avatar_url, next_destination, travel_mode, travel_style, languages, lived_countries')
       .eq('id', userId)
       .single();
 
