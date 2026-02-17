@@ -15,17 +15,26 @@ struct ProfileSettingsAvatarSection: View {
     let profileVM: ProfileViewModel
     @Binding var selectedPhotoItem: PhotosPickerItem?
     let isUploadingAvatar: Bool
+    let shouldRemoveAvatar: Bool
+    let onRemoveAvatar: () -> Void
 
     var body: some View {
         SectionCard {
             VStack(spacing: 12) {
 
                 ZStack {
-                    if let image = selectedUIImage {
+                    if shouldRemoveAvatar {
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .foregroundStyle(.secondary)
+
+                    } else if let image = selectedUIImage {
                         Image(uiImage: image)
                             .resizable()
                             .scaledToFill()
+
                     } else if let urlString = profileVM.profile?.avatarUrl,
+                              !urlString.isEmpty,
                               let url = URL(string: urlString) {
                         AsyncImage(
                             url: url,
@@ -56,6 +65,7 @@ struct ProfileSettingsAvatarSection: View {
                                 EmptyView()
                             }
                         }
+
                     } else {
                         Image(systemName: "person.crop.circle.fill")
                             .resizable()
@@ -72,6 +82,17 @@ struct ProfileSettingsAvatarSection: View {
                     Text("Change profile photo")
                         .font(.subheadline)
                         .foregroundStyle(.primary)
+                }
+
+                if !shouldRemoveAvatar &&
+                   (selectedUIImage != nil ||
+                    (profileVM.profile?.avatarUrl?.isEmpty == false)) {
+                    Button(role: .destructive) {
+                        onRemoveAvatar()
+                    } label: {
+                        Text("Remove profile photo")
+                            .font(.subheadline)
+                    }
                 }
 
                 if isUploadingAvatar {

@@ -17,6 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { lightColors, darkColors } from '../theme/colors';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 
 import { useCountries } from '../hooks/useCountries';
 
@@ -25,6 +26,68 @@ type EditField = 'display_name' | 'username';
 export default function ProfileSettingsScreen() {
   const router = useRouter();
   const { profile, signOut, updateProfile } = useAuth();
+
+  const deleteAvatar = async () => {
+    try {
+      if (!profile?.avatar_url) return;
+
+      const fileName = profile.avatar_url.split('/').pop();
+      if (fileName) {
+        await supabase.storage.from('avatars').remove([fileName]);
+      }
+
+      await updateProfile({ avatar_url: null });
+    } catch (err) {
+      console.error('Error deleting avatar:', err);
+      Alert.alert('Error', 'Failed to remove profile photo.');
+    }
+  };
+
+  const handleAvatarPress = () => {
+    const options = profile?.avatar_url
+      ? ['Choose Photo', 'Remove Photo', 'Cancel']
+      : ['Choose Photo', 'Cancel'];
+
+    const cancelButtonIndex = options.length - 1;
+    const destructiveButtonIndex = profile?.avatar_url ? 1 : undefined;
+
+    const apply = async (index: number) => {
+      if (index === cancelButtonIndex) return;
+
+      if (profile?.avatar_url && index === 1) {
+        await deleteAvatar();
+      } else {
+        // placeholder for existing image picker logic
+        Alert.alert('Image picker not implemented here');
+      }
+    };
+
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options,
+          cancelButtonIndex,
+          destructiveButtonIndex,
+        },
+        apply
+      );
+    } else {
+      Alert.alert(
+        'Profile Photo',
+        '',
+        options.map((option, i) => ({
+          text: option,
+          style:
+            option === 'Cancel'
+              ? 'cancel'
+              : option === 'Remove Photo'
+              ? 'destructive'
+              : 'default',
+          onPress: () => apply(i),
+        }))
+      );
+    }
+  };
 
   const scheme = useColorScheme();
   const colors = scheme === 'dark' ? darkColors : lightColors;
@@ -317,7 +380,7 @@ useEffect(() => {
             />
           )}
 
-          <Pressable>
+          <Pressable onPress={handleAvatarPress}>
             <Text
               style={[styles.changePhoto, { color: colors.textSecondary }]}
             >

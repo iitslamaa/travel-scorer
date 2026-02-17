@@ -32,6 +32,7 @@ struct ProfileSettingsView: View {
     @State private var selectedPhotoItem: PhotosPickerItem? = nil
     @State private var selectedUIImage: UIImage? = nil
     @State private var isUploadingAvatar = false
+    @State private var shouldRemoveAvatar = false
 
     // Sheets / dialogs
     @State private var showTravelModeDialog = false
@@ -74,7 +75,11 @@ struct ProfileSettingsView: View {
                         selectedUIImage: selectedUIImage,
                         profileVM: profileVM,
                         selectedPhotoItem: $selectedPhotoItem,
-                        isUploadingAvatar: isUploadingAvatar
+                        isUploadingAvatar: isUploadingAvatar,
+                        shouldRemoveAvatar: shouldRemoveAvatar,
+                        onRemoveAvatar: {
+                            markAvatarForRemoval()
+                        }
                     )
 
                     ProfileSettingsAccountSection(
@@ -174,6 +179,7 @@ struct ProfileSettingsView: View {
                    let uiImage = UIImage(data: data) {
                     await MainActor.run {
                         selectedUIImage = uiImage
+                        shouldRemoveAvatar = false
                     }
                 }
             }
@@ -186,7 +192,7 @@ struct ProfileSettingsView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
                     Task {
-                        let avatarURL = await uploadAvatarIfNeeded()
+                        let avatarURL = await resolveAvatarChange()
 
                         await profileVM.saveProfile(
                             firstName: firstName.isEmpty ? nil : firstName,
@@ -337,6 +343,22 @@ struct ProfileSettingsView: View {
             print("🔴 Avatar upload failed:", error)
             return nil
         }
+    }
+
+    private func resolveAvatarChange() async -> String? {
+        // If user chose to remove avatar
+        if shouldRemoveAvatar {
+            return ""
+        }
+
+        // Otherwise upload if new image selected
+        return await uploadAvatarIfNeeded()
+    }
+
+    func markAvatarForRemoval() {
+        selectedUIImage = nil
+        selectedPhotoItem = nil
+        shouldRemoveAvatar = true
     }
 
     private func handleDelete() async {
