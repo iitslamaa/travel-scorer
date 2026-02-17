@@ -38,6 +38,12 @@ export default function CountryDetailScreen() {
   const score = country.facts?.scoreTotal ?? 0;
   const advisoryLevel = country.facts?.advisoryLevel ?? '—';
 
+  const advisoryScore =
+    country.facts?.advisoryScore ??
+    country.facts?.advisoryNormalized ??
+    country.facts?.advisoryWeighted ??
+    0;
+
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: colors.background }}
@@ -52,7 +58,7 @@ export default function CountryDetailScreen() {
       />
 
       <AdvisoryCard
-        score={country.facts?.advisory ?? score}
+        score={advisoryScore}
         level={advisoryLevel}
         summary={country.facts?.advisorySummary}
         url={country.facts?.advisoryUrl}
@@ -61,7 +67,7 @@ export default function CountryDetailScreen() {
             ? `Last updated: ${(country as any).advisory.updatedAt}`
             : undefined
         }
-        normalizedLabel={`Normalized: ${score}`}
+        normalizedLabel={`Normalized: ${advisoryScore}`}
         weightOnlyLabel={'Weight: 10%'}
       />
 

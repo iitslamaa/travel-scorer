@@ -1,9 +1,14 @@
 export const lightColors = {
   background: '#F5F5F7',
   card: '#F9FAFB',
+
   textPrimary: '#111827',
   textSecondary: '#6B7280',
   textMuted: '#9CA3AF',
+
+  // Primary brand color
+  primary: '#065F46',
+  primaryText: '#FFFFFF',
 
   greenBg: '#EAFBF1',
   greenBorder: '#6EE7B7',
@@ -21,9 +26,14 @@ export const lightColors = {
 export const darkColors = {
   background: '#0F172A',
   card: '#1E293B',
+
   textPrimary: '#F9FAFB',
   textSecondary: '#CBD5E1',
   textMuted: '#94A3B8',
+
+  // Primary brand color (brighter for dark mode)
+  primary: '#10B981',
+  primaryText: '#0F172A',
 
   greenBg: '#064E3B',
   greenBorder: '#10B981',

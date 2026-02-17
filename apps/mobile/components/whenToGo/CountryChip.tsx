@@ -1,22 +1,28 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { getScoreColor } from "../../utils/seasonColor";
 
 type Props = {
   name: string;
   region: string;
   score: number;
+  iso2: string;
+  onPress?: () => void;
 };
 
-export default function CountryChip({ name, region, score }: Props) {
+export default function CountryChip({ name, region, score, onPress }: Props) {
   const colors = getScoreColor(score);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.8}
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <Text style={styles.name}>{name}</Text>
       <Text style={styles.region}>{region}</Text>
       <Text style={[styles.score, { color: colors.text }]}>{score}</Text>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -27,7 +33,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 999,
-    margin: 4,
+    margin: 2,
   },
   name: {
     fontWeight: "600",
