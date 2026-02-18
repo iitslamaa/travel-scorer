@@ -1,5 +1,5 @@
 import { SeasonalitySection as SeasonalityCard } from '@/lib/display/SeasonalitySection';
-import type { FactRow } from '../page';
+import type { FactRow } from '@travel-af/domain';
 
 type SeasonalityFM = {
   best?: number[];

@@ -1,5 +1,6 @@
 import path from 'path';
 import { promises as fs } from 'fs';
+import type { CountryFacts, VisaEase } from '@travel-af/shared';
 
 // Minimal shape used from advisories; duplicated locally to avoid cross-importing route code
 export type Advisory = {
@@ -11,33 +12,6 @@ export type Advisory = {
 
 // Numeric visa score expected by the scorer (0..100)
 // We keep the original categorical value only internally for mapping.
-export type VisaEase = 'visa_free' | 'eta' | 'voa' | 'visa_required' | 'unknown';
-
-export type CountryFacts = {
-  iso2: string;
-
-  // Safety & sentiment
-  advisoryLevel?: 1 | 2 | 3 | 4;
-  advisorySummary?: string;
-  advisoryUrl?: string;
-  travelSafeOverall?: number;   // 0..100
-  soloFemaleIndex?: number;     // 0..100
-  redditComposite?: number;     // 0..100
-  redditN?: number;             // sample size
-
-  // Logistics & experience
-  seasonality?: number;         // 0..100 (100 = now is peak/best time)
-  visaEase?: number;            // 0..100 (derived from VisaEase)
-  affordability?: number;       // 0..100 (higher = cheaper)
-  directFlight?: number;        // 0..100 (1 = direct flight available)
-  infrastructure?: number;      // 0..100
-
-  // Legacy / auxiliary fields (kept for compatibility if needed)
-  homicidesPer100k?: number;    // raw reference
-  gdpPppPerCapita?: number;     // raw reference
-  englishProficiency?: number;  // raw reference 0..100
-  visaEaseUS?: VisaEase;        // raw categorical
-};
 
 type AdvisoryMap = Record<string, Advisory>;
 
@@ -167,10 +141,10 @@ export async function loadFacts(iso2List: string[], advisories: Advisory[]): Pro
       infrastructure: infra,
 
       // raw references kept (handy for detail pages)
-      homicidesPer100k: Number.isFinite(homicides[iso2]) ? homicides[iso2] : undefined,
-      gdpPppPerCapita: raw,
-      englishProficiency: Number.isFinite(epi[iso2]) ? clamp(epi[iso2]) : undefined,
-      visaEaseUS: visaCat,
+      // homicidesPer100k: Number.isFinite(homicides[iso2]) ? homicides[iso2] : undefined,
+      // gdpPppPerCapita: raw,
+      // englishProficiency: Number.isFinite(epi[iso2]) ? clamp(epi[iso2]) : undefined,
+      // visaEaseUS: visaCat,
     };
   }
   return out;

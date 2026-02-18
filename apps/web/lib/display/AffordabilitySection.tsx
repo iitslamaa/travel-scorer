@@ -1,4 +1,4 @@
-import type { CountryFacts } from "@/lib/facts";
+import type { CountryFacts } from '@travel-af/shared';
 
 type Props = {
   facts?: CountryFacts;

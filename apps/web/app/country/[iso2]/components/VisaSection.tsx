@@ -1,7 +1,7 @@
 import { ScorePill } from '@/lib/display/ScorePill';
 import { VisaBadge } from '@/lib/display/VisaBadge';
-import type { CountryFacts } from '@/lib/facts';
-import type { FactRow } from '../page';
+import type { CountryFacts } from '@travel-af/shared';
+import type { FactRow } from '@travel-af/domain';
 
 type VisaFacts = CountryFacts & {
   visaType?: 'visa_free' | 'voa' | 'evisa' | 'visa_required' | 'ban';

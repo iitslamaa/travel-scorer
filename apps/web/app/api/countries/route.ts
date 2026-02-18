@@ -3,7 +3,7 @@ import { COUNTRY_SEEDS, byIso2 } from '@/lib/seed';
 import { headers } from 'next/headers';
 import type { CountrySeed } from '@/lib/types';
 import { loadFacts } from '@/lib/facts';
-import type { CountryFacts } from '@/lib/facts';
+import type { CountryFacts } from '@travel-af/shared';
 import { nameToIso2 } from '@/lib/countryMatch';
 
 import fs from 'node:fs/promises';
