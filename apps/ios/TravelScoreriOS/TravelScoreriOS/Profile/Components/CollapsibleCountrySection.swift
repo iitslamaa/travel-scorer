@@ -59,6 +59,10 @@ struct CollapsibleCountrySection: View {
             if hasLoadedMap {
                 VStack(spacing: 16) {
 
+                    // 🔎 Normalize ISO codes once (ISO2 contract)
+                    let normalizedISOs = countryCodes
+                        .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() }
+
                     ScrollView(.horizontal, showsIndicators: false) {
                         FlagStrip(
                             flags: countryCodes,
@@ -81,12 +85,13 @@ struct CollapsibleCountrySection: View {
 
                         ScoreWorldMapRepresentable(
                             countries: [],
-                            highlightedISOs: countryCodes.map {
-                                $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-                            },
+                            highlightedISOs: normalizedISOs,
                             selectedCountryISO: $selectedCountryISO,
                             isLoading: $isLoadingMap
                         )
+                        .onAppear {
+                            print("🧩 Collapsible normalized ISOs:", normalizedISOs)
+                        }
                         .transaction { transaction in
                             transaction.animation = nil
                         }
