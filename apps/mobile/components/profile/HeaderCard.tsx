@@ -7,6 +7,7 @@ import {
   useColorScheme,
   Animated,
 } from 'react-native';
+import CountryFlag from 'react-native-country-flag';
 
 type Props = {
   name: string;
@@ -78,10 +79,13 @@ export default function HeaderCard({
 
           {flags.length > 0 && (
             <View style={styles.flagsRow}>
-              {flags.map((f) => (
-                <Text key={f} style={styles.flag}>
-                  {f}
-                </Text>
+              {flags.map((iso) => (
+                <CountryFlag
+                  key={iso}
+                  isoCode={iso}
+                  size={20}
+                  style={{ marginRight: 8 }}
+                />
               ))}
             </View>
           )}
@@ -159,10 +163,5 @@ const styles = StyleSheet.create({
   flagsRow: {
     marginTop: 10,
     flexDirection: 'row',
-  },
-
-  flag: {
-    fontSize: 20,
-    marginRight: 8,
   },
 });

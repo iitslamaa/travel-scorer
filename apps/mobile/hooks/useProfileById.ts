@@ -29,7 +29,17 @@ export function useProfileById(userId?: string | string[]) {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select(`
+          id,
+          username,
+          full_name,
+          avatar_url,
+          languages,
+          travel_mode,
+          travel_style,
+          next_destination,
+          lived_countries
+        `)
         .eq('id', id)
         .single();
 
@@ -37,7 +47,14 @@ export function useProfileById(userId?: string | string[]) {
         console.error(error);
         setProfile(null);
       } else {
-        setProfile(data as PublicProfile);
+        const normalized = {
+          ...data,
+          lived_countries: Array.isArray(data?.lived_countries)
+            ? data.lived_countries
+            : [],
+        } as PublicProfile;
+
+        setProfile(normalized);
       }
 
       setLoading(false);

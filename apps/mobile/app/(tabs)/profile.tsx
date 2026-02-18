@@ -121,7 +121,7 @@ export default function ProfileScreen() {
         name={displayName}
         handle={profile?.username ? `@${profile.username}` : ''}
         avatarUrl={profile?.avatar_url ?? undefined}
-        flags={profile?.home_countries ?? []}
+        flags={profile?.lived_countries ?? []}
       />
 
       <View style={styles.section}>
@@ -145,11 +145,11 @@ export default function ProfileScreen() {
         <DisclosureRow
           label="Countries Traveled"
           value={
-            profile?.countries_traveled?.length
-              ? String(profile.countries_traveled.length)
+            Array.isArray((profile as any)?.countries_traveled)
+              ? String((profile as any).countries_traveled.length)
               : '0'
           }
-          onPress={() => router.push('/countries-traveled')}
+          // onPress={() => router.push('/countries-traveled')}
         />
       </View>
     </ScrollView>
