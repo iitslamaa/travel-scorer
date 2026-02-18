@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Image,
   useColorScheme,
+  Animated,
 } from 'react-native';
 
 type Props = {
@@ -23,95 +24,145 @@ export default function HeaderCard({
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
 
+  // Subtle fade‑in animation
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
   return (
-    <View style={[styles.card, isDark && styles.cardDark]}>
+    <Animated.View style={[styles.wrapper, { opacity: fadeAnim }]}>
       <View style={styles.row}>
-        <View style={styles.avatarWrapper}>
+        {/* Avatar */}
+        <View style={styles.avatarContainer}>
           {avatarUrl ? (
             <Image source={{ uri: avatarUrl }} style={styles.avatar} />
           ) : (
-            <View style={[styles.avatarFallback, isDark && styles.avatarFallbackDark]} />
+            <View
+              style={[
+                styles.avatarFallback,
+                isDark
+                  ? styles.avatarFallbackDark
+                  : styles.avatarFallbackLight,
+              ]}
+            />
           )}
         </View>
 
+        {/* Text Meta */}
         <View style={styles.meta}>
-          <Text style={[styles.name, isDark && styles.textDark]}>
+          <Text
+            style={[
+              styles.name,
+              isDark ? styles.nameDark : styles.nameLight,
+            ]}
+          >
             {name}
           </Text>
 
-          <Text style={[styles.handle, isDark && styles.subTextDark]}>
-            {handle}
-          </Text>
+          {!!handle && (
+            <Text
+              style={[
+                styles.handle,
+                isDark ? styles.handleDark : styles.handleLight,
+              ]}
+            >
+              {handle}
+            </Text>
+          )}
 
-          <View style={styles.flagsRow}>
-            {flags.map((f) => (
-              <Text key={f} style={styles.flag}>
-                {f}
-              </Text>
-            ))}
-          </View>
+          {flags.length > 0 && (
+            <View style={styles.flagsRow}>
+              {flags.map((f) => (
+                <Text key={f} style={styles.flag}>
+                  {f}
+                </Text>
+              ))}
+            </View>
+          )}
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 24,
-    padding: 18,
-    marginBottom: 18,
+  wrapper: {
+    marginBottom: 32,
   },
-  cardDark: {
-    backgroundColor: '#0F172A',
-  },
+
   row: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  avatarWrapper: {
-    marginRight: 16,
+
+  avatarContainer: {
+    marginRight: 20,
   },
+
   avatar: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
+    width: 118,
+    height: 118,
+    borderRadius: 59,
   },
+
   avatarFallback: {
-    width: 92,
-    height: 92,
-    borderRadius: 46,
+    width: 118,
+    height: 118,
+    borderRadius: 59,
+  },
+
+  avatarFallbackDark: {
+    backgroundColor: '#2A2A2A',
+  },
+
+  avatarFallbackLight: {
     backgroundColor: '#E5E7EB',
   },
-  avatarFallbackDark: {
-    backgroundColor: '#334155',
-  },
+
   meta: {
     flex: 1,
   },
+
   name: {
-    fontSize: 24,
-    fontWeight: '800',
+    fontSize: 28,
+    fontWeight: '700',
+    letterSpacing: -0.3,
+  },
+
+  nameDark: {
+    color: '#FFFFFF',
+  },
+
+  nameLight: {
     color: '#111827',
   },
+
   handle: {
-    marginTop: 4,
+    marginTop: 6,
     fontSize: 16,
+  },
+
+  handleDark: {
+    color: '#A1A1AA',
+  },
+
+  handleLight: {
     color: '#6B7280',
   },
+
   flagsRow: {
-    marginTop: 8,
+    marginTop: 10,
     flexDirection: 'row',
   },
+
   flag: {
-    fontSize: 18,
+    fontSize: 20,
     marginRight: 8,
-  },
-  textDark: {
-    color: '#F9FAFB',
-  },
-  subTextDark: {
-    color: '#94A3B8',
   },
 });
