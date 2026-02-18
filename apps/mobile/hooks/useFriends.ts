@@ -22,11 +22,11 @@ export function useFriends() {
     async function fetchFriends() {
       setLoading(true);
 
-      // Get friend IDs
+      // Get friend rows where I am either user_id OR friend_id
       const { data: friendRows, error: friendError } = await supabase
         .from('friends')
-        .select('friend_id')
-        .eq('user_id', userId);
+        .select('user_id, friend_id')
+        .or(`user_id.eq.${userId},friend_id.eq.${userId}`);
 
       if (friendError) {
         console.error(friendError);
@@ -34,7 +34,15 @@ export function useFriends() {
         return;
       }
 
-      const friendIds = friendRows.map(f => f.friend_id);
+      // Compute the "other" user id for each row
+      const ids = (friendRows ?? []).flatMap((row: any) => {
+        if (row.user_id === userId) return [row.friend_id];
+        if (row.friend_id === userId) return [row.user_id];
+        return [];
+      });
+
+      // Deduplicate
+      const friendIds = Array.from(new Set(ids)).filter(Boolean);
 
       if (friendIds.length === 0) {
         setFriends([]);
@@ -51,7 +59,11 @@ export function useFriends() {
       if (profileError) {
         console.error(profileError);
       } else {
-        setFriends((profiles as FriendProfile[]) ?? []);
+        const typedProfiles = (profiles as FriendProfile[]) ?? [];
+        const sorted = typedProfiles.sort((a, b) =>
+          (a.full_name ?? '').localeCompare(b.full_name ?? '')
+        );
+        setFriends(sorted);
       }
 
       setLoading(false);
