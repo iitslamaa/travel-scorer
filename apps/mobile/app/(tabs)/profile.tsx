@@ -4,8 +4,8 @@ import {
   StyleSheet,
   View,
   Text,
-  useColorScheme,
   Pressable,
+  useColorScheme,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,10 +18,16 @@ import DisclosureRow from '../../components/profile/DisclosureRow';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { session, profile, exitGuest } = useAuth();
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
-  const router = useRouter();
-  const { session, profile, profileLoading, exitGuest } = useAuth();
+
+  const backgroundColor = isDark ? '#0F0F10' : '#F7F7F8';
+  const titleColor = isDark ? '#FFFFFF' : '#111827';
+  const subtitleColor = isDark ? '#A1A1AA' : '#6B7280';
+  const iconColor = isDark ? '#FFFFFF' : '#111827';
+
   const user = session?.user ?? null;
 
   if (!user) {
@@ -29,55 +35,74 @@ export default function ProfileScreen() {
       <View
         style={[
           styles.container,
-          { flex: 1, justifyContent: 'center', alignItems: 'center' },
+          {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor,
+          },
         ]}
       >
-        <Text style={[styles.title, isDark && styles.titleDark]}>
-          Login to customize your profile!
+        <Text style={[styles.title, { color: titleColor }]}> 
+          Login to customize your profile
         </Text>
 
-        <Text
-          style={{
-            marginTop: 12,
-            fontSize: 16,
-            color: isDark ? '#CBD5E1' : '#6B7280',
-            textAlign: 'center',
-            paddingHorizontal: 20,
-          }}
-        >
+        <Text style={[styles.subtitle, { color: subtitleColor }]}> 
           Sign in to set your languages, travel style, and destinations.
         </Text>
 
-        <View style={{ marginTop: 24 }}>
-          <Text
-            onPress={() => {
-              exitGuest();
-              router.replace('/');
-            }}
-            style={{
-              fontSize: 18,
-              fontWeight: '700',
-              color: '#2563EB',
-            }}
-          >
-            Go to Login →
-          </Text>
-        </View>
+        <Pressable
+          style={styles.loginButton}
+          onPress={() => {
+            exitGuest();
+            router.replace('/');
+          }}
+        >
+          <Text style={styles.loginButtonText}>Go to Login →</Text>
+        </Pressable>
       </View>
     );
   }
 
+  const languages =
+    Array.isArray(profile?.languages)
+      ? profile.languages.join(' · ')
+      : '—';
+
+  const travelMode =
+    Array.isArray(profile?.travel_mode) && profile.travel_mode.length
+      ? profile.travel_mode[0].charAt(0).toUpperCase() +
+        profile.travel_mode[0].slice(1)
+      : '—';
+
+  const travelStyle =
+    Array.isArray(profile?.travel_style) && profile.travel_style.length
+      ? profile.travel_style[0].charAt(0).toUpperCase() +
+        profile.travel_style[0].slice(1)
+      : '—';
+
+  const nextDestination =
+    typeof profile?.next_destination === 'string'
+      ? profile.next_destination
+      : '—';
+
+  const displayName =
+    profile?.full_name ??
+    profile?.username ??
+    'Your Profile';
+
   return (
     <ScrollView
+      style={{ backgroundColor }}
       contentContainerStyle={[
         styles.container,
-        { paddingTop: insets.top + 12, paddingBottom: insets.bottom + 28 },
+        { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 80 },
       ]}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.topRow}>
-        <Text style={[styles.title, isDark && styles.titleDark]}>
-          {profile?.display_name ?? profile?.username ?? 'Your Profile'}
+        <Text style={[styles.title, { color: titleColor }]}>
+          {displayName}
         </Text>
 
         <Pressable
@@ -86,29 +111,45 @@ export default function ProfileScreen() {
         >
           <Ionicons
             name="settings-outline"
-            size={22}
-            color={isDark ? '#F9FAFB' : '#111827'}
+            size={20}
+            color={iconColor}
           />
         </Pressable>
       </View>
 
       <HeaderCard
-        name={profile?.display_name ?? profile?.username ?? 'User'}
+        name={displayName}
         handle={profile?.username ? `@${profile.username}` : ''}
         avatarUrl={profile?.avatar_url ?? undefined}
-        flags={[]}
+        flags={profile?.home_countries ?? []}
       />
 
       <View style={styles.section}>
+        <InfoCard title="Languages" value={languages} />
+
+        <InfoCard
+          title="Travel Mode"
+          value={travelMode}
+        />
+
+        <InfoCard
+          title="Travel Style"
+          value={travelStyle}
+        />
+
         <InfoCard
           title="Next Destination"
-          value={profile?.next_destination ?? '—'}
+          value={nextDestination}
         />
 
         <DisclosureRow
-          label="Countries Traveled:"
-          value="0"
-          onPress={() => console.log('open countries')}
+          label="Countries Traveled"
+          value={
+            profile?.countries_traveled?.length
+              ? String(profile.countries_traveled.length)
+              : '0'
+          }
+          onPress={() => router.push('/countries-traveled')}
         />
       </View>
     </ScrollView>
@@ -117,31 +158,49 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 18,
+    paddingHorizontal: 22,
   },
+
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 18,
+    marginBottom: 20,
   },
+
   settingsIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#111827',
+    fontSize: 30,
+    fontWeight: '700',
+    letterSpacing: -0.5,
   },
-  titleDark: {
-    color: '#F9FAFB',
+
+  subtitle: {
+    marginTop: 12,
+    fontSize: 15,
+    textAlign: 'center',
+    paddingHorizontal: 24,
   },
+
+  loginButton: {
+    marginTop: 24,
+  },
+
+  loginButtonText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: '#3B82F6',
+  },
+
   section: {
-    marginTop: 14,
-    gap: 14,
+    marginTop: 18,
+    gap: 18,
   },
 });

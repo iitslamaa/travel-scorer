@@ -5,7 +5,7 @@ import { Session } from '@supabase/supabase-js';
 export type Profile = {
   id: string;
   username: string | null;
-  display_name: string | null;
+  full_name?: string | null;
   onboarding_completed: boolean | null;
   avatar_url?: string | null;
   next_destination?: string | null;
@@ -44,14 +44,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const fetchProfile = async (userId: string) => {
     setProfileLoading(true);
+
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, username, display_name, onboarding_completed, avatar_url, next_destination, travel_mode, travel_style, languages, lived_countries')
+      .select('*') // TEMP: fetch everything for debugging
       .eq('id', userId)
       .single();
 
-    // If RLS blocks, you’ll see error here; for now we just null profile.
-    setProfile(error ? null : (data as Profile));
+    if (error) {
+      setProfile(null);
+    } else {
+      setProfile(data as Profile);
+    }
+
     setProfileLoading(false);
   };
 
@@ -65,20 +70,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userId = session?.user?.id;
     if (!userId) return;
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('profiles')
       .update(patch)
-      .eq('id', userId);
+      .eq('id', userId)
+      .select('*')
+      .single();
 
     if (error) throw error;
 
-    // Optimistically update local state
-    setProfile(prev =>
-      prev ? ({ ...prev, ...patch } as Profile) : prev
-    );
-
-    // Re-fetch to ensure server truth
-    await fetchProfile(userId);
+    setProfile(data as Profile);
   };
 
   useEffect(() => {

@@ -12,47 +12,72 @@ export default function InfoCard({ title, value, hideValuePadding }: Props) {
   const isDark = scheme === 'dark';
 
   return (
-    <View style={[styles.card, isDark && styles.cardDark]}>
-      <Text style={[styles.title, isDark && styles.titleDark]}>
-        {title}
-      </Text>
+    <View style={[styles.card, isDark ? styles.cardDark : styles.cardLight]}>
       <Text
         style={[
-          styles.value,
-          isDark && styles.valueDark,
-          hideValuePadding && { marginTop: 0 },
+          styles.title,
+          isDark ? styles.titleDark : styles.titleLight,
         ]}
       >
-        {value}
+        {title}
       </Text>
+
+      {!!value && (
+        <Text
+          style={[
+            styles.value,
+            isDark ? styles.valueDark : styles.valueLight,
+            hideValuePadding && { marginTop: 0 },
+          ]}
+        >
+          {value}
+        </Text>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 16,
-    marginBottom: 14,
+    borderRadius: 28,
+    paddingVertical: 24,
+    paddingHorizontal: 22,
+    marginBottom: 22,
   },
+
   cardDark: {
-    backgroundColor: '#0F172A',
+    backgroundColor: '#111111',
   },
+
+  cardLight: {
+    backgroundColor: '#FFFFFF',
+  },
+
   title: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#111827',
+    fontSize: 15,
+    fontWeight: '600',
+    letterSpacing: 0.3,
   },
-  value: {
-    marginTop: 8,
-    fontSize: 16,
-    color: '#111827',
-  },
+
   titleDark: {
-    color: '#F9FAFB',
+    color: '#A1A1AA',
   },
+
+  titleLight: {
+    color: '#6B7280',
+  },
+
+  value: {
+    marginTop: 10,
+    fontSize: 18,
+    fontWeight: '600',
+  },
+
   valueDark: {
-    color: '#CBD5E1',
+    color: '#FFFFFF',
+  },
+
+  valueLight: {
+    color: '#111827',
   },
 });
