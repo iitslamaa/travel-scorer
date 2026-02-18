@@ -170,6 +170,9 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: MKMapView, context: Context) {
+        
+        // 🔄 Keep coordinator highlights synced with SwiftUI updates
+        context.coordinator.updateHighlights(highlightedISOs)
 
         context.coordinator.selectedCountryISO = selectedCountryISO
 
@@ -236,8 +239,8 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     
     class Coordinator: NSObject, MKMapViewDelegate {
         
-        let highlightedISOs: [String]
-        let highlightedTokens: Set<String>
+        var highlightedISOs: [String]
+        var highlightedTokens: Set<String>
         let countryLookup: [String: Country]
         @Binding var selectedCountryISO: String?
         weak var mapView: MKMapView?
@@ -316,6 +319,26 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
                     break
                 }
             }
+        }
+        
+        func updateHighlights(_ newISOs: [String]) {
+            self.highlightedISOs = newISOs.map { $0.uppercased() }
+
+            var tokens = Set<String>()
+            for iso in self.highlightedISOs {
+                let up = iso.uppercased()
+                tokens.insert(up)
+                tokens.insert(String(up.prefix(2)))
+
+                if let nameLocal = Locale.current.localizedString(forRegionCode: up)?.uppercased() {
+                    tokens.insert(nameLocal)
+                }
+                if let nameEN = Locale(identifier: "en_US").localizedString(forRegionCode: up)?.uppercased() {
+                    tokens.insert(nameEN)
+                }
+            }
+
+            self.highlightedTokens = tokens
         }
         
         func zoomToCountry(polygons: [CountryPolygon]) {
@@ -409,6 +432,27 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
                 (geoISO != nil && selectedTokens.contains(geoISO!)) ||
                 (geoISO != nil && selectedTokens.contains(String(geoISO!.prefix(2)))) ||
                 (geoName != nil && selectedTokens.contains(geoName!))
+
+            // 🔹 Highlight-only mode (e.g. Profile collapsible sections)
+            // When no countries are provided, use highlightedTokens instead of score colors.
+            if countryLookup.isEmpty {
+                let isHighlighted =
+                    (geoISO != nil && highlightedTokens.contains(geoISO!)) ||
+                    (geoISO != nil && highlightedTokens.contains(String(geoISO!.prefix(2)))) ||
+                    (geoName != nil && highlightedTokens.contains(geoName!))
+
+                if isHighlighted {
+                    renderer.fillColor = UIColor.systemBlue.withAlphaComponent(0.6)
+                    renderer.strokeColor = UIColor.systemBlue
+                    renderer.lineWidth = 1.5
+                } else {
+                    renderer.fillColor = UIColor.systemGray.withAlphaComponent(0.15)
+                    renderer.strokeColor = UIColor.black.withAlphaComponent(0.2)
+                    renderer.lineWidth = 0.5
+                }
+
+                return renderer
+            }
 
             if let id = identifier,
                let country = countryLookup[id] {
