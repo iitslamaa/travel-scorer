@@ -3,41 +3,30 @@ import {
   Text,
   StyleSheet,
   Image,
+  Pressable,
+  ScrollView,
   useColorScheme,
 } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { supabase } from '../../lib/supabase';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { lightColors, darkColors } from '../../theme/colors';
+import { useProfileById } from '../../hooks/useProfileById';
+import { useFriendshipStatus } from '../../hooks/useFriendshipStatus';
+import { useFriendCount } from '../../hooks/useFriendCount';
+import { useUserCounts } from '../../hooks/useUserCounts';
 
-export default function ProfileScreen() {
+export default function FriendProfileScreen() {
+  const router = useRouter();
   const { id } = useLocalSearchParams();
   const scheme = useColorScheme();
   const colors = scheme === 'dark' ? darkColors : lightColors;
 
-  const [profile, setProfile] = useState<any>(null);
+  const { profile, loading } = useProfileById(id);
+  const { isFriend } = useFriendshipStatus(id);
+  const { count: friendCount } = useFriendCount(id);
+  const { traveledCount } = useUserCounts(id);
 
-  useEffect(() => {
-    async function fetchProfile() {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (!error) {
-        setProfile(data);
-      } else {
-        console.error(error);
-      }
-    }
-
-    if (id) {
-      fetchProfile();
-    }
-  }, [id]);
-
-  if (!profile) {
+  if (loading || !profile) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <Text style={{ color: colors.textMuted }}>Loading...</Text>
@@ -45,44 +34,141 @@ export default function ProfileScreen() {
     );
   }
 
+  const title = `${profile.full_name}'s Profile`;
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {profile.avatar_url ? (
-        <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
-      ) : (
-        <View style={styles.avatar} />
-      )}
+      {/* Top back */}
+      <Pressable onPress={() => router.back()} style={styles.backBtn}>
+        <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
+      </Pressable>
 
-      <Text style={[styles.name, { color: colors.textPrimary }]}>
-        {profile.full_name}
-      </Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>{title}</Text>
 
-      <Text style={[styles.username, { color: colors.textMuted }]}>
-        @{profile.username}
-      </Text>
+        {/* Header block */}
+        <View style={styles.headerRow}>
+          <View style={styles.avatarWrap}>
+            {profile.avatar_url ? (
+              <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
+            ) : (
+              <View style={[styles.avatar, { backgroundColor: '#444' }]} />
+            )}
+          </View>
+
+          <View style={{ flex: 1, marginLeft: 18 }}>
+            <Text style={[styles.name, { color: colors.textPrimary }]}>
+              {profile.full_name}
+            </Text>
+            <Text style={[styles.username, { color: colors.textMuted }]}>
+              @{profile.username}
+            </Text>
+
+            {/* Friend button */}
+            <Pressable
+              style={[
+                styles.friendBtn,
+                {
+                  borderColor: colors.primary,
+                },
+              ]}
+            >
+              <Ionicons
+                name={isFriend ? 'checkmark' : 'person-add-outline'}
+                size={18}
+                color={colors.primary}
+              />
+              <Text style={[styles.friendBtnText, { color: colors.primary }]}>
+                {friendCount} Friend{friendCount === 1 ? '' : 's'}
+              </Text>
+            </Pressable>
+          </View>
+        </View>
+
+        {/* Cards - (we’ll fill these from profile fields next) */}
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
+            Languages
+          </Text>
+          <Text style={[styles.cardValue, { color: colors.textMuted }]}>
+            {Array.isArray(profile.languages)
+              ? profile.languages.map((l: any) => l?.name ?? l).join(' · ')
+              : '—'}
+          </Text>
+        </View>
+
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
+            Travel Mode: Solo or Group?
+          </Text>
+          <Text style={[styles.cardValue, { color: colors.textMuted }]}>
+            {profile.travel_mode ?? '—'}
+          </Text>
+        </View>
+
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
+            Travel Style: Budget, Comfortable, or In Between?
+          </Text>
+          <Text style={[styles.cardValue, { color: colors.textMuted }]}>
+            {profile.travel_style ?? '—'}
+          </Text>
+        </View>
+
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
+            Next Destination
+          </Text>
+          <Text style={[styles.cardValue, { color: colors.textMuted }]}>
+            {profile.next_destination ?? '—'}
+          </Text>
+        </View>
+
+        <Pressable style={[styles.linkRow, { backgroundColor: colors.card }]}>
+          <Ionicons name="chevron-forward" size={18} color={colors.primary} />
+          <Text style={[styles.linkText, { color: colors.primary }]}>
+            Countries Traveled:
+          </Text>
+          <Text style={{ color: '#d2a21b', marginLeft: 8, fontWeight: '700' }}>
+            {traveledCount}
+          </Text>
+        </Pressable>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  container: { flex: 1, paddingTop: 60, paddingHorizontal: 20 },
+  backBtn: { marginBottom: 14 },
+  title: { fontSize: 40, fontWeight: '800', marginBottom: 22 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 22 },
+  avatarWrap: { width: 150, height: 150, borderRadius: 75, overflow: 'hidden' },
+  avatar: { width: 150, height: 150, borderRadius: 75 },
+  name: { fontSize: 28, fontWeight: '800', marginTop: 6 },
+  username: { fontSize: 18, marginTop: 4 },
+  friendBtn: {
+    marginTop: 14,
+    alignSelf: 'flex-start',
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 26,
+    borderWidth: 2,
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 100,
+    gap: 10,
   },
-  avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#444',
-    marginBottom: 20,
+  friendBtnText: { fontSize: 16, fontWeight: '700' },
+  card: { borderRadius: 24, padding: 18, marginTop: 16 },
+  cardTitle: { fontSize: 18, fontWeight: '800' },
+  cardValue: { fontSize: 16, marginTop: 8 },
+  linkRow: {
+    marginTop: 18,
+    borderRadius: 24,
+    paddingVertical: 18,
+    paddingHorizontal: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  name: {
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  username: {
-    fontSize: 16,
-    marginTop: 6,
-  },
+  linkText: { fontSize: 18, fontWeight: '800', marginLeft: 10 },
 });
