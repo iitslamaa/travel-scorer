@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@travel-af/domain": "workspace:*",
     "@travel-af/shared": "workspace:*",
     "fast-xml-parser": "^5.3.1",
     "leaflet": "^1.9.4",

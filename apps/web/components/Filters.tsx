@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { DEFAULT_WEIGHTS, type Weights } from '@travel-af/shared';
+import { DEFAULT_WEIGHTS } from '@travel-af/domain';
+import type { Weights } from '@travel-af/shared';
 
 // Derive a safe key type from DEFAULT_WEIGHTS so our slider keys are checked
 type WeightMap = typeof DEFAULT_WEIGHTS;

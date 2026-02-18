@@ -10,22 +10,29 @@ export type Weights = {
   infrastructure: number;
 };
 
+export type VisaEase =
+  | 'visa_free'
+  | 'eta'
+  | 'voa'
+  | 'visa_required'
+  | 'unknown';
+
 export type CountryFacts = {
   iso2: string;
 
   // Safety and sentiment
   advisoryLevel?: 1 | 2 | 3 | 4;
-  travelSafeOverall?: number;   // 0–100
-  soloFemaleIndex?: number;     // 0–100
-  redditComposite?: number;     // 0–100
-  redditN?: number;             // sample size
+  travelSafeOverall?: number;
+  soloFemaleIndex?: number;
+  redditComposite?: number;
+  redditN?: number;
 
   // Travel logistics
-  seasonality?: number;         // 0–100 (100 = currently peak season)
-  visaEase?: number;            // 0–100
-  affordability?: number;       // 0–100 (higher = cheaper)
-  directFlight?: number;        // 0–100 (1 = direct flight exists, or score inverse to hours)
-  infrastructure?: number;      // 0–100 (higher = better)
+  seasonality?: number;
+  visaEase?: number;
+  affordability?: number;
+  directFlight?: number;
+  infrastructure?: number;
 
   // Meta
   advisoryUrl?: string;

@@ -1,4 +1,4 @@
-import type { CountryFacts } from "@/lib/facts";
+import type { CountryFacts } from '@travel-af/shared';
 import { AffordabilitySection as AffordabilityDisplay } from "@/lib/display/AffordabilitySection";
 
 type Props = {
