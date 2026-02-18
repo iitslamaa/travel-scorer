@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import CountryFlag from 'react-native-country-flag';
 import { lightColors, darkColors } from '../../theme/colors';
 import { useProfileById } from '../../hooks/useProfileById';
 import { useFriendshipStatus } from '../../hooks/useFriendshipStatus';
@@ -33,6 +34,8 @@ export default function FriendProfileScreen() {
       </View>
     );
   }
+
+  console.log('PROFILE DATA:', profile);
 
   const title = `${profile.full_name}'s Profile`;
 
@@ -63,6 +66,20 @@ export default function FriendProfileScreen() {
             <Text style={[styles.username, { color: colors.textMuted }]}>
               @{profile.username}
             </Text>
+
+            {Array.isArray(profile.lived_countries) &&
+              profile.lived_countries.length > 0 && (
+                <View style={styles.homeRow}>
+                  {profile.lived_countries.map((iso: string) => (
+                    <CountryFlag
+                      key={iso}
+                      isoCode={iso}
+                      size={24}
+                      style={{ marginRight: 8 }}
+                    />
+                  ))}
+                </View>
+              )}
 
             {/* Friend button */}
             <Pressable
@@ -147,6 +164,11 @@ const styles = StyleSheet.create({
   avatar: { width: 150, height: 150, borderRadius: 75 },
   name: { fontSize: 28, fontWeight: '800', marginTop: 6 },
   username: { fontSize: 18, marginTop: 4 },
+  homeRow: {
+    flexDirection: 'row',
+    marginTop: 10,
+    alignItems: 'center',
+  },
   friendBtn: {
     marginTop: 14,
     alignSelf: 'flex-start',
