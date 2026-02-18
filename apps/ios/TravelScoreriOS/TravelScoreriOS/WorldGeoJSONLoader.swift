@@ -121,7 +121,7 @@ struct WorldGeoJSONLoader {
                             countryPolygonsByISO: &countryPolygonsByISO,
                             countryNamesByISO: &countryNamesByISO
                         )
-                    } else if isoCode == "NL" {
+                    } else if isoCode == "NL" || isoCode == "BQ" {
                         splitNetherlandsPolygon(
                             polygon,
                             countryPolygonsByISO: &countryPolygonsByISO,
@@ -142,7 +142,7 @@ struct WorldGeoJSONLoader {
                                 countryPolygonsByISO: &countryPolygonsByISO,
                                 countryNamesByISO: &countryNamesByISO
                             )
-                        } else if isoCode == "NL" {
+                        } else if isoCode == "NL" || isoCode == "BQ" {
                             splitNetherlandsPolygon(
                                 polygon,
                                 countryPolygonsByISO: &countryPolygonsByISO,
@@ -263,44 +263,57 @@ struct WorldGeoJSONLoader {
         countryNamesByISO: inout [String: String]
     ) {
 
-        let rect = polygon.boundingMapRect
-        let center = MKMapPoint(x: rect.midX, y: rect.midY).coordinate
+        // NOTE: Using boundingMapRect center can be misleading for tiny islands (or multi-island shapes).
+        // Use a representative point from the polygon instead.
+        let firstPoint = polygon.points()[0]
+        let center = firstPoint.coordinate
 
         let lat = center.latitude
         let lng = center.longitude
+
+        // Debug: helps verify Dutch Caribbean classification
+        if lng < 0 && lat < 30 {
+            print("🇳🇱 [NL split] candidate lat:\(lat) lng:\(lng) points:\(polygon.pointCount)")
+        }
 
         // 🇳🇱 Mainland Netherlands (Europe)
         if lat > 50 && lat < 54 && lng > 3 && lng < 8 {
             countryPolygonsByISO["NL", default: []].append(polygon)
             countryNamesByISO["NL"] = "Netherlands"
+            print("✅ [NL split] classified as NL (mainland) lat:\(lat) lng:\(lng)")
         }
 
-        // 🇦🇼 Aruba
-        else if lat > 11 && lat < 13 && lng < -68 {
+        // 🇦🇼 Aruba (tightened bounds so it does NOT capture Bonaire)
+        else if lat > 11 && lat < 13 && lng < -69.5 {
             countryPolygonsByISO["AW", default: []].append(polygon)
             countryNamesByISO["AW"] = "Aruba"
+            print("✅ [NL split] classified as AW (Aruba) lat:\(lat) lng:\(lng)")
         }
 
         // 🇨🇼 Curaçao
-        else if lat > 11 && lat < 13 && lng > -69 && lng < -67 {
+        else if lat > 11 && lat < 13 && lng >= -69.5 && lng < -68.5 {
             countryPolygonsByISO["CW", default: []].append(polygon)
             countryNamesByISO["CW"] = "Curaçao"
+            print("✅ [NL split] classified as CW (Curaçao) lat:\(lat) lng:\(lng)")
         }
 
         // 🇸🇽 Sint Maarten
         else if lat > 17 && lat < 19 && lng < -62 {
             countryPolygonsByISO["SX", default: []].append(polygon)
             countryNamesByISO["SX"] = "Sint Maarten"
+            print("✅ [NL split] classified as SX (Sint Maarten) lat:\(lat) lng:\(lng)")
         }
 
-        // 🇧🇶 Caribbean Netherlands (Bonaire, Saba, Sint Eustatius)
-        else if lat > 11 && lat < 18 && lng < -62 {
+        // 🇧🇶 Bonaire (ONLY Bonaire island — ignore Saba & Sint Eustatius)
+        // Bonaire is roughly lat 12.0 N, lng -68.3 W
+        else if lat > 11.5 && lat < 12.6 && lng >= -68.5 && lng < -67.8 {
             countryPolygonsByISO["BQ", default: []].append(polygon)
-            countryNamesByISO["BQ"] = "Caribbean Netherlands"
+            countryNamesByISO["BQ"] = "Bonaire"
+            print("✅ [NL split] classified as BQ (Bonaire) lat:\(lat) lng:\(lng)")
         }
 
         else {
-            print("⚠️ Unclassified Netherlands polygon lat:\(lat) lng:\(lng)")
+            print("⚠️ [NL split] UNCLASSIFIED lat:\(lat) lng:\(lng) points:\(polygon.pointCount)")
         }
     }
 }
