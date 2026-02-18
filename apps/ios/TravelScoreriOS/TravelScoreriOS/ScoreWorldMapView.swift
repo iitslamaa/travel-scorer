@@ -269,6 +269,19 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
                 lookup[country.iso2.uppercased()] = country
                 lookup[country.name] = country
             }
+
+            // Normalize overseas territories to parent ISO for scoring
+            let franceTerritories = ["GF","GP","MQ","RE","YT","PM","NC","PF","WF"]
+            let netherlandsTerritories = ["AW","CW","SX","BQ"]
+
+            for iso in franceTerritories {
+                lookup[iso] = lookup["FR"]
+            }
+
+            for iso in netherlandsTerritories {
+                lookup[iso] = lookup["NL"]
+            }
+
             self.countryLookup = lookup
             self._selectedCountryISO = selectedCountryISO
         }
@@ -385,19 +398,30 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
                 }
             }
 
+            let identifier: String? = {
+                if let iso = geoISO, iso != "-99" {
+                    return iso
+                }
+                return geoName
+            }()
+
             let isSelected =
                 (geoISO != nil && selectedTokens.contains(geoISO!)) ||
                 (geoISO != nil && selectedTokens.contains(String(geoISO!.prefix(2)))) ||
                 (geoName != nil && selectedTokens.contains(geoName!))
 
-            let isHighlighted =
-                (geoISO != nil && highlightedTokens.contains(geoISO!)) ||
-                (geoISO != nil && highlightedTokens.contains(String(geoISO!.prefix(2)))) ||
-                (geoName != nil && highlightedTokens.contains(geoName!))
+            if let id = identifier,
+               let country = countryLookup[id] {
 
-            renderer.fillColor = isHighlighted
-                ? UIColor.systemYellow.withAlphaComponent(isSelected ? 0.9 : 0.6)
-                : UIColor.systemGray.withAlphaComponent(0.15)
+                let baseColor = UIColor(ScoreColor.background(for: country.score))
+
+                renderer.fillColor = isSelected
+                    ? baseColor.withAlphaComponent(0.85)
+                    : baseColor.withAlphaComponent(0.6)
+
+            } else {
+                renderer.fillColor = UIColor.systemGray.withAlphaComponent(0.15)
+            }
 
             renderer.strokeColor = isSelected
                 ? UIColor.systemOrange
