@@ -17,6 +17,7 @@ struct CollapsibleCountrySection: View {
     @State private var isExpanded = false
     @State private var selectedCountryISO: String? = nil
     @State private var hasLoadedMap = false
+    @State private var isLoadingMap: Bool = false
 
     init(
         title: String,
@@ -65,16 +66,26 @@ struct CollapsibleCountrySection: View {
                             spacing: 10,
                             showsTooltip: false,
                             selectedISO: selectedCountryISO,
-                            onFlagTap: { selectedCountryISO = $0 },
+                            onFlagTap: {
+                                let normalized = $0
+                                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                                    .uppercased()
+                                print("🇫🇷 [FlagTap] tapped:", $0, "normalized:", normalized)
+                                selectedCountryISO = normalized
+                            },
                             mutualCountries: mutualCountries
                         )
                     }
 
                     ZStack(alignment: .bottom) {
 
-                        WorldMapView(
-                            highlightedCountryCodes: countryCodes,
-                            selectedCountryISO: $selectedCountryISO
+                        ScoreWorldMapRepresentable(
+                            countries: [],
+                            highlightedISOs: countryCodes.map {
+                                $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                            },
+                            selectedCountryISO: $selectedCountryISO,
+                            isLoading: $isLoadingMap
                         )
                         .transaction { transaction in
                             transaction.animation = nil
