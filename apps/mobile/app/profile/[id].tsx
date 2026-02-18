@@ -15,6 +15,7 @@ import { useProfileById } from '../../hooks/useProfileById';
 import { useFriendshipStatus } from '../../hooks/useFriendshipStatus';
 import { useFriendCount } from '../../hooks/useFriendCount';
 import { useUserCounts } from '../../hooks/useUserCounts';
+import { useCountries } from '../../hooks/useCountries';
 
 export default function FriendProfileScreen() {
   const router = useRouter();
@@ -27,6 +28,17 @@ export default function FriendProfileScreen() {
   const { count: friendCount } = useFriendCount(id);
   const { traveledCount } = useUserCounts(id);
 
+  const { countries } = useCountries();
+
+  const nextDestinationIso =
+    typeof profile?.next_destination === 'string'
+      ? profile.next_destination
+      : null;
+
+  const nextDestinationCountry = countries?.find(
+    c => c.iso2 === nextDestinationIso
+  );
+
   if (loading || !profile) {
     return (
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -35,9 +47,16 @@ export default function FriendProfileScreen() {
     );
   }
 
-  console.log('PROFILE DATA:', profile);
 
   const title = `${profile.full_name}'s Profile`;
+
+  const languagesText =
+    Array.isArray(profile.languages) && profile.languages.length > 0
+      ? profile.languages
+          .map((l: any) => (typeof l === 'string' ? l : l?.name))
+          .filter(Boolean)
+          .join(' · ')
+      : '—';
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -107,10 +126,8 @@ export default function FriendProfileScreen() {
           <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
             Languages
           </Text>
-          <Text style={[styles.cardValue, { color: colors.textMuted }]}>
-            {Array.isArray(profile.languages)
-              ? profile.languages.map((l: any) => l?.name ?? l).join(' · ')
-              : '—'}
+          <Text style={[styles.cardValue, { color: colors.textMuted }]}> 
+            {languagesText}
           </Text>
         </View>
 
@@ -136,9 +153,20 @@ export default function FriendProfileScreen() {
           <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
             Next Destination
           </Text>
-          <Text style={[styles.cardValue, { color: colors.textMuted }]}>
-            {profile.next_destination ?? '—'}
-          </Text>
+          {nextDestinationCountry ? (
+            <View style={styles.inlineRow}>
+              <CountryFlag
+                isoCode={nextDestinationCountry.iso2}
+                size={18}
+                style={{ marginRight: 6 }}
+              />
+              <Text style={[styles.cardValue, { color: colors.textMuted, marginTop: 0 }]}>
+                {nextDestinationCountry.name}
+              </Text>
+            </View>
+          ) : (
+            <Text style={[styles.cardValue, { color: colors.textMuted }]}>—</Text>
+          )}
         </View>
 
         <Pressable style={[styles.linkRow, { backgroundColor: colors.card }]}>
@@ -168,6 +196,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginTop: 10,
     alignItems: 'center',
+  },
+  inlineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
   },
   friendBtn: {
     marginTop: 14,

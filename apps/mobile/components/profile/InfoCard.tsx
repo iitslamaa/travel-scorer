@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, useColorScheme } from 'react-native';
 
 type Props = {
   title: string;
-  value: string;
+  value: React.ReactNode;
   hideValuePadding?: boolean;
 };
 

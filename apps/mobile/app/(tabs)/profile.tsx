@@ -11,6 +11,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
+import { useCountries } from '../../hooks/useCountries';
+import CountryFlag from 'react-native-country-flag';
 
 import HeaderCard from '../../components/profile/HeaderCard';
 import InfoCard from '../../components/profile/InfoCard';
@@ -20,6 +22,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { session, profile, exitGuest } = useAuth();
+  const { countries } = useCountries();
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
 
@@ -43,11 +46,11 @@ export default function ProfileScreen() {
           },
         ]}
       >
-        <Text style={[styles.title, { color: titleColor }]}> 
+        <Text style={[styles.title, { color: titleColor }]}>
           Login to customize your profile
         </Text>
 
-        <Text style={[styles.subtitle, { color: subtitleColor }]}> 
+        <Text style={[styles.subtitle, { color: subtitleColor }]}>
           Sign in to set your languages, travel style, and destinations.
         </Text>
 
@@ -81,10 +84,14 @@ export default function ProfileScreen() {
         profile.travel_style[0].slice(1)
       : '—';
 
-  const nextDestination =
+  const nextDestinationIso =
     typeof profile?.next_destination === 'string'
       ? profile.next_destination
-      : '—';
+      : null;
+
+  const nextDestinationCountry = countries?.find(
+    c => c.iso2 === nextDestinationIso
+  );
 
   const displayName =
     profile?.full_name ??
@@ -139,7 +146,19 @@ export default function ProfileScreen() {
 
         <InfoCard
           title="Next Destination"
-          value={nextDestination}
+          value={
+            
+            nextDestinationCountry ? (
+              <>
+                <CountryFlag
+                  isoCode={nextDestinationCountry.iso2}
+                  size={18}
+                  style={{ marginRight: 6 }}
+                />
+                {nextDestinationCountry.name}
+              </>
+            ) : '—'
+          }
         />
 
         <DisclosureRow
@@ -149,7 +168,6 @@ export default function ProfileScreen() {
               ? String((profile as any).countries_traveled.length)
               : '0'
           }
-          // onPress={() => router.push('/countries-traveled')}
         />
       </View>
     </ScrollView>
