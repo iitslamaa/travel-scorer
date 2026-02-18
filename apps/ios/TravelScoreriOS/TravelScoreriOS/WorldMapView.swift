@@ -8,11 +8,14 @@ import MapKit
 
 struct WorldMapView: UIViewRepresentable {
 
+    private static var cachedPolygons: [MKOverlay]?
+
     let highlightedCountryCodes: [String]
     @Binding var selectedCountryISO: String?
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView()
+
         mapView.mapType = .mutedStandard
         mapView.isRotateEnabled = false
         mapView.isPitchEnabled = false
@@ -26,8 +29,13 @@ struct WorldMapView: UIViewRepresentable {
             animated: false
         )
 
-        let polygons = WorldGeoJSONLoader.loadPolygons()
-        mapView.addOverlays(polygons)
+        if let cached = WorldMapView.cachedPolygons {
+            mapView.addOverlays(cached)
+        } else {
+            let polygons = WorldGeoJSONLoader.loadPolygons()
+            WorldMapView.cachedPolygons = polygons
+            mapView.addOverlays(polygons)
+        }
 
         context.coordinator.mapView = mapView
 
@@ -35,45 +43,32 @@ struct WorldMapView: UIViewRepresentable {
             target: context.coordinator,
             action: #selector(Coordinator.handleTap(_:))
         )
+        tapGesture.delegate = context.coordinator
         mapView.addGestureRecognizer(tapGesture)
 
         return mapView
     }
 
     func updateUIView(_ uiView: MKMapView, context: Context) {
-        context.coordinator.highlightedCountryCodes = highlightedCountryCodes
 
-        // Update fill + selection styling
-        for overlay in uiView.overlays {
-            guard let polygon = overlay as? CountryPolygon,
-                  let renderer = uiView.renderer(for: overlay) as? MKPolygonRenderer else { continue }
+        context.coordinator.highlightedCountryCodes =
+            highlightedCountryCodes.map { $0.uppercased() }
 
-            let isHighlighted = polygon.isoCode.map { highlightedCountryCodes.contains($0) } ?? false
-            let isSelected = polygon.isoCode == selectedCountryISO
+        // 🔥 Only zoom when selection changes
+        guard let iso = selectedCountryISO?.uppercased(),
+              context.coordinator.lastZoomedISO != iso else { return }
 
-            renderer.fillColor = isHighlighted
-                ? UIColor.systemYellow.withAlphaComponent(0.6)
-                : UIColor.systemGray.withAlphaComponent(0.2)
+        context.coordinator.lastZoomedISO = iso
 
-            renderer.strokeColor = isSelected
-                ? UIColor.systemYellow
-                : UIColor.black.withAlphaComponent(0.2)
+        let matching = uiView.overlays
+            .compactMap { $0 as? CountryPolygon }
+            .filter { $0.isoCode?.uppercased() == iso }
 
-            renderer.lineWidth = isSelected ? 2.5 : 0.5
-        }
+        guard !matching.isEmpty else { return }
 
-        // Restore zoom-on-selection (for flag tap)
-        if let iso = selectedCountryISO,
-           context.coordinator.lastZoomedISO != iso {
-
-            let matchingPolygons = uiView.overlays
-                .compactMap { $0 as? CountryPolygon }
-                .filter { $0.isoCode == iso }
-
-            if !matchingPolygons.isEmpty {
-                context.coordinator.lastZoomedISO = iso
-                context.coordinator.zoomToCountry(polygons: matchingPolygons, animated: true)
-            }
+        // 🔥 CRITICAL: async to avoid SwiftUI mutation cycle
+        DispatchQueue.main.async {
+            context.coordinator.zoomToCountry(polygons: matching, animated: true)
         }
     }
 
@@ -84,7 +79,7 @@ struct WorldMapView: UIViewRepresentable {
         )
     }
 
-    class Coordinator: NSObject, MKMapViewDelegate {
+    class Coordinator: NSObject, MKMapViewDelegate, UIGestureRecognizerDelegate {
 
         var highlightedCountryCodes: [String]
         @Binding var selectedCountryISO: String?
@@ -97,6 +92,7 @@ struct WorldMapView: UIViewRepresentable {
             self._selectedCountryISO = selectedCountryISO
         }
 
+        // 🔥 ONLY set selection here. DO NOT zoom.
         @objc func handleTap(_ gesture: UITapGestureRecognizer) {
             guard let mapView = mapView else { return }
 
@@ -105,47 +101,33 @@ struct WorldMapView: UIViewRepresentable {
             let mapPoint = MKMapPoint(coordinate)
 
             for overlay in mapView.overlays {
-                guard let polygon = overlay as? CountryPolygon else { continue }
+                guard let polygon = overlay as? CountryPolygon,
+                      let renderer = mapView.renderer(for: overlay) as? MKMultiPolygonRenderer else { continue }
 
-                guard let renderer = mapView.renderer(for: overlay) as? MKPolygonRenderer else { continue }
                 renderer.createPath()
-
                 let point = renderer.point(for: mapPoint)
 
-                if let path = renderer.path, path.contains(point),
-                   let iso = polygon.isoCode {
+                if let path = renderer.path,
+                   path.contains(point),
+                   let iso = polygon.isoCode?.uppercased() {
 
                     selectedCountryISO = iso
-                    lastZoomedISO = iso
-
-                    let matching = mapView.overlays
-                        .compactMap { $0 as? CountryPolygon }
-                        .filter { $0.isoCode == iso }
-
-                    zoomToCountry(polygons: matching, animated: true)
                     break
                 }
             }
         }
 
         func zoomToCountry(polygons: [CountryPolygon], animated: Bool) {
-            guard let mapView = mapView, !polygons.isEmpty else { return }
+            guard let mapView = mapView else { return }
 
             var combinedRect = polygons.first!.boundingMapRect
             for polygon in polygons.dropFirst() {
                 combinedRect = combinedRect.union(polygon.boundingMapRect)
             }
 
-            // Bahamas-friendly framing (as before)
-            let expansionFactor: Double = 0.15
-            let expandedRect = combinedRect.insetBy(
-                dx: -combinedRect.size.width * expansionFactor,
-                dy: -combinedRect.size.height * expansionFactor
-            )
-
             mapView.setVisibleMapRect(
-                expandedRect,
-                edgePadding: UIEdgeInsets(top: 60, left: 60, bottom: 110, right: 60),
+                combinedRect,
+                edgePadding: UIEdgeInsets(top: 60, left: 60, bottom: 60, right: 60),
                 animated: animated
             )
         }
@@ -153,22 +135,33 @@ struct WorldMapView: UIViewRepresentable {
         func mapView(_ mapView: MKMapView,
                      rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
 
-            guard let polygon = overlay as? CountryPolygon else {
+            guard let multi = overlay as? CountryPolygon else {
                 return MKOverlayRenderer(overlay: overlay)
             }
 
-            let renderer = MKPolygonRenderer(polygon: polygon)
-            renderer.strokeColor = UIColor.black.withAlphaComponent(0.2)
-            renderer.lineWidth = 0.5
+            let renderer = MKMultiPolygonRenderer(multiPolygon: multi)
 
-            if let iso = polygon.isoCode,
-               highlightedCountryCodes.contains(iso) {
-                renderer.fillColor = UIColor.systemYellow.withAlphaComponent(0.6)
-            } else {
-                renderer.fillColor = UIColor.systemGray.withAlphaComponent(0.2)
-            }
+            let geoISO = multi.isoCode?.uppercased()
+            let isHighlighted = geoISO != nil &&
+                highlightedCountryCodes.contains(geoISO!)
+            let isSelected = geoISO == selectedCountryISO?.uppercased()
+
+            renderer.fillColor = isHighlighted
+                ? UIColor.systemYellow.withAlphaComponent(isSelected ? 0.85 : 0.6)
+                : UIColor.systemGray.withAlphaComponent(0.2)
+
+            renderer.strokeColor = isSelected
+                ? UIColor.systemYellow
+                : UIColor.black.withAlphaComponent(0.2)
+
+            renderer.lineWidth = isSelected ? 2.5 : 0.5
 
             return renderer
+        }
+
+        func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer,
+                               shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+            return true
         }
     }
 }
