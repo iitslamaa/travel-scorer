@@ -147,16 +147,15 @@ export default function ProfileScreen() {
         <InfoCard
           title="Next Destination"
           value={
-            
             nextDestinationCountry ? (
-              <>
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Text>{nextDestinationCountry.name}</Text>
                 <CountryFlag
                   isoCode={nextDestinationCountry.iso2}
                   size={18}
-                  style={{ marginRight: 6 }}
+                  style={{ marginLeft: 8 }}
                 />
-                {nextDestinationCountry.name}
-              </>
+              </View>
             ) : '—'
           }
         />

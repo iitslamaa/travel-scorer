@@ -15,6 +15,7 @@ import { useState, useMemo } from 'react';
 import AuthGate from '../../components/AuthGate';
 import { useCountries } from '../../hooks/useCountries';
 import CountryRow from '../../components/CountryRow';
+import { useAuth } from '../../context/AuthContext';
 
 export default function DiscoveryScreen() {
   const { countries, loading } = useCountries();
@@ -24,6 +25,8 @@ export default function DiscoveryScreen() {
   const [ascending, setAscending] = useState(false);
   const [search, setSearch] = useState('');
   const [searchActive, setSearchActive] = useState(false);
+
+  const { toggleBucket, toggleVisited, isBucketed, isVisited } = useAuth();
 
   const filteredCountries = useMemo(() => {
     let data = [...countries];
@@ -151,18 +154,19 @@ export default function DiscoveryScreen() {
               </View>
             }
             renderItem={({ item }) => (
-              <Pressable
+              <CountryRow
+                country={item}
                 onPress={() =>
                   router.push({
                     pathname: '/country/[iso2]',
                     params: { iso2: item.iso2 },
                   })
                 }
-                android_ripple={{ color: '#E0E0E0' }}
-                style={{ borderRadius: 12 }}
-              >
-                <CountryRow country={item} />
-              </Pressable>
+                isBucketed={isBucketed(item.iso2)}
+                onToggleBucket={() => toggleBucket(item.iso2)}
+                isVisited={isVisited(item.iso2)}
+                onToggleVisited={() => toggleVisited(item.iso2)}
+              />
             )}
           />
         )}

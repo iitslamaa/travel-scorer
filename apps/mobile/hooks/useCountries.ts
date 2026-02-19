@@ -34,7 +34,8 @@ export function useCountries() {
         const mapped = Array.isArray(data)
           ? data.map((c: any) => ({
               ...c,
-              flagEmoji: iso2ToFlagEmoji(c.iso2),
+              iso2: c.iso2?.toUpperCase(),
+              flagEmoji: iso2ToFlagEmoji(c.iso2?.toUpperCase()),
             }))
           : [];
 

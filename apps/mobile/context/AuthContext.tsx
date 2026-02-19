@@ -11,7 +11,7 @@ export type Profile = {
   next_destination?: string | null;
   travel_mode?: string | null;
   travel_style?: string | null;
-  languages?: any[] | null; // <-- ADD THIS
+  languages?: any[] | null;
   lived_countries?: string[] | null;
 };
 
@@ -21,6 +21,14 @@ type AuthContextType = {
 
   profile: Profile | null;
   profileLoading: boolean;
+
+  bucketIsoCodes: string[];
+  visitedIsoCodes: string[];
+
+  toggleBucket: (iso2: string) => Promise<void>;
+  toggleVisited: (iso2: string) => Promise<void>;
+  isBucketed: (iso2: string) => boolean;
+  isVisited: (iso2: string) => boolean;
 
   isGuest: boolean;
   continueAsGuest: () => void;
@@ -40,6 +48,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [profileLoading, setProfileLoading] = useState(false);
 
+  const [bucketIsoCodes, setBucketIsoCodes] = useState<string[]>([]);
+  const [visitedIsoCodes, setVisitedIsoCodes] = useState<string[]>([]);
+
   const [isGuest, setIsGuest] = useState(false);
 
   const fetchProfile = async (userId: string) => {
@@ -47,15 +58,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('*') // TEMP: fetch everything for debugging
+      .select('*')
       .eq('id', userId)
       .single();
 
-    if (error) {
-      setProfile(null);
-    } else {
+    if (!error && data) {
       setProfile(data as Profile);
     }
+
+    // Fetch bucket list
+    const { data: bucketData } = await supabase
+      .from('user_bucket_list')
+      .select('country_id')
+      .eq('user_id', userId);
+
+    setBucketIsoCodes(bucketData?.map(r => r.country_id) ?? []);
+
+    // Fetch visited list
+    const { data: visitedData } = await supabase
+      .from('user_traveled')
+      .select('country_id')
+      .eq('user_id', userId);
+
+    setVisitedIsoCodes(visitedData?.map(r => r.country_id) ?? []);
 
     setProfileLoading(false);
   };
@@ -77,9 +102,54 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .select('*')
       .single();
 
-    if (error) throw error;
+    if (!error && data) {
+      setProfile(data as Profile);
+    }
+  };
 
-    setProfile(data as Profile);
+  const isBucketed = (iso2: string) => bucketIsoCodes.includes(iso2);
+  const isVisited = (iso2: string) => visitedIsoCodes.includes(iso2);
+
+  const toggleBucket = async (iso2: string) => {
+    const userId = session?.user?.id;
+    if (!userId) return;
+
+    if (bucketIsoCodes.includes(iso2)) {
+      await supabase
+        .from('user_bucket_list')
+        .delete()
+        .eq('user_id', userId)
+        .eq('country_iso2', iso2);
+
+      setBucketIsoCodes(prev => prev.filter(c => c !== iso2));
+    } else {
+      await supabase
+        .from('user_bucket_list')
+        .insert({ user_id: userId, country_iso2: iso2 });
+
+      setBucketIsoCodes(prev => [...prev, iso2]);
+    }
+  };
+
+  const toggleVisited = async (iso2: string) => {
+    const userId = session?.user?.id;
+    if (!userId) return;
+
+    if (visitedIsoCodes.includes(iso2)) {
+      await supabase
+        .from('user_traveled')
+        .delete()
+        .eq('user_id', userId)
+        .eq('country_iso2', iso2);
+
+      setVisitedIsoCodes(prev => prev.filter(c => c !== iso2));
+    } else {
+      await supabase
+        .from('user_traveled')
+        .insert({ user_id: userId, country_iso2: iso2 });
+
+      setVisitedIsoCodes(prev => [...prev, iso2]);
+    }
   };
 
   useEffect(() => {
@@ -105,6 +175,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         fetchProfile(s.user.id);
       } else {
         setProfile(null);
+        setBucketIsoCodes([]);
+        setVisitedIsoCodes([]);
       }
     });
 
@@ -127,6 +199,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase.auth.signOut();
     setSession(null);
     setProfile(null);
+    setBucketIsoCodes([]);
+    setVisitedIsoCodes([]);
     setIsGuest(false);
   };
 
@@ -136,6 +210,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       profile,
       profileLoading,
+      bucketIsoCodes,
+      visitedIsoCodes,
+      toggleBucket,
+      toggleVisited,
+      isBucketed,
+      isVisited,
       isGuest,
       continueAsGuest,
       exitGuest,
@@ -143,7 +223,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       updateProfile,
       signOut,
     }),
-    [session, loading, profile, profileLoading, isGuest]
+    [session, loading, profile, profileLoading, bucketIsoCodes, visitedIsoCodes, isGuest]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
