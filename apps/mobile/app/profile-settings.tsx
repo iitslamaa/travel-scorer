@@ -26,6 +26,33 @@ export default function ProfileSettingsScreen() {
   const router = useRouter();
   const { profile, signOut, updateProfile } = useAuth();
 
+  /* ---------------- Delete Account ---------------- */
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    try {
+      setDeleting(true);
+
+      const { error } = await supabase.functions.invoke('delete-user', {
+        body: {},
+      });
+
+      if (error) throw error;
+
+      await signOut();
+      await supabase.auth.signOut();
+
+      router.replace('/(auth)/login');
+    } catch (e: any) {
+      Alert.alert('Delete failed', e?.message ?? 'Please try again.');
+    } finally {
+      setDeleting(false);
+      setDeleteOpen(false);
+    }
+  };
+
   const scheme = useColorScheme();
   const colors = scheme === 'dark' ? darkColors : lightColors;
 
@@ -218,6 +245,27 @@ export default function ProfileSettingsScreen() {
           <Divider color={borderColor} />
           <Row label="Travel style" value={styleLabel} />
         </View>
+
+        <View style={[styles.card, { backgroundColor: colors.card }]}> 
+          <Text style={{ fontSize: 16, fontWeight: '700', color: '#EF4444', marginBottom: 12 }}>
+            Danger Zone
+          </Text>
+
+          <Pressable
+            onPress={() => setDeleteOpen(true)}
+            style={{
+              borderWidth: 1,
+              borderColor: '#EF4444',
+              borderRadius: 16,
+              paddingVertical: 16,
+              alignItems: 'center',
+            }}
+          >
+            <Text style={{ color: '#EF4444', fontWeight: '700', fontSize: 15 }}>
+              Delete account
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
 
       <Modal visible={editOpen} animationType="slide" transparent>
@@ -235,6 +283,64 @@ export default function ProfileSettingsScreen() {
             <Text>Save</Text>
           </Pressable>
         </View>
+      </Modal>
+
+      <Modal visible={deleteOpen} animationType="fade" transparent>
+        <Pressable
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', padding: 24 }}
+          onPress={() => setDeleteOpen(false)}
+        >
+          <View
+            style={{
+              backgroundColor: colors.card,
+              borderRadius: 20,
+              padding: 20,
+            }}
+          >
+            <Text style={{ fontSize: 18, fontWeight: '700', marginBottom: 8, color: colors.textPrimary }}>
+              Delete account?
+            </Text>
+
+            <Text style={{ fontSize: 14, marginBottom: 20, color: colors.textSecondary }}>
+              This action is permanent. Your account and all associated data will be deleted.
+            </Text>
+
+            <View style={{ flexDirection: 'row', gap: 12 }}>
+              <Pressable
+                onPress={() => setDeleteOpen(false)}
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  borderRadius: 14,
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: borderColor,
+                }}
+              >
+                <Text style={{ fontWeight: '600', color: colors.textPrimary }}>
+                  Cancel
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={handleDeleteAccount}
+                disabled={deleting}
+                style={{
+                  flex: 1,
+                  paddingVertical: 14,
+                  borderRadius: 14,
+                  alignItems: 'center',
+                  borderWidth: 1,
+                  borderColor: '#EF4444',
+                }}
+              >
+                <Text style={{ fontWeight: '700', color: '#EF4444' }}>
+                  {deleting ? 'Deleting…' : 'Delete'}
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </Pressable>
       </Modal>
     </SafeAreaView>
   );
