@@ -53,7 +53,8 @@ struct ProfileView: View {
     }
 
     private var buttonTitle: String {
-        switch profileVM.relationshipState {
+        guard let state = profileVM.relationshipState else { return "" }
+        switch state {
         case .none:
             return "Add Friend"
         case .requestSent:
@@ -121,7 +122,7 @@ struct ProfileView: View {
         ZStack {
             Color(.systemBackground).ignoresSafeArea()
 
-            if profileVM.isLoading && profileVM.profile == nil {
+            if profileVM.boundUserId != userId || (profileVM.isLoading && profileVM.profile == nil) {
                 ProgressView("Loading profile…")
             } else {
                 ScrollView {
@@ -142,6 +143,7 @@ struct ProfileView: View {
                             mutualFriends: profileVM.mutualFriends,
                             onCancelRequest: { await profileVM.cancelFriendRequest() },
                             relationshipState: profileVM.relationshipState,
+                            isRelationshipLoading: profileVM.isRelationshipLoading,
                             friendCount: profileVM.friendCount,
                             userId: userId,
                             buttonTitle: buttonTitle,
@@ -156,7 +158,7 @@ struct ProfileView: View {
                         )
 
                         ProfileInfoSection(
-                            relationshipState: profileVM.relationshipState,
+                            relationshipState: profileVM.relationshipState ?? .none,
                             viewedTraveledCountries: profileVM.viewedTraveledCountries,
                             viewedBucketListCountries: profileVM.viewedBucketListCountries,
                             orderedTraveledCountries: profileVM.orderedTraveledCountries,
@@ -247,7 +249,7 @@ struct ProfileView: View {
                 }
             }
         }
-        .onAppear {
+        .task(id: userId) {
             profileVM.setUserIdIfNeeded(userId)
         }
     }

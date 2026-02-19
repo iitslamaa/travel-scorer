@@ -25,7 +25,8 @@ final class ProfileViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isFriend: Bool = false
     @Published var isFriendLoading: Bool = false
-    @Published var relationshipState: RelationshipState = .none
+    @Published var relationshipState: RelationshipState? = nil
+    @Published var isRelationshipLoading: Bool = false
     @Published var viewedTraveledCountries: Set<String> = []
     @Published var viewedBucketListCountries: Set<String> = []
     @Published var friendCount: Int = 0
@@ -42,6 +43,9 @@ final class ProfileViewModel: ObservableObject {
     private let supabase = SupabaseManager.shared
     private let friendService = FriendService()
     private var userId: UUID?
+    private var loadTask: Task<Void, Never>?
+    private var loadGeneration: UUID = UUID()
+    @Published private(set) var boundUserId: UUID?
     
     // MARK: - Init
     init(profileService: ProfileService) {
@@ -51,12 +55,11 @@ final class ProfileViewModel: ObservableObject {
     // MARK: - User binding
     
     func setUserIdIfNeeded(_ newUserId: UUID) {
-        // 🔥 Prevent infinite rebinding loop
         guard userId != newUserId else { return }
-        
-        print("🔁 Binding profileVM to:", newUserId)
-        
+
         userId = newUserId
+        boundUserId = newUserId
+
         profile = nil
         errorMessage = nil
         viewedTraveledCountries = []
@@ -65,76 +68,91 @@ final class ProfileViewModel: ObservableObject {
         mutualTraveledCountries = []
         friends = []
         mutualFriends = []
-        relationshipState = .none
+        relationshipState = nil
+        isRelationshipLoading = true
         isFriend = false
         isFriendLoading = false
-        
-        Task {
-            await load()
+        friendCount = 0
+
+        loadTask?.cancel()
+
+        let generation = UUID()
+        loadGeneration = generation
+
+        loadTask = Task { [weak self] in
+            await self?.load(generation: generation)
         }
     }
     
     // MARK: - Load
-    func load() async {
-        defer { isLoading = false }
-        
-        guard let userId else {
-            print("❌ load() — userId is nil")
-            return
-        }
-        
-        print("🚀 load() called for userId:", userId)
-        
+    func load(generation: UUID) async {
+        guard let userId else { return }
+
         isLoading = true
+        defer { isLoading = false }
         errorMessage = nil
-        
+        isRelationshipLoading = true
+
         do {
             profile = try await profileService.fetchOrCreateProfile(userId: userId)
             friends = try await friendService.fetchFriends(for: userId)
-            print("👀 friends loaded:", friends)
-            print("✅ profile fetched:", profile as Any)
-            print("➡️ fullName:", profile?.fullName as Any)
-            print("➡️ username:", profile?.username as Any)
-            
+            friendCount = friends.count
+            // 👀 friends loaded and profile fetched
+            // print("👀 friends loaded:", friends)
+            // print("✅ profile fetched:", profile as Any)
+            // print("➡️ fullName:", profile?.fullName as Any)
+            // print("➡️ username:", profile?.username as Any)
+
+            guard generation == loadGeneration else { return }
+
             viewedTraveledCountries =
-            try await profileService.fetchTraveledCountries(userId: userId)
-            
+                try await profileService.fetchTraveledCountries(userId: userId)
             viewedBucketListCountries =
-            try await profileService.fetchBucketListCountries(userId: userId)
-            
+                try await profileService.fetchBucketListCountries(userId: userId)
+
+            guard generation == loadGeneration else { return }
+
             // Compute mutual bucket list if viewing someone else's profile
             if let currentUserId = supabase.currentUserId,
                currentUserId != userId {
-                
+
                 let currentUserBucket =
-                try await profileService.fetchBucketListCountries(userId: currentUserId)
-                
+                    try await profileService.fetchBucketListCountries(userId: currentUserId)
+
                 let currentSet = Set(currentUserBucket)
                 let viewedSet = viewedBucketListCountries
-                
+
                 mutualBucketCountries = Array(currentSet.intersection(viewedSet)).sorted()
-                
+
                 // Compute mutual traveled countries
                 let currentUserTraveled =
                     try await profileService.fetchTraveledCountries(userId: currentUserId)
-                
+
                 let currentTraveledSet = Set(currentUserTraveled)
                 let viewedTraveledSet = viewedTraveledCountries
-                
+
                 mutualTraveledCountries =
                     Array(currentTraveledSet.intersection(viewedTraveledSet)).sorted()
             } else {
                 mutualBucketCountries = []
                 mutualTraveledCountries = []
             }
-            
+
             computeOrderedLists()
-            
+
+            guard generation == loadGeneration else { return }
+
+            isRelationshipLoading = true
             try await refreshRelationshipState()
-            await loadFriendCount()
+
+            guard generation == loadGeneration else { return }
+
             await loadPendingRequestCount()
+
+            guard generation == loadGeneration else { return }
+
             await loadMutualFriends()
-            
+
         } catch {
             print("❌ load() failed:", error)
             errorMessage = error.localizedDescription
@@ -142,7 +160,12 @@ final class ProfileViewModel: ObservableObject {
     }
     
     func refreshProfile() async {
-        await load()
+        let generation = UUID()
+        loadGeneration = generation
+        loadTask?.cancel()
+        loadTask = Task { [weak self] in
+            await self?.load(generation: generation)
+        }
     }
     
     // MARK: - Save (single source of truth)
@@ -181,7 +204,7 @@ final class ProfileViewModel: ObservableObject {
             )
             
             // 🔁 Reload full profile state (profile + traveled + bucket + mutuals)
-            await load()
+            await refreshProfile()
 
             print("💾 Saved + fully reloaded profile state")
             
@@ -205,15 +228,20 @@ final class ProfileViewModel: ObservableObject {
     // MARK: - Relationship refresh
     
     func refreshRelationshipState() async throws {
+        isRelationshipLoading = true
         guard
             let userId,
             let currentUserId = supabase.currentUserId
-        else { return }
+        else {
+            isRelationshipLoading = false
+            return
+        }
         
         // Viewing own profile
         if currentUserId == userId {
             relationshipState = .selfProfile
             isFriend = false
+            isRelationshipLoading = false
             return
         }
         
@@ -224,6 +252,7 @@ final class ProfileViewModel: ObservableObject {
         ) {
             relationshipState = .friends
             isFriend = true
+            isRelationshipLoading = false
             return
         }
         
@@ -231,12 +260,14 @@ final class ProfileViewModel: ObservableObject {
         if try await friendService.hasSentRequest(from: currentUserId, to: userId) {
             relationshipState = .requestSent
             isFriend = false
+            isRelationshipLoading = false
             return
         }
         
         // No relationship
         relationshipState = .none
         isFriend = false
+        isRelationshipLoading = false
     }
     
     // MARK: - Friend Count
@@ -299,7 +330,8 @@ final class ProfileViewModel: ObservableObject {
         defer { isFriendLoading = false }
         
         do {
-            switch relationshipState {
+            guard let state = relationshipState else { return }
+            switch state {
             case .none:
                 do {
                     guard let currentUserId = supabase.currentUserId else { return }

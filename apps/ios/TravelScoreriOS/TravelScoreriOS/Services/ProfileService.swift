@@ -76,6 +76,7 @@ final class ProfileService {
             .from("profiles")
             .select()
             .eq("id", value: userId)
+            .limit(1)
             .execute()
 
         guard let profile = response.value.first else {
@@ -147,7 +148,7 @@ final class ProfileService {
 
         do {
             return try await fetchMyProfile(userId: userId)
-        } catch {
+        } catch let error as NSError where error.code == 404 {
             try await ensureProfileExists(
                 userId: userId,
                 defaultUsername: defaultUsername,
@@ -205,6 +206,7 @@ final class ProfileService {
             .from("user_traveled")
             .select("country_id")
             .eq("user_id", value: userId.uuidString)
+            .limit(1000)
             .execute()
 
         return Set(response.value.map { $0.countryId })
@@ -216,6 +218,7 @@ final class ProfileService {
             .from("user_bucket_list")
             .select("country_id")
             .eq("user_id", value: userId.uuidString)
+            .limit(1000)
             .execute()
 
         return Set(response.value.map { $0.countryId })

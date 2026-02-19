@@ -62,8 +62,6 @@ final class SessionManager: ObservableObject {
         isAuthSuppressed = false
         didContinueAsGuest = true
         isAuthenticated = false
-        print("🧪 continueAsGuest → didContinueAsGuest=true")
-        bumpAuthScreen()
     }
 
     func signOut() async {
@@ -108,7 +106,6 @@ final class SessionManager: ObservableObject {
             print("🧪 forceRefreshAuthState(\(source)) suppressed → staying logged out")
             isAuthenticated = false
             userId = nil
-            bumpAuthScreen()
             return
         }
         do {
@@ -124,7 +121,6 @@ final class SessionManager: ObservableObject {
                     isAuthenticated = false
                     userId = nil
                     hasMergedGuestData = false
-                    bumpAuthScreen()
                 } else {
                     print("🧪 session is valid → isAuthenticated=true")
                     isAuthenticated = true
@@ -142,7 +138,6 @@ final class SessionManager: ObservableObject {
                 userId = nil
                 hasMergedGuestData = false
                 didEnsureProfile = false
-                bumpAuthScreen()
             }
         } catch {
             print("⚠️ forceRefreshAuthState transient error:", error)
@@ -192,7 +187,6 @@ final class SessionManager: ObservableObject {
                 print("🧪 refreshFromCurrentSession(\(source)) suppressed → staying logged out")
                 self.isAuthenticated = false
                 self.userId = nil
-                self.bumpAuthScreen()
                 return
             }
             do {
@@ -214,7 +208,6 @@ final class SessionManager: ObservableObject {
                     userId = nil
                     hasMergedGuestData = false
                     didEnsureProfile = false
-                    bumpAuthScreen()
                 }
             } catch {
                 print("⚠️ refreshFromCurrentSession transient error:", error)
