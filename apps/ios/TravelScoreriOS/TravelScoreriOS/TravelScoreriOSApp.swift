@@ -40,7 +40,7 @@ struct TravelScoreriOSApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AuthGate()
+            AppRootView()
                 .environmentObject(sessionManager)
                 .environmentObject(bucketListStore)
                 .environmentObject(traveledStore)

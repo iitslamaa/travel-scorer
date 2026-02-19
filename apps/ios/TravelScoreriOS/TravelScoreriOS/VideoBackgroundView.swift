@@ -2,8 +2,6 @@
 //  VideoBackgroundView.swift
 //  TravelScoreriOS
 //
-//  Created by Lama Yassine on 2/4/26.
-//
 
 import SwiftUI
 import AVKit
@@ -12,25 +10,27 @@ struct VideoBackgroundView: UIViewRepresentable {
     let videoName: String
     let videoType: String
     let loop: Bool
+    var onFinished: (() -> Void)? = nil   // NEW
 
     func makeUIView(context: Context) -> PlayerUIView {
         let view = PlayerUIView()
+        view.onFinished = onFinished      // NEW
         view.load(videoName: videoName, videoType: videoType, loop: loop)
         return view
     }
 
     func updateUIView(_ uiView: PlayerUIView, context: Context) {
-        // Only update if the video identity actually changed
+        uiView.onFinished = onFinished    // keep closure updated
         uiView.updateIfNeeded(videoName: videoName, videoType: videoType, loop: loop)
     }
 }
 
 final class PlayerUIView: UIView {
     private let playerLayer = AVPlayerLayer()
-    private var player: AVQueuePlayer?
-    private var looper: AVPlayerLooper?
-
+    private var player: AVPlayer?
     private var currentKey: String?
+
+    var onFinished: (() -> Void)?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -48,9 +48,9 @@ final class PlayerUIView: UIView {
     }
 
     func load(videoName: String, videoType: String, loop: Bool) {
-        // Allow background music (Spotify/Apple Music) to continue playing
         try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
+
         let key = "\(videoName).\(videoType)-loop:\(loop)"
         currentKey = key
 
@@ -59,30 +59,48 @@ final class PlayerUIView: UIView {
             return
         }
 
-        let asset = AVAsset(url: url)
-        let item = AVPlayerItem(asset: asset)
-        let queuePlayer = AVQueuePlayer(playerItem: item)
-        queuePlayer.isMuted = true
-        queuePlayer.actionAtItemEnd = .none
+        let item = AVPlayerItem(url: url)
+        let player = AVPlayer(playerItem: item)
+        player.isMuted = true
+        player.actionAtItemEnd = .pause
 
-        if loop {
-            looper = AVPlayerLooper(player: queuePlayer, templateItem: item)
-        }
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
 
-        self.player = queuePlayer
-        playerLayer.player = queuePlayer
-        queuePlayer.play()
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleVideoFinished(_:)),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: item
+        )
+
+        self.player = player
+        playerLayer.player = player
+        player.play()
     }
 
     func updateIfNeeded(videoName: String, videoType: String, loop: Bool) {
         let newKey = "\(videoName).\(videoType)-loop:\(loop)"
         guard newKey != currentKey else { return }
 
-        // Tear down and reload ONLY if identity changed
         player?.pause()
-        looper = nil
         player = nil
 
         load(videoName: videoName, videoType: videoType, loop: loop)
+    }
+
+    @objc private func handleVideoFinished(_ notification: Notification) {
+        player?.pause()
+
+        // Trigger routing immediately
+        onFinished?()
+
+        // Fade out in parallel (prevents perceived lag)
+        UIView.animate(withDuration: 0.15) {
+            self.alpha = 0
+        }
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
