@@ -94,6 +94,11 @@
 		170C227F2F47A9880090BA78 /* ScorePill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170C227E2F47A9880090BA78 /* ScorePill.swift */; };
 		170F3EC02F218C6C0083E900 /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F3EBF2F218C6C0083E900 /* APIConfig.swift */; };
 		172A74C92F357340003EF4DF /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172A74C82F357340003EF4DF /* SessionManager.swift */; };
+		17A4EC7C2F47BE0F00627746 /* ProfileViewModel+Load.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC7B2F47BE0F00627746 /* ProfileViewModel+Load.swift */; };
+		17A4EC7E2F47BE1A00627746 /* ProfileViewModel+Save.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC7D2F47BE1A00627746 /* ProfileViewModel+Save.swift */; };
+		17A4EC802F47BE2400627746 /* ProfileViewModel+Relationship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC7F2F47BE2400627746 /* ProfileViewModel+Relationship.swift */; };
+		17A4EC822F47BE3000627746 /* ProfileViewModel+Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC812F47BE3000627746 /* ProfileViewModel+Friends.swift */; };
+		17A4EC842F47BE3A00627746 /* ProfileViewModel+Countries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC832F47BE3A00627746 /* ProfileViewModel+Countries.swift */; };
 		17F063812F32730600F1F4F3 /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063802F32730600F1F4F3 /* SupabaseClient.swift */; };
 		17F063832F32732F00F1F4F3 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063822F32732F00F1F4F3 /* AuthViewModel.swift */; };
 		17F063852F32734800F1F4F3 /* EmailAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063842F32734800F1F4F3 /* EmailAuthView.swift */; };
@@ -190,6 +195,11 @@
 		170C227E2F47A9880090BA78 /* ScorePill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScorePill.swift; sourceTree = "<group>"; };
 		170F3EBF2F218C6C0083E900 /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 		172A74C82F357340003EF4DF /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
+		17A4EC7B2F47BE0F00627746 /* ProfileViewModel+Load.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Load.swift"; sourceTree = "<group>"; };
+		17A4EC7D2F47BE1A00627746 /* ProfileViewModel+Save.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Save.swift"; sourceTree = "<group>"; };
+		17A4EC7F2F47BE2400627746 /* ProfileViewModel+Relationship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Relationship.swift"; sourceTree = "<group>"; };
+		17A4EC812F47BE3000627746 /* ProfileViewModel+Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Friends.swift"; sourceTree = "<group>"; };
+		17A4EC832F47BE3A00627746 /* ProfileViewModel+Countries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Countries.swift"; sourceTree = "<group>"; };
 		17AFEC8A2EC2C3D800B9585B /* TravelScoreriOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelScoreriOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		17F063802F32730600F1F4F3 /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
 		17F063822F32732F00F1F4F3 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
@@ -251,19 +261,9 @@
 		170C22462F479AED0090BA78 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
-				170C22512F479B500090BA78 /* Utilities */,
-				170C22502F479B4A0090BA78 /* Extensions */,
-				170C224F2F479B410090BA78 /* Components */,
 				170C224E2F479B3B0090BA78 /* UI */,
 			);
 			path = Shared;
-			sourceTree = "<group>";
-		};
-		170C22472F479AF20090BA78 /* New Group */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "New Group";
 			sourceTree = "<group>";
 		};
 		170C22482F479B070090BA78 /* Models */ = {
@@ -338,27 +338,6 @@
 			path = UI;
 			sourceTree = "<group>";
 		};
-		170C224F2F479B410090BA78 /* Components */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Components;
-			sourceTree = "<group>";
-		};
-		170C22502F479B4A0090BA78 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		170C22512F479B500090BA78 /* Utilities */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Utilities;
-			sourceTree = "<group>";
-		};
 		170C22522F479B5B0090BA78 /* Auth */ = {
 			isa = PBXGroup;
 			children = (
@@ -407,7 +386,6 @@
 			isa = PBXGroup;
 			children = (
 				170C22802F47B0020090BA78 /* Settings */,
-				170C226D2F479C4C0090BA78 /* Support */,
 				170C226C2F479C470090BA78 /* Components */,
 				170C226B2F479C410090BA78 /* ViewModels */,
 				170C226A2F479C3C0090BA78 /* Views */,
@@ -601,6 +579,11 @@
 			isa = PBXGroup;
 			children = (
 				170C21142F4790E00090BA78 /* ProfileViewModel.swift */,
+				17A4EC7B2F47BE0F00627746 /* ProfileViewModel+Load.swift */,
+				17A4EC7D2F47BE1A00627746 /* ProfileViewModel+Save.swift */,
+				17A4EC7F2F47BE2400627746 /* ProfileViewModel+Relationship.swift */,
+				17A4EC812F47BE3000627746 /* ProfileViewModel+Friends.swift */,
+				17A4EC832F47BE3A00627746 /* ProfileViewModel+Countries.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -614,13 +597,6 @@
 				170C20D22F4790E00090BA78 /* StatCard.swift */,
 			);
 			path = Components;
-			sourceTree = "<group>";
-		};
-		170C226D2F479C4C0090BA78 /* Support */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Support;
 			sourceTree = "<group>";
 		};
 		170C226E2F479D900090BA78 /* Views */ = {
@@ -774,7 +750,6 @@
 			isa = PBXGroup;
 			children = (
 				170C22482F479B070090BA78 /* Models */,
-				170C22472F479AF20090BA78 /* New Group */,
 				170C22462F479AED0090BA78 /* Shared */,
 				170C22452F479AE60090BA78 /* Features */,
 				170C22442F479AE10090BA78 /* Core */,
@@ -884,9 +859,11 @@
 			files = (
 				17F063852F32734800F1F4F3 /* EmailAuthView.swift in Sources */,
 				170C21272F4790E00090BA78 /* CountryAdvisoryCard.swift in Sources */,
+				17A4EC802F47BE2400627746 /* ProfileViewModel+Relationship.swift in Sources */,
 				170C21282F4790E00090BA78 /* CountryDetailView.swift in Sources */,
 				170C21292F4790E00090BA78 /* CountryHeaderCard.swift in Sources */,
 				170C212A2F4790E00090BA78 /* CountryScoreStyling.swift in Sources */,
+				17A4EC7E2F47BE1A00627746 /* ProfileViewModel+Save.swift in Sources */,
 				170C212B2F4790E00090BA78 /* CountrySeasonalityCard.swift in Sources */,
 				170C212C2F4790E00090BA78 /* CountrySeasonalityHelpers.swift in Sources */,
 				170C212D2F4790E00090BA78 /* CountryTextHelpers.swift in Sources */,
@@ -917,6 +894,7 @@
 				170C21462F4790E00090BA78 /* SeasonalityViewModel.swift in Sources */,
 				170C21472F4790E00090BA78 /* FriendService.swift in Sources */,
 				170C21482F4790E00090BA78 /* ListSyncService.swift in Sources */,
+				17A4EC842F47BE3A00627746 /* ProfileViewModel+Countries.swift in Sources */,
 				170C21492F4790E00090BA78 /* MetaService.swift in Sources */,
 				170C214A2F4790E00090BA78 /* ProfileService.swift in Sources */,
 				170C214B2F4790E00090BA78 /* SeasonalityService.swift in Sources */,
@@ -933,12 +911,14 @@
 				170C21572F4790E00090BA78 /* CountryAPI.swift in Sources */,
 				170C21582F4790E00090BA78 /* CountryBottomDrawerView.swift in Sources */,
 				170C21592F4790E00090BA78 /* CountryDTO.swift in Sources */,
+				17A4EC7C2F47BE0F00627746 /* ProfileViewModel+Load.swift in Sources */,
 				170C215A2F4790E00090BA78 /* CountryListView.swift in Sources */,
 				170C215B2F4790E00090BA78 /* CountryPreviewCardMobile.swift in Sources */,
 				170C215D2F4790E00090BA78 /* DataLoader.swift in Sources */,
 				170C215E2F4790E00090BA78 /* DiscoveryView.swift in Sources */,
 				170C215F2F4790E00090BA78 /* FlagWithTooltip.swift in Sources */,
 				170C21602F4790E00090BA78 /* FriendRequestsView.swift in Sources */,
+				17A4EC822F47BE3000627746 /* ProfileViewModel+Friends.swift in Sources */,
 				170C21612F4790E00090BA78 /* FriendRequestsViewModel.swift in Sources */,
 				170C21622F4790E00090BA78 /* FriendsActionSheetView.swift in Sources */,
 				170C21632F4790E00090BA78 /* FriendsSection.swift in Sources */,
