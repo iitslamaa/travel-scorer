@@ -17,11 +17,18 @@ import CountryFlag from 'react-native-country-flag';
 import HeaderCard from '../../components/profile/HeaderCard';
 import InfoCard from '../../components/profile/InfoCard';
 import DisclosureRow from '../../components/profile/DisclosureRow';
+import CollapsibleCountrySection from '../../components/profile/CollapsibleCountrySection';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { session, profile, exitGuest } = useAuth();
+  const {
+    session,
+    profile,
+    exitGuest,
+    bucketIsoCodes,
+    visitedIsoCodes,
+  } = useAuth();
   const { countries } = useCountries();
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
@@ -160,13 +167,14 @@ export default function ProfileScreen() {
           }
         />
 
-        <DisclosureRow
-          label="Countries Traveled"
-          value={
-            Array.isArray((profile as any)?.countries_traveled)
-              ? String((profile as any).countries_traveled.length)
-              : '0'
-          }
+        <CollapsibleCountrySection
+          title="Countries Traveled"
+          countries={visitedIsoCodes}
+        />
+
+        <CollapsibleCountrySection
+          title="Bucket List"
+          countries={bucketIsoCodes}
         />
       </View>
     </ScrollView>
