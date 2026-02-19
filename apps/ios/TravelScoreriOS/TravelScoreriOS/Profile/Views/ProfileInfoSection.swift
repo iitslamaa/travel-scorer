@@ -25,7 +25,7 @@ struct ProfileInfoSection: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        VStack(spacing: 28) {
+        LazyVStack(spacing: 28) {
             languagesCard
             travelModeCard
             travelStyleCard
@@ -38,7 +38,7 @@ struct ProfileInfoSection: View {
     }
 
     private var infoCards: some View {
-        VStack(spacing: 12) {
+        LazyVStack(spacing: 12) {
 
             if relationshipState == .selfProfile {
 
@@ -96,7 +96,6 @@ struct ProfileInfoSection: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
 
     private var travelModeCard: some View {
@@ -119,7 +118,6 @@ struct ProfileInfoSection: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
 
     private var travelStyleCard: some View {
@@ -142,7 +140,6 @@ struct ProfileInfoSection: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
 
     private var nextDestinationCard: some View {
@@ -167,7 +164,6 @@ struct ProfileInfoSection: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
 
     private func flagEmoji(for countryCode: String) -> String {

@@ -20,15 +20,12 @@ struct AppRootView: View {
             // MAIN APP CONTENT — always mounted immediately
             if sessionManager.isAuthSuppressed {
                 AuthLandingView()
-                    .id(sessionManager.authScreenNonce)
                 
             } else if sessionManager.isAuthenticated || sessionManager.didContinueAsGuest {
                 RootTabView()
-                    .id(sessionManager.authScreenNonce)
                 
             } else {
                 AuthLandingView()
-                    .id(sessionManager.authScreenNonce)
             }
             
             // INTRO VIDEO OVERLAY

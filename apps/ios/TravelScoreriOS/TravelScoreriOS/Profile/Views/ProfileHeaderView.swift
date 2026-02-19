@@ -15,7 +15,8 @@ struct ProfileHeaderView: View {
     let homeCountryCodes: [String]
     let mutualFriends: [Profile]
     let onCancelRequest: () async -> Void
-    let relationshipState: RelationshipState
+    let relationshipState: RelationshipState?
+    let isRelationshipLoading: Bool
     let friendCount: Int
     let userId: UUID
     let buttonTitle: String
@@ -49,13 +50,11 @@ struct ProfileHeaderView: View {
                         radius: 12 + cappedPull * 0.08,
                         y: 6 + cappedPull * 0.04
                     )
-                    .animation(.spring(response: 0.4, dampingFraction: 0.85), value: cappedPull)
 
                 profileTextContent
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .offset(y: -cappedPull * 0.08)
                     .scaleEffect(1 + cappedPull / 900)
-                    .animation(.spring(response: 0.4, dampingFraction: 0.9), value: cappedPull)
 
             }
             .padding(.horizontal, 20)
@@ -70,10 +69,7 @@ struct ProfileHeaderView: View {
         Group {
             if let urlString = profile?.avatarUrl,
                let url = URL(string: urlString) {
-                AsyncImage(
-                    url: url,
-                    transaction: Transaction(animation: .easeInOut(duration: 0.2))
-                ) { phase in
+                AsyncImage(url: url) { phase in
                     switch phase {
                     case .success(let image):
                         image
@@ -143,7 +139,9 @@ struct ProfileHeaderView: View {
                 .padding(.top, 4)
             }
             
-            if relationshipState != .selfProfile {
+            if !isRelationshipLoading,
+               let relationshipState,
+               relationshipState != .selfProfile {
                 headerFriendCTA
             }
         }
@@ -214,10 +212,7 @@ struct ProfileHeaderView: View {
     private func mutualAvatar(urlString: String?) -> some View {
         Group {
             if let urlString, let url = URL(string: urlString) {
-                AsyncImage(
-                    url: url,
-                    transaction: Transaction(animation: .easeInOut(duration: 0.2))
-                ) { phase in
+                AsyncImage(url: url) { phase in
                     switch phase {
                     case .success(let image):
                         image
@@ -374,13 +369,10 @@ struct ProfileHeaderView: View {
     }
     
     private var friendButtonLabel: String {
+        guard let relationshipState else { return "" }
         switch relationshipState {
         case .friends:
-            if friendCount == 1 {
-                return "1 Friend"
-            } else {
-                return "\(friendCount) Friends"
-            }
+            return friendCount == 1 ? "1 Friend" : "\(friendCount) Friends"
         case .none:
             return "Add Friend"
         case .requestSent:

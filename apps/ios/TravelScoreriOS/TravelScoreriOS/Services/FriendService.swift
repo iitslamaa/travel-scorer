@@ -30,6 +30,7 @@ final class FriendService {
             .from("friends")
             .select("user_id, friend_id")
             .eq("user_id", value: userId)
+            .limit(1000)
             .execute()
 
         // Query 2: friend_id = me (use UUID directly)
@@ -37,30 +38,24 @@ final class FriendService {
             .from("friends")
             .select("user_id, friend_id")
             .eq("friend_id", value: userId)
+            .limit(1000)
             .execute()
 
         let rows = sentResponse.value + receivedResponse.value
-
-        print("👀 raw friend rows:", rows)
 
         let friendIds: [UUID] = rows.map { row in
             row.user_id == userId ? row.friend_id : row.user_id
         }
 
         if friendIds.isEmpty {
-            print("👀 friendIds empty")
             return []
         }
-
-        print("👀 friend IDs:", friendIds)
 
         let profilesResponse: PostgrestResponse<[Profile]> = try await supabase.client
             .from("profiles")
             .select("*")
             .in("id", values: friendIds)
             .execute()
-
-        print("👀 friend profiles:", profilesResponse.value)
 
         return profilesResponse.value
     }
@@ -93,15 +88,16 @@ final class FriendService {
     }
 
     func fetchMutualFriends(currentUserId: UUID, otherUserId: UUID) async throws -> [Profile] {
-        let currentFriends = try await fetchFriends(for: currentUserId)
-        let otherFriends = try await fetchFriends(for: otherUserId)
+        async let currentFriends = fetchFriends(for: currentUserId)
+        async let otherFriends = fetchFriends(for: otherUserId)
 
-        let currentSet = Set(currentFriends.map { $0.id })
-        let mutual = otherFriends.filter { currentSet.contains($0.id) }
+        let current = try await currentFriends
+        let other = try await otherFriends
 
-        return mutual.sorted {
-            $0.username < $1.username
-        }
+        let currentSet = Set(current.map { $0.id })
+        let mutual = other.filter { currentSet.contains($0.id) }
+
+        return mutual.sorted { $0.username < $1.username }
     }
 
     // MARK: - Requests
@@ -130,6 +126,7 @@ final class FriendService {
             .select("id")
             .eq("receiver_id", value: myUserId)
             .eq("status", value: "pending")
+            .limit(1000)
             .execute()
 
         return response.value.count

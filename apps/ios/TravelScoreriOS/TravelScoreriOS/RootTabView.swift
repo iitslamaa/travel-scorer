@@ -37,6 +37,7 @@ struct RootTabView: View {
                 if sessionManager.isAuthenticated,
                    let userId = sessionManager.userId {
                     FriendsView(userId: userId)
+                        .id(userId)
                 } else {
                     VStack(spacing: 20) {
                         Spacer()
@@ -74,6 +75,7 @@ struct RootTabView: View {
                 if sessionManager.isAuthenticated,
                    let userId = sessionManager.userId {
                     ProfileView(userId: userId)
+                        .id(userId)
                 } else {
                     VStack(spacing: 20) {
                         Spacer()

@@ -13,6 +13,7 @@ final class SupabaseManager {
 
     // Emits whenever auth state changes (sign in / sign out)
     private let authStateSubject = PassthroughSubject<Void, Never>()
+    private var hasStartedAuthListener = false
     var authStatePublisher: AnyPublisher<Void, Never> {
         authStateSubject.eraseToAnyPublisher()
     }
@@ -38,6 +39,9 @@ final class SupabaseManager {
     }
 
     func startAuthListener() async {
+        guard !hasStartedAuthListener else { return }
+        hasStartedAuthListener = true
+
         await client.auth.onAuthStateChange { [weak self] _, _ in
             Task { @MainActor in
                 self?.authStateSubject.send(())
@@ -56,7 +60,6 @@ final class SupabaseManager {
 
     func signOut() async throws {
         try await client.auth.signOut()
-        authStateSubject.send(())
     }
 
     /// Deletes the currently authenticated user account via Edge Function
@@ -66,7 +69,6 @@ final class SupabaseManager {
 
         // Sign out locally after backend deletion
         try await client.auth.signOut()
-        authStateSubject.send(())
     }
 
     // MARK: - User Queries
