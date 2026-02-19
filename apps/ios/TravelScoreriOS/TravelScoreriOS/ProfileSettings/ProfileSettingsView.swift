@@ -238,7 +238,8 @@ struct ProfileSettingsView: View {
 
         .sheet(isPresented: $showHomePicker) {
             CountryMultiSelectView(
-                title: "Select home countries",
+                title: "Home Countries",
+                subtitle: "Add any flag that represents you! Your home country, background, places you've lived, ethnicity, etc.",
                 selection: $homeCountries
             )
         }
@@ -387,6 +388,7 @@ struct ProfileSettingsView: View {
 
 private struct CountryMultiSelectView: View {
     let title: String
+    let subtitle: String?
     @Binding var selection: Set<String>
     @Environment(\.dismiss) private var dismiss
     @State private var searchText = ""
@@ -394,8 +396,9 @@ private struct CountryMultiSelectView: View {
 
     let initialSelection: Set<String>
 
-    init(title: String, selection: Binding<Set<String>>) {
+    init(title: String, subtitle: String? = nil, selection: Binding<Set<String>>) {
         self.title = title
+        self.subtitle = subtitle
         self._selection = selection
         self.initialSelection = selection.wrappedValue
     }
@@ -409,31 +412,48 @@ private struct CountryMultiSelectView: View {
 
     var body: some View {
         NavigationStack {
-            let filtered = searchText.isEmpty
-                ? countries
-                : countries.filter { $0.1.localizedCaseInsensitiveContains(searchText) }
+            VStack(spacing: 0) {
 
-            List(filtered, id: \.0) { (code, name) in
-                Button {
-                    if selection.contains(code) {
-                        selection.remove(code)
-                    } else {
-                        selection.insert(code)
+                if let subtitle {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title)
+                            .font(.title2)
+                            .fontWeight(.semibold)
+
+                        Text(subtitle)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
-                    hasChanges = selection != initialSelection
-                } label: {
-                    HStack {
-                        Text(countryCodeToFlag(code))
-                        Text(name)
-                        Spacer()
+                    .padding(.horizontal)
+                    .padding(.top)
+                }
+
+                let filtered = searchText.isEmpty
+                    ? countries
+                    : countries.filter { $0.1.localizedCaseInsensitiveContains(searchText) }
+
+                List(filtered, id: \.0) { (code, name) in
+                    Button {
                         if selection.contains(code) {
-                            Image(systemName: "checkmark")
+                            selection.remove(code)
+                        } else {
+                            selection.insert(code)
+                        }
+                        hasChanges = selection != initialSelection
+                    } label: {
+                        HStack {
+                            Text(countryCodeToFlag(code))
+                            Text(name)
+                            Spacer()
+                            if selection.contains(code) {
+                                Image(systemName: "checkmark")
+                            }
                         }
                     }
                 }
+                .searchable(text: $searchText)
             }
-            .searchable(text: $searchText)
-            .navigationTitle(title)
+            .navigationTitle(subtitle == nil ? title : "")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
