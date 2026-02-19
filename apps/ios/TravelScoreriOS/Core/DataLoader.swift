@@ -8,59 +8,9 @@
 import Foundation
 
 enum DataLoader {
-    static func loadCountriesFromBundle() -> [Country] {
-        guard let url = Bundle.main.url(forResource: "countries", withExtension: "json") else {
-            print("❌ countries.json NOT FOUND in bundle")
-            return []
-        }
-        do {
-            let data = try Data(contentsOf: url)
-            print("✅ JSON bytes:", data.count)
-
-            // Fallback JSON in the bundle is a top-level array of CountryDTO
-            let dtos = try JSONDecoder().decode([CountryDTO].self, from: data)
-            print("✅ Decoded countries:", dtos.count)
-
-            // SSOT: use dto.iso2 and dto.score directly
-            return dtos.map { dto in
-                Country(
-                    iso2: dto.iso2,
-                    name: dto.name,
-                    score: dto.score ?? 0,
-                    region: dto.region,
-                    subregion: dto.subregion,
-                    advisoryLevel: dto.advisoryLevelText,
-                    advisorySummary: dto.advisorySummary,
-                    advisoryUpdatedAt: dto.advisoryUpdatedAt,
-                    advisoryUrl: dto.advisoryUrl,
-                    seasonalityScore: dto.seasonalityScore,
-                    seasonalityLabel: dto.seasonalityLabel,
-                    seasonalityBestMonths: dto.seasonalityBestMonths,
-                    seasonalityNotes: dto.seasonalityNotes,
-                    visaEaseScore: dto.visaEaseScore,
-                    visaType: dto.visaType,
-                    visaAllowedDays: dto.visaAllowedDays,
-                    visaFeeUsd: dto.visaFeeUsd,
-                    visaNotes: dto.visaNotes,
-                    visaSourceUrl: dto.visaSourceUrl,
-                    dailySpendTotalUsd: dto.dailySpendTotalUsd,
-                    dailySpendHotelUsd: dto.dailySpendHotelUsd,
-                    dailySpendFoodUsd: dto.dailySpendFoodUsd,
-                    dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd
-                )
-            }
-        } catch {
-            print("❌ Decode error:", error)
-            return []
-        }
-    }
 
     // MARK: - Backend-controlled refresh
 
-    struct Meta: Codable, Equatable {
-        let countriesVersion: String
-        let seasonalityVersion: String
-    }
 
     private static let metaCacheKey = "cached_meta_v1"
 
@@ -81,20 +31,20 @@ enum DataLoader {
         }
     }
 
-    private static func fetchRemoteMeta() async throws -> Meta {
+    private static func fetchRemoteMeta() async throws -> MetaDTO {
         let url = APIConfig.baseURL.appendingPathComponent("/api/meta")
         let (data, _) = try await URLSession.shared.data(from: url)
-        return try JSONDecoder().decode(Meta.self, from: data)
+        return try JSONDecoder().decode(MetaDTO.self, from: data)
     }
 
-    private static func loadCachedMeta() -> Meta? {
+    private static func loadCachedMeta() -> MetaDTO? {
         guard let data = UserDefaults.standard.data(forKey: metaCacheKey) else {
             return nil
         }
-        return try? JSONDecoder().decode(Meta.self, from: data)
+        return try? JSONDecoder().decode(MetaDTO.self, from: data)
     }
 
-    private static func saveCachedMeta(_ meta: Meta) {
+    private static func saveCachedMeta(_ meta: MetaDTO) {
         if let data = try? JSONEncoder().encode(meta) {
             UserDefaults.standard.set(data, forKey: metaCacheKey)
         }

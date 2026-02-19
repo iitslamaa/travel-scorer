@@ -245,7 +245,7 @@ private struct SeasonalityCountryBottomDrawerView: View {
                     Spacer()
 
                     // Overall score pill next to title
-                    scorePill(value: country.score)
+                    ScorePill(score: country.score ?? 0)
                 }
             }
 
@@ -277,30 +277,8 @@ private struct SeasonalityCountryBottomDrawerView: View {
 
             Spacer()
 
-            scorePill(value: value)
+            ScorePill(score: value ?? 0)
         }
         .padding(.vertical, 6)
     }
-
-    private func scorePill(value: Double?) -> some View {
-        let v = value ?? 0
-        return Text(String(format: "%.0f", v))
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(scoreColor(v).opacity(0.18))
-            .foregroundStyle(scoreColor(v))
-            .clipShape(Capsule())
-            .overlay(
-                Capsule()
-                    .stroke(scoreColor(v).opacity(0.25), lineWidth: 1)
-            )
-            .accessibilityLabel("Score \(Int(v))")
-    }
-
-    private func scoreColor(_ v: Double) -> Color {
-        // Simple, consistent mapping (swap later to your shared helper if you want).
-        if v >= 80 { return .green }
-        if v >= 60 { return .yellow }
-        return .red }
 }

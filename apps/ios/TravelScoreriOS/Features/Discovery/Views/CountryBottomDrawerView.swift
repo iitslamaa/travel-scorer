@@ -41,10 +41,27 @@ struct CountryBottomDrawerView: View {
                 .font(.headline)
 
             // TODO: replace with real breakdown fields you already compute
-            HStack(spacing: 12) {
-                DrawerScorePill(label: "Seasonality", value: 80)
-                DrawerScorePill(label: "Affordability", value: 90)
-                DrawerScorePill(label: "Visa ease", value: 100)
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Seasonality")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    ScorePill(score: 80)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Affordability")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    ScorePill(score: 90)
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Visa ease")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    ScorePill(score: 100)
+                }
             }
 
             Text("This month is one of the best times to visit based on weather, crowds, and overall conditions. Open the full country page to compare safety, affordability, and visa details.")
@@ -84,24 +101,6 @@ struct CountryBottomDrawerView: View {
     }
 }
 
-private struct DrawerScorePill: View {
-    let label: String
-    let value: Int
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Text("\(value)")
-                .font(.headline).bold()
-        }
-        .padding(10)
-        .background(.thinMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-}
 
 private struct InAppSafariView: UIViewControllerRepresentable {
     let url: URL
