@@ -218,38 +218,12 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		170C20CB2F4790E00090BA78 /* CountryDetail */ = {
-			isa = PBXGroup;
-			children = (
-				170C20C02F4790E00090BA78 /* CountryAdvisoryCard.swift */,
-				170C20C12F4790E00090BA78 /* CountryDetailView.swift */,
-				170C20C22F4790E00090BA78 /* CountryHeaderCard.swift */,
-				170C20C32F4790E00090BA78 /* CountryScoreStyling.swift */,
-				170C20C42F4790E00090BA78 /* CountrySeasonalityCard.swift */,
-				170C20C52F4790E00090BA78 /* CountrySeasonalityHelpers.swift */,
-				170C20C62F4790E00090BA78 /* CountryTextHelpers.swift */,
-				170C20C72F4790E00090BA78 /* CountryTravelSafeCard.swift */,
-				170C20C82F4790E00090BA78 /* CountryTravelSafeHelpers.swift */,
-				170C20C92F4790E00090BA78 /* CountryVisaCard.swift */,
-				170C20CA2F4790E00090BA78 /* CountryVisaHelpers.swift */,
-			);
-			path = CountryDetail;
-			sourceTree = "<group>";
-		};
 		170C20CD2F4790E00090BA78 /* Meta */ = {
 			isa = PBXGroup;
 			children = (
 				170C20CC2F4790E00090BA78 /* MetaDTO.swift */,
 			);
 			path = Meta;
-			sourceTree = "<group>";
-		};
-		170C20CF2F4790E00090BA78 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				170C20CE2F4790E00090BA78 /* Profile.swift */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 		170C20D32F4790E00090BA78 /* Components */ = {
@@ -307,7 +281,499 @@
 			path = Seasonality;
 			sourceTree = "<group>";
 		};
-		170C20ED2F4790E00090BA78 /* Services */ = {
+		170C22432F479ADC0090BA78 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				170C211E2F4790E00090BA78 /* TravelScoreriOSApp.swift */,
+				170C21152F4790E00090BA78 /* RootTabView.swift */,
+				170C20FA2F4790E00090BA78 /* ContentView.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		170C22442F479AE10090BA78 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				170C227A2F479F0A0090BA78 /* Services */,
+				170C224D2F479B2E0090BA78 /* Foundation */,
+				170C224C2F479B260090BA78 /* Persistence */,
+				170C224B2F479B1E0090BA78 /* Networking */,
+				170C224A2F479B190090BA78 /* Config */,
+				170C22492F479B140090BA78 /* Auth */,
+				170C21042F4790E00090BA78 /* DataLoader.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		170C22452F479AE60090BA78 /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				170C22592F479B840090BA78 /* Legal */,
+				170C22582F479B7D0090BA78 /* MyTravels */,
+				170C22572F479B770090BA78 /* Seasonality */,
+				170C22562F479B720090BA78 /* Friends */,
+				170C22552F479B6D0090BA78 /* Profile */,
+				170C22542F479B670090BA78 /* CountryDetail */,
+				170C22532F479B600090BA78 /* Discovery */,
+				170C22522F479B5B0090BA78 /* Auth */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		170C22462F479AED0090BA78 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				170C22512F479B500090BA78 /* Utilities */,
+				170C22502F479B4A0090BA78 /* Extensions */,
+				170C224F2F479B410090BA78 /* Components */,
+				170C224E2F479B3B0090BA78 /* UI */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		170C22472F479AF20090BA78 /* New Group */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "New Group";
+			sourceTree = "<group>";
+		};
+		170C22482F479B070090BA78 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				170C20FD2F4790E00090BA78 /* Country.swift */,
+				170C21002F4790E00090BA78 /* CountryDTO.swift */,
+				170C21202F4790E00090BA78 /* WhenToGoModels.swift */,
+				170C21192F4790E00090BA78 /* SeasonalityModels.swift */,
+				170C20CE2F4790E00090BA78 /* Profile.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		170C22492F479B140090BA78 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				172A74C82F357340003EF4DF /* SessionManager.swift */,
+				17F063822F32732F00F1F4F3 /* AuthViewModel.swift */,
+				17F063842F32734800F1F4F3 /* EmailAuthView.swift */,
+				170C20F42F4790E00090BA78 /* AuthGate.swift */,
+				170C20F52F4790E00090BA78 /* AuthLandingView.swift */,
+				170C20F62F4790E00090BA78 /* AuthRequiredView.swift */,
+				170C20F72F4790E00090BA78 /* AuthSheetView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		170C224A2F479B190090BA78 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				170F3EBF2F218C6C0083E900 /* APIConfig.swift */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		170C224B2F479B1E0090BA78 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				17F063802F32730600F1F4F3 /* SupabaseClient.swift */,
+				170C20FE2F4790E00090BA78 /* CountryAPI.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		170C224C2F479B260090BA78 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				170C20EE2F4790E00090BA78 /* BucketListStore.swift */,
+				170C20EF2F4790E00090BA78 /* MetaStore.swift */,
+				170C211C2F4790E00090BA78 /* TraveledStore.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		170C224D2F479B2E0090BA78 /* Foundation */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Foundation;
+			sourceTree = "<group>";
+		};
+		170C224E2F479B3B0090BA78 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				170C210D2F4790E00090BA78 /* FrostedCard.swift */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		170C224F2F479B410090BA78 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		170C22502F479B4A0090BA78 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		170C22512F479B500090BA78 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		170C22522F479B5B0090BA78 /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				170C22792F479DDB0090BA78 /* Support */,
+				170C22782F479DD20090BA78 /* Components */,
+				170C22772F479DCD0090BA78 /* ViewModels */,
+				170C22762F479DC90090BA78 /* Views */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		170C22532F479B600090BA78 /* Discovery */ = {
+			isa = PBXGroup;
+			children = (
+				170C22752F479DC00090BA78 /* Support */,
+				170C22742F479DBA0090BA78 /* Components */,
+				170C22732F479DB50090BA78 /* ViewModels */,
+				170C22722F479DB00090BA78 /* Views */,
+			);
+			path = Discovery;
+			sourceTree = "<group>";
+		};
+		170C22542F479B670090BA78 /* CountryDetail */ = {
+			isa = PBXGroup;
+			children = (
+				170C22712F479DA60090BA78 /* Support */,
+				170C22702F479DA00090BA78 /* Components */,
+				170C226F2F479D9A0090BA78 /* ViewModels */,
+				170C226E2F479D900090BA78 /* Views */,
+				170C20C02F4790E00090BA78 /* CountryAdvisoryCard.swift */,
+				170C20C22F4790E00090BA78 /* CountryHeaderCard.swift */,
+				170C20C32F4790E00090BA78 /* CountryScoreStyling.swift */,
+				170C20C42F4790E00090BA78 /* CountrySeasonalityCard.swift */,
+				170C20C52F4790E00090BA78 /* CountrySeasonalityHelpers.swift */,
+				170C20C62F4790E00090BA78 /* CountryTextHelpers.swift */,
+				170C20C72F4790E00090BA78 /* CountryTravelSafeCard.swift */,
+				170C20C82F4790E00090BA78 /* CountryTravelSafeHelpers.swift */,
+				170C20C92F4790E00090BA78 /* CountryVisaCard.swift */,
+				170C20CA2F4790E00090BA78 /* CountryVisaHelpers.swift */,
+			);
+			path = CountryDetail;
+			sourceTree = "<group>";
+		};
+		170C22552F479B6D0090BA78 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				170C226D2F479C4C0090BA78 /* Support */,
+				170C226C2F479C470090BA78 /* Components */,
+				170C226B2F479C410090BA78 /* ViewModels */,
+				170C226A2F479C3C0090BA78 /* Views */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		170C22562F479B720090BA78 /* Friends */ = {
+			isa = PBXGroup;
+			children = (
+				170C22692F479C330090BA78 /* Support */,
+				170C22682F479C220090BA78 /* Components */,
+				170C22672F479C1C0090BA78 /* ViewModels */,
+				170C22662F479C170090BA78 /* Views */,
+			);
+			path = Friends;
+			sourceTree = "<group>";
+		};
+		170C22572F479B770090BA78 /* Seasonality */ = {
+			isa = PBXGroup;
+			children = (
+				170C22652F479C0F0090BA78 /* Support */,
+				170C22642F479C0A0090BA78 /* Components */,
+				170C22632F479C040090BA78 /* ViewModels */,
+				170C22622F479BFF0090BA78 /* Views */,
+			);
+			path = Seasonality;
+			sourceTree = "<group>";
+		};
+		170C22582F479B7D0090BA78 /* MyTravels */ = {
+			isa = PBXGroup;
+			children = (
+				170C22612F479BF90090BA78 /* Support */,
+				170C22602F479BF30090BA78 /* Components */,
+				170C225F2F479BED0090BA78 /* ViewModels */,
+				170C225E2F479BE80090BA78 /* Views */,
+			);
+			path = MyTravels;
+			sourceTree = "<group>";
+		};
+		170C22592F479B840090BA78 /* Legal */ = {
+			isa = PBXGroup;
+			children = (
+				170C225D2F479BDE0090BA78 /* Support */,
+				170C225C2F479BD80090BA78 /* Components */,
+				170C225B2F479BD10090BA78 /* ViewModels */,
+				170C225A2F479BCB0090BA78 /* Views */,
+			);
+			path = Legal;
+			sourceTree = "<group>";
+		};
+		170C225A2F479BCB0090BA78 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				170C21122F4790E00090BA78 /* LegalView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		170C225B2F479BD10090BA78 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		170C225C2F479BD80090BA78 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		170C225D2F479BDE0090BA78 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		170C225E2F479BE80090BA78 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				170C21132F4790E00090BA78 /* MyTravelsView.swift */,
+				170C20F82F4790E00090BA78 /* BucketListView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		170C225F2F479BED0090BA78 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		170C22602F479BF30090BA78 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				170C20F92F4790E00090BA78 /* BucketToggleButton.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		170C22612F479BF90090BA78 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		170C22622F479BFF0090BA78 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				170C21212F4790E00090BA78 /* WhenToGoView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		170C22632F479C040090BA78 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				170C21222F4790E00090BA78 /* WhenToGoViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		170C22642F479C0A0090BA78 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		170C22652F479C0F0090BA78 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				170C211A2F4790E00090BA78 /* SeasonalityUIHelpers.swift */,
+				170C21232F4790E00090BA78 /* WorldGeoJSONLoader.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		170C22662F479C170090BA78 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				170C210B2F4790E00090BA78 /* FriendsView.swift */,
+				170C21072F4790E00090BA78 /* FriendRequestsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		170C22672F479C1C0090BA78 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				170C210C2F4790E00090BA78 /* FriendsViewModel.swift */,
+				170C21082F4790E00090BA78 /* FriendRequestsViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		170C22682F479C220090BA78 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				170C21092F4790E00090BA78 /* FriendsActionSheetView.swift */,
+				170C210A2F4790E00090BA78 /* FriendsSection.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		170C22692F479C330090BA78 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		170C226A2F479C3C0090BA78 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		170C226B2F479C410090BA78 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				170C21142F4790E00090BA78 /* ProfileViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		170C226C2F479C470090BA78 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		170C226D2F479C4C0090BA78 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		170C226E2F479D900090BA78 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				170C20C12F4790E00090BA78 /* CountryDetailView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		170C226F2F479D9A0090BA78 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		170C22702F479DA00090BA78 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		170C22712F479DA60090BA78 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		170C22722F479DB00090BA78 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				170C21052F4790E00090BA78 /* DiscoveryView.swift */,
+				170C21012F4790E00090BA78 /* CountryListView.swift */,
+				170C20FF2F4790E00090BA78 /* CountryBottomDrawerView.swift */,
+				170C21022F4790E00090BA78 /* CountryPreviewCardMobile.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		170C22732F479DB50090BA78 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		170C22742F479DBA0090BA78 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				170C21172F4790E00090BA78 /* ScoreCountryDrawerView.swift */,
+				170C21062F4790E00090BA78 /* FlagWithTooltip.swift */,
+				170C21252F4790E00090BA78 /* WrapChips.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		170C22752F479DC00090BA78 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+				170C20E42F4790E00090BA78 /* CountryMetadataResolver.swift */,
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		170C22762F479DC90090BA78 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		170C22772F479DCD0090BA78 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		170C22782F479DD20090BA78 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		170C22792F479DDB0090BA78 /* Support */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Support;
+			sourceTree = "<group>";
+		};
+		170C227A2F479F0A0090BA78 /* Services */ = {
 			isa = PBXGroup;
 			children = (
 				170C20E82F4790E00090BA78 /* FriendService.swift */,
@@ -319,85 +785,35 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
-		170C20F02F4790E00090BA78 /* Stores */ = {
-			isa = PBXGroup;
-			children = (
-				170C20EE2F4790E00090BA78 /* BucketListStore.swift */,
-				170C20EF2F4790E00090BA78 /* MetaStore.swift */,
-			);
-			path = Stores;
-			sourceTree = "<group>";
-		};
 		17AFEC812EC2C3D800B9585B = {
 			isa = PBXGroup;
 			children = (
+				170C22482F479B070090BA78 /* Models */,
+				170C22472F479AF20090BA78 /* New Group */,
+				170C22462F479AED0090BA78 /* Shared */,
+				170C22452F479AE60090BA78 /* Features */,
+				170C22442F479AE10090BA78 /* Core */,
+				170C22432F479ADC0090BA78 /* App */,
 				170C20F12F4790E00090BA78 /* AppRootView.swift */,
 				170C20F22F4790E00090BA78 /* Assets.xcassets */,
 				170C20F32F4790E00090BA78 /* auth_loop.mp4 */,
-				170C20F42F4790E00090BA78 /* AuthGate.swift */,
-				170C20F52F4790E00090BA78 /* AuthLandingView.swift */,
-				170C20F62F4790E00090BA78 /* AuthRequiredView.swift */,
-				170C20F72F4790E00090BA78 /* AuthSheetView.swift */,
-				170C20F82F4790E00090BA78 /* BucketListView.swift */,
-				170C20F92F4790E00090BA78 /* BucketToggleButton.swift */,
-				170C20FA2F4790E00090BA78 /* ContentView.swift */,
 				170C20FB2F4790E00090BA78 /* countries.geojson */,
 				170C20FC2F4790E00090BA78 /* countries.json */,
-				170C20FD2F4790E00090BA78 /* Country.swift */,
-				170C20FE2F4790E00090BA78 /* CountryAPI.swift */,
-				170C20FF2F4790E00090BA78 /* CountryBottomDrawerView.swift */,
-				170C21002F4790E00090BA78 /* CountryDTO.swift */,
-				170C21012F4790E00090BA78 /* CountryListView.swift */,
-				170C21022F4790E00090BA78 /* CountryPreviewCardMobile.swift */,
 				170C21032F4790E00090BA78 /* CountryScoreCard.swift */,
-				170C21042F4790E00090BA78 /* DataLoader.swift */,
-				170C21052F4790E00090BA78 /* DiscoveryView.swift */,
-				170C21062F4790E00090BA78 /* FlagWithTooltip.swift */,
-				170C21072F4790E00090BA78 /* FriendRequestsView.swift */,
-				170C21082F4790E00090BA78 /* FriendRequestsViewModel.swift */,
-				170C21092F4790E00090BA78 /* FriendsActionSheetView.swift */,
-				170C210A2F4790E00090BA78 /* FriendsSection.swift */,
-				170C210B2F4790E00090BA78 /* FriendsView.swift */,
-				170C210C2F4790E00090BA78 /* FriendsViewModel.swift */,
-				170C210D2F4790E00090BA78 /* FrostedCard.swift */,
 				170C210E2F4790E00090BA78 /* FullBucketListView.swift */,
 				170C210F2F4790E00090BA78 /* Info.plist */,
 				170C21102F4790E00090BA78 /* intro.mp4 */,
 				170C21112F4790E00090BA78 /* LaunchView.swift */,
-				170C21122F4790E00090BA78 /* LegalView.swift */,
-				170C21132F4790E00090BA78 /* MyTravelsView.swift */,
-				170C21142F4790E00090BA78 /* ProfileViewModel.swift */,
-				170C21152F4790E00090BA78 /* RootTabView.swift */,
 				170C21162F4790E00090BA78 /* ScoreColor.swift */,
-				170C21172F4790E00090BA78 /* ScoreCountryDrawerView.swift */,
 				170C21182F4790E00090BA78 /* ScoreWorldMapView.swift */,
-				170C21192F4790E00090BA78 /* SeasonalityModels.swift */,
-				170C211A2F4790E00090BA78 /* SeasonalityUIHelpers.swift */,
 				170C211B2F4790E00090BA78 /* SocialView.swift */,
-				170C211C2F4790E00090BA78 /* TraveledStore.swift */,
 				170C211D2F4790E00090BA78 /* TravelScoreriOS.entitlements */,
-				170C211E2F4790E00090BA78 /* TravelScoreriOSApp.swift */,
 				170C211F2F4790E00090BA78 /* VideoBackgroundView.swift */,
-				170C21202F4790E00090BA78 /* WhenToGoModels.swift */,
-				170C21212F4790E00090BA78 /* WhenToGoView.swift */,
-				170C21222F4790E00090BA78 /* WhenToGoViewModel.swift */,
-				170C21232F4790E00090BA78 /* WorldGeoJSONLoader.swift */,
 				170C21242F4790E00090BA78 /* WorldMapView.swift */,
-				170C21252F4790E00090BA78 /* WrapChips.swift */,
-				170C20E42F4790E00090BA78 /* CountryMetadataResolver.swift */,
-				172A74C82F357340003EF4DF /* SessionManager.swift */,
-				17F063802F32730600F1F4F3 /* SupabaseClient.swift */,
-				17F063822F32732F00F1F4F3 /* AuthViewModel.swift */,
-				17F063842F32734800F1F4F3 /* EmailAuthView.swift */,
-				170F3EBF2F218C6C0083E900 /* APIConfig.swift */,
-				170C20F02F4790E00090BA78 /* Stores */,
-				170C20ED2F4790E00090BA78 /* Services */,
 				170C20E72F4790E00090BA78 /* Seasonality */,
 				170C20E32F4790E00090BA78 /* ProfileSettings */,
 				170C20D82F4790E00090BA78 /* Profile */,
-				170C20CF2F4790E00090BA78 /* Models */,
 				170C20CD2F4790E00090BA78 /* Meta */,
-				170C20CB2F4790E00090BA78 /* CountryDetail */,
 				17F063862F32747D00F1F4F3 /* Frameworks */,
 				17AFEC8B2EC2C3D800B9585B /* Products */,
 			);
