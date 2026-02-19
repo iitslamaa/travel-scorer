@@ -238,17 +238,6 @@ struct CountryListView: View {
                 scheduleRecomputeVisible()
                 return
             }
-
-            // 3) If we still have nothing, fall back to bundled data
-            if countries.isEmpty {
-                // Bundle decoding can be non-trivial; do it off-main.
-                let bundled = await Task.detached(priority: .utility) {
-                    DataLoader.loadCountriesFromBundle()
-                }.value
-
-                countries = bundled
-                scheduleRecomputeVisible()
-            }
         }
         // Recompute visible list when inputs change
         .onChange(of: searchText) { _, _ in

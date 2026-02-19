@@ -7,8 +7,6 @@
 
 
 import SwiftUI
-import Supabase
-import PostgREST
 
 struct FriendsView: View {
     private let userId: UUID
@@ -67,18 +65,8 @@ struct FriendsView: View {
                 .task {
                     await friendsVM.loadFriends(for: userId)
 
-                    do {
-                        let response: PostgrestResponse<Profile> = try await SupabaseManager.shared.client
-                            .from("profiles")
-                            .select("*")
-                            .eq("id", value: userId.uuidString)
-                            .single()
-                            .execute()
-
-                        displayName = response.value.fullName
-                    } catch {
-                        displayName = ""
-                    }
+                    await friendsVM.loadDisplayName(for: userId)
+                    displayName = friendsVM.displayName
 
                     if SupabaseManager.shared.currentUserId == userId {
                         await friendsVM.loadIncomingRequestCount()

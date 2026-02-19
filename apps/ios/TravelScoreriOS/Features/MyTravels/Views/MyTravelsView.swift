@@ -72,10 +72,6 @@ struct MyTravelsView: View {
                 return
             }
 
-            // 3) Fallback to bundled data
-            if countries.isEmpty {
-                countries = DataLoader.loadCountriesFromBundle()
-            }
         }
     }
 }

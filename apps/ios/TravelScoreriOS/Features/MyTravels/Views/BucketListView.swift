@@ -71,10 +71,6 @@ struct BucketListView: View {
             print("🟢 First 20 Country IDs from dataset:", countries.map { $0.id }.prefix(20))
             print("🟢 All dataset IDs:", countries.map { $0.id })
 
-            // 3) Fallback to bundled data
-            if countries.isEmpty {
-                countries = DataLoader.loadCountriesFromBundle()
-            }
         }
     }
 }

@@ -1,6 +1,0 @@
-[
-  { "name": "Japan",  "score": 86, "advisoryLevel": "Level 1: Exercise Normal Precautions" },
-  { "name": "Egypt",  "score": 62, "advisoryLevel": "Level 2: Exercise Increased Caution" },
-  { "name": "Brazil", "score": 48, "advisoryLevel": "Level 2: Exercise Increased Caution" },
-  { "name": "Iceland","score": 90, "advisoryLevel": null }
-]

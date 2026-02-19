@@ -21,6 +21,7 @@ final class FriendsViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var friends: [Profile] = []
     @Published var incomingRequestCount: Int = 0
+    @Published var displayName: String = ""
 
     // MARK: - Dependencies
     private let supabase = SupabaseManager.shared
@@ -40,6 +41,23 @@ final class FriendsViewModel: ObservableObject {
         }
 
         isLoading = false
+    }
+
+    // MARK: - Load Display Name
+
+    func loadDisplayName(for userId: UUID) async {
+        do {
+            let response: PostgrestResponse<Profile> = try await supabase.client
+                .from("profiles")
+                .select("*")
+                .eq("id", value: userId.uuidString)
+                .single()
+                .execute()
+
+            displayName = response.value.fullName
+        } catch {
+            displayName = ""
+        }
     }
 
     // MARK: - Incoming Requests Count
