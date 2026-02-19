@@ -375,6 +375,7 @@
 		170C224B2F479B1E0090BA78 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				170C227B2F47A4770090BA78 /* DTOs */,
 				17F063802F32730600F1F4F3 /* SupabaseClient.swift */,
 				170C20FE2F4790E00090BA78 /* CountryAPI.swift */,
 			);
@@ -783,6 +784,13 @@
 				170C20EC2F4790E00090BA78 /* SeasonalityService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		170C227B2F47A4770090BA78 /* DTOs */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = DTOs;
 			sourceTree = "<group>";
 		};
 		17AFEC812EC2C3D800B9585B = {
