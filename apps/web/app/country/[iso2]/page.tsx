@@ -9,7 +9,6 @@ import { VisaSection } from './components/VisaSection';
 import { Seasonality } from './components/Seasonality';
 import { buildRows } from '@travel-af/domain';
 import type { FactRow } from '@travel-af/domain';
-import { fmtUSD } from './lib/explainers';
 
 function toPct(n: number) {
   return `${Math.round(n * 100)}%`;
