@@ -9,6 +9,23 @@ extension Color {
     static let gold = Color(red: 0.85, green: 0.68, blue: 0.15)
 }
 
+struct LockedProfileView: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "lock.fill")
+                .font(.system(size: 28))
+                .foregroundStyle(.secondary)
+
+            Text("Learn more about this user by adding them as a friend!")
+                .font(.subheadline)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 32)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
 extension Notification.Name {
     static let friendshipUpdated = Notification.Name("friendshipUpdated")
 }
@@ -21,30 +38,34 @@ struct ProfileView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     private let userId: UUID
-    @State private var showUnfriendConfirmation = false
-    @State private var headerMinY: CGFloat = 0
+    @State private var showFriendsDrawer = false
+    @State private var navigateToFriends = false
 
     init(userId: UUID) {
         self.userId = userId
     }
 
+    // MARK: - Derived State
+
     private var username: String { profileVM.profile?.username ?? "" }
     private var homeCountryCodes: [String] { profileVM.profile?.livedCountries ?? [] }
     private var languages: [String] { profileVM.profile?.languages ?? [] }
+    private var friendCount: Int { profileVM.friendCount }
+
+    /// 🚨 CRITICAL FIX: normalize nil → .none
+    private var effectiveRelationshipState: RelationshipState {
+        profileVM.relationshipState ?? .none
+    }
 
     private var travelModeLabel: String? {
         guard let raw = profileVM.profile?.travelMode.first,
-              let mode = TravelMode(rawValue: raw) else {
-            return nil
-        }
+              let mode = TravelMode(rawValue: raw) else { return nil }
         return mode.label
     }
 
     private var travelStyleLabel: String? {
         guard let raw = profileVM.profile?.travelStyle.first,
-              let style = TravelStyle(rawValue: raw) else {
-            return nil
-        }
+              let style = TravelStyle(rawValue: raw) else { return nil }
         return style.label
     }
 
@@ -52,22 +73,9 @@ struct ProfileView: View {
         profileVM.profile?.nextDestination
     }
 
-    private var buttonTitle: String {
-        guard let state = profileVM.relationshipState else { return "" }
-        switch state {
-        case .none:
-            return "Add Friend"
-        case .requestSent:
-            return "Request Sent"
-        case .friends:
-            return "Friends"
-        case .selfProfile:
-            return ""
-        }
-    }
-
     private var firstName: String {
-        let raw = (profileVM.profile?.fullName ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        let raw = (profileVM.profile?.fullName ?? "")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
         if raw.isEmpty { return "Profile" }
         return raw.split(separator: " ").first.map(String.init) ?? "Profile"
     }
@@ -76,181 +84,161 @@ struct ProfileView: View {
         "\(firstName)’s Profile"
     }
 
-    private var miniAvatar: some View {
-        Group {
-            if let urlString = profileVM.profile?.avatarUrl,
-               let url = URL(string: urlString) {
-                AsyncImage(
-                    url: url,
-                    transaction: Transaction(animation: .easeInOut(duration: 0.2))
-                ) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .transition(.opacity)
-
-                    case .failure(_):
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .scaledToFill()
-                            .foregroundStyle(.gray)
-
-                    case .empty:
-                        ZStack {
-                            Circle()
-                                .fill(Color.gray.opacity(0.15))
-                            ProgressView()
-                                .scaleEffect(0.6)
-                        }
-
-                    @unknown default:
-                        EmptyView()
-                    }
-                }
-            } else {
-                Image(systemName: "person.crop.circle.fill")
-                    .resizable()
-                    .scaledToFill()
-                    .foregroundStyle(.gray)
-            }
-        }
-    }
-
     var body: some View {
         ZStack {
             Color(.systemBackground).ignoresSafeArea()
 
-            if profileVM.boundUserId != userId || (profileVM.isLoading && profileVM.profile == nil) {
+            if profileVM.boundUserId != userId ||
+                (profileVM.isLoading && profileVM.profile == nil) {
+
                 ProgressView("Loading profile…")
+
             } else {
+
                 ScrollView {
                     VStack(spacing: 0) {
-
-                        GeometryReader { geo in
-                            Color.clear
-                                .onChange(of: geo.frame(in: .global).minY) { newValue in
-                                    headerMinY = newValue
-                                }
-                        }
-                        .frame(height: 0)
 
                         ProfileHeaderView(
                             profile: profileVM.profile,
                             username: username,
                             homeCountryCodes: homeCountryCodes,
-                            mutualFriends: profileVM.mutualFriends,
-                            onCancelRequest: { await profileVM.cancelFriendRequest() },
-                            relationshipState: profileVM.relationshipState,
-                            isRelationshipLoading: profileVM.isRelationshipLoading,
-                            friendCount: profileVM.friendCount,
-                            userId: userId,
-                            buttonTitle: buttonTitle,
-                            headerMinY: headerMinY,
+                            relationshipState: effectiveRelationshipState,
+                            friendCount: friendCount,
                             onToggleFriend: {
-                                if profileVM.relationshipState == .friends {
-                                    showUnfriendConfirmation = true
-                                } else {
-                                    await profileVM.toggleFriend()
+                                switch effectiveRelationshipState {
+                                case .friends, .requestSent:
+                                    showFriendsDrawer = true
+                                case .none:
+                                    Task { await profileVM.toggleFriend() }
+                                case .selfProfile:
+                                    break
                                 }
                             }
                         )
 
-                        ProfileInfoSection(
-                            relationshipState: profileVM.relationshipState ?? .none,
-                            viewedTraveledCountries: profileVM.viewedTraveledCountries,
-                            viewedBucketListCountries: profileVM.viewedBucketListCountries,
-                            orderedTraveledCountries: profileVM.orderedTraveledCountries,
-                            orderedBucketListCountries: profileVM.orderedBucketListCountries,
-                            mutualTraveledCountries: profileVM.mutualTraveledCountries,
-                            mutualBucketCountries: profileVM.mutualBucketCountries,
-                            languages: languages,
-                            travelMode: travelModeLabel,
-                            travelStyle: travelStyleLabel,
-                            nextDestination: nextDestination
-                        )
-                    }
-                }
-                .overlay(alignment: .top) {
-                    let activationThreshold: CGFloat = 80
-                    let fadeDistance: CGFloat = 45
-                    let progress = min(max((-headerMinY - activationThreshold) / fadeDistance, 0), 1)
+                        // 🔒 GATE PROFILE CONTENT
+                        if effectiveRelationshipState == .friends ||
+                            effectiveRelationshipState == .selfProfile {
 
-                    HStack(spacing: 10) {
-                        miniAvatar
-                            .frame(width: 34, height: 34)
-                            .clipShape(Circle())
+                            ProfileInfoSection(
+                                relationshipState: effectiveRelationshipState,
+                                viewedTraveledCountries: profileVM.viewedTraveledCountries,
+                                viewedBucketListCountries: profileVM.viewedBucketListCountries,
+                                orderedTraveledCountries: profileVM.orderedTraveledCountries,
+                                orderedBucketListCountries: profileVM.orderedBucketListCountries,
+                                mutualTraveledCountries: profileVM.mutualTraveledCountries,
+                                mutualBucketCountries: profileVM.mutualBucketCountries,
+                                languages: languages,
+                                travelMode: travelModeLabel,
+                                travelStyle: travelStyleLabel,
+                                nextDestination: nextDestination
+                            )
 
-                        VStack(alignment: .leading, spacing: 1) {
-                            Text(profileVM.profile?.fullName ?? "")
-                                .font(.headline)
-                                .fontWeight(.semibold)
-                                .lineLimit(1)
-
-                            if !username.isEmpty {
-                                Text("@\(username)")
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
-                                    .lineLimit(1)
-                            }
-                        }
-
-                        Spacer()
-
-                        if !profileVM.orderedTraveledCountries.isEmpty {
-                            Text("\(profileVM.orderedTraveledCountries.count) 🌍")
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                                .foregroundStyle(.secondary)
-                                .lineLimit(1)
+                        } else {
+                            LockedProfileView()
+                                .padding(.top, 40)
                         }
                     }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(.ultraThinMaterial)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .shadow(color: .black.opacity(0.08), radius: 10, y: 6)
-                    .padding(.horizontal, 12)
-                    .padding(.top, 8)
-                    .opacity(progress)
-                    .animation(.easeInOut(duration: 0.18), value: progress)
                 }
-
-                if showUnfriendConfirmation {
-                    FriendsActionSheetView(
-                        username: username,
-                        onConfirm: {
+                .refreshable {
+                    await profileVM.reloadProfile(userId: userId)
+                }
+                .sheet(isPresented: $showFriendsDrawer) {
+                    FriendsSection(
+                        relationshipState: effectiveRelationshipState,
+                        friendCount: friendCount,
+                        onToggleFriend: {
                             Task {
                                 await profileVM.toggleFriend()
-                                showUnfriendConfirmation = false
                             }
                         },
-                        onCancel: { showUnfriendConfirmation = false }
+                        onCancelRequest: {
+                            Task {
+                                await profileVM.toggleFriend()
+                            }
+                        },
+                        onViewFriends: {
+                            showFriendsDrawer = false
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                                navigateToFriends = true
+                            }
+                        }
                     )
-                    .transition(.move(edge: .bottom))
-                    .zIndex(10)
                 }
+                .background(
+                    NavigationLink(
+                        destination: FriendsListView(),
+                        isActive: $navigateToFriends
+                    ) {
+                        EmptyView()
+                    }
+                    .hidden()
+                )
             }
         }
-        .animation(.spring(response: 0.4, dampingFraction: 0.85), value: showUnfriendConfirmation)
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            if SupabaseManager.shared.currentUserId == userId {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink {
-                        ProfileSettingsView(profileVM: profileVM, viewedUserId: userId)
-                    } label: {
-                        Image(systemName: "gearshape")
-                            .symbolRenderingMode(.hierarchical)
-                            .font(.system(size: 18, weight: .semibold))
-                    }
-                }
-            }
-        }
+        
         .task(id: userId) {
             profileVM.setUserIdIfNeeded(userId)
         }
+    }
+}
+
+struct FriendsListView: View {
+    @EnvironmentObject var profileVM: ProfileViewModel
+
+    var body: some View {
+        Group {
+            if profileVM.friends.isEmpty {
+                VStack(spacing: 16) {
+                    Image(systemName: "person.2")
+                        .font(.system(size: 40))
+                        .foregroundStyle(.secondary)
+
+                    Text("No friends yet")
+                        .font(.headline)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                List(profileVM.friends, id: \.id) { friend in
+                    HStack(spacing: 12) {
+                        if let urlString = friend.avatarUrl,
+                           let url = URL(string: urlString) {
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            } placeholder: {
+                                Circle()
+                                    .fill(Color.gray.opacity(0.2))
+                            }
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                        } else {
+                            Circle()
+                                .fill(Color.gray.opacity(0.2))
+                                .frame(width: 40, height: 40)
+                        }
+
+                        VStack(alignment: .leading) {
+                            Text(friend.fullName ?? "Unknown")
+                                .font(.headline)
+
+                            if !friend.username.isEmpty {
+                                Text("@\(friend.username)")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
+                .listStyle(.plain)
+            }
+        }
+        .navigationTitle("Friends")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }

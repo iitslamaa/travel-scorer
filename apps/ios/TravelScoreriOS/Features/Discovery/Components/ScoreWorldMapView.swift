@@ -130,7 +130,9 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
                     print("🇫🇷 [Map] Sample iso=\(f.isoCode ?? "nil") name=\(f.countryName ?? "nil")")
                 }
             }
-            isLoading = false
+            DispatchQueue.main.async {
+                isLoading = false
+            }
         } else {
             DispatchQueue.global(qos: .userInitiated).async {
                 let polygons = WorldGeoJSONLoader.loadPolygons()
@@ -170,11 +172,8 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: MKMapView, context: Context) {
-        
         // 🔄 Keep coordinator highlights synced with SwiftUI updates
         context.coordinator.updateHighlights(highlightedISOs)
-
-        context.coordinator.selectedCountryISO = selectedCountryISO
 
         let iso = selectedCountryISO?
             .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -183,10 +182,12 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
         print("🎯 [updateUIView] raw selectedCountryISO:", selectedCountryISO ?? "nil")
         print("🎯 [updateUIView] normalized iso:", iso ?? "nil")
 
-        guard let iso,
-              context.coordinator.lastZoomedISO != iso else { return }
+        guard let iso else { return }
 
-        context.coordinator.lastZoomedISO = iso
+        // Prevent redundant zoom loops
+        if context.coordinator.lastZoomedISO == iso {
+            return
+        }
 
         let targetNameLocal = Locale.current.localizedString(forRegionCode: iso)?.uppercased()
         let targetNameEN = Locale(identifier: "en_US").localizedString(forRegionCode: iso)?.uppercased()
@@ -218,9 +219,7 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
             return
         }
 
-        DispatchQueue.main.async {
-            context.coordinator.zoomToCountry(polygons: matching)
-        }
+        context.coordinator.zoomToCountry(polygons: matching)
     }
     
     static func dismantleUIView(_ uiView: MKMapView, coordinator: Coordinator) {
@@ -291,18 +290,18 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
         
         @objc func handleTap(_ gesture: UITapGestureRecognizer) {
             guard let mapView = mapView else { return }
-            
+
             let tapPoint = gesture.location(in: mapView)
             let coordinate = mapView.convert(tapPoint, toCoordinateFrom: mapView)
             let mapPoint = MKMapPoint(coordinate)
-            
+
             for overlay in mapView.overlays {
                 guard let polygon = overlay as? CountryPolygon,
                       let renderer = mapView.renderer(for: overlay) as? MKMultiPolygonRenderer else { continue }
-                
+
                 renderer.createPath()
                 let point = renderer.point(for: mapPoint)
-                
+
                 if let path = renderer.path,
                    path.contains(point) {
 
@@ -313,7 +312,10 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
                         return polygon.countryName
                     }()
 
-                    selectedCountryISO = identifier
+                    // Prevent feedback loop if value is identical
+                    if selectedCountryISO != identifier {
+                        selectedCountryISO = identifier
+                    }
                     print("🟡 Selected ISO from tap:", identifier ?? "nil")
 
                     break
@@ -345,6 +347,14 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
             guard let mapView = mapView, !polygons.isEmpty else { return }
 
             let iso = polygons.first?.isoCode?.uppercased()
+
+            // Prevent redundant zoom loops
+            if lastZoomedISO == iso {
+                return
+            }
+
+            lastZoomedISO = iso
+
             print("🔵 zoomToCountry ISO:", iso ?? "nil")
 
             if iso == "US" || iso == "USA" {
