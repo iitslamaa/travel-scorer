@@ -9,6 +9,7 @@ import { VisaSection } from './components/VisaSection';
 import { Seasonality } from './components/Seasonality';
 import { buildRows } from '@travel-af/domain';
 import type { FactRow } from '@travel-af/domain';
+import { loadWeights } from '@/lib/scoreWeights';
 
 function toPct(n: number) {
   return `${Math.round(n * 100)}%`;
@@ -102,7 +103,8 @@ export default async function CountryPage({ params }: PageProps) {
   if (!row) notFound();
 
   const facts: CountryFacts = { iso2, ...(row.facts ?? {}) };
-  const { rows, total }: { rows: FactRow[]; total: number } = buildRows(facts);
+  const userWeights = loadWeights();
+  const { rows, total }: { rows: FactRow[]; total: number } = buildRows(facts, userWeights);
   const providedTotal = (facts as unknown as { scoreTotal?: number }).scoreTotal;
   const displayTotal = Number.isFinite(providedTotal as number)
     ? Math.round(providedTotal as number)
