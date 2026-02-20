@@ -9,7 +9,7 @@ import { VisaSection } from './components/VisaSection';
 import { Seasonality } from './components/Seasonality';
 import { buildRows } from '@travel-af/domain';
 import type { FactRow } from '@travel-af/domain';
-import { loadWeights } from '@/lib/scoreWeights';
+import InteractiveScoring from './InteractiveScoring';
 
 function toPct(n: number) {
   return `${Math.round(n * 100)}%`;
@@ -103,13 +103,6 @@ export default async function CountryPage({ params }: PageProps) {
   if (!row) notFound();
 
   const facts: CountryFacts = { iso2, ...(row.facts ?? {}) };
-  const userWeights = loadWeights();
-  const { rows, total }: { rows: FactRow[]; total: number } = buildRows(facts, userWeights);
-  const providedTotal = (facts as unknown as { scoreTotal?: number }).scoreTotal;
-  const displayTotal = Number.isFinite(providedTotal as number)
-    ? Math.round(providedTotal as number)
-    : total;
-
 
   return (
     <>
@@ -129,50 +122,7 @@ export default async function CountryPage({ params }: PageProps) {
         <h1 className="h1">{row.name ?? iso2}</h1>
       </div>
 
-      <div className="card p-5 mb-8">
-        <div className="flex items-baseline justify-between mb-2">
-          <h2 className="font-medium">Overall Travelability Score</h2>
-          <div className="text-3xl font-bold">{displayTotal}</div>
-        </div>
-      </div>
-
-      {/* Advisory */}
-      <section className="card p-5 mb-8">
-        <h3 className="font-medium mb-2">Travel Advisory</h3>
-        {row.advisory && (
-          <>
-            <AdvisoryBadge level={row.advisory.level as 1|2|3|4|undefined} />
-            <p className="mt-2 text-sm">{explainAdvisory(row.name ?? iso2, row.advisory.level, row.advisory.updatedAt)}</p>
-            {renderFactorBreakdown(rows, 'travelGov')}
-          </>
-        )}
-      </section>
-
-      {/* Seasonality */}
-      <section className="card p-5 mb-8">
-        <h3 className="font-medium mb-2">Seasonality</h3>
-        <Seasonality rows={rows} fm={{}} />
-        {renderFactorBreakdown(rows, 'seasonality')}
-      </section>
-
-      {/* Visa */}
-      <section className="card p-5 mb-8">
-        <h3 className="font-medium mb-2">Visa Ease</h3>
-        <VisaSection rows={rows} facts={facts} />
-        {renderFactorBreakdown(rows, 'visa')}
-      </section>
-
-      {/* Affordability */}
-      <section className="card p-5 mb-8">
-        <h3 className="font-medium mb-2">Affordability</h3>
-        <ScorePill value={typeof rows.find(r=>r.key==='affordability')?.raw === 'number' ? Math.round(rows.find(r=>r.key==='affordability')!.raw as number) : undefined} />
-        {typeof (facts as any).affordabilityCategory === 'number' && (
-          <p className="mt-2 text-sm font-medium">
-            Cost level: {(facts as any).affordabilityCategory} / 10
-          </p>
-        )}
-        {renderFactorBreakdown(rows, 'affordability')}
-      </section>
+      <InteractiveScoring facts={facts} row={row} />
     </>
   );
 }
