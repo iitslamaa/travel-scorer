@@ -12,67 +12,83 @@ struct FriendsSection: View {
     
     let relationshipState: RelationshipState
     let friendCount: Int
-    let onToggleFriend: () async -> Void
-    let onCancelRequest: () async -> Void
+    let onToggleFriend: () -> Void
+    let onCancelRequest: () -> Void
+    let onViewFriends: () -> Void
     
-    @State private var showDrawer = false
     @State private var showUnfriendConfirmation = false
     
     var body: some View {
-        Button {
-            showDrawer = true
-        } label: {
-            HStack {
-                Label("Friends", systemImage: "person.2.fill")
-                    .font(.headline)
-                
-                Spacer()
-                
-                Text("\(friendCount)")
-                    .foregroundStyle(.secondary)
-                
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(.secondary)
-            }
-            .padding()
-            .background(Color(.secondarySystemBackground))
-            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .padding(.horizontal)
-        }
-        .sheet(isPresented: $showDrawer) {
-            drawerView
-                .presentationDetents([.medium])
-        }
+        drawerView
+            .presentationDetents([.medium])
     }
     
     private var drawerView: some View {
-        VStack(spacing: 24) {
-            
+        VStack(spacing: 20) {
+
+            // Title
+            Text("Friends")
+                .font(.title2.bold())
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            // View Friends Row
+            Button {
+                onViewFriends()
+            } label: {
+                HStack {
+                    Label("View Friends", systemImage: "person.2.fill")
+                        .font(.headline)
+                    Spacer()
+                    Text("\(friendCount)")
+                        .foregroundStyle(.secondary)
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(.secondary)
+                }
+                .padding()
+                .background(Color(.secondarySystemBackground))
+                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            }
+            .buttonStyle(.plain)
+
+            // Unfriend Option
             if relationshipState == .friends {
                 Button(role: .destructive) {
                     showUnfriendConfirmation = true
                 } label: {
-                    Text("Unfriend")
-                        .frame(maxWidth: .infinity)
+                    HStack {
+                        Image(systemName: "person.crop.circle.badge.minus")
+                        Text("Unfriend")
+                        Spacer()
+                    }
+                    .padding()
+                    .background(Color.red.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
             }
-            
+
+            // Cancel Request Option
             if relationshipState == .requestSent {
                 Button(role: .destructive) {
-                    Task { await onCancelRequest() }
+                    onCancelRequest()
                 } label: {
-                    Text("Cancel Friend Request")
-                        .frame(maxWidth: .infinity)
+                    HStack {
+                        Image(systemName: "xmark.circle")
+                        Text("Cancel Friend Request")
+                        Spacer()
+                    }
+                    .padding()
+                    .background(Color.red.opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
             }
-            
+
             Spacer()
         }
         .padding()
         .alert("Unfriend?", isPresented: $showUnfriendConfirmation) {
             Button("Cancel", role: .cancel) {}
             Button("Confirm", role: .destructive) {
-                Task { await onToggleFriend() }
+                onToggleFriend()
             }
         }
     }

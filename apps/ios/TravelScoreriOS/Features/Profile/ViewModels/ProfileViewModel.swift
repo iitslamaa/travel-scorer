@@ -84,4 +84,29 @@ final class ProfileViewModel: ObservableObject {
         }
     }
     
+    // MARK: - Pull to Refresh Support
+
+    /// Forces a full reload even if the same user is already bound.
+    /// This is used by `.refreshable` in ProfileView.
+    func reloadProfile(userId: UUID) async {
+        self.userId = userId
+        boundUserId = userId
+
+        isLoading = true
+        errorMessage = nil
+        isRelationshipLoading = true
+
+        loadTask?.cancel()
+
+        let generation = UUID()
+        loadGeneration = generation
+
+        loadTask = Task { [weak self] in
+            await self?.load(generation: generation)
+        }
+
+        await loadTask?.value
+
+        isLoading = false
+    }
 }
