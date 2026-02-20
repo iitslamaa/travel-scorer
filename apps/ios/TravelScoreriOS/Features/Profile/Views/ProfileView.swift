@@ -84,12 +84,17 @@ struct ProfileView: View {
         "\(firstName)’s Profile"
     }
 
+    private var isShowingCorrectProfile: Bool {
+        profileVM.boundUserId == userId &&
+        profileVM.profile?.id == userId &&
+        profileVM.isLoading == false
+    }
+
     var body: some View {
         ZStack {
             Color(.systemBackground).ignoresSafeArea()
 
-            if profileVM.boundUserId != userId ||
-                (profileVM.isLoading && profileVM.profile == nil) {
+            if !isShowingCorrectProfile {
 
                 ProgressView("Loading profile…")
 
