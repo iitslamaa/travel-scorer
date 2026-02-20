@@ -4,15 +4,10 @@ import type { CountryFacts } from '@travel-af/shared';
 
 // --- Weights (sum = 1.0)
 export const W = {
-  travelGov: 0.30,
-  travelSafe: 0.15,
-  sfti: 0.10,
-  reddit: 0.20,
-  seasonality: 0.05,
-  visa: 0.05,
-  affordability: 0.05,
-  directFlight: 0.05,
-  infrastructure: 0.05,
+  travelGov: 0.40,
+  seasonality: 0.20,
+  visa: 0.20,
+  affordability: 0.20,
 } as const;
 
 export const DEFAULT_WEIGHTS = W;
@@ -103,21 +98,6 @@ export function buildRows(
       value: advisoryToScore(facts.advisoryLevel),
     },
     {
-      key: 'travelSafe',
-      label: 'TravelSafe Abroad',
-      value: facts.travelSafeOverall,
-    },
-    {
-      key: 'sfti',
-      label: 'Solo Female Travelers',
-      value: facts.soloFemaleIndex,
-    },
-    {
-      key: 'reddit',
-      label: 'Reddit sentiment',
-      value: facts.redditComposite,
-    },
-    {
       key: 'seasonality',
       label: 'Seasonality (now)',
       value: facts.seasonality,
@@ -133,16 +113,6 @@ export function buildRows(
       value:
         fx.affordability ??
         computeAffordability(fx),
-    },
-    {
-      key: 'directFlight',
-      label: 'Direct flight',
-      value: facts.directFlight,
-    },
-    {
-      key: 'infrastructure',
-      label: 'Tourist infrastructure',
-      value: facts.infrastructure,
     },
   ];
 
