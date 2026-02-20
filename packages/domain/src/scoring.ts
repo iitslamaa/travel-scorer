@@ -12,7 +12,9 @@ export const W = {
 
 export const DEFAULT_WEIGHTS = W;
 
-export type ScoreWeights = typeof W;
+export type ScoreWeights = {
+  [K in keyof typeof W]: number;
+};
 
 export type FactRow = {
   key: keyof typeof W;
