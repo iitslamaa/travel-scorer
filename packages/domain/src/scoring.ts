@@ -12,6 +12,8 @@ export const W = {
 
 export const DEFAULT_WEIGHTS = W;
 
+export type ScoreWeights = typeof W;
+
 export type FactRow = {
   key: keyof typeof W;
   label: string;
@@ -83,7 +85,8 @@ function advisoryToScore(level?: 1 | 2 | 3 | 4) {
 // --- Main scoring engine
 
 export function buildRows(
-  facts: CountryFacts
+  facts: CountryFacts,
+  weights: Partial<ScoreWeights> = DEFAULT_WEIGHTS
 ): { rows: FactRow[]; total: number } {
   const fx = facts as FactsExtra;
 
@@ -119,14 +122,18 @@ export function buildRows(
   // Only count weights for present signals
   const presentWeightSum = signals
     .filter((s) => Number.isFinite(s.value))
-    .reduce((acc, s) => acc + (W[s.key] ?? 0), 0);
+    .reduce(
+      (acc, s) =>
+        acc + (weights[s.key] ?? DEFAULT_WEIGHTS[s.key] ?? 0),
+      0
+    );
 
   const rows: FactRow[] = signals.map((s) => {
     const raw = Number.isFinite(s.value as number)
       ? (s.value as number)
       : undefined;
 
-    const w = W[s.key] ?? 0;
+    const w = weights[s.key] ?? DEFAULT_WEIGHTS[s.key] ?? 0;
     const effW = presentWeightSum > 0 ? w / presentWeightSum : 0;
 
     const contrib = raw != null ? raw * effW : 0;
