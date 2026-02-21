@@ -40,6 +40,7 @@ export function WorldMap() {
 
   const mapRef = useRef<MapView | null>(null);
   const [isMapReady, setIsMapReady] = useState(false);
+  const [selectedIso, setSelectedIso] = useState<string | null>(null);
 
   const polygons = useMemo(() => {
     return features.flatMap((feature: any, featureIndex: number) => {
@@ -86,6 +87,45 @@ export function WorldMap() {
     }, 0);
   }, [features.length, polygons.length, polygonsForFit, polygons, isMapReady]);
 
+  useEffect(() => {
+    if (!isMapReady) return;
+
+    // If nothing selected → reset to world view
+    if (!selectedIso) {
+      if (polygons.length === 0) return;
+
+      const allCoords: LatLng[] = [];
+      for (const ring of polygons) {
+        allCoords.push(...ring.coords);
+      }
+
+      setTimeout(() => {
+        mapRef.current?.fitToCoordinates(allCoords, {
+          edgePadding: { top: 40, right: 40, bottom: 40, left: 40 },
+          animated: true,
+        });
+      }, 0);
+
+      return;
+    }
+
+    // Zoom to selected country
+    const selected = polygons.filter((p) => p.iso === selectedIso);
+    if (selected.length === 0) return;
+
+    const coords: LatLng[] = [];
+    for (const ring of selected) {
+      coords.push(...ring.coords);
+    }
+
+    setTimeout(() => {
+      mapRef.current?.fitToCoordinates(coords, {
+        edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
+        animated: true,
+      });
+    }, 0);
+  }, [selectedIso, isMapReady, polygons]);
+
   return (
     <View style={{ flex: 1 }}>
       <MapView
@@ -109,9 +149,13 @@ export function WorldMap() {
               key={key}
               iso={iso}
               coordinates={coords}
-              overlay={buildCountryOverlay({ iso })}
+              overlay={buildCountryOverlay({
+                iso,
+                selectedIso: selectedIso ?? undefined,
+              })}
               onPress={(iso) => {
                 console.log('Pressed:', iso);
+                setSelectedIso((prev) => (prev === iso ? null : iso));
               }}
             />
           );
