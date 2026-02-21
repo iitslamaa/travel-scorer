@@ -32,7 +32,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var errorMessage: String?
     @Published var isFriend: Bool = false
     @Published var isFriendLoading: Bool = false
-    @Published var relationshipState: RelationshipState? = nil
+    @Published var relationshipState: RelationshipState = .none
     @Published var isRelationshipLoading: Bool = false
     @Published var viewedTraveledCountries: Set<String> = [] {
         didSet {
@@ -102,7 +102,7 @@ final class ProfileViewModel: ObservableObject {
 
         // 🔒 Reset visible state to prevent stale UI flash
         profile = nil
-        relationshipState = nil
+        relationshipState = .none
         friends = []
         viewedTraveledCountries = []
         viewedBucketListCountries = []
@@ -123,6 +123,7 @@ final class ProfileViewModel: ObservableObject {
         }
 
         await loadTask?.value
+        isRelationshipLoading = false
         isLoading = false
     }
     
@@ -137,7 +138,7 @@ final class ProfileViewModel: ObservableObject {
 
         // 🔒 Reset visible state to prevent stale UI flash
         profile = nil
-        relationshipState = nil
+        relationshipState = .none
         friends = []
         viewedTraveledCountries = []
         viewedBucketListCountries = []
@@ -158,6 +159,7 @@ final class ProfileViewModel: ObservableObject {
         }
 
         await loadTask?.value
+        isRelationshipLoading = false
         isLoading = false
     }
 

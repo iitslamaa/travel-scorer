@@ -64,7 +64,6 @@ struct ProfileView: View {
 
     private var isReadyToRenderProfile: Bool {
         profileVM.profile?.id == userId &&
-        profileVM.relationshipState != nil &&
         profileVM.isRelationshipLoading == false &&
         profileVM.isLoading == false
     }
@@ -105,7 +104,8 @@ struct ProfileView: View {
             if !isReadyToRenderProfile {
                 ProfileLoadingView()
                     .transition(.opacity)
-            } else if let relationshipState = profileVM.relationshipState {
+            } else {
+                let relationshipState = profileVM.relationshipState
 
                 ScrollView {
                     VStack(spacing: 0) {

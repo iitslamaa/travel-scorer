@@ -79,7 +79,7 @@ extension ProfileViewModel {
         defer { isFriendLoading = false }
         
         do {
-            guard let state = relationshipState else { return }
+            let state = relationshipState
             switch state {
             case .none:
                 print("   ➕ Attempting to send friend request...")
