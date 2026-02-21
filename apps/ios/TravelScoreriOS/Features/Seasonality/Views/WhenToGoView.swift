@@ -89,13 +89,13 @@ struct WhenToGoView: View {
                     countryListSection(
                         title: "Peak season",
                         note: "Best weather and overall conditions — usually the busiest and priciest.",
-                        countries: viewModel.peakCountries.sorted { $0.seasonalityScore > $1.seasonalityScore }
+                        countries: viewModel.peakCountries.sorted { $0.country.score > $1.country.score }
                     )
                     
                     countryListSection(
                         title: "Shoulder season",
                         note: "Still good conditions, often fewer crowds and better value.",
-                        countries: viewModel.shoulderCountries.sorted { $0.seasonalityScore > $1.seasonalityScore }
+                        countries: viewModel.shoulderCountries.sorted { $0.country.score > $1.country.score }
                     )
                 }
             }
