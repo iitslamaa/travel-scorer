@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 
 struct WrapChips: View {
-    let countries: [SeasonalityCountry]
-    let onSelect: (SeasonalityCountry) -> Void
+    let countries: [WhenToGoItem]
+    let onSelect: (WhenToGoItem) -> Void
     
     @State private var totalHeight: CGFloat = .zero
     
@@ -58,31 +58,29 @@ struct WrapChips: View {
         }
     }
     
-    private func chip(for country: SeasonalityCountry) -> some View {
-        let bg = scoreBackground(country.score)
-        let fg = scoreTone(country.score)
+    private func chip(for country: WhenToGoItem) -> some View {
+        let bg = scoreBackground(Double(country.seasonalityScore))
+        let fg = scoreTone(Double(country.seasonalityScore))
         
         return Button {
             onSelect(country)
         } label: {
             HStack(spacing: 4) {
-                Text((country.name ?? country.isoCode).isEmpty ? country.isoCode : (country.name ?? country.isoCode))
+                Text((country.country.name ?? country.country.iso2).isEmpty ? country.country.iso2 : (country.country.name ?? country.country.iso2))
                     .font(.caption)
                     .fontWeight(.medium)
-                if let region = country.region {
+                if let region = country.country.region {
                     Text(region.uppercased())
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
-                if let score = country.score {
-                    Text(String(Int(score.rounded())))
-                        .font(.caption2.bold())
-                        .padding(.horizontal, 4)
-                        .padding(.vertical, 2)
-                        .background(bg)
-                        .foregroundColor(fg)
-                        .clipShape(Capsule())
-                }
+                Text(String(country.seasonalityScore))
+                    .font(.caption2.bold())
+                    .padding(.horizontal, 4)
+                    .padding(.vertical, 2)
+                    .background(bg)
+                    .foregroundColor(fg)
+                    .clipShape(Capsule())
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)

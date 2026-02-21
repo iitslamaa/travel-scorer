@@ -12,13 +12,13 @@ import SafariServices
 struct CountryBottomDrawerView: View {
     @Environment(\.dismiss) private var dismiss
 
-    let country: WhenToGoCountry
+    let country: WhenToGoItem
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
 
             HStack {
-                Text(country.name)
+                Text(country.country.name)
                     .font(.title2).bold()
 
                 Spacer()
@@ -40,27 +40,26 @@ struct CountryBottomDrawerView: View {
             Text("Score snapshot")
                 .font(.headline)
 
-            // TODO: replace with real breakdown fields you already compute
             HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Advisory")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    ScorePill(score: country.country.advisoryScore ?? 0)
+                }
+
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Seasonality")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    ScorePill(score: 80)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Affordability")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    ScorePill(score: 90)
+                    ScorePill(score: country.seasonalityScore)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Visa ease")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    ScorePill(score: 100)
+                    ScorePill(score: country.country.visaEaseScore ?? 0)
                 }
             }
 
@@ -68,10 +67,10 @@ struct CountryBottomDrawerView: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
 
-            if let url = URL(string: "https://travel-scorer.vercel.app/country/\(country.slug)") {
+            if let url = URL(string: "https://travel-scorer.vercel.app/country/\(country.country.iso2.lowercased())") {
                 NavigationLink {
                     InAppSafariView(url: url)
-                        .navigationTitle(country.name)
+                        .navigationTitle(country.country.name)
                         .navigationBarTitleDisplayMode(.inline)
                 } label: {
                     HStack {

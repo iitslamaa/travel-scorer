@@ -12,15 +12,10 @@ enum SeasonType: String, Codable, Hashable {
     case shoulder
 }
 
-struct WhenToGoCountry: Identifiable, Hashable {
-    /// Use slug or ISO code; must be stable
-    let id: String
-
-    let name: String
-    let region: String
-    let score: Int
+struct WhenToGoItem: Identifiable, Hashable {
+    let country: Country
     let seasonType: SeasonType
+    let seasonalityScore: Int
 
-    /// Needed for opening full country page
-    let slug: String
+    var id: String { country.iso2 }
 }

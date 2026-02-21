@@ -12,37 +12,71 @@ import Combine
 @MainActor
 final class WhenToGoViewModel: ObservableObject {
 
-    @Published var selectedMonthIndex: Int = 1 // 0=Jan, 1=Feb, ...
-    @Published var selectedCountry: WhenToGoCountry? = nil
+    @Published var selectedMonthIndex: Int = 1 {
+        didSet {
+            recalculateForSelectedMonth()
+        }
+    }
+    @Published var selectedCountry: WhenToGoItem? = nil
 
-    // Replace this with your real fetched data for the selected month.
-    @Published var countriesForSelectedMonth: [WhenToGoCountry] = []
+    @Published private(set) var countriesForSelectedMonth: [WhenToGoItem] = []
 
-    var peakCountries: [WhenToGoCountry] {
-        countriesForSelectedMonth
-            .filter { $0.seasonType == .peak }
-            .sorted { $0.score > $1.score }
+    private let allCountries: [Country]
+
+    init(countries: [Country]) {
+        self.allCountries = countries
+        recalculateForSelectedMonth()
     }
 
-    var shoulderCountries: [WhenToGoCountry] {
+    var peakCountries: [WhenToGoItem] {
+        countriesForSelectedMonth
+            .filter { $0.seasonType == .peak }
+            .sorted { $0.seasonalityScore > $1.seasonalityScore }
+    }
+
+    var shoulderCountries: [WhenToGoItem] {
         countriesForSelectedMonth
             .filter { $0.seasonType == .shoulder }
-            .sorted { $0.score > $1.score }
+            .sorted { $0.seasonalityScore > $1.seasonalityScore }
     }
 
     var peakCount: Int { peakCountries.count }
     var shoulderCount: Int { shoulderCountries.count }
     var totalCount: Int { peakCount + shoulderCount }
 
-    func loadMockDataIfNeeded() {
-        guard countriesForSelectedMonth.isEmpty else { return }
+    func recalculateForSelectedMonth() {
+        countriesForSelectedMonth = allCountries.compactMap { country in
+            guard let seasonType = computeSeasonType(for: country),
+                  let seasonalityScore = computeSeasonalityScore(for: country)
+            else { return nil }
 
-        // MOCK (so you can see UI immediately). Replace with real fetch.
-        countriesForSelectedMonth = [
-            .init(id: "qatar", name: "Qatar", region: "Asia", score: 97, seasonType: .peak, slug: "qatar"),
-            .init(id: "singapore", name: "Singapore", region: "Asia", score: 94, seasonType: .peak, slug: "singapore"),
-            .init(id: "suriname", name: "Suriname", region: "Americas", score: 97, seasonType: .shoulder, slug: "suriname"),
-            .init(id: "kenya", name: "Kenya", region: "Africa", score: 69, seasonType: .shoulder, slug: "kenya")
-        ]
+            return WhenToGoItem(
+                country: country,
+                seasonType: seasonType,
+                seasonalityScore: seasonalityScore
+            )
+        }
+    }
+
+    private func computeSeasonType(for country: Country) -> SeasonType? {
+        guard let bestMonths = country.seasonalityBestMonths,
+              !bestMonths.isEmpty,
+              let score = country.seasonalityScore
+        else { return nil }
+
+        if bestMonths.contains(selectedMonthIndex) {
+            return .peak
+        }
+
+        // If not peak but has a seasonality score, treat as shoulder
+        if score > 0 {
+            return .shoulder
+        }
+
+        return nil
+    }
+
+    private func computeSeasonalityScore(for country: Country) -> Int? {
+        return country.seasonalityScore
     }
 }

@@ -10,6 +10,9 @@ import SwiftUI
 struct RootTabView: View {
     @EnvironmentObject private var sessionManager: SessionManager
 
+    @State private var countries: [Country] = []
+    @State private var hasLoadedCountries = false
+
     private let instanceId = UUID()
 
     var body: some View {
@@ -27,7 +30,7 @@ struct RootTabView: View {
 
             // When To Go
             NavigationStack {
-                WhenToGoView()
+                WhenToGoView(countries: countries)
             }
             .tabItem {
                 Label("When To Go", systemImage: "calendar")
@@ -116,6 +119,24 @@ struct RootTabView: View {
             }
             .tabItem {
                 Label("More", systemImage: "ellipsis")
+            }
+        }
+        .task {
+            guard !hasLoadedCountries else { return }
+            hasLoadedCountries = true
+
+            if let cached = CountryAPI.loadCachedCountries() {
+                countries = cached
+            }
+
+            if let refreshed = await CountryAPI.refreshCountriesIfNeeded() {
+                countries = refreshed
+            } else if countries.isEmpty {
+                do {
+                    countries = try await CountryAPI.fetchCountries()
+                } catch {
+                    print("❌ Failed to fetch countries:", error)
+                }
             }
         }
     }
