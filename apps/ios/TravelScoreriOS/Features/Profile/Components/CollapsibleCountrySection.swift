@@ -66,8 +66,29 @@ struct CollapsibleCountrySection: View {
                         .map { $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased() }
 
                     ScrollView(.horizontal, showsIndicators: false) {
+
+                        // Ensure mutual countries appear first (stable order)
+                        let normalizedMutuals = Set(
+                            mutualCountries?.map {
+                                $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                            } ?? []
+                        )
+
+                        let orderedFlags =
+                            countryCodes.filter { code in
+                                normalizedMutuals.contains(
+                                    code.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                                )
+                            }
+                            +
+                            countryCodes.filter { code in
+                                !normalizedMutuals.contains(
+                                    code.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                                )
+                            }
+
                         FlagStrip(
-                            flags: countryCodes,
+                            flags: orderedFlags,
                             fontSize: 30,
                             spacing: 10,
                             showsTooltip: false,
@@ -184,10 +205,23 @@ struct FlagStrip: View {
 
     var body: some View {
         LazyHStack(spacing: spacing) {
-            ForEach(flags, id: \.self) { code in
-                let flag = flagEmoji(from: code)
-                let isMutual = mutualCountries?.contains(code) ?? false
-                let isSelected = selectedISO == code
+            ForEach(Array(flags), id: \.self) { (code: String) in
+                let normalizedCode = code
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .uppercased()
+
+                let flag = flagEmoji(from: normalizedCode)
+
+                let normalizedMutuals = mutualCountries?.map {
+                    $0.trimmingCharacters(in: .whitespacesAndNewlines)
+                        .uppercased()
+                }
+
+                let isMutual = normalizedMutuals?.contains(normalizedCode) ?? false
+                let isSelected = selectedISO?
+                    .trimmingCharacters(in: .whitespacesAndNewlines)
+                    .uppercased() == normalizedCode
+
 
                 Text(flag)
                     .font(.system(size: fontSize))
@@ -210,7 +244,7 @@ struct FlagStrip: View {
                     )
                     .contentShape(Rectangle())
                     .onTapGesture {
-                        onFlagTap?(code)
+                        onFlagTap?(normalizedCode)
                     }
             }
         }
