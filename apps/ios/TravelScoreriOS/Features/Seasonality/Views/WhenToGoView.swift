@@ -21,9 +21,7 @@ struct WhenToGoView: View {
         NavigationStack {
             VStack(spacing: 16) {
                 header
-                
                 monthScroller
-                
                 content
             }
             .padding()
@@ -33,7 +31,7 @@ struct WhenToGoView: View {
             .sheet(isPresented: $isDrawerOpen) {
                 if let selected = viewModel.selectedCountry {
                     NavigationStack {
-                        SeasonalityCountryBottomDrawerView(country: selected)
+                        WhenToGoCountryDrawerView(country: selected)
                     }
                     .presentationDetents([.medium, .large])
                     .presentationDragIndicator(.visible)
@@ -87,7 +85,6 @@ struct WhenToGoView: View {
             VStack(spacing: 16) {
                 selectedMonthSummary
                 
-                // Peak + Shoulder section
                 VStack(spacing: 12) {
                     countryListSection(
                         title: "Peak season",
@@ -140,8 +137,6 @@ struct WhenToGoView: View {
         }
     }
     
-    // MARK: - List sections
-    
     private func countryListSection(
         title: String,
         note: String,
@@ -171,87 +166,5 @@ struct WhenToGoView: View {
                 .fill(Color(.systemBackground))
                 .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 2)
         )
-    }
-}
-
-private struct SeasonalityCountryBottomDrawerView: View {
-    @Environment(\.dismiss) private var dismiss
-
-    let country: WhenToGoItem
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            header
-
-            Text((country.country.region ?? "").uppercased())
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            VStack(alignment: .leading, spacing: 10) {
-                scoreRow(title: "Advisory", value: Double(country.country.advisoryScore ?? 0))
-                scoreRow(title: "Visa ease", value: Double(country.country.visaEaseScore ?? 0))
-                scoreRow(title: "Seasonality", value: Double(country.seasonalityScore))
-            }
-            .padding(12)
-            .background(.thinMaterial)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-
-            Text("Open the full country page to compare safety, affordability, and visa details.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-
-            Spacer(minLength: 0)
-        }
-        .padding(16)
-        .navigationBarHidden(true)
-    }
-
-    // MARK: - Header
-
-    private var header: some View {
-        HStack(alignment: .top, spacing: 12) {
-            VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .center, spacing: 10) {
-                    Text(country.country.name ?? "Unknown")
-                        .font(.title2.bold())
-
-                    Spacer()
-
-                    // Overall score pill next to title
-                    ScorePill(score: country.country.score ?? 0)
-                }
-            }
-
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(.secondary)
-            }
-            .buttonStyle(.plain)
-        }
-    }
-
-    // MARK: - Rows + Pills
-
-    private func scoreRow(title: String, value: Double?, subtitle: String? = nil) -> some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-
-                if let subtitle {
-                    Text(subtitle)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-            }
-
-            Spacer()
-
-            ScorePill(score: value ?? 0)
-        }
-        .padding(.vertical, 6)
     }
 }
