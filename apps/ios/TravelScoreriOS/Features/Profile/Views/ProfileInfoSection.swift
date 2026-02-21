@@ -25,6 +25,20 @@ struct ProfileInfoSection: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
+        let _ = print("🧩 ProfileInfoSection BODY")
+        let _ = print("   relationshipState:", relationshipState)
+        let _ = print("   orderedTraveledCountries count:", orderedTraveledCountries.count)
+        let _ = print("   orderedTraveledCountries:", orderedTraveledCountries)
+        let _ = print("   orderedBucketListCountries count:", orderedBucketListCountries.count)
+        let _ = print("   orderedBucketListCountries:", orderedBucketListCountries)
+        let _ = print("   viewedTraveledCountries count:", viewedTraveledCountries.count)
+        let _ = print("   viewedBucketListCountries count:", viewedBucketListCountries.count)
+        let _ = print("   mutualTraveledCountries:", mutualTraveledCountries)
+        let _ = print("   mutualBucketCountries:", mutualBucketCountries)
+        let _ = print("   languages:", languages)
+        let _ = print("   travelMode:", travelMode as Any)
+        let _ = print("   travelStyle:", travelStyle as Any)
+        let _ = print("   nextDestination:", nextDestination as Any)
         LazyVStack(spacing: 28) {
             languagesCard
             travelModeCard
@@ -47,12 +61,14 @@ struct ProfileInfoSection: View {
                     countryCodes: orderedTraveledCountries,
                     highlightColor: .gold
                 )
+                .id("traveled-\(orderedTraveledCountries.joined(separator: ","))")
 
                 CollapsibleCountrySection(
                     title: "Bucket List",
                     countryCodes: orderedBucketListCountries,
                     highlightColor: .blue
                 )
+                .id("bucket-\(orderedBucketListCountries.joined(separator: ","))")
 
             } else if relationshipState == .friends {
 
@@ -62,6 +78,7 @@ struct ProfileInfoSection: View {
                     highlightColor: .gold,
                     mutualCountries: Set(mutualTraveledCountries)
                 )
+                .id("traveled-\(orderedTraveledCountries.joined(separator: ","))")
 
                 CollapsibleCountrySection(
                     title: "Bucket List",
@@ -69,6 +86,7 @@ struct ProfileInfoSection: View {
                     highlightColor: .blue,
                     mutualCountries: Set(mutualBucketCountries)
                 )
+                .id("bucket-\(orderedBucketListCountries.joined(separator: ","))")
 
             } else {
                 lockedProfileMessage

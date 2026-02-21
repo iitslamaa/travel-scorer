@@ -6,12 +6,13 @@
 import SwiftUI
 
 struct MyTravelsView: View {
-    @EnvironmentObject private var profileVM: ProfileViewModel
+    @EnvironmentObject private var sessionManager: SessionManager
     @State private var countries: [Country] = []
+    @State private var traveledCountryIds: Set<String> = []
 
     private var visitedCountries: [Country] {
         countries
-            .filter { profileVM.orderedTraveledCountries.contains($0.id) }
+            .filter { traveledCountryIds.contains($0.id) }
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
@@ -56,11 +57,6 @@ struct MyTravelsView: View {
             CountryDetailView(country: country)
         }
         .task {
-            // Ensure profileVM is bound to current user
-            if let id = SupabaseManager.shared.currentUserId {
-                profileVM.setUserIdIfNeeded(id)
-            }
-
             // 1) Show cached data immediately (fast/offline)
             if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
                 countries = cached
@@ -72,6 +68,13 @@ struct MyTravelsView: View {
                 return
             }
 
+            // Fetch traveled countries for current user (identity-scoped)
+            if let userId = sessionManager.userId {
+                let service = ProfileService(supabase: SupabaseManager.shared)
+                if let traveled = try? await service.fetchTraveledCountries(userId: userId) {
+                    traveledCountryIds = traveled
+                }
+            }
         }
     }
 }
@@ -79,10 +82,5 @@ struct MyTravelsView: View {
 #Preview {
     NavigationStack {
         MyTravelsView()
-            .environmentObject(
-                ProfileViewModel(
-                    profileService: ProfileService(supabase: SupabaseManager.shared)
-                )
-            )
     }
 }

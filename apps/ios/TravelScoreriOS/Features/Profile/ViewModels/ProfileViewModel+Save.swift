@@ -24,10 +24,7 @@ extension ProfileViewModel {
         nextDestination: String?,
         avatarUrl: String?
     ) async {
-        guard let userId else {
-            print("⚠️ saveProfile() skipped — no userId")
-            return
-        }
+        let userId = self.userId
         errorMessage = nil
         
         do {
@@ -49,7 +46,7 @@ extension ProfileViewModel {
             )
             
             // Reload full profile state
-            await refreshProfile()
+            await reloadProfile()
 
             print("💾 Saved + fully reloaded profile state")
             

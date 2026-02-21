@@ -72,12 +72,16 @@ final class ProfileService {
     // MARK: - Fetch
 
     func fetchMyProfile(userId: UUID) async throws -> Profile {
+        print("📥 fetchMyProfile called for userId:", userId)
+        print("   🧠 ProfileService instance:", ObjectIdentifier(self))
         let response: PostgrestResponse<[Profile]> = try await supabase.client
             .from("profiles")
             .select()
             .eq("id", value: userId)
             .limit(1)
             .execute()
+        print("   📦 fetchMyProfile raw count:", response.value.count)
+        print("   📦 fetchMyProfile ids:", response.value.map { $0.id })
 
         guard let profile = response.value.first else {
             throw NSError(
@@ -87,6 +91,7 @@ final class ProfileService {
             )
         }
 
+        print("✅ fetchMyProfile returning profile id:", profile.id)
         return profile
     }
 
@@ -95,6 +100,8 @@ final class ProfileService {
         defaultUsername: String? = nil,
         defaultAvatarUrl: String? = nil
     ) async throws {
+        print("🛠 ensureProfileExists called for:", userId)
+        print("   🧠 ProfileService instance:", ObjectIdentifier(self))
 
         // Try fetch first
         do {
@@ -145,7 +152,8 @@ final class ProfileService {
         defaultUsername: String? = nil,
         defaultAvatarUrl: String? = nil
     ) async throws -> Profile {
-
+        print("📥 fetchOrCreateProfile called for userId:", userId)
+        print("   🧠 ProfileService instance:", ObjectIdentifier(self))
         do {
             return try await fetchMyProfile(userId: userId)
         } catch let error as NSError where error.code == 404 {
@@ -202,24 +210,32 @@ final class ProfileService {
 
     /// Traveled countries for any viewed user
     func fetchTraveledCountries(userId: UUID) async throws -> Set<String> {
+        print("🌍 fetchTraveledCountries for userId:", userId)
+        print("   🧠 ProfileService instance:", ObjectIdentifier(self))
         let response: PostgrestResponse<[CountryRow]> = try await supabase.client
             .from("user_traveled")
             .select("country_id")
             .eq("user_id", value: userId.uuidString)
             .limit(1000)
             .execute()
+        print("   📦 traveled raw rows count:", response.value.count)
+        print("   📦 traveled countryIds:", response.value.map { $0.countryId })
 
         return Set(response.value.map { $0.countryId })
     }
 
     /// Bucket list countries for any viewed user
     func fetchBucketListCountries(userId: UUID) async throws -> Set<String> {
+        print("🪣 fetchBucketListCountries for userId:", userId)
+        print("   🧠 ProfileService instance:", ObjectIdentifier(self))
         let response: PostgrestResponse<[CountryRow]> = try await supabase.client
             .from("user_bucket_list")
             .select("country_id")
             .eq("user_id", value: userId.uuidString)
             .limit(1000)
             .execute()
+        print("   📦 bucket raw rows count:", response.value.count)
+        print("   📦 bucket countryIds:", response.value.map { $0.countryId })
 
         return Set(response.value.map { $0.countryId })
     }

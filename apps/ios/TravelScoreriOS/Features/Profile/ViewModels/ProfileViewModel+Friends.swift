@@ -15,11 +15,14 @@ extension ProfileViewModel {
     // MARK: - Friend Count
 
     func loadFriendCount() async {
-        guard let userId else { return }
+        let userId = self.userId
+        print("👥 loadFriendCount for:", userId)
         
         do {
             let friends = try await friendService.fetchFriends(for: userId)
+            print("   👥 fetched friends count:", friends.count)
             friendCount = friends.count
+            print("   👥 assigned friendCount:", friendCount)
         } catch {
             print("❌ failed to load friend count:", error)
             friendCount = 0
@@ -29,11 +32,12 @@ extension ProfileViewModel {
     // MARK: - Pending Friend Request Count
 
     func loadPendingRequestCount() async {
-        guard let userId else { return }
+        let userId = self.userId
+        print("🔔 loadPendingRequestCount for:", userId)
 
         do {
             pendingRequestCount = try await friendService.fetchPendingRequestCount(for: userId)
-            print("🔔 Pending requests:", pendingRequestCount)
+            print("   🔔 assigned pendingRequestCount:", pendingRequestCount)
         } catch {
             print("❌ failed to load pending request count:", error)
             pendingRequestCount = 0
@@ -43,20 +47,25 @@ extension ProfileViewModel {
     // MARK: - Mutual Friends
 
     func loadMutualFriends() async {
+        let viewedUserId = self.userId
         guard
-            let viewedUserId = userId,
             let currentUserId = supabase.currentUserId,
             currentUserId != viewedUserId
         else {
+            print("   🤝 no mutual friends context, clearing mutualFriends")
             mutualFriends = []
             return
         }
 
+        print("🤝 loadMutualFriends for viewedUserId:", viewedUserId)
+        print("🤝 currentUserId:", currentUserId)
         do {
+            print("   🤝 fetching mutual friends...")
             mutualFriends = try await friendService.fetchMutualFriends(
                 currentUserId: currentUserId,
                 otherUserId: viewedUserId
             )
+            print("   🤝 assigned mutualFriends count:", mutualFriends.count)
         } catch {
             print("❌ failed to load mutual friends:", error)
             mutualFriends = []

@@ -10,7 +10,6 @@ import SwiftUI
 struct CountryDetailView: View {
     private let isTravelSafetyEnabled = false
     @State var country: Country
-    @EnvironmentObject private var profileVM: ProfileViewModel
 
     var body: some View {
         ScrollView {
@@ -40,11 +39,6 @@ struct CountryDetailView: View {
         }
         .navigationTitle(country.name)
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            if let id = SupabaseManager.shared.currentUserId {
-                profileVM.setUserIdIfNeeded(id)
-            }
-        }
     }
 
     // MARK: - Factor helpers

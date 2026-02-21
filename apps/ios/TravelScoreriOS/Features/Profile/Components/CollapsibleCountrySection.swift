@@ -34,9 +34,11 @@ struct CollapsibleCountrySection: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
+
         VStack(alignment: .leading, spacing: 12) {
 
             Button {
+                print("🔘 Toggle tapped —", title)
                 if !isExpanded && !hasLoadedMap {
                     hasLoadedMap = true
                 }
@@ -90,7 +92,12 @@ struct CollapsibleCountrySection: View {
                             isLoading: $isLoadingMap
                         )
                         .onAppear {
-                            print("🧩 Collapsible normalized ISOs:", normalizedISOs)
+                            print("🧩 ScoreWorldMapRepresentable onAppear — title:", title,
+                                  " highlightedISOs:", normalizedISOs,
+                                  " selectedCountryISO:", selectedCountryISO as Any)
+                        }
+                        .onDisappear {
+                            print("🧩 ScoreWorldMapRepresentable onDisappear — title:", title)
                         }
                         .transaction { transaction in
                             transaction.animation = nil
@@ -123,6 +130,20 @@ struct CollapsibleCountrySection: View {
         .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
+        .onAppear {
+            print("📦 CollapsibleCountrySection APPEAR —", title, "count:", countryCodes.count)
+        }
+        .onDisappear {
+            print("📦 CollapsibleCountrySection DISAPPEAR — title:", title)
+        }
+        .onChange(of: countryCodes) { oldValue, newValue in
+            print("🔁 CollapsibleCountrySection countryCodes CHANGED — title:", title)
+            print("   old:", oldValue)
+            print("   new:", newValue)
+            isExpanded = false
+            hasLoadedMap = false
+            selectedCountryISO = nil
+        }
     }
 
     private func flagEmoji(from code: String) -> String {

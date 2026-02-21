@@ -6,12 +6,13 @@
 import SwiftUI
 
 struct BucketListView: View {
-    @EnvironmentObject private var profileVM: ProfileViewModel
+    @EnvironmentObject private var sessionManager: SessionManager
     @State private var countries: [Country] = []
+    @State private var bucketCountryIds: Set<String> = []
 
     private var bucketedCountries: [Country] {
         countries
-            .filter { profileVM.viewedBucketListCountries.contains($0.id) }
+            .filter { bucketCountryIds.contains($0.id) }
             .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
@@ -66,11 +67,13 @@ struct BucketListView: View {
                 countries = fresh
             }
 
-            // DEBUG PRINTS
-            print("🟢 Bucket ISO codes:", profileVM.orderedBucketListCountries)
-            print("🟢 First 20 Country IDs from dataset:", countries.map { $0.id }.prefix(20))
-            print("🟢 All dataset IDs:", countries.map { $0.id })
-
+            // Fetch bucket list for current user (identity-scoped)
+            if let userId = sessionManager.userId {
+                let service = ProfileService(supabase: SupabaseManager.shared)
+                if let bucket = try? await service.fetchBucketListCountries(userId: userId) {
+                    bucketCountryIds = bucket
+                }
+            }
         }
     }
 }
@@ -78,6 +81,5 @@ struct BucketListView: View {
 #Preview {
     NavigationStack {
         BucketListView()
-            .environmentObject(ProfileViewModel(profileService: ProfileService(supabase: SupabaseManager.shared)))
     }
 }

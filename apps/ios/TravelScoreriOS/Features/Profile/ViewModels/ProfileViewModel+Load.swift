@@ -6,73 +6,110 @@
 //
 
 import Foundation
-import Combine
-import Supabase
-import PostgREST
 
 extension ProfileViewModel {
 
     // MARK: - Load
 
     func load(generation: UUID) async {
-        guard let userId else { return }
+        let startingUserId = userId
+
+        print("🟣 load() START — instance:", instanceId)
+        print("   generation:", generation)
+        print("   current loadGeneration:", loadGeneration)
+        print("   userId at start:", startingUserId)
 
         isLoading = true
         defer { isLoading = false }
         errorMessage = nil
 
         do {
-            profile = try await profileService.fetchOrCreateProfile(userId: userId)
-            friends = try await friendService.fetchFriends(for: userId)
-            friendCount = friends.count
+            let fetchedProfile =
+                try await profileService.fetchOrCreateProfile(userId: startingUserId)
 
-            guard generation == loadGeneration else { return }
-
-            viewedTraveledCountries =
-                try await profileService.fetchTraveledCountries(userId: userId)
-            viewedBucketListCountries =
-                try await profileService.fetchBucketListCountries(userId: userId)
-
-            guard generation == loadGeneration else { return }
-
-            if let currentUserId = supabase.currentUserId,
-               currentUserId != userId {
-
-                let currentUserBucket =
-                    try await profileService.fetchBucketListCountries(userId: currentUserId)
-
-                let currentSet = Set(currentUserBucket)
-                let viewedSet = viewedBucketListCountries
-
-                mutualBucketCountries = Array(currentSet.intersection(viewedSet)).sorted()
-
-                let currentUserTraveled =
-                    try await profileService.fetchTraveledCountries(userId: currentUserId)
-
-                let currentTraveledSet = Set(currentUserTraveled)
-                let viewedTraveledSet = viewedTraveledCountries
-
-                mutualTraveledCountries =
-                    Array(currentTraveledSet.intersection(viewedTraveledSet)).sorted()
-            } else {
-                mutualBucketCountries = []
-                mutualTraveledCountries = []
+            guard generation == loadGeneration,
+                  self.userId == startingUserId else {
+                print("🛑 ABORT after fetchProfile (identity changed)")
+                return
             }
 
-            computeOrderedLists()
+            print("🟢 assigning profile id:", fetchedProfile.id)
+            profile = fetchedProfile
+            logPublishedState("after profile assignment")
 
-            guard generation == loadGeneration else { return }
+            let fetchedFriends =
+                try await friendService.fetchFriends(for: startingUserId)
+
+            guard generation == loadGeneration,
+                  self.userId == startingUserId else {
+                print("🛑 ABORT after fetchFriends (identity changed)")
+                return
+            }
+
+            friends = fetchedFriends
+            friendCount = fetchedFriends.count
+            logPublishedState("after friends assignment")
+
+            let traveled =
+                try await profileService.fetchTraveledCountries(userId: startingUserId)
+
+            guard generation == loadGeneration,
+                  self.userId == startingUserId else {
+                print("🛑 ABORT after fetchTraveled (identity changed)")
+                return
+            }
+
+            viewedTraveledCountries = traveled
+            logPublishedState("after traveled assignment")
+
+            let bucket =
+                try await profileService.fetchBucketListCountries(userId: startingUserId)
+
+            guard generation == loadGeneration,
+                  self.userId == startingUserId else {
+                print("🛑 ABORT after fetchBucket (identity changed)")
+                return
+            }
+
+            viewedBucketListCountries = bucket
+            logPublishedState("after bucket assignment")
+
+            mutualBucketCountries = []
+            mutualTraveledCountries = []
+
+            computeOrderedLists()
+            logPublishedState("after computeOrderedLists")
+
+            guard generation == loadGeneration,
+                  self.userId == startingUserId else {
+                print("🛑 ABORT after computeOrderedLists")
+                return
+            }
 
             isRelationshipLoading = true
             try await refreshRelationshipState()
+            logPublishedState("after refreshRelationshipState")
 
-            guard generation == loadGeneration else { return }
+            guard generation == loadGeneration,
+                  self.userId == startingUserId else {
+                print("🛑 ABORT after refreshRelationshipState")
+                return
+            }
 
             await loadPendingRequestCount()
+            logPublishedState("after loadPendingRequestCount")
 
-            guard generation == loadGeneration else { return }
+            guard generation == loadGeneration,
+                  self.userId == startingUserId else {
+                print("🛑 ABORT after loadPendingRequestCount")
+                return
+            }
 
             await loadMutualFriends()
+            logPublishedState("after loadMutualFriends")
+
+            print("✅ load() COMPLETE — instance:", instanceId, "user:", startingUserId)
+            logPublishedState("load complete")
 
         } catch {
             print("❌ load() failed:", error)
