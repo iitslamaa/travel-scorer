@@ -192,6 +192,21 @@ struct ProfileView: View {
         .id(userId)
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            if SupabaseManager.shared.currentUserId == userId {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink {
+                        ProfileSettingsView(
+                            profileVM: profileVM,
+                            viewedUserId: userId
+                        )
+                    } label: {
+                        Image(systemName: "gearshape")
+                            .font(.system(size: 18, weight: .semibold))
+                    }
+                }
+            }
+        }
         .animation(.easeInOut(duration: 0.25), value: isReadyToRenderProfile)
         
         .onAppear {

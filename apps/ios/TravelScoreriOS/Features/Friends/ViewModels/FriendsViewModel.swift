@@ -61,18 +61,19 @@ final class FriendsViewModel: ObservableObject {
 
     // MARK: - Load Friends
 
-    func loadFriends(for userId: UUID) async {
-        if hasLoaded {
+    func loadFriends(for userId: UUID, forceRefresh: Bool = false) async {
+        if hasLoaded && !forceRefresh {
             print("⏭ [FriendsVM:", instanceId, "] loadFriends skipped (already loaded)")
             return
         }
 
-        print("👥 [FriendsVM:", instanceId, "] loadFriends START for:", userId)
+        print("👥 [FriendsVM:", instanceId, "] loadFriends START for:", userId, "force:", forceRefresh)
         isLoading = true
         errorMessage = nil
 
         do {
-            friends = try await friendService.fetchFriends(for: userId)
+            let fetchedFriends = try await friendService.fetchFriends(for: userId)
+            friends = fetchedFriends
             hasLoaded = true
             print("👥 [FriendsVM:", instanceId, "] loadFriends result count:", friends.count)
         } catch {
