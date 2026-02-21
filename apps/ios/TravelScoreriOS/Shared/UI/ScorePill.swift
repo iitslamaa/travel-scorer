@@ -20,15 +20,18 @@ struct ScorePill: View {
     
     var body: some View {
         Text(formattedScore)
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, 10)
-            .padding(.vertical, 6)
-            .background(backgroundColor.opacity(0.18))
+            .font(.subheadline.weight(.bold))
+            .monospacedDigit()
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
             .foregroundStyle(backgroundColor)
-            .clipShape(Capsule())
+            .background(
+                Capsule()
+                    .fill(backgroundColor.opacity(0.10))
+            )
             .overlay(
                 Capsule()
-                    .stroke(backgroundColor.opacity(0.25), lineWidth: 1)
+                    .stroke(backgroundColor.opacity(0.45), lineWidth: 1.5)
             )
             .accessibilityLabel("Score \(Int(score))")
     }
