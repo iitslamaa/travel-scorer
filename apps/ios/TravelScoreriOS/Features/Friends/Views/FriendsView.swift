@@ -23,32 +23,55 @@ struct FriendsView: View {
             .toolbar {
                 if SupabaseManager.shared.currentUserId == userId {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        Button {
-                            showFriendRequests = true
-                        } label: {
-                            ZStack {
-                                Circle()
-                                    .fill(Color(.systemGray5))
-                                    .frame(width: 36, height: 36)
+                        HStack(spacing: 12) {
 
-                                Image(systemName: "person.crop.circle.badge.plus")
-                                    .font(.system(size: 18, weight: .semibold))
-                                    .foregroundStyle(.primary)
+                            // Refresh Button
+                            Button {
+                                Task {
+                                    await friendsVM.loadFriends(for: userId, forceRefresh: true)
 
-                                if friendsVM.incomingRequestCount > 0 {
-                                    Text("\(min(friendsVM.incomingRequestCount, 9))")
-                                        .font(.system(size: 10, weight: .bold))
-                                        .foregroundStyle(.white)
-                                        .frame(width: 16, height: 16)
-                                        .background(
-                                            Circle().fill(.red)
-                                        )
-                                        .offset(x: 10, y: -10)
+                                    if SupabaseManager.shared.currentUserId == userId {
+                                        await friendsVM.loadIncomingRequestCount()
+                                    }
                                 }
+                            } label: {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .frame(width: 36, height: 36)
+                                    .background(
+                                        Circle().fill(Color(.systemGray5))
+                                    )
                             }
-                            .contentShape(Circle())
+                            .buttonStyle(.plain)
+
+                            // Friend Requests Button
+                            Button {
+                                showFriendRequests = true
+                            } label: {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color(.systemGray5))
+                                        .frame(width: 36, height: 36)
+
+                                    Image(systemName: "person.crop.circle.badge.plus")
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundStyle(.primary)
+
+                                    if friendsVM.incomingRequestCount > 0 {
+                                        Text("\(min(friendsVM.incomingRequestCount, 9))")
+                                            .font(.system(size: 10, weight: .bold))
+                                            .foregroundStyle(.white)
+                                            .frame(width: 16, height: 16)
+                                            .background(
+                                                Circle().fill(.red)
+                                            )
+                                            .offset(x: 10, y: -10)
+                                    }
+                                }
+                                .contentShape(Circle())
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
@@ -69,7 +92,7 @@ struct FriendsView: View {
                 Text(friendsVM.errorMessage ?? "")
             }
             .task(id: userId) {
-                await friendsVM.loadFriends(for: userId)
+                await friendsVM.loadFriends(for: userId, forceRefresh: false)
 
                 if friendsVM.displayName.isEmpty {
                     await friendsVM.loadDisplayName(for: userId)
@@ -128,6 +151,13 @@ struct FriendsView: View {
                     }
                     .padding(.vertical, 6)
                 }
+            }
+        }
+        .refreshable {
+            await friendsVM.loadFriends(for: userId, forceRefresh: true)
+
+            if SupabaseManager.shared.currentUserId == userId {
+                await friendsVM.loadIncomingRequestCount()
             }
         }
         .listStyle(.insetGrouped)
