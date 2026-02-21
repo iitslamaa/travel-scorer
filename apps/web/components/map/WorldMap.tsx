@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "leaflet/dist/leaflet.css";
 import dynamic from "next/dynamic";
 import type { Airport } from "../../../../packages/data/src";
@@ -36,6 +36,7 @@ const GeoJSON = dynamic(
 
 export default function WorldMap({ airports }: WorldMapProps) {
   const [geoData, setGeoData] = useState<any>(null);
+  const [selectedIso, setSelectedIso] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/world.geo.json")
@@ -60,12 +61,39 @@ export default function WorldMap({ airports }: WorldMapProps) {
         {geoData && (
           <GeoJSON
             data={geoData}
-            style={{
-              color: "#CBD5E1",
-              weight: 1,
-              fillColor: "#E2E8F0",
-              fillOpacity: 0.4,
-            } as any}
+            style={(feature: any) => {
+              const iso =
+                feature?.properties?.ISO_A2 ??
+                feature?.properties?.iso_a2 ??
+                null;
+
+              const isSelected = iso && iso === selectedIso;
+
+              return {
+                color: isSelected ? "#000000" : "#CBD5E1",
+                weight: isSelected ? 2 : 1,
+                fillColor: isSelected
+                  ? "rgba(255, 215, 0, 0.6)"
+                  : "#E2E8F0",
+                fillOpacity: isSelected ? 0.6 : 0.4,
+              };
+            }}
+            onEachFeature={(feature: any, layer: any) => {
+              const iso =
+                feature?.properties?.ISO_A2 ??
+                feature?.properties?.iso_a2 ??
+                null;
+
+              if (iso) {
+                layer.on({
+                  click: () => {
+                    setSelectedIso((prev) =>
+                      prev === iso ? null : iso
+                    );
+                  },
+                });
+              }
+            }}
           />
         )}
 
