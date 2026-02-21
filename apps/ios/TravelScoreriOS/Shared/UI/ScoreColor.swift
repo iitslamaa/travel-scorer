@@ -17,13 +17,13 @@ struct ScoreColor {
 
         switch score {
         case 80...100:
-            return Color.green.opacity(0.2)
+            return Color.green
         case 60..<80:
-            return Color.yellow.opacity(0.2)
+            return Color.yellow
         case 40..<60:
-            return Color.orange.opacity(0.2)
+            return Color.orange
         default:
-            return Color.red.opacity(0.2)
+            return Color.red
         }
     }
 
@@ -34,13 +34,13 @@ struct ScoreColor {
 
         switch score {
         case 80...100:
-            return Color.green.opacity(0.7)
+            return Color.green
         case 60..<80:
-            return Color.yellow.opacity(0.7)
+            return Color.yellow
         case 40..<60:
-            return Color.orange.opacity(0.7)
+            return Color.orange
         default:
-            return Color.red.opacity(0.7)
+            return Color.red
         }
     }
 }
