@@ -4,6 +4,7 @@ struct FriendsView: View {
     private let userId: UUID
     @StateObject private var friendsVM = FriendsViewModel()
     @State private var displayName: String = ""
+    @State private var showFriendRequests: Bool = false
 
     init(userId: UUID) {
         self.userId = userId
@@ -22,26 +23,37 @@ struct FriendsView: View {
             .toolbar {
                 if SupabaseManager.shared.currentUserId == userId {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink {
-                            FriendRequestsView()
+                        Button {
+                            showFriendRequests = true
                         } label: {
-                            ZStack(alignment: .topTrailing) {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(.systemGray5))
+                                    .frame(width: 36, height: 36)
+
                                 Image(systemName: "person.crop.circle.badge.plus")
-                                    .font(.system(size: 20, weight: .semibold))
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundStyle(.primary)
 
                                 if friendsVM.incomingRequestCount > 0 {
-                                    Text("\(friendsVM.incomingRequestCount)")
-                                        .font(.caption2)
-                                        .foregroundColor(.white)
-                                        .padding(5)
-                                        .background(Color.red)
-                                        .clipShape(Circle())
+                                    Text("\(min(friendsVM.incomingRequestCount, 9))")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(.white)
+                                        .frame(width: 16, height: 16)
+                                        .background(
+                                            Circle().fill(.red)
+                                        )
                                         .offset(x: 10, y: -10)
                                 }
                             }
+                            .contentShape(Circle())
                         }
+                        .buttonStyle(.plain)
                     }
                 }
+            }
+            .navigationDestination(isPresented: $showFriendRequests) {
+                FriendRequestsView()
             }
             .searchable(text: $friendsVM.searchText, prompt: "Search by username")
             .onChange(of: friendsVM.searchText) { _ in
