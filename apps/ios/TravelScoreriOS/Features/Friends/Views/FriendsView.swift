@@ -84,7 +84,11 @@ struct FriendsView: View {
 
     private var contentView: some View {
         List {
-            ForEach(friendsVM.friends) { profile in
+            let data = friendsVM.searchText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+                ? friendsVM.friends
+                : friendsVM.searchResults
+
+            ForEach(data) { profile in
                 NavigationLink(value: profile.id) {
                     HStack(spacing: 14) {
 
@@ -121,7 +125,6 @@ struct FriendsView: View {
                         }
 
                         Spacer()
-                        // ❌ Remove manual chevron — List provides the correct system arrow automatically
                     }
                     .padding(.vertical, 6)
                 }
@@ -130,7 +133,6 @@ struct FriendsView: View {
         .listStyle(.insetGrouped)
         .navigationDestination(for: UUID.self) { destinationUserId in
             ProfileView(userId: destinationUserId)
-                .id(destinationUserId)
         }
     }
 }
