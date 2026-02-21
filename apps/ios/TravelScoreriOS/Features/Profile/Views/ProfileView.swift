@@ -84,15 +84,15 @@ struct ProfileView: View {
         profileVM.profile?.nextDestination
     }
 
-    private var firstName: String {
+    private var firstName: String? {
         let raw = (profileVM.profile?.fullName ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        if raw.isEmpty { return "Profile" }
-        return raw.split(separator: " ").first.map(String.init) ?? "Profile"
+        guard !raw.isEmpty else { return nil }
+        return raw.split(separator: " ").first.map(String.init)
     }
 
     private var navigationTitle: String {
-        "\(firstName)’s Profile"
+        "Profile"
     }
 
 
