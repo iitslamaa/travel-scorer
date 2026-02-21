@@ -90,28 +90,41 @@ struct FriendRequestsView: View {
 
                                 // Accept / Decline
                                 HStack(spacing: 8) {
-                                    Button("Accept") {
+
+                                    Button {
                                         Task {
                                             do {
                                                 try await vm.acceptRequest(from: profile.id)
-                                                print("✅ friendship insert attempted")
                                             } catch {
                                                 print("❌ accept failed:", error)
                                             }
                                             await vm.loadIncomingRequests()
                                             NotificationCenter.default.post(name: .friendshipUpdated, object: nil)
                                         }
+                                    } label: {
+                                        Text("Accept")
+                                            .font(.system(size: 14, weight: .semibold))
                                     }
                                     .buttonStyle(.borderedProminent)
+                                    .controlSize(.small)
+                                    .buttonBorderShape(.capsule)
+                                    .fixedSize()
 
-                                    Button("Decline") {
+                                    Button {
                                         Task {
                                             try? await vm.rejectRequest(from: profile.id)
                                             await vm.loadIncomingRequests()
                                         }
+                                    } label: {
+                                        Text("Decline")
+                                            .font(.system(size: 14, weight: .semibold))
                                     }
                                     .buttonStyle(.bordered)
+                                    .controlSize(.small)
+                                    .buttonBorderShape(.capsule)
+                                    .fixedSize()
                                 }
+                                .fixedSize()
                             }
                             .padding(.vertical, 6)
                         }
