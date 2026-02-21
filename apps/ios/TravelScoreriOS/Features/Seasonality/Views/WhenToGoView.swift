@@ -9,7 +9,12 @@ import Foundation
 import SwiftUI
 
 struct WhenToGoView: View {
-    @StateObject private var viewModel = SeasonalityViewModel()
+    @StateObject private var viewModel: WhenToGoViewModel
+    
+    init(countries: [Country]) {
+        _viewModel = StateObject(wrappedValue: WhenToGoViewModel(countries: countries))
+    }
+    
     @State private var isDrawerOpen: Bool = false
     
     var body: some View {
@@ -19,26 +24,12 @@ struct WhenToGoView: View {
                 
                 monthScroller
                 
-                if viewModel.isLoading {
-                    ProgressView("Loading…")
-                        .padding()
-                } else if let error = viewModel.loadError {
-                    Text(error)
-                        .foregroundColor(.red)
-                        .padding()
-                } else {
-                    content
-                }
+                content
             }
             .padding()
             .navigationTitle("When to Go")
             .navigationBarTitleDisplayMode(.inline)
-            .task {
-                // Load data on first appearance
-                if viewModel.peakCountries.isEmpty && viewModel.shoulderCountries.isEmpty {
-                    viewModel.loadInitial()
-                }
-            }
+            .task { }
             .sheet(isPresented: $isDrawerOpen) {
                 if let selected = viewModel.selectedCountry {
                     NavigationStack {
@@ -66,15 +57,11 @@ struct WhenToGoView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 ForEach(allMonthsMeta) { month in
-                    let isSelected = month.id == viewModel.selectedMonth
+                    let isSelected = month.id == viewModel.selectedMonthIndex
                     Button {
                         isDrawerOpen = false
                         viewModel.selectedCountry = nil
-                        viewModel.selectedMonth = month.id   // 👈 ADD THIS
-
-                        Task {
-                            await viewModel.load(forMonth: month.id)
-                        }
+                        viewModel.selectedMonthIndex = month.id
                     } label: {
                         VStack(spacing: 2) {
                             Text(month.short.uppercased())
@@ -105,13 +92,13 @@ struct WhenToGoView: View {
                     countryListSection(
                         title: "Peak season",
                         note: "Best weather and overall conditions — usually the busiest and priciest.",
-                        countries: viewModel.peakCountries.sorted { ($0.score ?? -1) > ($1.score ?? -1) }
+                        countries: viewModel.peakCountries.sorted { $0.seasonalityScore > $1.seasonalityScore }
                     )
                     
                     countryListSection(
                         title: "Shoulder season",
                         note: "Still good conditions, often fewer crowds and better value.",
-                        countries: viewModel.shoulderCountries.sorted { ($0.score ?? -1) > ($1.score ?? -1) }
+                        countries: viewModel.shoulderCountries.sorted { $0.seasonalityScore > $1.seasonalityScore }
                     )
                 }
             }
@@ -119,14 +106,14 @@ struct WhenToGoView: View {
     }
     
     private var selectedMonthSummary: some View {
-        let monthMeta = allMonthsMeta.first { $0.id == viewModel.selectedMonth }
+        let monthMeta = allMonthsMeta.first { $0.id == viewModel.selectedMonthIndex }
         
         return HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text("Selected month")
                     .font(.caption.bold())
                     .foregroundColor(.secondary)
-                Text(monthMeta?.label ?? "Month \(viewModel.selectedMonth)")
+                Text(monthMeta?.label ?? "Month \(viewModel.selectedMonthIndex)")
                     .font(.subheadline)
             }
             Spacer()
@@ -158,7 +145,7 @@ struct WhenToGoView: View {
     private func countryListSection(
         title: String,
         note: String,
-        countries: [SeasonalityCountry]
+        countries: [WhenToGoItem]
     ) -> some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(title)
@@ -173,7 +160,7 @@ struct WhenToGoView: View {
                     .foregroundColor(.secondary)
             } else {
                 WrapChips(countries: countries) { country in
-                    viewModel.select(country)
+                    viewModel.selectedCountry = country
                     isDrawerOpen = true
                 }
             }
@@ -190,34 +177,20 @@ struct WhenToGoView: View {
 private struct SeasonalityCountryBottomDrawerView: View {
     @Environment(\.dismiss) private var dismiss
 
-    let country: SeasonalityCountry
-
-    // Advisory: map level (1–4) into a 0–100 style score so it fits the same pill UX.
-    // Level 1 -> 100, Level 2 -> 75, Level 3 -> 50, Level 4 -> 25
-    private var advisoryScore: Double? {
-        guard let level = country.advisoryLevel else { return nil }
-        let clamped = min(max(level, 1), 4)
-        return Double(5 - clamped) * 25.0
-    }
-
-    private var advisorySubtitle: String? {
-        guard let level = country.advisoryLevel else { return nil }
-        return "Level \(level)"
-    }
+    let country: WhenToGoItem
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             header
 
-            Text((country.region ?? "").uppercased())
+            Text((country.country.region ?? "").uppercased())
                 .font(.caption)
                 .foregroundStyle(.secondary)
 
             VStack(alignment: .leading, spacing: 10) {
-                scoreRow(title: "Advisory", value: advisoryScore, subtitle: advisorySubtitle)
-                scoreRow(title: "Affordability", value: country.scores?.affordability)
-                scoreRow(title: "Visa ease", value: country.scores?.visaEase)
-                scoreRow(title: "Seasonality", value: country.scores?.seasonality)
+                scoreRow(title: "Advisory", value: Double(country.country.advisoryScore ?? 0))
+                scoreRow(title: "Visa ease", value: Double(country.country.visaEaseScore ?? 0))
+                scoreRow(title: "Seasonality", value: Double(country.seasonalityScore))
             }
             .padding(12)
             .background(.thinMaterial)
@@ -239,13 +212,13 @@ private struct SeasonalityCountryBottomDrawerView: View {
         HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .center, spacing: 10) {
-                    Text(country.name ?? "Unknown")
+                    Text(country.country.name ?? "Unknown")
                         .font(.title2.bold())
 
                     Spacer()
 
                     // Overall score pill next to title
-                    ScorePill(score: country.score ?? 0)
+                    ScorePill(score: country.country.score ?? 0)
                 }
             }
 
