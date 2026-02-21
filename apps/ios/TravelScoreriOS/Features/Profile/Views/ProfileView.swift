@@ -179,7 +179,8 @@ struct ProfileView: View {
                 }
                 .background(
                     NavigationLink(
-                        destination: FriendsListView(),
+                        destination: FriendsListView()
+                            .environmentObject(profileVM),
                         isActive: $navigateToFriends
                     ) {
                         EmptyView()
