@@ -66,14 +66,11 @@ struct WrapChips: View {
             onSelect(country)
         } label: {
             HStack(spacing: 4) {
-                Text((country.country.name ?? country.country.iso2).isEmpty ? country.country.iso2 : (country.country.name ?? country.country.iso2))
+                Text(country.country.name)
                     .font(.caption)
                     .fontWeight(.medium)
-                if let region = country.country.region {
-                    Text(region.uppercased())
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                }
+                    .lineLimit(1)
+                    .truncationMode(.tail)
                 Text(String(country.country.score))
                     .font(.caption2.bold())
                     .padding(.horizontal, 4)
