@@ -74,11 +74,55 @@ extension ProfileViewModel {
             viewedBucketListCountries = bucket
             logPublishedState("after bucket assignment")
 
+            // Reset mutuals before computing
             mutualBucketCountries = []
             mutualTraveledCountries = []
 
             computeOrderedLists()
             logPublishedState("after computeOrderedLists")
+
+            // If viewing a friend, compute mutual country intersections
+            if startingUserId != supabase.currentUserId {
+                if let currentUserId = supabase.currentUserId {
+                    let myTraveled =
+                        try await profileService.fetchTraveledCountries(userId: currentUserId)
+
+                    let myBucket =
+                        try await profileService.fetchBucketListCountries(userId: currentUserId)
+
+                    let normalizedMyTraveled = Set(
+                        myTraveled.map {
+                            $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                        }
+                    )
+
+                    let normalizedMyBucket = Set(
+                        myBucket.map {
+                            $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                        }
+                    )
+
+                    let normalizedViewedTraveled = Set(
+                        viewedTraveledCountries.map {
+                            $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                        }
+                    )
+
+                    let normalizedViewedBucket = Set(
+                        viewedBucketListCountries.map {
+                            $0.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+                        }
+                    )
+
+                    mutualTraveledCountries =
+                        Array(normalizedMyTraveled.intersection(normalizedViewedTraveled))
+
+                    mutualBucketCountries =
+                        Array(normalizedMyBucket.intersection(normalizedViewedBucket))
+
+                    logPublishedState("after mutual computation")
+                }
+            }
 
             guard generation == loadGeneration,
                   self.userId == startingUserId else {
