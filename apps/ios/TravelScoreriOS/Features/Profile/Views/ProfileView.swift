@@ -34,7 +34,7 @@ struct ProfileView: View {
     @EnvironmentObject private var sessionManager: SessionManager
     @EnvironmentObject private var bucketList: BucketListStore
     @EnvironmentObject private var traveled: TraveledStore
-    @EnvironmentObject private var profileVM: ProfileViewModel
+    @StateObject private var profileVM: ProfileViewModel
     @Environment(\.colorScheme) private var colorScheme
 
     private let userId: UUID
@@ -42,7 +42,17 @@ struct ProfileView: View {
     @State private var navigateToFriends = false
 
     init(userId: UUID) {
+        print("🆕 ProfileView INIT for:", userId)
         self.userId = userId
+
+        // ✅ VM is now single-identity (no rebinding / no stale reuse)
+        _profileVM = StateObject(
+            wrappedValue: ProfileViewModel(
+                userId: userId,
+                profileService: ProfileService(supabase: SupabaseManager.shared),
+                friendService: FriendService(supabase: SupabaseManager.shared)
+            )
+        )
     }
 
     // MARK: - Derived State
@@ -52,9 +62,11 @@ struct ProfileView: View {
     private var languages: [String] { profileVM.profile?.languages ?? [] }
     private var friendCount: Int { profileVM.friendCount }
 
-    /// 🚨 CRITICAL FIX: normalize nil → .none
-    private var effectiveRelationshipState: RelationshipState {
-        profileVM.relationshipState ?? .none
+    private var isReadyToRenderProfile: Bool {
+        profileVM.profile?.id == userId &&
+        profileVM.relationshipState != nil &&
+        profileVM.isRelationshipLoading == false &&
+        profileVM.isLoading == false
     }
 
     private var travelModeLabel: String? {
@@ -84,21 +96,16 @@ struct ProfileView: View {
         "\(firstName)’s Profile"
     }
 
-    private var isShowingCorrectProfile: Bool {
-        profileVM.boundUserId == userId &&
-        profileVM.profile?.id == userId &&
-        profileVM.isLoading == false
-    }
 
     var body: some View {
         ZStack {
             Color(.systemBackground).ignoresSafeArea()
 
-            if !isShowingCorrectProfile {
-
-                ProgressView("Loading profile…")
-
-            } else {
+            // 🛡 Strict identity + relationship gate (production-safe)
+            if !isReadyToRenderProfile {
+                ProfileLoadingView()
+                    .transition(.opacity)
+            } else if let relationshipState = profileVM.relationshipState {
 
                 ScrollView {
                     VStack(spacing: 0) {
@@ -107,10 +114,10 @@ struct ProfileView: View {
                             profile: profileVM.profile,
                             username: username,
                             homeCountryCodes: homeCountryCodes,
-                            relationshipState: effectiveRelationshipState,
+                            relationshipState: relationshipState,
                             friendCount: friendCount,
                             onToggleFriend: {
-                                switch effectiveRelationshipState {
+                                switch relationshipState {
                                 case .friends, .requestSent:
                                     showFriendsDrawer = true
                                 case .none:
@@ -122,11 +129,11 @@ struct ProfileView: View {
                         )
 
                         // 🔒 GATE PROFILE CONTENT
-                        if effectiveRelationshipState == .friends ||
-                            effectiveRelationshipState == .selfProfile {
+                        if relationshipState == .friends ||
+                            relationshipState == .selfProfile {
 
                             ProfileInfoSection(
-                                relationshipState: effectiveRelationshipState,
+                                relationshipState: relationshipState,
                                 viewedTraveledCountries: profileVM.viewedTraveledCountries,
                                 viewedBucketListCountries: profileVM.viewedBucketListCountries,
                                 orderedTraveledCountries: profileVM.orderedTraveledCountries,
@@ -146,11 +153,11 @@ struct ProfileView: View {
                     }
                 }
                 .refreshable {
-                    await profileVM.reloadProfile(userId: userId)
+                    Task { await profileVM.reloadProfile() }
                 }
                 .sheet(isPresented: $showFriendsDrawer) {
                     FriendsSection(
-                        relationshipState: effectiveRelationshipState,
+                        relationshipState: relationshipState,
                         friendCount: friendCount,
                         onToggleFriend: {
                             Task {
@@ -181,11 +188,23 @@ struct ProfileView: View {
                 )
             }
         }
+        .id(userId)
         .navigationTitle(navigationTitle)
         .navigationBarTitleDisplayMode(.large)
+        .animation(.easeInOut(duration: 0.25), value: isReadyToRenderProfile)
         
-        .task(id: userId) {
-            profileVM.setUserIdIfNeeded(userId)
+        .onAppear {
+            print("📌 ProfileView onAppear load start for:", userId)
+            Task {
+                await profileVM.loadIfNeeded()
+            }
+        }
+        .onDisappear {
+            print("""
+            🚪 ProfileView onDisappear
+               view.userId: \(userId)
+               vm.objectId: \(ObjectIdentifier(profileVM))
+            """)
         }
     }
 }

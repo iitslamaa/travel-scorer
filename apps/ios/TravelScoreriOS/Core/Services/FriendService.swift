@@ -15,15 +15,23 @@ private struct FriendRow: Decodable {
 @MainActor
 final class FriendService {
 
+    private let instanceId = UUID()
+
     private let supabase: SupabaseManager
 
     init(supabase: SupabaseManager = .shared) {
         self.supabase = supabase
+        print("🧠 FriendService INIT — instance:", instanceId, " supabase:", ObjectIdentifier(supabase))
     }
 
     // MARK: - Friends
 
     func fetchFriends(for userId: UUID) async throws -> [Profile] {
+        let requestId = UUID()
+        let start = Date()
+        print("👥 [FriendService \(instanceId)] fetchFriends START")
+        print("   requestId:", requestId)
+        print("   userId:", userId)
 
         // Query 1: user_id = me (use UUID directly, NOT uuidString)
         let sentResponse: PostgrestResponse<[FriendRow]> = try await supabase.client
@@ -32,6 +40,7 @@ final class FriendService {
             .eq("user_id", value: userId)
             .limit(1000)
             .execute()
+        print("   ✅ [\(requestId)] sentResponse rows:", sentResponse.value.count)
 
         // Query 2: friend_id = me (use UUID directly)
         let receivedResponse: PostgrestResponse<[FriendRow]> = try await supabase.client
@@ -40,6 +49,7 @@ final class FriendService {
             .eq("friend_id", value: userId)
             .limit(1000)
             .execute()
+        print("   ✅ [\(requestId)] receivedResponse rows:", receivedResponse.value.count)
 
         let rows = sentResponse.value + receivedResponse.value
 
@@ -48,6 +58,7 @@ final class FriendService {
         }
 
         if friendIds.isEmpty {
+            print("   🟡 [\(requestId)] friendIds empty → returning []")
             return []
         }
 
@@ -57,10 +68,21 @@ final class FriendService {
             .in("id", values: friendIds)
             .execute()
 
+        let elapsed = Date().timeIntervalSince(start)
+        print("👥 [FriendService \(instanceId)] fetchFriends END")
+        print("   requestId:", requestId)
+        print("   profiles count:", profilesResponse.value.count)
+        print("   elapsed:", String(format: "%.3fs", elapsed))
         return profilesResponse.value
     }
 
     func isFriend(currentUserId: UUID, otherUserId: UUID) async throws -> Bool {
+        let requestId = UUID()
+        let start = Date()
+        print("🤝 [FriendService \(instanceId)] isFriend START")
+        print("   requestId:", requestId)
+        print("   current:", currentUserId)
+        print("   other:", otherUserId)
 
         let filter = "and(user_id.eq.\(currentUserId.uuidString),friend_id.eq.\(otherUserId.uuidString)),and(user_id.eq.\(otherUserId.uuidString),friend_id.eq.\(currentUserId.uuidString))"
 
@@ -71,6 +93,12 @@ final class FriendService {
             .limit(1)
             .execute()
 
+        let elapsed = Date().timeIntervalSince(start)
+        print("🤝 [FriendService \(instanceId)] isFriend END")
+        print("   requestId:", requestId)
+        print("   count:", response.count ?? 0)
+        print("   result:", (response.count ?? 0) > 0)
+        print("   elapsed:", String(format: "%.3fs", elapsed))
         return (response.count ?? 0) > 0
     }
 
@@ -88,6 +116,13 @@ final class FriendService {
     }
 
     func fetchMutualFriends(currentUserId: UUID, otherUserId: UUID) async throws -> [Profile] {
+        let requestId = UUID()
+        let start = Date()
+        print("🔁 [FriendService \(instanceId)] fetchMutualFriends START")
+        print("   requestId:", requestId)
+        print("   current:", currentUserId)
+        print("   other:", otherUserId)
+
         async let currentFriends = fetchFriends(for: currentUserId)
         async let otherFriends = fetchFriends(for: otherUserId)
 
@@ -97,12 +132,19 @@ final class FriendService {
         let currentSet = Set(current.map { $0.id })
         let mutual = other.filter { currentSet.contains($0.id) }
 
+        let elapsed = Date().timeIntervalSince(start)
+        print("🔁 [FriendService \(instanceId)] fetchMutualFriends END")
+        print("   requestId:", requestId)
+        print("   mutual count:", mutual.count)
+        print("   elapsed:", String(format: "%.3fs", elapsed))
         return mutual.sorted { $0.username < $1.username }
     }
 
     // MARK: - Requests
 
     func fetchIncomingRequests(for myUserId: UUID) async throws -> [Profile] {
+        print("📩 [FriendService] fetchIncomingRequests for:", myUserId)
+
         let response: PostgrestResponse<[IncomingRequestJoinedRow]> = try await supabase.client
             .from("friend_requests")
             .select("""
@@ -114,10 +156,16 @@ final class FriendService {
             .eq("status", value: "pending")
             .execute()
 
+        print("📩 [FriendService] incoming requests count:", response.value.count)
         return response.value.map { $0.profile }
     }
 
     func incomingRequestCount(for myUserId: UUID) async throws -> Int {
+        let requestId = UUID()
+        let start = Date()
+        print("🔢 [FriendService \(instanceId)] incomingRequestCount START")
+        print("   requestId:", requestId)
+        print("   userId:", myUserId)
 
         struct RequestIDRow: Decodable { let id: UUID }
 
@@ -129,6 +177,11 @@ final class FriendService {
             .limit(1000)
             .execute()
 
+        let elapsed = Date().timeIntervalSince(start)
+        print("🔢 [FriendService \(instanceId)] incomingRequestCount END")
+        print("   requestId:", requestId)
+        print("   count:", response.value.count)
+        print("   elapsed:", String(format: "%.3fs", elapsed))
         return response.value.count
     }
 
@@ -153,6 +206,7 @@ final class FriendService {
     }
 
     func hasSentRequest(from myUserId: UUID, to otherUserId: UUID) async throws -> Bool {
+        print("📤 [FriendService] hasSentRequest:", myUserId, "→", otherUserId)
 
         struct RequestIDRow: Decodable { let id: UUID }
 
@@ -165,10 +219,12 @@ final class FriendService {
             .limit(1)
             .execute()
 
+        print("📤 [FriendService] hasSentRequest result:", !response.value.isEmpty)
         return !response.value.isEmpty
     }
 
     func sendFriendRequest(from myUserId: UUID, to otherUserId: UUID) async throws {
+        print("📨 [FriendService] sendFriendRequest:", myUserId, "→", otherUserId)
 
         guard myUserId != otherUserId else { return }
 
@@ -192,6 +248,7 @@ final class FriendService {
             .from("friend_requests")
             .insert(payload)
             .execute()
+        print("📨 [FriendService] sendFriendRequest SUCCESS")
     }
 
     func cancelRequest(from myUserId: UUID, to otherUserId: UUID) async throws {
@@ -206,6 +263,7 @@ final class FriendService {
     }
 
     func acceptRequest(myUserId: UUID, from otherUserId: UUID) async throws {
+        print("✅ [FriendService] acceptRequest:", myUserId, "<-", otherUserId)
 
         // Remove pending request
         try await supabase.client
@@ -223,9 +281,11 @@ final class FriendService {
                 "friend_id": otherUserId
             ])
             .execute()
+        print("✅ [FriendService] friendship row inserted")
     }
 
     func rejectRequest(myUserId: UUID, from otherUserId: UUID) async throws {
+        print("❌ [FriendService] rejectRequest:", myUserId, "<-", otherUserId)
 
         try await supabase.client
             .from("friend_requests")
@@ -233,6 +293,11 @@ final class FriendService {
             .eq("sender_id", value: otherUserId)
             .eq("receiver_id", value: myUserId)
             .execute()
+        print("❌ [FriendService] request deleted")
+    }
+
+    deinit {
+        print("💀 FriendService DEINIT — instance:", instanceId)
     }
 }
 

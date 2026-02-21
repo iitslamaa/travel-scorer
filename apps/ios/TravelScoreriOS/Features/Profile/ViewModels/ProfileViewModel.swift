@@ -19,84 +19,101 @@ enum RelationshipState {
 @MainActor
 final class ProfileViewModel: ObservableObject {
     
+    let instanceId = UUID()
+    
     // MARK: - Published state
-    @Published var profile: Profile?
+    @Published var profile: Profile? {
+        didSet {
+            print("📦 [\(instanceId)] profile DID SET →", profile?.id as Any)
+            logPublishedState("profile updated")
+        }
+    }
     @Published var isLoading = false
     @Published var errorMessage: String?
     @Published var isFriend: Bool = false
     @Published var isFriendLoading: Bool = false
     @Published var relationshipState: RelationshipState? = nil
     @Published var isRelationshipLoading: Bool = false
-    @Published var viewedTraveledCountries: Set<String> = []
-    @Published var viewedBucketListCountries: Set<String> = []
+    @Published var viewedTraveledCountries: Set<String> = [] {
+        didSet {
+            print("✈️ [\(instanceId)] traveled DID SET → count:", viewedTraveledCountries.count)
+        }
+    }
+    @Published var viewedBucketListCountries: Set<String> = [] {
+        didSet {
+            print("🪣 [\(instanceId)] bucket DID SET → count:", viewedBucketListCountries.count)
+        }
+    }
     @Published var friendCount: Int = 0
-    @Published var friends: [Profile] = []
+    @Published var friends: [Profile] = [] {
+        didSet {
+            print("👥 [\(instanceId)] friends DID SET → count:", friends.count)
+            logPublishedState("friends updated")
+        }
+    }
     @Published var mutualBucketCountries: [String] = []
     @Published var mutualTraveledCountries: [String] = []
     @Published var pendingRequestCount: Int = 0
     @Published var mutualFriends: [Profile] = []
-    @Published var orderedBucketListCountries: [String] = []
-    @Published var orderedTraveledCountries: [String] = []
+    @Published var orderedBucketListCountries: [String] = [] {
+        didSet {
+            print("📊 [\(instanceId)] orderedBucket DID SET →", orderedBucketListCountries)
+        }
+    }
+    @Published var orderedTraveledCountries: [String] = [] {
+        didSet {
+            print("📊 [\(instanceId)] orderedTraveled DID SET →", orderedTraveledCountries)
+        }
+    }
     
     // MARK: - Dependencies
     let profileService: ProfileService
+    let friendService: FriendService
     let supabase = SupabaseManager.shared
-    let friendService = FriendService()
-    var userId: UUID?
+
+    // ✅ Identity is now immutable (no rebinding)
+    let userId: UUID
+
     var loadTask: Task<Void, Never>?
     var loadGeneration: UUID = UUID()
-    @Published private(set) var boundUserId: UUID?
     
     // MARK: - Init
-    init(profileService: ProfileService) {
+    init(
+        userId: UUID,
+        profileService: ProfileService,
+        friendService: FriendService
+    ) {
+        print("🧠 ProfileViewModel INIT — instance:", instanceId)
+        self.userId = userId
         self.profileService = profileService
-    }
-    
-    // MARK: - User binding
-    
-    func setUserIdIfNeeded(_ newUserId: UUID) {
-        guard userId != newUserId else { return }
-
-        userId = newUserId
-        boundUserId = newUserId
-
-        profile = nil
-        errorMessage = nil
-        viewedTraveledCountries = []
-        viewedBucketListCountries = []
-        mutualBucketCountries = []
-        mutualTraveledCountries = []
-        friends = []
-        mutualFriends = []
-        relationshipState = nil
-        isRelationshipLoading = true
-        isFriend = false
-        isFriendLoading = false
-        friendCount = 0
-
-        loadTask?.cancel()
-
-        let generation = UUID()
-        loadGeneration = generation
-
-        loadTask = Task { [weak self] in
-            await self?.load(generation: generation)
-        }
+        self.friendService = friendService
     }
     
     // MARK: - Pull to Refresh Support
 
     /// Forces a full reload even if the same user is already bound.
     /// This is used by `.refreshable` in ProfileView.
-    func reloadProfile(userId: UUID) async {
-        self.userId = userId
-        boundUserId = userId
+    func reloadProfile() async {
+        print("🔄 [\(instanceId)] reloadProfile called for:", userId)
 
         isLoading = true
         errorMessage = nil
         isRelationshipLoading = true
 
-        loadTask?.cancel()
+        // 🔒 Reset visible state to prevent stale UI flash
+        profile = nil
+        relationshipState = nil
+        friends = []
+        viewedTraveledCountries = []
+        viewedBucketListCountries = []
+        orderedBucketListCountries = []
+        orderedTraveledCountries = []
+        mutualFriends = []
+        mutualBucketCountries = []
+        mutualTraveledCountries = []
+        friendCount = 0
+
+        cancelInFlightWork()
 
         let generation = UUID()
         loadGeneration = generation
@@ -106,7 +123,60 @@ final class ProfileViewModel: ObservableObject {
         }
 
         await loadTask?.value
-
         isLoading = false
+    }
+    
+    // MARK: - Identity-Safe Lifecycle
+
+    func loadIfNeeded() async {
+        guard profile?.id != userId else { return }
+
+        isLoading = true
+        errorMessage = nil
+        isRelationshipLoading = true
+
+        // 🔒 Reset visible state to prevent stale UI flash
+        profile = nil
+        relationshipState = nil
+        friends = []
+        viewedTraveledCountries = []
+        viewedBucketListCountries = []
+        orderedBucketListCountries = []
+        orderedTraveledCountries = []
+        mutualFriends = []
+        mutualBucketCountries = []
+        mutualTraveledCountries = []
+        friendCount = 0
+
+        cancelInFlightWork()
+
+        let generation = UUID()
+        loadGeneration = generation
+
+        loadTask = Task { [weak self] in
+            await self?.load(generation: generation)
+        }
+
+        await loadTask?.value
+        isLoading = false
+    }
+
+    func cancelInFlightWork() {
+        loadTask?.cancel()
+        loadTask = nil
+    }
+    
+    deinit {
+        print("💀 ProfileViewModel DEINIT — instance:", instanceId, "userId:", userId as Any)
+    }
+    
+    func logPublishedState(_ label: String) {
+        print("📡 [\(instanceId)] \(label)")
+        print("   userId:", userId)
+        print("   profile.id:", profile?.id as Any)
+        print("   friends.count:", friends.count)
+        print("   traveled.count:", viewedTraveledCountries.count)
+        print("   bucket.count:", viewedBucketListCountries.count)
+        print("   relationshipState:", relationshipState as Any)
     }
 }

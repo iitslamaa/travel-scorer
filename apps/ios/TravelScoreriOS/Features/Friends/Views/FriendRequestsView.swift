@@ -9,7 +9,6 @@ import SwiftUI
 
 struct FriendRequestsView: View {
     @StateObject private var vm = FriendRequestsViewModel()
-    @EnvironmentObject private var profileVM: ProfileViewModel
 
     var body: some View {
         NavigationStack {
@@ -100,7 +99,6 @@ struct FriendRequestsView: View {
                                                 print("❌ accept failed:", error)
                                             }
                                             await vm.loadIncomingRequests()
-                                            await profileVM.loadPendingRequestCount()
                                             NotificationCenter.default.post(name: .friendshipUpdated, object: nil)
                                         }
                                     }
@@ -110,7 +108,6 @@ struct FriendRequestsView: View {
                                         Task {
                                             try? await vm.rejectRequest(from: profile.id)
                                             await vm.loadIncomingRequests()
-                                            await profileVM.loadPendingRequestCount()
                                         }
                                     }
                                     .buttonStyle(.bordered)

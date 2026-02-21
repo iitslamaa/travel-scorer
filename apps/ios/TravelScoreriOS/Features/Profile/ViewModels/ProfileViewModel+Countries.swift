@@ -59,10 +59,7 @@ extension ProfileViewModel {
     // MARK: - Traveled Toggle
 
     func toggleTraveled(_ countryId: String) async {
-        guard let currentUserId = userId else {
-            print("❌ toggleTraveled: No bound userId")
-            return
-        }
+        let currentUserId = self.userId
 
         let wasVisited = viewedTraveledCountries.contains(countryId)
 

@@ -86,6 +86,7 @@ struct ScoreWorldMapView: View {
 // MARK: - UIKit Map Wrapper
 
 struct ScoreWorldMapRepresentable: UIViewRepresentable {
+    private let instanceId = UUID()
     
     private static var cachedPolygons: [MKOverlay]?
     
@@ -95,6 +96,7 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     @Binding var isLoading: Bool
     
     func makeUIView(context: Context) -> MKMapView {
+        print("🧱 makeUIView — instance:", instanceId)
         let mapView = MKMapView()
         let config = MKStandardMapConfiguration(elevationStyle: .flat)
         mapView.showsBuildings = false
@@ -116,20 +118,6 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
         
         if let polygons = ScoreWorldMapRepresentable.cachedPolygons {
             mapView.addOverlays(polygons)
-            print("🗺️ [Map] Added cached overlays count:", polygons.count)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                let polys = mapView.overlays.compactMap { $0 as? CountryPolygon }
-                print("🗺️ [Map] Current polygon overlays:", polys.count)
-                let france = polys.filter {
-                    let iso = $0.isoCode?.uppercased() ?? ""
-                    let name = $0.countryName?.uppercased() ?? ""
-                    return iso.contains("FR") || name.contains("FRANCE")
-                }
-                print("🇫🇷 [Map] France polygons found:", france.count)
-                if let f = france.first {
-                    print("🇫🇷 [Map] Sample iso=\(f.isoCode ?? "nil") name=\(f.countryName ?? "nil")")
-                }
-            }
             DispatchQueue.main.async {
                 isLoading = false
             }
@@ -139,20 +127,6 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
                 DispatchQueue.main.async {
                     ScoreWorldMapRepresentable.cachedPolygons = polygons
                     mapView.addOverlays(polygons)
-                    print("🗺️ [Map] Added freshly loaded overlays count:", polygons.count)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        let polys = mapView.overlays.compactMap { $0 as? CountryPolygon }
-                        print("🗺️ [Map] Current polygon overlays:", polys.count)
-                        let france = polys.filter {
-                            let iso = $0.isoCode?.uppercased() ?? ""
-                            let name = $0.countryName?.uppercased() ?? ""
-                            return iso.contains("FR") || name.contains("FRANCE")
-                        }
-                        print("🇫🇷 [Map] France polygons found:", france.count)
-                        if let f = france.first {
-                            print("🇫🇷 [Map] Sample iso=\(f.isoCode ?? "nil") name=\(f.countryName ?? "nil")")
-                        }
-                    }
                     withAnimation(.easeInOut(duration: 0.3)) {
                         isLoading = false
                     }
@@ -172,15 +146,13 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: MKMapView, context: Context) {
+        print("🔄 updateUIView — instance:", instanceId)
         // 🔄 Keep coordinator highlights synced with SwiftUI updates
         context.coordinator.updateHighlights(highlightedISOs)
 
         let iso = selectedCountryISO?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .uppercased()
-
-        print("🎯 [updateUIView] raw selectedCountryISO:", selectedCountryISO ?? "nil")
-        print("🎯 [updateUIView] normalized iso:", iso ?? "nil")
 
         guard let iso else { return }
 
@@ -212,8 +184,6 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
                 return false
             }
 
-        print("🎯 [updateUIView] matching polygons count:", matching.count)
-
         guard !matching.isEmpty else {
             print("❌ No polygons found for ISO:", iso)
             return
@@ -223,13 +193,15 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     }
     
     static func dismantleUIView(_ uiView: MKMapView, coordinator: Coordinator) {
+        print("🧹 dismantleUIView called — tearing down MKMapView")
         uiView.delegate = nil
         uiView.removeOverlays(uiView.overlays)
         uiView.gestureRecognizers?.forEach { uiView.removeGestureRecognizer($0) }
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(
+        print("🧭 makeCoordinator — instance:", instanceId)
+        return Coordinator(
             countries: countries,
             highlightedISOs: highlightedISOs,
             selectedCountryISO: $selectedCountryISO
@@ -237,6 +209,7 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     }
     
     class Coordinator: NSObject, MKMapViewDelegate {
+        private let coordinatorId = UUID()
         
         var highlightedISOs: [String]
         var highlightedTokens: Set<String>
@@ -250,6 +223,7 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
             highlightedISOs: [String],
             selectedCountryISO: Binding<String?>
         ) {
+            print("🧠 Coordinator init — id:", coordinatorId)
             self.highlightedISOs = highlightedISOs.map { $0.uppercased() }
 
             var tokens = Set<String>()
@@ -355,10 +329,7 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
 
             lastZoomedISO = iso
 
-            print("🔵 zoomToCountry ISO:", iso ?? "nil")
-
             if iso == "US" || iso == "USA" {
-                print("🇺🇸 Using hardcoded USA fallback region")
                 let center = CLLocationCoordinate2D(latitude: 39.5, longitude: -98.35)
                 let span = MKCoordinateSpan(latitudeDelta: 28.0, longitudeDelta: 60.0)
                 mapView.setRegion(MKCoordinateRegion(center: center, span: span), animated: true)
@@ -506,6 +477,9 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
             }
             
             return UIColor.systemGray.withAlphaComponent(0.15)
+        }
+        deinit {
+            print("💀 Coordinator DEINIT — id:", coordinatorId)
         }
     }
 }

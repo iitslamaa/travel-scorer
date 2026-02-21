@@ -12,15 +12,19 @@ import PostgREST
 @MainActor
 final class ListSyncService {
 
+    private let instanceId = UUID()
+
     private let supabase: SupabaseManager
 
     init(supabase: SupabaseManager) {
         self.supabase = supabase
+        print("🧠 ListSyncService INIT — instance:", instanceId)
     }
 
     // MARK: - Fetch
 
     func fetchBucketList(userId: UUID) async throws -> Set<String> {
+        print("🪣 [ListSync:", instanceId, "] fetchBucketList START for:", userId)
         let rows: [[String: String]] = try await supabase.client
             .from("user_bucket_list")
             .select("country_id")
@@ -28,11 +32,12 @@ final class ListSyncService {
             .execute()
             .value
 
-        print("🧪 fetched bucket from supabase:", rows)
+        print("🪣 [ListSync:", instanceId, "] fetched bucket rows:", rows)
         return Set(rows.compactMap { $0["country_id"] })
     }
 
     func fetchTraveled(userId: UUID) async throws -> Set<String> {
+        print("✈️ [ListSync:", instanceId, "] fetchTraveled START for:", userId)
         let rows: [[String: String]] = try await supabase.client
             .from("user_traveled")
             .select("country_id")
@@ -40,7 +45,7 @@ final class ListSyncService {
             .execute()
             .value
 
-        print("🧪 fetched traveled from supabase:", rows)
+        print("✈️ [ListSync:", instanceId, "] fetched traveled rows:", rows)
         return Set(rows.compactMap { $0["country_id"] })
     }
 
@@ -51,6 +56,7 @@ final class ListSyncService {
         countryId: String,
         add: Bool
     ) async {
+        print("🪣 [ListSync:", instanceId, "] setBucket — user:", userId, "country:", countryId, "add:", add)
         do {
             if add {
                 try await supabase.client
@@ -69,7 +75,7 @@ final class ListSyncService {
                     .execute()
             }
         } catch {
-            print("❌ setBucket failed:", error)
+            print("❌ [ListSync:", instanceId, "] setBucket failed:", error)
         }
     }
 
@@ -78,6 +84,7 @@ final class ListSyncService {
         countryId: String,
         add: Bool
     ) async {
+        print("✈️ [ListSync:", instanceId, "] setTraveled — user:", userId, "country:", countryId, "add:", add)
         do {
             if add {
                 try await supabase.client
@@ -96,7 +103,11 @@ final class ListSyncService {
                     .execute()
             }
         } catch {
-            print("❌ setTraveled failed:", error)
+            print("❌ [ListSync:", instanceId, "] setTraveled failed:", error)
         }
+    }
+
+    deinit {
+        print("💀 ListSyncService DEINIT — instance:", instanceId)
     }
 }

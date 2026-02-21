@@ -12,9 +12,10 @@ struct TravelScoreriOSApp: App {
     @StateObject private var bucketListStore = BucketListStore()
     @StateObject private var traveledStore = TraveledStore()
     @StateObject private var sessionManager: SessionManager
-    @StateObject private var profileViewModel: ProfileViewModel
 
     init() {
+        print("🚀 TravelScoreriOSApp INIT")
+
         let bucket = BucketListStore()
         let traveled = TraveledStore()
 
@@ -28,23 +29,24 @@ struct TravelScoreriOSApp: App {
         _traveledStore = StateObject(wrappedValue: traveled)
         _sessionManager = StateObject(wrappedValue: session)
 
-        // IMPORTANT:
-        // Initialize with a placeholder UUID.
-        // The real userId will be injected once auth resolves.
-        _profileViewModel = StateObject(
-            wrappedValue: ProfileViewModel(
-                profileService: ProfileService(supabase: SupabaseManager.shared)
-            )
-        )
+        print("📦 bucketListStore instance:", ObjectIdentifier(bucket))
+        print("🧳 traveledStore instance:", ObjectIdentifier(traveled))
+        print("🔐 sessionManager instance:", ObjectIdentifier(session))
+        print("   🔎 SupabaseManager shared instance:", ObjectIdentifier(SupabaseManager.shared))
     }
 
     var body: some Scene {
         WindowGroup {
+            let _ = print("🧱 TravelScoreriOSApp BODY — app instance:", ObjectIdentifier(self as AnyObject),
+                          " sessionManager instance:", ObjectIdentifier(sessionManager),
+                          " bucketListStore instance:", ObjectIdentifier(bucketListStore),
+                          " traveledStore instance:", ObjectIdentifier(traveledStore),
+                          " userId:", sessionManager.userId as Any)
+
             AppRootView()
                 .environmentObject(sessionManager)
                 .environmentObject(bucketListStore)
                 .environmentObject(traveledStore)
-                .environmentObject(profileViewModel)
         }
     }
 }

@@ -5,7 +5,10 @@
 //  Created by Lama Yassine on 11/10/25.
 //
 
+
 import SwiftUI
+import Supabase
+import PostgREST
 
 enum SortOrder {
     case ascending
@@ -30,13 +33,15 @@ struct CountryListView: View {
         self.searchText = searchText
     }
 
-    @EnvironmentObject private var profileVM: ProfileViewModel
+    @EnvironmentObject private var sessionManager: SessionManager
 
     @State private var sort: CountrySort = .name
     @State private var sortOrder: SortOrder = .descending
     @State private var countries: [Country] = []
     @State private var visibleCountries: [Country] = []
     @State private var hasLoaded = false
+    @State private var bucketCountryIds: Set<String> = []
+    @State private var traveledCountryIds: Set<String> = []
 
     // Keep a handle to the latest recompute task so we can cancel stale work
     @State private var recomputeTask: Task<Void, Never>?
@@ -147,12 +152,21 @@ struct CountryListView: View {
                 .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                     Button {
                         Task {
-                            await profileVM.toggleBucket(idStr)
-                            flashConfirm(.bucket, for: idStr)
+                            if let userId = sessionManager.userId {
+                                let service = ProfileService(supabase: SupabaseManager.shared)
+                                if bucketCountryIds.contains(idStr) {
+                                    try? await service.removeFromBucketList(userId: userId, countryCode: idStr)
+                                    bucketCountryIds.remove(idStr)
+                                } else {
+                                    try? await service.addToBucketList(userId: userId, countryCode: idStr)
+                                    bucketCountryIds.insert(idStr)
+                                }
+                                flashConfirm(.bucket, for: idStr)
+                            }
                         }
                     } label: {
                         Text(
-                            profileVM.viewedBucketListCountries.contains(idStr)
+                            bucketCountryIds.contains(idStr)
                             ? "🪣 Unbucket"
                             : "🪣 Bucket"
                         )
@@ -161,12 +175,29 @@ struct CountryListView: View {
 
                     Button {
                         Task {
-                            await profileVM.toggleTraveled(idStr)
-                            flashConfirm(.visited, for: idStr)
+                            if let userId = sessionManager.userId {
+                                let client = SupabaseManager.shared.client
+                                if traveledCountryIds.contains(idStr) {
+                                    try? await client
+                                        .from("user_traveled")
+                                        .delete()
+                                        .eq("user_id", value: userId.uuidString)
+                                        .eq("country_id", value: idStr)
+                                        .execute()
+                                    traveledCountryIds.remove(idStr)
+                                } else {
+                                    try? await client
+                                        .from("user_traveled")
+                                        .insert(["user_id": userId.uuidString, "country_id": idStr])
+                                        .execute()
+                                    traveledCountryIds.insert(idStr)
+                                }
+                                flashConfirm(.visited, for: idStr)
+                            }
                         }
                     } label: {
                         Text(
-                            profileVM.viewedTraveledCountries.contains(idStr)
+                            traveledCountryIds.contains(idStr)
                             ? "📝 Unvisit"
                             : "📝 Visited"
                         )
@@ -238,6 +269,17 @@ struct CountryListView: View {
                 scheduleRecomputeVisible()
                 return
             }
+
+            // Fetch identity-scoped bucket + traveled state
+            if let userId = sessionManager.userId {
+                let service = ProfileService(supabase: SupabaseManager.shared)
+                if let bucket = try? await service.fetchBucketListCountries(userId: userId) {
+                    bucketCountryIds = bucket
+                }
+                if let traveled = try? await service.fetchTraveledCountries(userId: userId) {
+                    traveledCountryIds = traveled
+                }
+            }
         }
         // Recompute visible list when inputs change
         .onChange(of: searchText) { _, _ in
@@ -271,5 +313,4 @@ extension View {
 
 #Preview {
     CountryListView(showsSearchBar: true, searchText: "")
-        .environmentObject(BucketListStore())
 }
