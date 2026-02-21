@@ -9,7 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.lamayassine.travelaf",
+      "config": {
+        "googleMapsApiKey": "AIzaSyCqrhA7YntcVFd76qoOdAihIimHy8wTzVo"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -18,8 +22,12 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCqrhA7YntcVFd76qoOdAihIimHy8wTzVo"
+        }
+      },
+      "package": "com.lamayassine.travelaf"
     },
     "web": {
       "output": "static",
