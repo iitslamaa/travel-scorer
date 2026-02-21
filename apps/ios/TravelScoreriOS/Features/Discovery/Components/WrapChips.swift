@@ -59,8 +59,8 @@ struct WrapChips: View {
     }
     
     private func chip(for country: WhenToGoItem) -> some View {
-        let bg = scoreBackground(Double(country.seasonalityScore))
-        let fg = scoreTone(Double(country.seasonalityScore))
+        let bg = scoreBackground(Double(country.country.score))
+        let fg = scoreTone(Double(country.country.score))
         
         return Button {
             onSelect(country)
@@ -74,7 +74,7 @@ struct WrapChips: View {
                         .font(.caption2)
                         .foregroundColor(.secondary)
                 }
-                Text(String(country.seasonalityScore))
+                Text(String(country.country.score))
                     .font(.caption2.bold())
                     .padding(.horizontal, 4)
                     .padding(.vertical, 2)
