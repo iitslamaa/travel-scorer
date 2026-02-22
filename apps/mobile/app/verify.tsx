@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#F8F8F8',
   },
   inner: {
     padding: 24,
@@ -89,20 +88,22 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: '700',
     marginBottom: 8,
+    color: 'white',
   },
   subtitle: {
     fontSize: 15,
-    color: '#666',
+    color: 'rgba(255,255,255,0.8)',
     marginBottom: 32,
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: 12,
     padding: 16,
     fontSize: 18,
     letterSpacing: 6,
     textAlign: 'center',
     marginBottom: 24,
+    color: 'white',
   },
   button: {
     backgroundColor: 'black',

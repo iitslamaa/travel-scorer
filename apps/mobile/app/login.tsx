@@ -54,7 +54,7 @@ export default function LoginScreen() {
           style={styles.input}
           autoCapitalize="none"
           keyboardType="email-address"
-          placeholderTextColor="#999"
+          placeholderTextColor="rgba(255,255,255,0.6)"
         />
 
         <Pressable
@@ -79,7 +79,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#F8F8F8',
   },
   inner: {
     padding: 24,
@@ -88,13 +87,15 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: '600',
     marginBottom: 24,
+    color: 'white',
   },
   input: {
-    backgroundColor: 'white',
+    backgroundColor: 'rgba(255,255,255,0.15)',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     marginBottom: 16,
+    color: 'white',
   },
   button: {
     backgroundColor: 'black',
@@ -110,6 +111,6 @@ const styles = StyleSheet.create({
   link: {
     textAlign: 'center',
     marginTop: 16,
-    color: '#666',
+    color: 'rgba(255,255,255,0.8)',
   },
 });
