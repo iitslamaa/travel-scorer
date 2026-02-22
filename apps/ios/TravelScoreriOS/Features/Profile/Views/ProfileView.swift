@@ -64,7 +64,6 @@ struct ProfileView: View {
 
     private var isReadyToRenderProfile: Bool {
         profileVM.profile?.id == userId &&
-        profileVM.isRelationshipLoading == false &&
         profileVM.isLoading == false
     }
 
@@ -153,7 +152,7 @@ struct ProfileView: View {
                     }
                 }
                 .refreshable {
-                    Task { await profileVM.reloadProfile() }
+                    await profileVM.reloadProfile()
                 }
                 .sheet(isPresented: $showFriendsDrawer) {
                     FriendsSection(

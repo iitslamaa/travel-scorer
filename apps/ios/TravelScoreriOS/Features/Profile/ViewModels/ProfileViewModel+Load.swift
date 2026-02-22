@@ -19,8 +19,16 @@ extension ProfileViewModel {
         print("   current loadGeneration:", loadGeneration)
         print("   userId at start:", startingUserId)
 
-        isLoading = true
-        defer { isLoading = false }
+        // Only show full-screen loading during initial load,
+        // NOT during pull-to-refresh.
+        if !isRefreshing {
+            isLoading = true
+        }
+        defer {
+            if !isRefreshing {
+                isLoading = false
+            }
+        }
         errorMessage = nil
 
         do {
@@ -132,6 +140,7 @@ extension ProfileViewModel {
 
             isRelationshipLoading = true
             try await refreshRelationshipState()
+            isRelationshipLoading = false
             logPublishedState("after refreshRelationshipState")
 
             guard generation == loadGeneration,

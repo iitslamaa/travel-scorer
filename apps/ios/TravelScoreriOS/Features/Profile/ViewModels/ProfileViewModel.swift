@@ -34,6 +34,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var isFriendLoading: Bool = false
     @Published var relationshipState: RelationshipState = .none
     @Published var isRelationshipLoading: Bool = false
+    @Published var isRefreshing: Bool = false
     @Published var viewedTraveledCountries: Set<String> = [] {
         didSet {
             print("✈️ [\(instanceId)] traveled DID SET → count:", viewedTraveledCountries.count)
@@ -96,22 +97,8 @@ final class ProfileViewModel: ObservableObject {
     func reloadProfile() async {
         print("🔄 [\(instanceId)] reloadProfile called for:", userId)
 
-        isLoading = true
+        isRefreshing = true
         errorMessage = nil
-        isRelationshipLoading = true
-
-        // 🔒 Reset visible state to prevent stale UI flash
-        profile = nil
-        relationshipState = .none
-        friends = []
-        viewedTraveledCountries = []
-        viewedBucketListCountries = []
-        orderedBucketListCountries = []
-        orderedTraveledCountries = []
-        mutualFriends = []
-        mutualBucketCountries = []
-        mutualTraveledCountries = []
-        friendCount = 0
 
         cancelInFlightWork()
 
@@ -123,8 +110,8 @@ final class ProfileViewModel: ObservableObject {
         }
 
         await loadTask?.value
-        isRelationshipLoading = false
-        isLoading = false
+
+        isRefreshing = false
     }
     
     // MARK: - Identity-Safe Lifecycle
