@@ -655,10 +655,10 @@
 		170C22742F479DBA0090BA78 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				17EC41DC2F4BB1DB004B80DA /* ScoreWorldMap */,
 				170C21172F4790E00090BA78 /* ScoreCountryDrawerView.swift */,
 				170C21062F4790E00090BA78 /* FlagWithTooltip.swift */,
 				170C21252F4790E00090BA78 /* WrapChips.swift */,
-				170C21182F4790E00090BA78 /* ScoreWorldMapView.swift */,
 			);
 			path = Components;
 			sourceTree = "<group>";
@@ -775,6 +775,14 @@
 				17AFEC8A2EC2C3D800B9585B /* TravelScoreriOS.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		17EC41DC2F4BB1DB004B80DA /* ScoreWorldMap */ = {
+			isa = PBXGroup;
+			children = (
+				170C21182F4790E00090BA78 /* ScoreWorldMapView.swift */,
+			);
+			path = ScoreWorldMap;
 			sourceTree = "<group>";
 		};
 		17F063862F32747D00F1F4F3 /* Frameworks */ = {
@@ -1088,7 +1096,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TravelScorerIOS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = SVZL633CJV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -1124,7 +1132,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = TravelScorerIOS.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = SVZL633CJV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
