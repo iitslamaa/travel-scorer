@@ -91,7 +91,8 @@ export default function DiscoveryScreen() {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'center',
+                    justifyContent: 'space-between',
+                    paddingHorizontal: 16,
                   }}
                 >
                   {/* Segmented Control */}
@@ -100,8 +101,9 @@ export default function DiscoveryScreen() {
                       flexDirection: 'row',
                       backgroundColor: '#F2F2F7',
                       borderRadius: 24,
-                      width: width * 0.7,
+                      flex: 1,
                       padding: 4,
+                      marginRight: 12,
                     }}
                   >
                     <Pressable
@@ -150,6 +152,21 @@ export default function DiscoveryScreen() {
                       </Text>
                     </Pressable>
                   </View>
+
+                  {/* World Map Button */}
+                  <Pressable
+                    onPress={() => router.push('/score-map')}
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      backgroundColor: '#111',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Text style={{ color: 'white', fontSize: 20 }}>🗺</Text>
+                  </Pressable>
                 </View>
               </View>
             }
