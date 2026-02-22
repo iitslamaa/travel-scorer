@@ -8,9 +8,12 @@ import {
   UIManager,
   Platform,
   useColorScheme,
+  FlatList,
 } from 'react-native';
 import CountryFlag from 'react-native-country-flag';
 import { Ionicons } from '@expo/vector-icons';
+
+import { WorldMap } from '../../src/features/map/components/WorldMap';
 
 if (Platform.OS === 'android') {
   UIManager.setLayoutAnimationEnabledExperimental?.(true);
@@ -26,6 +29,7 @@ export default function CollapsibleCountrySection({
   countries = [],
 }: Props) {
   const [expanded, setExpanded] = useState(true);
+  const [selectedIso, setSelectedIso] = useState<string | null>(null);
   const scheme = useColorScheme();
   const isDark = scheme === 'dark';
 
@@ -69,7 +73,7 @@ export default function CollapsibleCountrySection({
           </Text>
         </View>
 
-        <Text style={[styles.count, { color: mutedColor }]}>
+        <Text style={[styles.count, { color: mutedColor }]}> 
           {sortedCountries.length}
         </Text>
       </Pressable>
@@ -77,20 +81,42 @@ export default function CollapsibleCountrySection({
       {expanded && (
         <View style={styles.content}>
           {sortedCountries.length === 0 ? (
-            <Text style={[styles.emptyText, { color: mutedColor }]}>
+            <Text style={[styles.emptyText, { color: mutedColor }]}> 
               No countries yet
             </Text>
           ) : (
-            <View style={styles.flagsRow}>
-              {sortedCountries.map((code, index) => (
-                <CountryFlag
-                  key={`${code}-${index}`}
-                  isoCode={code}
-                  size={26}
-                  style={styles.flag}
+            <>
+              <FlatList
+                data={sortedCountries}
+                horizontal
+                keyExtractor={(item, index) => `${item}-${index}`}
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.flagsList}
+                renderItem={({ item }) => {
+                  const isSelected = selectedIso === item;
+
+                  return (
+                    <Pressable
+                      onPress={() => setSelectedIso(item)}
+                      style={[
+                        styles.flagWrapper,
+                        isSelected && styles.flagSelected,
+                      ]}
+                    >
+                      <CountryFlag isoCode={item} size={26} />
+                    </Pressable>
+                  );
+                }}
+              />
+
+              <View style={styles.mapContainer}>
+                <WorldMap
+                  countries={sortedCountries}
+                  selectedIso={selectedIso}
+                  onSelect={(iso) => setSelectedIso(iso)}
                 />
-              ))}
-            </View>
+              </View>
+            </>
           )}
         </View>
       )}
@@ -127,15 +153,24 @@ const styles = StyleSheet.create({
   content: {
     marginTop: 14,
   },
-  flagsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  flag: {
-    marginRight: 10,
-    marginBottom: 10,
-  },
   emptyText: {
     fontSize: 14,
+  },
+  mapContainer: {
+    height: 250,
+    marginTop: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  flagsList: {
+    paddingVertical: 4,
+  },
+  flagWrapper: {
+    marginRight: 12,
+    padding: 6,
+    borderRadius: 12,
+  },
+  flagSelected: {
+    backgroundColor: '#FACC15',
   },
 });

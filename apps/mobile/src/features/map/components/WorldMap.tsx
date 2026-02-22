@@ -35,12 +35,21 @@ function extractPolygons(feature: any): LatLng[][] {
   return [];
 }
 
-export function WorldMap() {
+ type WorldMapProps = {
+  countries?: string[];
+  selectedIso?: string | null;
+  onSelect?: (iso: string) => void;
+};
+
+export function WorldMap({
+  countries = [],
+  selectedIso,
+  onSelect,
+}: WorldMapProps) {
   const { features } = useGeoJson();
 
   const mapRef = useRef<MapView | null>(null);
   const [isMapReady, setIsMapReady] = useState(false);
-  const [selectedIso, setSelectedIso] = useState<string | null>(null);
 
   const polygons = useMemo(() => {
     return features.flatMap((feature: any, featureIndex: number) => {
@@ -62,7 +71,12 @@ export function WorldMap() {
     });
   }, [features]);
 
-  const polygonsForFit = polygons;
+  const polygonsForFit = useMemo(() => {
+    if (!countries || countries.length === 0) return [];
+
+    const upper = countries.map((c) => c.toUpperCase());
+    return polygons.filter((p) => upper.includes(p.iso));
+  }, [countries, polygons]);
 
   useEffect(() => {
     console.log('Geo features:', features.length);
@@ -70,7 +84,7 @@ export function WorldMap() {
 
     if (!isMapReady) return;
 
-    const target = polygonsForFit.length > 0 ? polygonsForFit : polygons;
+    const target = polygonsForFit.length > 0 ? polygonsForFit : [];
     if (target.length === 0) return;
 
     const allCoords: LatLng[] = [];
@@ -85,32 +99,16 @@ export function WorldMap() {
         animated: false,
       });
     }, 0);
-  }, [features.length, polygons.length, polygonsForFit, polygons, isMapReady]);
+  }, [polygonsForFit, isMapReady]);
 
   useEffect(() => {
     if (!isMapReady) return;
+    if (!selectedIso) return;
 
-    // If nothing selected → reset to world view
-    if (!selectedIso) {
-      if (polygons.length === 0) return;
+    const selected = polygonsForFit.filter(
+      (p) => p.iso === selectedIso
+    );
 
-      const allCoords: LatLng[] = [];
-      for (const ring of polygons) {
-        allCoords.push(...ring.coords);
-      }
-
-      setTimeout(() => {
-        mapRef.current?.fitToCoordinates(allCoords, {
-          edgePadding: { top: 40, right: 40, bottom: 40, left: 40 },
-          animated: true,
-        });
-      }, 0);
-
-      return;
-    }
-
-    // Zoom to selected country
-    const selected = polygons.filter((p) => p.iso === selectedIso);
     if (selected.length === 0) return;
 
     const coords: LatLng[] = [];
@@ -124,7 +122,7 @@ export function WorldMap() {
         animated: true,
       });
     }, 0);
-  }, [selectedIso, isMapReady, polygons]);
+  }, [selectedIso, isMapReady, polygonsForFit]);
 
   return (
     <View style={{ flex: 1 }}>
@@ -142,7 +140,7 @@ export function WorldMap() {
           longitudeDelta: 60,
         }}
       >
-        {polygons.map((item) => {
+        {polygonsForFit.map((item) => {
           const { key, iso, coords } = item;
           return (
             <CountryPolygon
@@ -154,8 +152,7 @@ export function WorldMap() {
                 selectedIso: selectedIso ?? undefined,
               })}
               onPress={(iso) => {
-                console.log('Pressed:', iso);
-                setSelectedIso((prev) => (prev === iso ? null : iso));
+                onSelect?.(iso);
               }}
             />
           );
