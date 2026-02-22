@@ -23,46 +23,30 @@ struct FriendsView: View {
             .toolbar {
                 if SupabaseManager.shared.currentUserId == userId {
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        HStack(spacing: 12) {
-                            Button {
-                                Task {
-                                    await friendsVM.loadFriends(for: userId, forceRefresh: true)
-
-                                    if SupabaseManager.shared.currentUserId == userId {
-                                        await friendsVM.loadIncomingRequestCount()
-                                    }
-                                }
-                            } label: {
-                                Image(systemName: "arrow.clockwise")
-                                    .font(.system(size: 16, weight: .semibold))
+                        Button {
+                            showFriendRequests = true
+                        } label: {
+                            ZStack {
+                                Circle()
+                                    .fill(Color(.systemGray5))
                                     .frame(width: 36, height: 36)
-                                    .background(Circle().fill(Color(.systemGray5)))
-                            }
-                            .buttonStyle(.plain)
 
-                            Button { showFriendRequests = true } label: {
-                                ZStack {
-                                    Circle()
-                                        .fill(Color(.systemGray5))
-                                        .frame(width: 36, height: 36)
+                                Image(systemName: "person.crop.circle.badge.plus")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundStyle(.primary)
 
-                                    Image(systemName: "person.crop.circle.badge.plus")
-                                        .font(.system(size: 18, weight: .semibold))
-                                        .foregroundStyle(.primary)
-
-                                    if friendsVM.incomingRequestCount > 0 {
-                                        Text("\(min(friendsVM.incomingRequestCount, 9))")
-                                            .font(.system(size: 10, weight: .bold))
-                                            .foregroundStyle(.white)
-                                            .frame(width: 16, height: 16)
-                                            .background(Circle().fill(.red))
-                                            .offset(x: 10, y: -10)
-                                    }
+                                if friendsVM.incomingRequestCount > 0 {
+                                    Text("\(min(friendsVM.incomingRequestCount, 9))")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundStyle(.white)
+                                        .frame(width: 16, height: 16)
+                                        .background(Circle().fill(.red))
+                                        .offset(x: 10, y: -10)
                                 }
-                                .contentShape(Circle())
                             }
-                            .buttonStyle(.plain)
+                            .contentShape(Circle())
                         }
+                        .buttonStyle(.plain)
                     }
                 }
             }
