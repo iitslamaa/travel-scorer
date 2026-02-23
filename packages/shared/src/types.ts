@@ -32,6 +32,8 @@ export type CountryFacts = {
   seasonality?: number;
   visaEase?: number;
   affordability?: number;
+  affordabilityCategory?: number; // 1 (cheapest) .. 10 (most expensive)
+  affordabilityBand?: 'good' | 'warn' | 'bad' | 'danger';
   directFlight?: number;
   infrastructure?: number;
 

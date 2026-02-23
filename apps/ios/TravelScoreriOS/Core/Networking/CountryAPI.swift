@@ -102,6 +102,9 @@ enum CountryAPI {
                 dailySpendHotelUsd: dto.dailySpendHotelUsd,
                 dailySpendFoodUsd: dto.dailySpendFoodUsd,
                 dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd,
+                affordabilityCategory: dto.affordabilityCategory,
+                affordabilityScore: dto.affordabilityScore,
+                affordabilityBand: dto.affordabilityBand,
                 travelSafeScore: dto.travelSafeScore
             )
         }
@@ -147,6 +150,9 @@ extension CountryAPI {
                     dailySpendHotelUsd: dto.dailySpendHotelUsd,
                     dailySpendFoodUsd: dto.dailySpendFoodUsd,
                     dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd,
+                    affordabilityCategory: dto.affordabilityCategory,
+                    affordabilityScore: dto.affordabilityScore,
+                    affordabilityBand: dto.affordabilityBand,
                     travelSafeScore: dto.travelSafeScore
                 )
             }
@@ -223,6 +229,8 @@ extension CountryAPI {
                     dailySpendHotelUsd: dto.dailySpendHotelUsd,
                     dailySpendFoodUsd: dto.dailySpendFoodUsd,
                     dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd,
+                    affordabilityCategory: dto.affordabilityCategory,
+                    affordabilityScore: dto.affordabilityScore,
                     travelSafeScore: dto.travelSafeScore
                 )
             }

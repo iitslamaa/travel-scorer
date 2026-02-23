@@ -68,6 +68,7 @@ type FactsExtraServer = Partial<CountryFacts> & {
   // server-computed affordability details
   averageDailyCostUsd?: number;    // per-person daily cost in USD
   affordabilityCategory?: number;  // 1 (cheapest) .. 10 (most expensive)
+  affordabilityBand?: 'good' | 'warn' | 'bad' | 'danger';  // centralized UI band
 
   // server-computed total
   scoreTotal?: number;
@@ -193,21 +194,6 @@ function advisoryToScore(level?: 1|2|3|4) {
   if (!level) return 50; // neutral when missing
   return ((5 - level) / 4) * 100;
 }
-function affordabilityFromFacts(f: Partial<CountryFacts>): number | undefined {
-  const fx = f as FactsExtraServer;
-  const col = toNum(fx.costOfLivingIndex);
-  const food = toNum(fx.foodCostIndex);
-  const gdp  = toNum(fx.gdpPerCapitaUsd);
-  const fxr  = toNum(fx.fxLocalPerUSD ?? fx.localPerUSD ?? fx.usdToLocalRate);
-  const parts: number[] = [];
-  if (col != null) parts.push(scale100(col, 30, 120, true));
-  if (food != null) parts.push(scale100(food, 20, 200, true));
-  if (gdp != null) parts.push(scale100(gdp, 2000, 80000, true));
-  if (fxr != null)  parts.push(scale100(fxr, 0.2, 400, false));
-  if (!parts.length) return 50; // neutral baseline
-  return Math.round(parts.reduce((a,b)=>a+b,0) / parts.length);
-}
-
 function extractAverageDailyCostUsd(fx: FactsExtraServer): number | undefined {
   const spend = fx.dailySpend as unknown as {
     totalUsd?: number;
@@ -233,26 +219,26 @@ function extractAverageDailyCostUsd(fx: FactsExtraServer): number | undefined {
   return parts.reduce((a, b) => a + b, 0);
 }
 
-function costToAffordabilityCategory(costUsd: number, minCostUsd: number, maxCostUsd: number): number {
-  if (!Number.isFinite(costUsd)) return 0;
-  const range = maxCostUsd - minCostUsd;
-  if (range <= 0) return 5;
+function affordabilityBandFromCategory(
+  category?: number
+): 'good' | 'warn' | 'bad' | 'danger' | undefined {
+  if (category == null) return undefined;
 
-  let t = (costUsd - minCostUsd) / range; // 0..1
-  if (t < 0) t = 0;
-  if (t >= 1) t = 0.999999;
+  // 1–3 = cheapest → green (good)
+  if (category >= 1 && category <= 3) return 'good';
 
-  const idx = Math.floor(t * 10); // 0..9
-  return idx + 1;                 // 1..10
+  // 4–5 → yellow
+  if (category >= 4 && category <= 5) return 'warn';
+
+  // 6–7 → orange
+  if (category >= 6 && category <= 7) return 'bad';
+
+  // 8–10 → red (most expensive)
+  if (category >= 8 && category <= 10) return 'danger';
+
+  return undefined;
 }
 
-function affordabilityScoreFromCategory(category: number): number {
-  if (!Number.isFinite(category)) return 50;
-  if (category < 1) category = 1;
-  if (category > 10) category = 10;
-  // Cheap (1) -> 100, Expensive (10) -> 10
-  return (11 - category) * 10;
-}
 
 // Best-effort optional JSON imports (files may not exist in all demos)
 // We read JSON directly from the filesystem so this works reliably in Node/Next.
@@ -289,6 +275,7 @@ export async function GET() {
   const envBase = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/+$/, '');
   const proto = vercel ? 'https' : (h.get('x-forwarded-proto') ?? (host.includes('localhost') ? 'http' : 'https'));
   const base = envBase || (host ? `${proto}://${host}` : '');
+
 
   // --- Fetch user-specific score weights from Supabase (if authenticated)
   let userWeights = DEFAULT_WEIGHTS;
@@ -556,8 +543,6 @@ export async function GET() {
 
     const todayMonth = new Date().getMonth() + 1; // 1..12
 
-    const affordabilityCostsUsd: number[] = [];
-    
     for (const row of merged) {
       const keyUpper = row.iso2.toUpperCase();
       const facts = factsByIso2[keyUpper] ?? factsByIso2[row.iso2] ?? undefined;
@@ -608,6 +593,15 @@ export async function GET() {
       if (themesMap[keyUpper]?.length) extra.redditThemes = themesMap[keyUpper];
 
       row.facts = facts ? { ...facts, ...extra } as CountryFacts : (extra as CountryFacts);
+
+      try {
+        const fxFacts = row.facts as unknown as FactsExtraServer;
+        const { total } = buildRows(
+          row.facts as CountryFacts,
+          userWeights
+        );
+        fxFacts.scoreTotal = total;
+      } catch {}
 
 
       // --- Compute daily spend (hotel traveler) from provider (preferred), fallback to estimator
@@ -679,46 +673,6 @@ export async function GET() {
           fxFacts.seasonality = todayScore;
         }
       } catch {}
-
-      // --- Compute average daily cost in USD for affordability buckets
-      try {
-        const fxFacts = row.facts as unknown as FactsExtraServer;
-        const avgCostUsd = extractAverageDailyCostUsd(fxFacts);
-        if (avgCostUsd != null && Number.isFinite(avgCostUsd)) {
-          fxFacts.averageDailyCostUsd = avgCostUsd;
-          affordabilityCostsUsd.push(avgCostUsd);
-        }
-      } catch {}
-    }
-    // Second pass: turn averageDailyCostUsd into affordability buckets and scores
-    try {
-      if (affordabilityCostsUsd.length >= 2) {
-        const minCostUsd = Math.min(...affordabilityCostsUsd);
-        const maxCostUsd = Math.max(...affordabilityCostsUsd);
-
-        for (const row of merged) {
-          const fxFacts = row.facts as unknown as FactsExtraServer;
-          const cost = fxFacts?.averageDailyCostUsd;
-          if (typeof cost !== 'number' || !Number.isFinite(cost)) continue;
-
-          const category = costToAffordabilityCategory(cost, minCostUsd, maxCostUsd);
-          const score = affordabilityScoreFromCategory(category);
-
-          fxFacts.affordabilityCategory = category;
-          fxFacts.affordability = score;
-
-          // compute and store canonical total using 4-factor domain scorer
-          try {
-            const { total } = buildRows(
-              row.facts as CountryFacts,
-              userWeights
-            );
-            fxFacts.scoreTotal = total;
-          } catch {}
-        }
-      }
-    } catch (err) {
-      console.warn('[countries] failed to compute affordability buckets:', err);
     }
 
     if (merged.length) {

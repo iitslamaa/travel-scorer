@@ -113,6 +113,7 @@
 		17F063832F32732F00F1F4F3 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063822F32732F00F1F4F3 /* AuthViewModel.swift */; };
 		17F063852F32734800F1F4F3 /* EmailAuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063842F32734800F1F4F3 /* EmailAuthView.swift */; };
 		17F063882F32747D00F1F4F3 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 17F063872F32747D00F1F4F3 /* Supabase */; };
+		17F2E1602F4C3C27009A7E6D /* CountryScoreSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F2E15F2F4C3C27009A7E6D /* CountryScoreSection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -224,6 +225,7 @@
 		17F063802F32730600F1F4F3 /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
 		17F063822F32732F00F1F4F3 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
 		17F063842F32734800F1F4F3 /* EmailAuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EmailAuthView.swift; sourceTree = "<group>"; };
+		17F2E15F2F4C3C27009A7E6D /* CountryScoreSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryScoreSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -628,6 +630,7 @@
 			isa = PBXGroup;
 			children = (
 				170C20C12F4790E00090BA78 /* CountryDetailView.swift */,
+				17F2E15F2F4C3C27009A7E6D /* CountryScoreSection.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -988,6 +991,7 @@
 				170C21762F4790E00090BA78 /* WhenToGoModels.swift in Sources */,
 				170C21772F4790E00090BA78 /* WhenToGoView.swift in Sources */,
 				170C227F2F47A9880090BA78 /* ScorePill.swift in Sources */,
+				17F2E1602F4C3C27009A7E6D /* CountryScoreSection.swift in Sources */,
 				170C21782F4790E00090BA78 /* WhenToGoViewModel.swift in Sources */,
 				170C21792F4790E00090BA78 /* WorldGeoJSONLoader.swift in Sources */,
 				170C217A2F4790E00090BA78 /* WorldMapView.swift in Sources */,

@@ -48,6 +48,14 @@ struct CountryDTO: Decodable {
     let dailySpendFoodUsd: Double?
     let dailySpendActivitiesUsd: Double?
 
+    /// Canonical affordability (1–10 bucket from backend)
+    let affordabilityCategory: Int?
+    /// Canonical affordability score (0–100, derived server-side)
+    let affordabilityScore: Int?
+    /// Canonical affordability band from backend ("good" | "warn" | "bad" | "danger")
+    let affordabilityBand: String?
+
+
     var advisoryLevelText: String? {
         advisoryLevelNumber.map { "Level \($0)" }
     }
@@ -111,6 +119,12 @@ struct CountryDTO: Decodable {
         // affordability / daily spend
         let dailySpend: DailySpend?
 
+        // canonical affordability (from Supabase)
+        let affordabilityCategory: Int?
+        let affordability: Double?
+        let affordabilityBand: String?
+
+
         private enum CodingKeys: String, CodingKey {
             case scoreTotal
             case travelSafeOverall
@@ -128,6 +142,9 @@ struct CountryDTO: Decodable {
             case visaNotes
             case visaSource
             case dailySpend
+            case affordabilityCategory
+            case affordability
+            case affordabilityBand
         }
 
         init(from decoder: Decoder) throws {
@@ -159,6 +176,17 @@ struct CountryDTO: Decodable {
             visaSource = try? c.decode(String.self, forKey: .visaSource)
 
             dailySpend = try? c.decode(DailySpend.self, forKey: .dailySpend)
+
+            affordabilityCategory = try? c.decode(Int.self, forKey: .affordabilityCategory)
+
+            if let d = try? c.decode(Double.self, forKey: .affordability) {
+                affordability = d
+            } else if let i = try? c.decode(Int.self, forKey: .affordability) {
+                affordability = Double(i)
+            } else {
+                affordability = nil
+            }
+            affordabilityBand = try? c.decode(String.self, forKey: .affordabilityBand)
         }
     }
 
@@ -326,6 +354,21 @@ struct CountryDTO: Decodable {
             self.dailySpendActivitiesUsd = nil
         }
 
+        // --- Canonical affordability (from facts) ---
+        if let cat = facts?.affordabilityCategory {
+            self.affordabilityCategory = cat
+        } else {
+            self.affordabilityCategory = nil
+        }
+
+        if let aff = facts?.affordability {
+            self.affordabilityScore = Int(aff.rounded())
+        } else {
+            self.affordabilityScore = nil
+        }
+        self.affordabilityBand = facts?.affordabilityBand
+
+
         // Debug (super useful right now)
         #if DEBUG
         if DEBUG_COUNTRY_LOGS {
@@ -344,6 +387,21 @@ struct CountryDTO: Decodable {
                 print("🛡 advisory score for \(name): \(advisoryScore)")
             } else {
                 print("🛡 advisory score missing for \(name)")
+            }
+            if let affordabilityCategory {
+                print("💰 affordability category for \(name): \(affordabilityCategory)")
+            } else {
+                print("💰 affordability category missing for \(name)")
+            }
+            if let affordabilityScore {
+                print("💵 affordability score for \(name): \(affordabilityScore)")
+            } else {
+                print("💵 affordability score missing for \(name)")
+            }
+            if let affordabilityBand {
+                print("🎨 affordability band for \(name): \(affordabilityBand)")
+            } else {
+                print("🎨 affordability band missing for \(name)")
             }
         }
         #endif

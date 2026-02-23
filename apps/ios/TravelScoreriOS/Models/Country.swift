@@ -43,6 +43,11 @@ struct Country: Identifiable, Hashable {
     let dailySpendHotelUsd: Double?
     let dailySpendFoodUsd: Double?
     let dailySpendActivitiesUsd: Double?
+
+    // Canonical affordability (from backend)
+    let affordabilityCategory: Int?
+    let affordabilityScore: Int?
+    let affordabilityBand: String?
     
     // Nice combined label for UI, similar to web
     var regionLabel: String? {
@@ -85,6 +90,9 @@ struct Country: Identifiable, Hashable {
         dailySpendHotelUsd: Double? = nil,
         dailySpendFoodUsd: Double? = nil,
         dailySpendActivitiesUsd: Double? = nil,
+        affordabilityCategory: Int? = nil,
+        affordabilityScore: Int? = nil,
+        affordabilityBand: String? = nil,
         travelSafeScore: Int? = nil
     ) {
         self.iso2 = iso2
@@ -110,6 +118,9 @@ struct Country: Identifiable, Hashable {
         self.dailySpendHotelUsd = dailySpendHotelUsd
         self.dailySpendFoodUsd = dailySpendFoodUsd
         self.dailySpendActivitiesUsd = dailySpendActivitiesUsd
+        self.affordabilityCategory = affordabilityCategory
+        self.affordabilityScore = affordabilityScore
+        self.affordabilityBand = affordabilityBand
         self.travelSafeScore = travelSafeScore
     }
 
