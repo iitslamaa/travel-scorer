@@ -5,47 +5,78 @@
 
 import SwiftUI
 
-/// Canonical TravelAF score pill.
-/// This is the single source of truth for score styling across the app.
 struct ScorePill: View {
+    enum Band {
+        case good      // green
+        case warn      // yellow
+        case bad       // orange
+        case danger    // red
+    }
+
     let score: Double
-    
+    let band: Band?
+
+    // Default initializer (normal score-based coloring)
     init(score: Int) {
         self.score = Double(score)
+        self.band = nil
     }
-    
+
     init(score: Double) {
         self.score = score
+        self.band = nil
     }
-    
+
+    // Explicit band initializer (used for affordability or any backend-driven band)
+    init(score: Int, band: Band?) {
+        self.score = Double(score)
+        self.band = band
+    }
+
+    init(score: Double, band: Band?) {
+        self.score = score
+        self.band = band
+    }
+
     var body: some View {
         Text(formattedScore)
             .font(.subheadline.weight(.bold))
             .monospacedDigit()
             .padding(.horizontal, 14)
             .padding(.vertical, 8)
-            .foregroundStyle(backgroundColor)
+            .foregroundStyle(resolvedColor)
             .background(
                 Capsule()
-                    .fill(backgroundColor.opacity(0.10))
+                    .fill(resolvedColor.opacity(0.10))
             )
             .overlay(
                 Capsule()
-                    .stroke(backgroundColor.opacity(0.45), lineWidth: 1.5)
+                    .stroke(resolvedColor.opacity(0.45), lineWidth: 1.5)
             )
             .accessibilityLabel("Score \(Int(score))")
     }
-    
+
     private var formattedScore: String {
         String(format: "%.0f", score)
     }
-    
-    /// Centralized TravelAF score color system.
-    /// 80–100: Green
-    /// 60–79: Yellow
-    /// 40–59: Orange
-    /// 0–39: Red
-    private var backgroundColor: Color {
-        ScoreColor.background(for: Int(score))
+
+    /// Unified color resolver:
+    /// - If a backend-driven band exists → use it
+    /// - Otherwise fall back to canonical score buckets
+    private var resolvedColor: Color {
+        if let band {
+            switch band {
+            case .good:
+                return ScoreColor.background(for: 100)
+            case .warn:
+                return ScoreColor.background(for: 70)
+            case .bad:
+                return ScoreColor.background(for: 50)
+            case .danger:
+                return ScoreColor.background(for: 10)
+            }
+        }
+
+        return ScoreColor.background(for: Int(score))
     }
 }
