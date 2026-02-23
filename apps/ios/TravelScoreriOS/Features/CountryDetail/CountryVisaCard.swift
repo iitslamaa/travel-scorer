@@ -72,11 +72,6 @@ struct CountryVisaCard: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
 
-                if let notes = country.visaNotes, !notes.isEmpty {
-                    Text(notes)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
 
                 if let url = country.visaSourceUrl {
                     Link("View official visa source", destination: url)
