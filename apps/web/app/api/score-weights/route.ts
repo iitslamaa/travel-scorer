@@ -4,7 +4,7 @@ import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { normalizeWeights, type ScoreWeights } from '@travel-af/domain/src/scoring';
 
 export async function POST(req: Request) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
