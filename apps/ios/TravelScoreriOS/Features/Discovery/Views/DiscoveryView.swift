@@ -22,8 +22,6 @@ struct DiscoveryView: View {
             )
 
         }
-        .navigationTitle("Discover")
-        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
