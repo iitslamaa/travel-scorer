@@ -12,6 +12,7 @@
     "build:web": "pnpm -F ./apps/web build"
   },
   "devDependencies": {
+    "supabase": "^2.76.12",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.6"
   },
