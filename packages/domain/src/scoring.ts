@@ -23,10 +23,12 @@ export function normalizeWeights(
     return { ...DEFAULT_WEIGHTS };
   }
 
-  const normalized: ScoreWeights = { ...merged };
-  (Object.keys(normalized) as (keyof ScoreWeights)[]).forEach((k) => {
-    normalized[k] = normalized[k] / sum;
-  });
+  const entries = Object.entries(merged) as [keyof ScoreWeights, number][];
+
+  const normalized = entries.reduce((acc, [key, value]) => {
+    acc[key] = value / sum;
+    return acc;
+  }, {} as ScoreWeights);
 
   return normalized;
 }
