@@ -54,6 +54,7 @@ Architecture Overview
 
 Monorepo structure with shared domain logic across platforms.
 
+```
 travel-af/
 ├── apps/
 │   ├── web/                             # Next.js 15 web application
@@ -86,6 +87,7 @@ travel-af/
 ├── data/                                # Canonical country metadata
 │
 └── package.json                         # npm workspaces (monorepo root)
+```
 ⸻
 
 Mobile Stack
