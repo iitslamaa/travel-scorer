@@ -70,6 +70,12 @@ enum CountryAPI {
             }
         }
         print("🟢 [CountryAPI] Decoded \(dtos.count) DTOs")
+#if DEBUG
+        if let ch = dtos.first(where: { $0.iso2.uppercased() == "CH" }) {
+            print("🇨🇭 DTO advisoryScore:", ch.advisoryScore as Any)
+        }
+#endif
+
 
         let countries = dtos.map { dto in
             Country(
@@ -78,7 +84,7 @@ enum CountryAPI {
                 score: dto.score ?? 0,
                 region: dto.region,
                 subregion: dto.subregion,
-                advisoryLevel: dto.advisoryLevelText,
+                advisoryScore: dto.advisoryScore,
                 advisorySummary: dto.advisorySummary,
                 advisoryUpdatedAt: dto.advisoryUpdatedAt,
                 advisoryUrl: dto.advisoryUrl,
@@ -123,7 +129,7 @@ extension CountryAPI {
                     score: dto.score ?? 0,
                     region: dto.region,
                     subregion: dto.subregion,
-                    advisoryLevel: dto.advisoryLevelText,
+                    advisoryScore: dto.advisoryScore,
                     advisorySummary: dto.advisorySummary,
                     advisoryUpdatedAt: dto.advisoryUpdatedAt,
                     advisoryUrl: dto.advisoryUrl,
@@ -159,13 +165,6 @@ extension CountryAPI {
         let now = Date().timeIntervalSince1970
         let last = UserDefaults.standard.double(forKey: CountriesCache.lastRefreshKey)
 
-        if last > 0, (now - last) < minInterval {
-            #if DEBUG
-            print("🟡 [CountryAPI] Skipping refresh (cooldown \(Int(minInterval))s)")
-            #endif
-            return nil
-        }
-
         do {
             let data = try await fetchCountriesData()
             CountriesCache.saveData(data)
@@ -194,7 +193,11 @@ extension CountryAPI {
                     throw error
                 }
             }
-
+#if DEBUG
+            if let ch = dtos.first(where: { $0.iso2.uppercased() == "CH" }) {
+                print("🇨🇭 REFRESH DTO advisoryScore:", ch.advisoryScore as Any)
+            }
+#endif
             let countries = dtos.map { dto in
                 Country(
                     iso2: dto.iso2,
@@ -202,7 +205,7 @@ extension CountryAPI {
                     score: dto.score ?? 0,
                     region: dto.region,
                     subregion: dto.subregion,
-                    advisoryLevel: dto.advisoryLevelText,
+                    advisoryScore: dto.advisoryScore,
                     advisorySummary: dto.advisorySummary,
                     advisoryUpdatedAt: dto.advisoryUpdatedAt,
                     advisoryUrl: dto.advisoryUrl,
@@ -264,7 +267,7 @@ extension CountryAPI {
 
     private enum CountriesCache {
         static let lastRefreshKey = "countries_last_refresh_ts_v1"
-        private static let fileName = "countries_cache_v1.json"
+        private static let fileName = "countries_cache_v2.json"
 
         private static var cacheURL: URL {
             let fm = FileManager.default

@@ -12,7 +12,6 @@ struct SeasonalityCountry: Identifiable, Decodable {
     let name: String?
     let score: Double?
     let region: String?
-    let advisoryLevel: Int?
 
     // Sub-scores for the little snapshot in the drawer.
     // NOTE: The backend is not consistent about key names, so ScoreSnapshot accepts multiple variants
@@ -35,9 +34,6 @@ struct SeasonalityCountry: Identifiable, Decodable {
             case affordabilityScore
             case visaEaseScore
 
-            // Other possible variants
-            case advisoryLevel
-
             // Visa variants we may receive from different endpoints
             case visa
             case visaScore
@@ -53,7 +49,6 @@ struct SeasonalityCountry: Identifiable, Decodable {
             self.advisory =
                 try c.decodeIfPresent(Double.self, forKey: .advisory)
                 ?? (try c.decodeIfPresent(Double.self, forKey: .advisoryScore))
-                ?? (try c.decodeIfPresent(Double.self, forKey: .advisoryLevel))
 
             self.seasonality =
                 try c.decodeIfPresent(Double.self, forKey: .seasonality)
@@ -86,13 +81,11 @@ struct SeasonalityCountry: Identifiable, Decodable {
         case name
         case score
         case region
-        case advisoryLevel
-        case scores
+        case scores   // primary snapshot key
 
         // Alternate field names that might appear from older endpoints
         case iso
         case countryName
-        case advisory
 
         // Alternate containers for the snapshot
         case scoreSnapshot
@@ -120,16 +113,18 @@ struct SeasonalityCountry: Identifiable, Decodable {
         // region
         self.region = try c.decodeIfPresent(String.self, forKey: .region)
 
-        // advisory level
-        self.advisoryLevel =
-            try c.decodeIfPresent(Int.self, forKey: .advisoryLevel)
-            ?? (try c.decodeIfPresent(Int.self, forKey: .advisory))
+        // score snapshot (broken into distinct steps to help compiler)
+        let scoresDirect = try c.decodeIfPresent(ScoreSnapshot.self, forKey: .scores)
+        let scoresAlt1 = try c.decodeIfPresent(ScoreSnapshot.self, forKey: .scoreSnapshot)
+        let scoresAlt2 = try c.decodeIfPresent(ScoreSnapshot.self, forKey: .subScores)
 
-        // score snapshot
-        self.scores =
-            try c.decodeIfPresent(ScoreSnapshot.self, forKey: .scores)
-            ?? (try c.decodeIfPresent(ScoreSnapshot.self, forKey: .scoreSnapshot))
-            ?? (try c.decodeIfPresent(ScoreSnapshot.self, forKey: .subScores))
+        if let s = scoresDirect {
+            self.scores = s
+        } else if let s = scoresAlt1 {
+            self.scores = s
+        } else {
+            self.scores = scoresAlt2
+        }
     }
 }
 

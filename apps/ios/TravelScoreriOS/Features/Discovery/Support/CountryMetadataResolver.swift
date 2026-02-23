@@ -18,8 +18,6 @@ final class CountryMetadataResolver {
         let affordability: Double?
         let visaEase: Double?
         let seasonality: Double?
-
-        let advisoryLevel: Int?
     }
 
     private var countryMetaByISO: [String: CountryMeta] = [:]
@@ -44,17 +42,11 @@ final class CountryMetadataResolver {
             for c in countries {
                 let iso = c.iso2.uppercased()
 
-                let advisoryLevel: Int? = {
-                    if let level = c.advisoryLevel as? Int { return level }
-                    if let level = c.advisoryLevel as? Double { return Int(level) }
-                    if let level = c.advisoryLevel as? String, let intVal = Int(level) { return intVal }
-                    return nil
-                }()
-
                 let advisoryScore: Double? = {
-                    if let v = c.travelSafeScore as? Double { return v }
-                    if let v = c.travelSafeScore as? Int { return Double(v) }
-                    return mapLevelToAdvisoryScore(advisoryLevel)
+                    if let v = c.advisoryScore {
+                        return Double(v)
+                    }
+                    return nil
                 }()
 
                 let dailyTotal = c.dailySpendTotalUsd
@@ -85,8 +77,7 @@ final class CountryMetadataResolver {
                     advisory: advisoryScore,
                     affordability: affordabilityScore,
                     visaEase: visaEase,
-                    seasonality: seasonality,
-                    advisoryLevel: advisoryLevel
+                    seasonality: seasonality
                 )
             }
 
@@ -108,12 +99,6 @@ final class CountryMetadataResolver {
                     name: meta.name,
                     score: meta.score ?? c.score,
                     region: meta.region ?? c.region,
-                    advisoryLevel: {
-                        if let level = c.advisoryLevel as? Int { return level }
-                        if let level = c.advisoryLevel as? Double { return Int(level) }
-                        if let level = c.advisoryLevel as? String, let intVal = Int(level) { return intVal }
-                        return meta.advisoryLevel
-                    }(),
                     scores: makeSnapshot(
                         advisory: meta.advisory ?? c.scores?.advisory,
                         seasonality: meta.seasonality ?? c.scores?.seasonality,
@@ -128,11 +113,6 @@ final class CountryMetadataResolver {
 
     // MARK: - Helpers
 
-    private func mapLevelToAdvisoryScore(_ level: Int?) -> Double? {
-        guard let level else { return nil }
-        let clamped = min(max(level, 1), 4)
-        return Double(5 - clamped) * 25.0
-    }
 
     private func affordabilityFromDailySpend(totalUsd: Double?) -> Double? {
         guard let totalUsd else { return nil }

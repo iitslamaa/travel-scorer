@@ -152,14 +152,12 @@ extension SeasonalityCountry {
         name: String?,
         score: Double?,
         region: String?,
-        advisoryLevel: Int?,
         scores: ScoreSnapshot?
     ) {
         self.isoCode = isoCode
         self.name = name
         self.score = score
         self.region = region
-        self.advisoryLevel = advisoryLevel
         self.scores = scores
     }
 }

@@ -23,7 +23,11 @@ function readJson<T>(rel: string): Promise<T> {
 
 // --- helpers ---------------------------------------------------------------
 
+
 const clamp = (x: number, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, x));
+
+const advisoryToPct = (lvl?: 1 | 2 | 3 | 4) =>
+  (!lvl ? undefined : clamp(((5 - lvl) / 4) * 100));
 
 function visaCategoryToScore(v: VisaEase | undefined): number {
   switch (v) {
@@ -120,12 +124,19 @@ export async function loadFacts(iso2List: string[], advisories: Advisory[]): Pro
 
     const r = reddit[iso2];
 
+    // compute advisory score safely
+    const advisoryScore =
+      adv?.level != null
+        ? advisoryToPct(adv.level)
+        : undefined;
+
     out[iso2] = {
       iso2,
       // advisory
-      advisoryLevel: adv?.level,
-      advisorySummary: adv?.summary,
-      advisoryUrl: adv?.url,
+      advisoryLevel: adv?.level ?? undefined,
+      advisoryScore,
+      advisorySummary: adv?.summary ?? undefined,
+      advisoryUrl: adv?.url ?? undefined,
 
       // safety & sentiment
       travelSafeOverall: Number.isFinite(travelSafe[iso2]) ? clamp(travelSafe[iso2]) : undefined,

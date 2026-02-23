@@ -165,9 +165,6 @@ struct CountryListView: View {
                     Text(country.flagEmoji).font(.largeTitle)
                     VStack(alignment: .leading, spacing: 4) {
                         Text(country.name).font(.headline)
-                        if let adv = country.advisoryLevel {
-                            Text(adv).font(.subheadline).foregroundStyle(.secondary)
-                        }
                     }
                     Spacer()
 
