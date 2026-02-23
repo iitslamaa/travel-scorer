@@ -11,8 +11,13 @@ import SwiftUI
 struct WhenToGoView: View {
     @StateObject private var viewModel: WhenToGoViewModel
     
-    init(countries: [Country]) {
-        _viewModel = StateObject(wrappedValue: WhenToGoViewModel(countries: countries))
+    init(countries: [Country], weightsStore: ScoreWeightsStore) {
+        _viewModel = StateObject(
+            wrappedValue: WhenToGoViewModel(
+                countries: countries,
+                weightsStore: weightsStore
+            )
+        )
     }
     
     @State private var isDrawerOpen: Bool = false

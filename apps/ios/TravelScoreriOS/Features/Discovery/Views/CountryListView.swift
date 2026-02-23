@@ -78,7 +78,6 @@ struct CountryListView: View {
 
             // Simple 4-factor weighted score recompute
             let advisory = country.travelSafeScore ?? 50
-            let seasonality = country.seasonalityScore ?? 50
             let visa = country.visaEaseScore ?? 50
 
             // Normalize affordability roughly to 0–100 range (fallback 50)
@@ -86,19 +85,16 @@ struct CountryListView: View {
             let affordability = min(max(affordabilityRaw, 0), 100)
 
             let weightedAdvisory = Double(advisory) * weights.advisory
-            let weightedSeasonality = Double(seasonality) * weights.seasonality
             let weightedVisa = Double(visa) * weights.visa
             let weightedAffordability = Double(affordability) * weights.affordability
 
             let totalWeight =
                 weights.advisory +
-                weights.seasonality +
                 weights.visa +
                 weights.affordability
 
             let total =
                 weightedAdvisory +
-                weightedSeasonality +
                 weightedVisa +
                 weightedAffordability
 

@@ -15,9 +15,28 @@ struct CustomWeightsView: View {
     @EnvironmentObject private var sessionManager: SessionManager
     @State private var isSaving: Bool = false
     
+    // MARK: - Derived State
+    
+    private var totalWeight: Double {
+        weightsStore.weights.advisory +
+        weightsStore.weights.visa +
+        weightsStore.weights.affordability
+    }
+    
+    private var isZeroSum: Bool {
+        totalWeight <= 0.0001
+    }
+    
     var body: some View {
         Form {
+            
             Section(header: Text("Customize Your Travel Priorities")) {
+                
+                if isZeroSum {
+                    Text("At least one category must have weight.")
+                        .font(.footnote)
+                        .foregroundStyle(.red)
+                }
                 
                 weightSlider(
                     title: "Affordability",
@@ -33,11 +52,6 @@ struct CustomWeightsView: View {
                     title: "Travel Advisory",
                     value: $weightsStore.weights.advisory
                 )
-
-                weightSlider(
-                    title: "Seasonality",
-                    value: $weightsStore.weights.seasonality
-                )
             }
             
             Section {
@@ -46,10 +60,12 @@ struct CustomWeightsView: View {
                         await saveWeightsToBackend()
                     }
                 }
-                .disabled(sessionManager.userId == nil || isSaving)
+                .disabled(sessionManager.userId == nil || isSaving || isZeroSum)
 
                 Button("Reset to Default") {
-                    weightsStore.resetToDefault()
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        weightsStore.resetToDefault()
+                    }
                 }
                 .foregroundColor(.red)
             }
@@ -58,19 +74,12 @@ struct CustomWeightsView: View {
         .navigationBarTitleDisplayMode(.large)
     }
     
+    // MARK: - Slider
+    
     private func weightSlider(title: String, value: Binding<Double>) -> some View {
-        let totalWeight =
-            weightsStore.weights.advisory +
-            weightsStore.weights.seasonality +
-            weightsStore.weights.visa +
-            weightsStore.weights.affordability
-
-        let percentage: Double
-        if totalWeight > 0 {
-            percentage = (value.wrappedValue / totalWeight) * 100
-        } else {
-            percentage = 0
-        }
+        let percentage: Double = totalWeight > 0
+            ? (value.wrappedValue / totalWeight) * 100
+            : 0
 
         return VStack(alignment: .leading) {
             HStack {
@@ -84,6 +93,8 @@ struct CustomWeightsView: View {
         }
         .padding(.vertical, 6)
     }
+    
+    // MARK: - Save
     
     private func saveWeightsToBackend() async {
         guard let userId = sessionManager.userId else { return }
@@ -109,7 +120,6 @@ struct CustomWeightsView: View {
             struct PreferencesRow: Encodable {
                 let user_id: UUID
                 let advisory: Double
-                let seasonality: Double
                 let visa: Double
                 let affordability: Double
             }
@@ -117,7 +127,6 @@ struct CustomWeightsView: View {
             let row = PreferencesRow(
                 user_id: userId,
                 advisory: weightsStore.weights.advisory,
-                seasonality: weightsStore.weights.seasonality,
                 visa: weightsStore.weights.visa,
                 affordability: weightsStore.weights.affordability
             )
