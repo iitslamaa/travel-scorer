@@ -28,7 +28,6 @@ enum SeasonalityCache {
         let name: String?
         let score: Double?
         let region: String?
-        let advisoryLevel: Int?
         let scores: ScoreItem?
 
         struct ScoreItem: Codable {
@@ -43,7 +42,6 @@ enum SeasonalityCache {
             self.name = model.name
             self.score = model.score
             self.region = model.region
-            self.advisoryLevel = model.advisoryLevel
             if let s = model.scores {
                 self.scores = ScoreItem(
                     advisory: s.advisory,
@@ -72,7 +70,6 @@ enum SeasonalityCache {
                 name: name,
                 score: score,
                 region: region,
-                advisoryLevel: advisoryLevel,
                 scores: snapshot
             )
         }

@@ -5,8 +5,7 @@
 //  Created by Lama Yassine on 11/11/25.
 //
 
-
-private let DEBUG_COUNTRY_LOGS = false
+private let DEBUG_COUNTRY_LOGS = true
 import Foundation
 
 struct CountryDTO: Decodable {
@@ -23,6 +22,8 @@ struct CountryDTO: Decodable {
     
     /// From advisory.level (1–4)
     let advisoryLevelNumber: Int?
+    /// Pure advisory normalized score (0...100) from backend
+    let advisoryScore: Int?
     let advisorySummary: String?
     let advisoryUrl: URL?
     let advisoryUpdatedAt: String?
@@ -83,10 +84,14 @@ struct CountryDTO: Decodable {
     }
 
     private struct Facts: Decodable {
-        let scoreTotal: Double?                // canonical Travelability score
-        
+        let scoreTotal: Double?
+
         // safety
         let travelSafeOverall: Double?
+
+        // advisory (single source of truth from backend facts)
+        let advisoryScore: Double?
+        let advisoryLevel: Int?
 
         // seasonality
         let seasonality: Double?
@@ -105,6 +110,56 @@ struct CountryDTO: Decodable {
 
         // affordability / daily spend
         let dailySpend: DailySpend?
+
+        private enum CodingKeys: String, CodingKey {
+            case scoreTotal
+            case travelSafeOverall
+            case advisoryScore
+            case advisoryLevel
+            case seasonality
+            case fmSeasonalityTodayScore
+            case fmSeasonalityTodayLabel
+            case fmSeasonalityBestMonths
+            case fmSeasonalityNotes
+            case visaEase
+            case visaType
+            case visaAllowedDays
+            case visaFeeUsd
+            case visaNotes
+            case visaSource
+            case dailySpend
+        }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: CodingKeys.self)
+
+            scoreTotal = try? c.decode(Double.self, forKey: .scoreTotal)
+            travelSafeOverall = try? c.decode(Double.self, forKey: .travelSafeOverall)
+            // Decode advisoryScore as Double OR Int (backend may send either)
+            if let d = try? c.decode(Double.self, forKey: .advisoryScore) {
+                advisoryScore = d
+            } else if let i = try? c.decode(Int.self, forKey: .advisoryScore) {
+                advisoryScore = Double(i)
+            } else {
+                advisoryScore = nil
+            }
+            advisoryLevel = try? c.decode(Int.self, forKey: .advisoryLevel)
+
+            seasonality = try? c.decode(Double.self, forKey: .seasonality)
+            fmSeasonalityTodayScore = try? c.decode(Double.self, forKey: .fmSeasonalityTodayScore)
+            fmSeasonalityTodayLabel = try? c.decode(String.self, forKey: .fmSeasonalityTodayLabel)
+            fmSeasonalityBestMonths = try? c.decode([Int].self, forKey: .fmSeasonalityBestMonths)
+            fmSeasonalityNotes = try? c.decode(String.self, forKey: .fmSeasonalityNotes)
+
+            visaEase = try? c.decode(Double.self, forKey: .visaEase)
+            visaType = try? c.decode(String.self, forKey: .visaType)
+            visaAllowedDays = try? c.decode(Int.self, forKey: .visaAllowedDays)
+            visaFeeUsd = try? c.decode(Double.self, forKey: .visaFeeUsd)
+            visaNotes = try? c.decode(String.self, forKey: .visaNotes)
+            visaSource = try? c.decode(String.self, forKey: .visaSource)
+
+            dailySpend = try? c.decode(DailySpend.self, forKey: .dailySpend)
+        }
     }
 
     private static func decodeHTML(_ text: String) -> String {
@@ -203,9 +258,23 @@ struct CountryDTO: Decodable {
             self.travelSafeScore = nil
         }
 
-        // nested advisory.level (API)
+        // Decode advisory object (level + metadata)
         let advisory = try? c.decode(Advisory.self, forKey: .advisory)
-        self.advisoryLevelNumber = advisory?.level
+
+        // Advisory score: prefer facts.advisoryScore, fallback to advisory.level
+        if let score = facts?.advisoryScore {
+            self.advisoryScore = Int(score.rounded())
+        } else if let level = advisory?.level {
+            let normalized = ((5.0 - Double(level)) / 4.0) * 100.0
+            self.advisoryScore = Int(normalized.rounded())
+        } else {
+            self.advisoryScore = nil
+        }
+
+        // Advisory level: prefer facts.advisoryLevel, fallback to advisory.level
+        self.advisoryLevelNumber = facts?.advisoryLevel ?? advisory?.level
+
+        // advisory metadata (text + URL)
         self.advisorySummary = advisory?.summary.map { Self.decodeHTML($0) }
         self.advisoryUpdatedAt = advisory?.updatedAt
         if let urlString = advisory?.url, let url = URL(string: urlString) {
@@ -270,6 +339,11 @@ struct CountryDTO: Decodable {
             }
             if let visaEaseScore {
                 print("🛂 visa ease for \(name): \(visaEaseScore) type=\(visaType ?? "-")")
+            }
+            if let advisoryScore {
+                print("🛡 advisory score for \(name): \(advisoryScore)")
+            } else {
+                print("🛡 advisory score missing for \(name)")
             }
         }
         #endif

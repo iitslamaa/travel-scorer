@@ -44,8 +44,8 @@ struct CountryPreviewCardMobile: View {
             
             // “Tags” row
             HStack(spacing: 8) {
-                if let level = country.advisoryLevel {
-                    Text("Safety info: Level \(level)")
+                if let advisoryScore = country.scores?.advisory {
+                    Text("Safety score: \(Int(advisoryScore.rounded()))")
                         .tagStyle()
                 }
                 if let region = country.region {

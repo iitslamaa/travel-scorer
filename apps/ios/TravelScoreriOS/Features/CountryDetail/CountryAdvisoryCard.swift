@@ -14,7 +14,7 @@ struct CountryAdvisoryCard: View {
     @State private var showFullAdvisory = false
 
     var body: some View {
-        if country.advisoryLevel != nil || country.advisorySummary != nil {
+        if let advisoryScore = country.advisoryScore {
             VStack(alignment: .leading, spacing: 12) {
 
                 // Title row
@@ -29,28 +29,21 @@ struct CountryAdvisoryCard: View {
 
                 // Score pill + description
                 HStack(spacing: 12) {
-                    if let advisoryScore = country.advisoryScore {
-                        Text("\(advisoryScore)")
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 6)
-                            .background(
-                                Capsule()
-                                    .fill(CountryScoreStyling.backgroundColor(for: advisoryScore))
-                            )
-                            .overlay(
-                                Capsule()
-                                    .stroke(CountryScoreStyling.borderColor(for: advisoryScore), lineWidth: 1)
-                            )
-                    }
+
+                    Text("\(advisoryScore)")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(CountryScoreStyling.backgroundColor(for: advisoryScore))
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(CountryScoreStyling.borderColor(for: advisoryScore), lineWidth: 1)
+                        )
 
                     VStack(alignment: .leading, spacing: 4) {
-
-                        if let level = country.advisoryLevel {
-                            Text(level)
-                                .font(.subheadline)
-                                .fontWeight(.semibold)
-                        }
 
                         if let rawSummary = country.advisorySummary,
                            !rawSummary.isEmpty {
@@ -90,14 +83,12 @@ struct CountryAdvisoryCard: View {
                         .font(.footnote)
                 }
 
-                if let advisoryScore = country.advisoryScore {
-                    HStack(spacing: 12) {
-                        Text("Normalized: \(advisoryScore)")
-                        Text("Weight: \(weightPercentage)%")
-                    }
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 12) {
+                    Text("Normalized: \(advisoryScore)")
+                    Text("Weight: \(weightPercentage)%")
                 }
+                .font(.caption)
+                .foregroundStyle(.secondary)
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)

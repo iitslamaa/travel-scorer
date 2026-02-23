@@ -15,7 +15,7 @@ struct Country: Identifiable, Hashable {
     var score: Int
     let region: String?
     let subregion: String?
-    let advisoryLevel: String?
+    let advisoryScore: Int?
     
     let travelSafeScore: Int?
 
@@ -59,22 +59,6 @@ struct Country: Identifiable, Hashable {
         }
     }
     
-    // Convert advisory level string (e.g. "Level 1") into a normalized numeric score
-    var advisoryScore: Int? {
-        guard let levelString = advisoryLevel else { return nil }
-
-        if levelString.contains("1") {
-            return 90
-        } else if levelString.contains("2") {
-            return 70
-        } else if levelString.contains("3") {
-            return 40
-        } else if levelString.contains("4") {
-            return 10
-        }
-
-        return nil
-    }
 
     // Custom initializer to maintain compatibility
     init(
@@ -83,7 +67,7 @@ struct Country: Identifiable, Hashable {
         score: Int,
         region: String? = nil,
         subregion: String? = nil,
-        advisoryLevel: String?,
+        advisoryScore: Int? = nil,
         advisorySummary: String? = nil,
         advisoryUpdatedAt: String? = nil,
         advisoryUrl: URL? = nil,
@@ -108,7 +92,7 @@ struct Country: Identifiable, Hashable {
         self.score = score
         self.region = region
         self.subregion = subregion
-        self.advisoryLevel = advisoryLevel
+        self.advisoryScore = advisoryScore
         self.advisorySummary = advisorySummary
         self.advisoryUpdatedAt = advisoryUpdatedAt
         self.advisoryUrl = advisoryUrl

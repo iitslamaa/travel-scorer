@@ -41,7 +41,6 @@ const ADVISORY_FALLBACK_BY_ISO2: Record<string, { level: 1|2|3|4; summary: strin
 
 // Local type to avoid any
 type FactsExtraServer = Partial<CountryFacts> & {
-  advisoryLevel?: 1 | 2 | 3 | 4;
   travelSafeOverall?: number;
   soloFemaleIndex?: number;
   redditComposite?: number;
@@ -278,8 +277,8 @@ type Advisory = {
 };
 
 type CountryOut = CountrySeed & {
-  advisory: null | { level: 1|2|3|4; updatedAt: string; url: string; summary: string };
-  facts?: CountryFacts;
+  advisory: null | { level: 1|2|3|4; score: number; updatedAt: string; url: string; summary: string };
+  facts?: FactsExtraServer;
 };
 
 export async function GET() {
@@ -435,6 +434,7 @@ export async function GET() {
           ...seed,
           advisory: {
             level: fb.level,
+            score: advisoryToScore(fb.level),
             updatedAt: '',
             url: 'https://travel.state.gov/',
             summary: fb.summary,
@@ -448,6 +448,7 @@ export async function GET() {
       advisory: adv
         ? {
             level: adv.level,
+            score: advisoryToScore(adv.level),
             updatedAt: adv.updatedAt || '',
             url: adv.url || '',
             summary: decodeHtmlEntitiesServer(adv.summary) ?? '',
@@ -607,6 +608,7 @@ export async function GET() {
 
       row.facts = facts ? { ...facts, ...extra } as CountryFacts : (extra as CountryFacts);
 
+
       // --- Compute daily spend (hotel traveler) from provider (preferred), fallback to estimator
       try {
         const fxFacts = row.facts as unknown as FactsExtraServer;
@@ -731,5 +733,5 @@ export async function GET() {
   // Sort alphabetically by name
   merged.sort((x, y) => x.name.localeCompare(y.name));
 
-  return NextResponse.json(merged);
+  return NextResponse.json(merged as unknown as CountryOut[]);
 }
