@@ -15,8 +15,8 @@ extension ProfileViewModel {
     // MARK: - Save (single source of truth)
 
     func saveProfile(
-        firstName: String?,
-        username: String?,
+        firstName: String,
+        username: String,
         homeCountries: [String]?,
         languages: [String]?,
         travelMode: String?,
@@ -27,10 +27,18 @@ extension ProfileViewModel {
         let userId = self.userId
         errorMessage = nil
         
+        let trimmedName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        guard !trimmedName.isEmpty, !trimmedUsername.isEmpty else {
+            errorMessage = "Name and username are required."
+            return
+        }
+        
         do {
             let payload = ProfileUpdate(
-                username: username,
-                fullName: firstName,
+                username: trimmedUsername,
+                fullName: trimmedName,
                 avatarUrl: avatarUrl,
                 languages: languages,
                 livedCountries: homeCountries,
