@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { COUNTRY_SEEDS, byIso2 } from '@/lib/seed';
-import { headers } from 'next/headers';
+import { headers, cookies } from 'next/headers';
 import type { CountrySeed } from '@/lib/types';
 import { loadFacts } from '@/lib/facts';
 import type { CountryFacts } from '@travel-af/shared';
@@ -18,6 +18,8 @@ import {
 import { buildVisaIndex } from '@/lib/providers/visa';
 import { estimateDailySpendHotel } from '@/lib/providers/costs';
 import type { DailySpend } from '@/lib/providers/costs';
+import { buildRows, DEFAULT_WEIGHTS } from '@travel-af/domain/src/scoring';
+import { createServerClient } from '@supabase/auth-helpers-nextjs';
 
 // --- Explicit advisory fallbacks (LAST RESORT ONLY)
 // Used ONLY when RSS/snapshot cannot be resolved deterministically.
@@ -80,18 +82,6 @@ type FactsExtraServer = Partial<CountryFacts> & {
   fmSeasonalityNotes?: string;
 };
 
-// --- unified scoring helpers (server-side source of truth) ---
-const W_WEIGHTS = {
-  travelGov: 0.30,
-  travelSafe: 0.15,
-  sfti: 0.10,
-  reddit: 0.20,
-  seasonality: 0.05,
-  visa: 0.05,
-  affordability: 0.05,
-  directFlight: 0.05,
-  infrastructure: 0.05,
-} as const;
 
 // --- Name normalization & alias index (to recover missing iso2 from names) ---
 function normalizeName(s: string): string {
@@ -218,32 +208,6 @@ function affordabilityFromFacts(f: Partial<CountryFacts>): number | undefined {
   if (!parts.length) return 50; // neutral baseline
   return Math.round(parts.reduce((a,b)=>a+b,0) / parts.length);
 }
-function totalScoreFromFacts(f: Partial<CountryFacts>): number {
-  const fx = f as FactsExtraServer;
-  const signals: { key: keyof typeof W_WEIGHTS; value?: number }[] = [
-    { key: 'travelGov',     value: advisoryToScore(fx.advisoryLevel) },
-    { key: 'travelSafe',    value: fx.travelSafeOverall },
-    { key: 'sfti',          value: fx.soloFemaleIndex },
-    { key: 'reddit',        value: fx.redditComposite },
-    { key: 'seasonality',   value: fx.seasonality },
-    { key: 'visa',          value: fx.visaEase },
-    { key: 'affordability', value: fx.affordability ?? affordabilityFromFacts(fx) },
-    { key: 'directFlight',  value: fx.directFlight },
-    { key: 'infrastructure',value: fx.infrastructure },
-  ];
-
-  const presentSum = signals
-    .filter(s => Number.isFinite(s.value as number))
-    .reduce((a,s)=>a+(W_WEIGHTS[s.key]||0), 0);
-  const total = signals.reduce((acc, s) => {
-    const raw = Number.isFinite(s.value as number) ? (s.value as number) : undefined;
-    if (raw == null) return acc;
-    const baseW = W_WEIGHTS[s.key] || 0;
-    const eff = presentSum > 0 ? baseW / presentSum : 0;
-    return acc + raw * eff;
-  }, 0);
-  return Math.round(total);
-}
 
 function extractAverageDailyCostUsd(fx: FactsExtraServer): number | undefined {
   const spend = fx.dailySpend as unknown as {
@@ -326,6 +290,54 @@ export async function GET() {
   const envBase = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/+$/, '');
   const proto = vercel ? 'https' : (h.get('x-forwarded-proto') ?? (host.includes('localhost') ? 'http' : 'https'));
   const base = envBase || (host ? `${proto}://${host}` : '');
+
+  // --- Fetch user-specific score weights from Supabase (if authenticated)
+  let userWeights = DEFAULT_WEIGHTS;
+  try {
+    const cookieStore = await cookies();
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value;
+          },
+        },
+      }
+    );
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const { data } = await supabase
+        .from('user_score_preferences')
+        // DB columns are: affordability, visa, advisory, seasonality
+        .select('advisory, seasonality, visa, affordability')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (data) {
+        userWeights = {
+          // Domain expects `travelGov`; DB stores this as `advisory`
+          travelGov: (data as any).advisory ?? DEFAULT_WEIGHTS.travelGov,
+          seasonality: (data as any).seasonality ?? DEFAULT_WEIGHTS.seasonality,
+          visa: (data as any).visa ?? DEFAULT_WEIGHTS.visa,
+          affordability: (data as any).affordability ?? DEFAULT_WEIGHTS.affordability,
+        };
+
+        console.log('[countries] loaded userWeights', {
+          userId: user.id,
+          userWeights,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn('[countries] failed to load user weights, using defaults', err);
+  }
 
   let advisories: Advisory[] = [];
   try {
@@ -692,9 +704,12 @@ export async function GET() {
           fxFacts.affordabilityCategory = category;
           fxFacts.affordability = score;
 
-          // compute and store canonical total on the server so all clients agree
+          // compute and store canonical total using 4-factor domain scorer
           try {
-            const total = totalScoreFromFacts(row.facts as Partial<CountryFacts>);
+            const { total } = buildRows(
+              row.facts as CountryFacts,
+              userWeights
+            );
             fxFacts.scoreTotal = total;
           } catch {}
         }

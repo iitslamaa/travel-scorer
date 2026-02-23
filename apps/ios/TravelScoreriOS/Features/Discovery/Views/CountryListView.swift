@@ -34,6 +34,7 @@ struct CountryListView: View {
     }
 
     @EnvironmentObject private var sessionManager: SessionManager
+    @EnvironmentObject private var weightsStore: ScoreWeightsStore
 
     @State private var sort: CountrySort = .name
     @State private var sortOrder: SortOrder = .descending
@@ -68,8 +69,52 @@ struct CountryListView: View {
         // Cancel any in-flight recompute so fast typing / toggling doesn't queue work.
         recomputeTask?.cancel()
 
+        // Recalculate scores using current weights
+        var recalculatedCountries: [Country] = []
+        let weights = weightsStore.weights
+
+        for country in countries {
+            var updated = country
+
+            // Simple 4-factor weighted score recompute
+            let advisory = country.travelSafeScore ?? 50
+            let seasonality = country.seasonalityScore ?? 50
+            let visa = country.visaEaseScore ?? 50
+
+            // Normalize affordability roughly to 0–100 range (fallback 50)
+            let affordabilityRaw = country.dailySpendTotalUsd ?? 50
+            let affordability = min(max(affordabilityRaw, 0), 100)
+
+            let weightedAdvisory = Double(advisory) * weights.advisory
+            let weightedSeasonality = Double(seasonality) * weights.seasonality
+            let weightedVisa = Double(visa) * weights.visa
+            let weightedAffordability = Double(affordability) * weights.affordability
+
+            let totalWeight =
+                weights.advisory +
+                weights.seasonality +
+                weights.visa +
+                weights.affordability
+
+            let total =
+                weightedAdvisory +
+                weightedSeasonality +
+                weightedVisa +
+                weightedAffordability
+
+            let normalizedScore: Double
+            if totalWeight > 0 {
+                normalizedScore = total / totalWeight
+            } else {
+                normalizedScore = 0
+            }
+
+            updated.score = Int(normalizedScore.rounded())
+            recalculatedCountries.append(updated)
+        }
+
         // Capture a snapshot of inputs to process off-main.
-        let snapshotCountries = countries
+        let snapshotCountries = recalculatedCountries
         let snapshotSearch = searchText
         let snapshotSort = sort
         let snapshotSortOrder = sortOrder

@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.15.0",
     "@travel-af/domain": "workspace:*",
     "@travel-af/shared": "workspace:*",
     "fast-xml-parser": "^5.3.1",

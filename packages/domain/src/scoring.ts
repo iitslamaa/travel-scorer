@@ -10,7 +10,29 @@ export const W = {
   affordability: 0.20,
 } as const;
 
-export const DEFAULT_WEIGHTS = W;
+export const DEFAULT_WEIGHTS: ScoreWeights = { ...W };
+
+export function normalizeWeights(
+  partial: Partial<ScoreWeights>
+): ScoreWeights {
+  const merged: ScoreWeights = { ...DEFAULT_WEIGHTS, ...partial };
+
+  const sum = Object.values(merged).reduce(
+    (a, b) => a + (Number(b) || 0),
+    0
+  );
+
+  if (!Number.isFinite(sum) || sum <= 0) {
+    return { ...DEFAULT_WEIGHTS };
+  }
+
+  return {
+    travelGov: merged.travelGov / sum,
+    seasonality: merged.seasonality / sum,
+    visa: merged.visa / sum,
+    affordability: merged.affordability / sum,
+  };
+}
 
 export type ScoreWeights = {
   [K in keyof typeof W]: number;
@@ -92,6 +114,8 @@ export function buildRows(
 ): { rows: FactRow[]; total: number } {
   const fx = facts as FactsExtra;
 
+  const normalizedWeights = normalizeWeights(weights);
+
   const signals: {
     key: FactRow['key'];
     label: string;
@@ -126,7 +150,7 @@ export function buildRows(
     .filter((s) => Number.isFinite(s.value))
     .reduce(
       (acc, s) =>
-        acc + (weights[s.key] ?? DEFAULT_WEIGHTS[s.key] ?? 0),
+        acc + normalizedWeights[s.key],
       0
     );
 
@@ -135,7 +159,7 @@ export function buildRows(
       ? (s.value as number)
       : undefined;
 
-    const w = weights[s.key] ?? DEFAULT_WEIGHTS[s.key] ?? 0;
+    const w = normalizedWeights[s.key];
     const effW = presentWeightSum > 0 ? w / presentWeightSum : 0;
 
     const contrib = raw != null ? raw * effW : 0;

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Supabase
 
 enum CountryAPI {
     static let baseURL = APIConfig.baseURL
@@ -14,7 +15,16 @@ enum CountryAPI {
     static func fetchCountries() async throws -> [Country] {
         print("🔵 [CountryAPI] Fetching:", countriesURL.absoluteString)
 
-        let (data, resp) = try await URLSession.shared.data(from: countriesURL)
+        var request = URLRequest(url: countriesURL)
+        request.httpMethod = "GET"
+
+        // Attach Supabase access token if available
+        if let session = try? await SupabaseManager.shared.fetchCurrentSession() {
+            let accessToken = session.accessToken
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, resp) = try await URLSession.shared.data(for: request)
 
         guard let http = resp as? HTTPURLResponse else {
             print("🔴 [CountryAPI] Non-HTTP response")
@@ -229,7 +239,15 @@ extension CountryAPI {
     // MARK: - Private helpers
 
     private static func fetchCountriesData() async throws -> Data {
-        let (data, resp) = try await URLSession.shared.data(from: countriesURL)
+        var request = URLRequest(url: countriesURL)
+        request.httpMethod = "GET"
+
+        if let session = try? await SupabaseManager.shared.fetchCurrentSession() {
+            let accessToken = session.accessToken
+            request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+        }
+
+        let (data, resp) = try await URLSession.shared.data(for: request)
         guard let http = resp as? HTTPURLResponse else {
             throw URLError(.badServerResponse)
         }

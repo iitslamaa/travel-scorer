@@ -105,6 +105,9 @@
 		17EC41E22F4BB227004B80DA /* ScoreWorldMapRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41E12F4BB227004B80DA /* ScoreWorldMapRenderer.swift */; };
 		17EC41E42F4BB235004B80DA /* CountryLookupBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41E32F4BB235004B80DA /* CountryLookupBuilder.swift */; };
 		17EC41E62F4BB2CA004B80DA /* LoadingOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41E52F4BB2CA004B80DA /* LoadingOverlayView.swift */; };
+		17EC41E82F4BB8B7004B80DA /* ScoreWeights.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41E72F4BB8B7004B80DA /* ScoreWeights.swift */; };
+		17EC41EA2F4BB90A004B80DA /* ScoreWeightsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41E92F4BB90A004B80DA /* ScoreWeightsStore.swift */; };
+		17EC41EC2F4BBA4B004B80DA /* CustomWeightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41EB2F4BBA4B004B80DA /* CustomWeightsView.swift */; };
 		17EE81642F49081000C8CEF2 /* ProfileSkeletonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EE81632F49081000C8CEF2 /* ProfileSkeletonView.swift */; };
 		17F063812F32730600F1F4F3 /* SupabaseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063802F32730600F1F4F3 /* SupabaseClient.swift */; };
 		17F063832F32732F00F1F4F3 /* AuthViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F063822F32732F00F1F4F3 /* AuthViewModel.swift */; };
@@ -214,6 +217,9 @@
 		17EC41E12F4BB227004B80DA /* ScoreWorldMapRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreWorldMapRenderer.swift; sourceTree = "<group>"; };
 		17EC41E32F4BB235004B80DA /* CountryLookupBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryLookupBuilder.swift; sourceTree = "<group>"; };
 		17EC41E52F4BB2CA004B80DA /* LoadingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingOverlayView.swift; sourceTree = "<group>"; };
+		17EC41E72F4BB8B7004B80DA /* ScoreWeights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreWeights.swift; sourceTree = "<group>"; };
+		17EC41E92F4BB90A004B80DA /* ScoreWeightsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreWeightsStore.swift; sourceTree = "<group>"; };
+		17EC41EB2F4BBA4B004B80DA /* CustomWeightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomWeightsView.swift; sourceTree = "<group>"; };
 		17EE81632F49081000C8CEF2 /* ProfileSkeletonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSkeletonView.swift; sourceTree = "<group>"; };
 		17F063802F32730600F1F4F3 /* SupabaseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseClient.swift; sourceTree = "<group>"; };
 		17F063822F32732F00F1F4F3 /* AuthViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthViewModel.swift; sourceTree = "<group>"; };
@@ -288,6 +294,7 @@
 				170C21202F4790E00090BA78 /* WhenToGoModels.swift */,
 				170C21192F4790E00090BA78 /* SeasonalityModels.swift */,
 				170C20CE2F4790E00090BA78 /* Profile.swift */,
+				17EC41E72F4BB8B7004B80DA /* ScoreWeights.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -330,6 +337,7 @@
 				170C20EE2F4790E00090BA78 /* BucketListStore.swift */,
 				170C20EF2F4790E00090BA78 /* MetaStore.swift */,
 				170C211C2F4790E00090BA78 /* TraveledStore.swift */,
+				17EC41E92F4BB90A004B80DA /* ScoreWeightsStore.swift */,
 			);
 			path = Persistence;
 			sourceTree = "<group>";
@@ -651,6 +659,7 @@
 				170C21052F4790E00090BA78 /* DiscoveryView.swift */,
 				170C21012F4790E00090BA78 /* CountryListView.swift */,
 				170C21022F4790E00090BA78 /* CountryPreviewCardMobile.swift */,
+				17EC41EB2F4BBA4B004B80DA /* CustomWeightsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -888,6 +897,7 @@
 			files = (
 				17F063852F32734800F1F4F3 /* EmailAuthView.swift in Sources */,
 				170C21272F4790E00090BA78 /* CountryAdvisoryCard.swift in Sources */,
+				17EC41EC2F4BBA4B004B80DA /* CustomWeightsView.swift in Sources */,
 				17A4EC802F47BE2400627746 /* ProfileViewModel+Relationship.swift in Sources */,
 				170C21282F4790E00090BA78 /* CountryDetailView.swift in Sources */,
 				170C21292F4790E00090BA78 /* CountryHeaderCard.swift in Sources */,
@@ -949,8 +959,10 @@
 				170C215A2F4790E00090BA78 /* CountryListView.swift in Sources */,
 				170C215B2F4790E00090BA78 /* CountryPreviewCardMobile.swift in Sources */,
 				170C215D2F4790E00090BA78 /* DataLoader.swift in Sources */,
+				17EC41E82F4BB8B7004B80DA /* ScoreWeights.swift in Sources */,
 				170C215E2F4790E00090BA78 /* DiscoveryView.swift in Sources */,
 				170C215F2F4790E00090BA78 /* FlagWithTooltip.swift in Sources */,
+				17EC41EA2F4BB90A004B80DA /* ScoreWeightsStore.swift in Sources */,
 				17EC41E42F4BB235004B80DA /* CountryLookupBuilder.swift in Sources */,
 				170C21602F4790E00090BA78 /* FriendRequestsView.swift in Sources */,
 				17A4EC822F47BE3000627746 /* ProfileViewModel+Friends.swift in Sources */,
