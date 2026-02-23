@@ -294,7 +294,7 @@ export async function GET() {
   // --- Fetch user-specific score weights from Supabase (if authenticated)
   let userWeights = DEFAULT_WEIGHTS;
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
 
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
