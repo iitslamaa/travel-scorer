@@ -17,20 +17,21 @@ export function normalizeWeights(
 ): ScoreWeights {
   const merged: ScoreWeights = { ...DEFAULT_WEIGHTS, ...partial };
 
-  const sum = Object.values(merged).reduce((a, b) => a + (Number(b) || 0), 0);
+  const sum = Object.values(merged).reduce(
+    (a, b) => a + (Number(b) || 0),
+    0
+  );
 
   if (!Number.isFinite(sum) || sum <= 0) {
     return { ...DEFAULT_WEIGHTS };
   }
 
-  const entries = Object.entries(merged) as [keyof ScoreWeights, number][];
-
-  const normalized = entries.reduce((acc, [key, value]) => {
-    acc[key] = value / sum;
-    return acc;
-  }, {} as ScoreWeights);
-
-  return normalized;
+  return {
+    travelGov: merged.travelGov / sum,
+    seasonality: merged.seasonality / sum,
+    visa: merged.visa / sum,
+    affordability: merged.affordability / sum,
+  };
 }
 
 export type ScoreWeights = {
