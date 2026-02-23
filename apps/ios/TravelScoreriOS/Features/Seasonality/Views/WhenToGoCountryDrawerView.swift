@@ -11,6 +11,7 @@ struct WhenToGoCountryDrawerView: View {
     @EnvironmentObject private var weightsStore: ScoreWeightsStore
 
     let country: WhenToGoItem
+    @State private var showCountryDetail = false
 
     var body: some View {
         ScrollView {
@@ -137,8 +138,8 @@ struct WhenToGoCountryDrawerView: View {
             }
         }
         .safeAreaInset(edge: .bottom) {
-            NavigationLink {
-                CountryDetailView(country: country.country)
+            Button {
+                showCountryDetail = true
             } label: {
                 HStack(spacing: 6) {
                     Spacer()
@@ -152,6 +153,11 @@ struct WhenToGoCountryDrawerView: View {
                 .foregroundStyle(.blue)
             }
             .padding(.horizontal, 20)
+        }
+        .sheet(isPresented: $showCountryDetail) {
+            NavigationStack {
+                CountryDetailView(country: country.country)
+            }
         }
         .scrollIndicators(.hidden)
     }
