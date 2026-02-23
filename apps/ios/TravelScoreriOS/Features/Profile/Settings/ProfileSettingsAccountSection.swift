@@ -18,8 +18,12 @@ struct ProfileSettingsAccountSection: View {
             TextField(
                 "",
                 text: $firstName,
-                prompt: Text("First name")
-                    .foregroundStyle(.secondary)
+                prompt:
+                    (Text("Name")
+                        .foregroundStyle(.secondary)
+                     +
+                     Text(" *")
+                        .foregroundStyle(.red))
             )
             .padding(12)
             .background(.regularMaterial)
@@ -35,8 +39,12 @@ struct ProfileSettingsAccountSection: View {
                 TextField(
                     "",
                     text: $username,
-                    prompt: Text("username")
-                        .foregroundStyle(.secondary)
+                    prompt:
+                        (Text("username")
+                            .foregroundStyle(.secondary)
+                         +
+                         Text(" *")
+                            .foregroundStyle(.red))
                 )
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled(true)

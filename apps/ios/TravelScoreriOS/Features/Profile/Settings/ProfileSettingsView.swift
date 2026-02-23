@@ -48,6 +48,12 @@ struct ProfileSettingsView: View {
     @State private var isDeleting = false
     @State private var deleteError: String? = nil
 
+    private var isFormValid: Bool {
+        let trimmedName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !trimmedName.isEmpty && !trimmedUsername.isEmpty
+    }
+
     var body: some View {
         Group {
             if SupabaseManager.shared.currentUserId != viewedUserId {
@@ -194,9 +200,12 @@ struct ProfileSettingsView: View {
                     Task {
                         let avatarURL = await resolveAvatarChange()
 
+                        let trimmedName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
+                        let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
+
                         await profileVM.saveProfile(
-                            firstName: firstName.isEmpty ? nil : firstName,
-                            username: username.isEmpty ? nil : username,
+                            firstName: trimmedName,
+                            username: trimmedUsername,
                             homeCountries: Array(homeCountries),
                             languages: languages.map { $0.name },
                             travelMode: travelMode?.rawValue,
@@ -207,6 +216,8 @@ struct ProfileSettingsView: View {
                         dismiss()
                     }
                 }
+                .disabled(!isFormValid)
+                .opacity(isFormValid ? 1 : 0.5)
             }
         }
 
