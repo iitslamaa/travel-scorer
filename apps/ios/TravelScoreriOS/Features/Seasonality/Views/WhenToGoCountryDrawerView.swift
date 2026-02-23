@@ -78,16 +78,9 @@ struct WhenToGoCountryDrawerView: View {
 
             Spacer()
 
-            VStack(alignment: .trailing, spacing: 6) {
-                Text("OVERALL")
-                    .font(.caption2)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.secondary)
-
-                ScorePill(score: country.country.score)
-                    .scaleEffect(1.35)
-            }
-            .padding(.trailing, 18)
+            ScorePill(score: country.country.score)
+                .scaleEffect(1.35)
+                .padding(.trailing, 18)
         }
     }
 
