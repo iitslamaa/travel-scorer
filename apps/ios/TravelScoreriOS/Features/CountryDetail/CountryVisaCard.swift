@@ -10,6 +10,7 @@ import SwiftUI
 
 struct CountryVisaCard: View {
     let country: Country
+    let weightPercentage: Int
 
     var body: some View {
         if country.visaEaseScore != nil || country.visaType != nil {
@@ -20,7 +21,7 @@ struct CountryVisaCard: View {
                     Text("Visa")
                         .font(.headline)
                     Spacer()
-                    Text("US passport · 5%")
+                    Text("US passport · \(weightPercentage)%")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -86,7 +87,7 @@ struct CountryVisaCard: View {
                     if let ease = country.visaEaseScore {
                         Text("Normalized: \(ease)")
                     }
-                    Text("Weight: 5%")
+                    Text("Weight: \(weightPercentage)%")
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)

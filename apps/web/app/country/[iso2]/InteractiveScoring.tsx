@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import type { CountryFacts } from '@travel-af/shared';
 import type { ScoreWeights } from '@travel-af/domain/src/scoring';
-import { buildRows } from '@travel-af/domain';
-import { loadWeights, saveWeights, normalizeWeights, DEFAULT_WEIGHTS } from '@/lib/scoreWeights';
+import { buildRows, normalizeWeights, DEFAULT_WEIGHTS } from '@travel-af/domain/src/scoring';
 import { AdvisoryBadge } from '@/lib/display/AdvisoryBadge';
 import { ScorePill } from '@/lib/display/ScorePill';
 import { VisaSection } from './components/VisaSection';
@@ -16,9 +15,23 @@ type Props = {
 };
 
 export default function InteractiveScoring({ facts, row }: Props) {
-  const [weights, setWeights] = useState<ScoreWeights>(loadWeights());
+  const [weights, setWeights] = useState<ScoreWeights>(DEFAULT_WEIGHTS);
 
   const { rows, total } = buildRows(facts, weights);
+
+  async function persist(updated: ScoreWeights) {
+    try {
+      await fetch('/api/score-weights', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updated),
+      });
+    } catch (err) {
+      console.error('[InteractiveScoring] failed to persist weights', err);
+    }
+  }
 
   function update(key: keyof ScoreWeights, value: number) {
     const updated = normalizeWeights({
@@ -27,7 +40,12 @@ export default function InteractiveScoring({ facts, row }: Props) {
     });
 
     setWeights(updated);
-    saveWeights(updated);
+    persist(updated);
+  }
+
+  function reset() {
+    setWeights(DEFAULT_WEIGHTS);
+    persist(DEFAULT_WEIGHTS);
   }
 
   return (
@@ -49,19 +67,14 @@ export default function InteractiveScoring({ facts, row }: Props) {
               max="1"
               step="0.01"
               value={weights[key]}
-              onChange={(e) =>
-                update(key, Number(e.target.value))
-              }
+              onChange={(e) => update(key, Number(e.target.value))}
               className="w-full"
             />
           </div>
         ))}
 
         <button
-          onClick={() => {
-            setWeights(DEFAULT_WEIGHTS);
-            saveWeights(DEFAULT_WEIGHTS);
-          }}
+          onClick={reset}
           className="text-sm underline mt-2"
         >
           Reset to defaults
@@ -79,11 +92,7 @@ export default function InteractiveScoring({ facts, row }: Props) {
       {/* Advisory */}
       <section className="card p-5 mb-8">
         <h3 className="font-medium mb-2">Travel Advisory</h3>
-        {row.advisory && (
-          <>
-            <AdvisoryBadge level={row.advisory.level} />
-          </>
-        )}
+        {row.advisory && <AdvisoryBadge level={row.advisory.level} />}
       </section>
 
       {/* Seasonality */}

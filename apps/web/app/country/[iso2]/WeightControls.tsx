@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { ScoreWeights } from '@travel-af/domain/src/scoring';
-import { normalizeWeights, loadWeights, saveWeights, DEFAULT_WEIGHTS } from '@/lib/scoreWeights';
+import { normalizeWeights, DEFAULT_WEIGHTS } from '@travel-af/domain/src/scoring';
 
 type Props = {
   onChange: (weights: ScoreWeights) => void;
@@ -12,9 +12,8 @@ export default function WeightControls({ onChange }: Props) {
   const [weights, setWeights] = useState<ScoreWeights>(DEFAULT_WEIGHTS);
 
   useEffect(() => {
-    const stored = loadWeights();
-    setWeights(stored);
-    onChange(stored);
+    setWeights(DEFAULT_WEIGHTS);
+    onChange(DEFAULT_WEIGHTS);
   }, []);
 
   function update(key: keyof ScoreWeights, value: number) {
@@ -24,8 +23,18 @@ export default function WeightControls({ onChange }: Props) {
     });
 
     setWeights(updated);
-    saveWeights(updated);
     onChange(updated);
+
+    // Persist to backend
+    fetch('/api/score-weights', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updated),
+    }).catch((err) => {
+      console.error('[WeightControls] failed to save weights', err);
+    });
   }
 
   return (
@@ -56,8 +65,17 @@ export default function WeightControls({ onChange }: Props) {
       <button
         onClick={() => {
           setWeights(DEFAULT_WEIGHTS);
-          saveWeights(DEFAULT_WEIGHTS);
           onChange(DEFAULT_WEIGHTS);
+
+          fetch('/api/score-weights', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(DEFAULT_WEIGHTS),
+          }).catch((err) => {
+            console.error('[WeightControls] failed to reset weights', err);
+          });
         }}
         className="text-sm underline mt-2"
       >

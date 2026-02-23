@@ -10,6 +10,7 @@ import SwiftUI
 
 struct CountryAdvisoryCard: View {
     let country: Country
+    let weightPercentage: Int
     @State private var showFullAdvisory = false
 
     var body: some View {
@@ -21,7 +22,7 @@ struct CountryAdvisoryCard: View {
                     Text("Travel advisory")
                         .font(.headline)
                     Spacer()
-                    Text("U.S. Dept. of State · 10%")
+                    Text("U.S. Dept. of State · \(weightPercentage)%")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -92,7 +93,7 @@ struct CountryAdvisoryCard: View {
                 if let advisoryScore = country.advisoryScore {
                     HStack(spacing: 12) {
                         Text("Normalized: \(advisoryScore)")
-                        Text("Weight: 10%")
+                        Text("Weight: \(weightPercentage)%")
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)

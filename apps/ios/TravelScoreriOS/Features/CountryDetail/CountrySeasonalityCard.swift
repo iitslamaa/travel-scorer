@@ -10,6 +10,7 @@ import SwiftUI
 
 struct CountrySeasonalityCard: View {
     let country: Country
+    let weightPercentage: Int
 
     var body: some View {
         if let seasonalityScore = country.seasonalityScore {
@@ -20,7 +21,7 @@ struct CountrySeasonalityCard: View {
                     Text("Seasonality")
                         .font(.headline)
                     Spacer()
-                    Text("Today · 5%")
+                    Text("Today · \(weightPercentage)%")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }
@@ -74,7 +75,7 @@ struct CountrySeasonalityCard: View {
 
                 HStack(spacing: 12) {
                     Text("Normalized: \(seasonalityScore)")
-                    Text("Weight: 5%")
+                    Text("Weight: \(weightPercentage)%")
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)

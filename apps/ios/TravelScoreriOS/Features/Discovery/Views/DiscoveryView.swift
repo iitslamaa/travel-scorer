@@ -10,6 +10,7 @@ import SwiftUI
 struct DiscoveryView: View {
 
     @State private var searchText = ""
+    @State private var showingWeights = false
 
     var body: some View {
         ZStack {
@@ -20,6 +21,22 @@ struct DiscoveryView: View {
                 searchText: searchText
             )
 
+        }
+        .navigationTitle("Discover")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button {
+                    showingWeights = true
+                } label: {
+                    Image(systemName: "slider.horizontal.3")
+                }
+            }
+        }
+        .sheet(isPresented: $showingWeights) {
+            NavigationStack {
+                CustomWeightsView()
+            }
         }
         .safeAreaInset(edge: .bottom) {
             FloatingSearchBar(text: $searchText)

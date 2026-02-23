@@ -10,6 +10,7 @@ import SwiftUI
 struct CountryDetailView: View {
     private let isTravelSafetyEnabled = false
     @State var country: Country
+    @EnvironmentObject private var weightsStore: ScoreWeightsStore
 
     var body: some View {
         ScrollView {
@@ -18,19 +19,20 @@ struct CountryDetailView: View {
                 CountryHeaderCard(country: country)
                     .padding(.horizontal)
 
-                CountryAdvisoryCard(country: country)
-                    .padding(.horizontal)
-                
-                if isTravelSafetyEnabled {
-                    CountryTravelSafeCard(country: country)
-                        .padding(.horizontal)
-                }
+                CountryAdvisoryCard(
+                    country: country,
+                    weightPercentage: weightsStore.advisoryPercentage
+                )
 
-                CountrySeasonalityCard(country: country)
-                    .padding(.horizontal)
+                CountrySeasonalityCard(
+                    country: country,
+                    weightPercentage: weightsStore.seasonalityPercentage
+                )
 
-                CountryVisaCard(country: country)
-                    .padding(.horizontal)
+                CountryVisaCard(
+                    country: country,
+                    weightPercentage: weightsStore.visaPercentage
+                )
 
                 // You can add more sections later: Reddit sentiment, TravelSafe, Solo Female Travel, etc.
             }
@@ -39,23 +41,5 @@ struct CountryDetailView: View {
         }
         .navigationTitle(country.name)
         .navigationBarTitleDisplayMode(.inline)
-    }
-
-    // MARK: - Factor helpers
-    
-}
-
-#Preview {
-    NavigationStack {
-        CountryDetailView(
-            country: Country(
-                iso2: "JP",
-                name: "Japan",
-                score: 90,
-                region: "Asia",
-                subregion: "East Asia",
-                advisoryLevel: "Level 1"
-            )
-        )
     }
 }

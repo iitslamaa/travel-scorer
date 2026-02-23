@@ -12,7 +12,7 @@ struct Country: Identifiable, Hashable {
     /// Stable identifier for persistence (do NOT use random UUIDs).
     var id: String { iso2.uppercased() }
     let name: String
-    let score: Int
+    var score: Int
     let region: String?
     let subregion: String?
     let advisoryLevel: String?
