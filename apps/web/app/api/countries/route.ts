@@ -472,6 +472,7 @@ export async function GET() {
         territory: true,
         advisory: {
           level: a.level,
+          score: advisoryToScore(a.level),
           updatedAt: a.updatedAt || '',
           url: a.url || '',
           summary: decodeHtmlEntitiesServer(a.summary) ?? '',
