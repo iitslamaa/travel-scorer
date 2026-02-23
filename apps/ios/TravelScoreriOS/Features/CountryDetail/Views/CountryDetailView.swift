@@ -23,16 +23,19 @@ struct CountryDetailView: View {
                     country: country,
                     weightPercentage: weightsStore.advisoryPercentage
                 )
+                .padding(.horizontal)
 
                 CountrySeasonalityCard(
                     country: country,
-                    weightPercentage: weightsStore.seasonalityPercentage
+                    weightPercentage: 0
                 )
+                .padding(.horizontal)
 
                 CountryVisaCard(
                     country: country,
                     weightPercentage: weightsStore.visaPercentage
                 )
+                .padding(.horizontal)
 
                 // You can add more sections later: Reddit sentiment, TravelSafe, Solo Female Travel, etc.
             }

@@ -22,8 +22,12 @@ final class ScoreWeightsStore: ObservableObject {
         if let data = UserDefaults.standard.data(forKey: key),
            let decoded = try? JSONDecoder().decode(ScoreWeights.self, from: data) {
             self.weights = decoded
+            // Ensure legacy seasonality weight does not affect calculations
+            self.weights.seasonality = 0
         } else {
             self.weights = .default
+            // Ensure seasonality starts at zero going forward
+            self.weights.seasonality = 0
         }
     }
     
@@ -42,7 +46,6 @@ extension ScoreWeightsStore {
 
     var totalWeight: Double {
         weights.advisory +
-        weights.seasonality +
         weights.visa +
         weights.affordability
     }
@@ -56,10 +59,6 @@ extension ScoreWeightsStore {
 
     var advisoryPercentage: Int {
         percentage(for: \.advisory)
-    }
-
-    var seasonalityPercentage: Int {
-        percentage(for: \.seasonality)
     }
 
     var visaPercentage: Int {

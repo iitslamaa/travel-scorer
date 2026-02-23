@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct WhenToGoCountryDrawerView: View {
+    @EnvironmentObject private var weightsStore: ScoreWeightsStore
+
     let country: WhenToGoItem
 
     var body: some View {
@@ -15,9 +17,21 @@ struct WhenToGoCountryDrawerView: View {
             header
 
             VStack(spacing: 16) {
-                scoreRow(title: "Advisory", value: Double(country.country.advisoryScore ?? 0))
-                scoreRow(title: "Visa ease", value: Double(country.country.visaEaseScore ?? 0))
-                scoreRow(title: "Seasonality", value: Double(country.seasonalityScore))
+                scoreRow(
+                    title: "Advisory",
+                    value: Double(country.country.advisoryScore ?? 0),
+                    weightPercentage: weightsStore.advisoryPercentage
+                )
+                scoreRow(
+                    title: "Visa ease",
+                    value: Double(country.country.visaEaseScore ?? 0),
+                    weightPercentage: weightsStore.visaPercentage
+                )
+                scoreRow(
+                    title: "Seasonality",
+                    value: Double(country.seasonalityScore),
+                    weightPercentage: 0
+                )
             }
             .padding(14)
             .background(.thinMaterial)
@@ -77,11 +91,19 @@ struct WhenToGoCountryDrawerView: View {
         }
     }
 
-    private func scoreRow(title: String, value: Double) -> some View {
+    private func scoreRow(title: String, value: Double, weightPercentage: Int) -> some View {
         HStack {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+
+                Text("Weight: \(weightPercentage)%")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+
             Spacer()
+
             ScorePill(score: value)
         }
         .padding(.vertical, 6)

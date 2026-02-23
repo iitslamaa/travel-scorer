@@ -9,6 +9,7 @@ import SwiftUI
 
 struct RootTabView: View {
     @EnvironmentObject private var sessionManager: SessionManager
+    @EnvironmentObject private var weightsStore: ScoreWeightsStore
 
     @State private var countries: [Country] = []
     @State private var hasLoadedCountries = false
@@ -30,7 +31,10 @@ struct RootTabView: View {
 
             // When To Go
             NavigationStack {
-                WhenToGoView(countries: countries)
+                WhenToGoView(
+                    countries: countries,
+                    weightsStore: weightsStore
+                )
             }
             .tabItem {
                 Label("When To Go", systemImage: "calendar")
