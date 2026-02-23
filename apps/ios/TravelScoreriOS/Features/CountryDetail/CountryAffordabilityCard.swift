@@ -91,6 +91,10 @@ struct CountryAffordabilityCard: View {
                 }
                 .font(.caption)
                 .foregroundStyle(.secondary)
+                Text("Estimated daily travel costs based on cost-of-living indices and hotel price modeling.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding()
             .frame(maxWidth: .infinity, alignment: .leading)
