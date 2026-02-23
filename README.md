@@ -1,115 +1,228 @@
-# TravelScorer — Travelability Scoring App
+Travel Adventure Finder
 
-**Status:** Work in Progress (Public Portfolio Project)
+Production Travel Intelligence Platform
+Web · iOS · React Native · Monorepo Architecture
 
-A modern travel discovery app that ranks every country and territory by **“Travelability”** — a composite score that reflects safety, affordability, seasonality, language accessibility, visa ease, transit quality, and more.
+Travel Adventure Finder is a full-stack travel intelligence platform that ranks every country and territory using a weighted, data-driven scoring system.
 
-Built as a **TypeScript monorepo** with:
-- **Next.js (Web)** — `apps/web`
-- **Shared Scoring Library** — `packages/shared`
-- (Soon) **Expo Mobile App** — `apps/mobile`
+The goal is to transform fragmented global datasets into a clear, actionable decision engine for travelers.
 
----
+Built end-to-end with scalable architecture, clean boundaries, and shared cross-platform logic.
 
-## Overview
+⸻
 
-TravelScorer aggregates and normalizes open global data sources:
+Overview
 
-| Data Source | Purpose |
-|--------------|----------|
-| [US State Dept (travel.state.gov)](https://travel.state.gov) | Live safety advisory levels (1–4) |
-| United Nations (UN M49 / ISO-3166) | Canonical country and territory metadata |
-| World Bank, CIA Factbook (planned) | Affordability, GDP PPP, infrastructure metrics |
-| English Proficiency Index | English accessibility |
-| VisaGuide, T-Mobile Maps, Weather APIs (planned) | Visa & mobility data, connectivity, best travel months |
+Travel Adventure Finder calculates a dynamic Travelability Score (0–100) for every country using normalized global datasets.
 
-Each country receives a **Travelability Score (0–100)** based on weighted factors:
+Users can:
+	•	Explore ranked countries
+	•	Adjust scoring weights
+	•	View safety advisories
+	•	Compare affordability
+	•	Analyze visa accessibility
+	•	Evaluate seasonal timing
+	•	Track personal travel lists
+	•	Use social profile features
+	•	Access real-time data updates
 
-| Factor | Weight | Example |
-|--------|--------|----------|
-| Safety | 25% | US Travel Advisory Level |
-| Affordability | 15% | GDP PPP, cost of living index |
-| English | 10% | EF EPI |
-| Seasonality | 10% | Best travel months |
-| Visa | 10% | Ease of entry for US travelers |
-| Flight Time | 10% | Estimated distance from NYC |
-| Transit | 10% | Public transportation availability |
-| Women Safety | 5% | UN/NGO data |
-| Solo Safety | 5% | Traveler sentiment |
+This is not a static dataset app. It is a structured scoring engine layered over normalized global inputs.
 
----
+⸻
 
-## Tech Stack
+Scoring System
 
-| Layer | Tech |
-|-------|------|
-| Web | Next.js 15 + React 19 + TypeScript |
-| Shared Logic | TypeScript library (`@travel-af/shared`) |
-| Styling | TailwindCSS + dark mode |
-| Build | npm workspaces + tsc monorepo setup |
-| Mobile (planned) | Expo + React Native + Metro monorepo integration |
+Each country receives a weighted composite score built from multiple normalized dimensions.
 
----
+Dimensions include:
+	•	Safety (US State Department travel advisory levels)
+	•	Affordability (GDP PPP and cost proxies)
+	•	Visa Ease (entry complexity)
+	•	Seasonality (best travel months)
+	•	English Accessibility (EF EPI)
+	•	Transit and Infrastructure
+	•	Women and Solo Safety
+	•	Flight Accessibility
 
-## Project Structure
+Weights are configurable and normalized dynamically.
 
-```
+Scoring logic lives in a shared TypeScript domain library used across web and mobile platforms.
+
+⸻
+
+Architecture Overview
+
+Monorepo structure with shared domain logic across platforms.
+
 travel-af/
 ├── apps/
-│   └── web/                     # Next.js app (website)
-│       ├── app/                 # Next.js App Router (pages, API routes)
-│       │   └── api/
-│       │       ├── advisories/route.ts   # Fetch & normalize travel.state.gov advisories
-│       │       └── countries/route.ts    # Join UN/ISO seeds + advisories into one response
-│       ├── lib/                 # Country matching, facts joiners, types
-│       ├── data/                # UN/ISO seed data + public datasets
-│       └── scripts/
-│           └── generate-seeds.mjs # Seed generator (idempotent)
+│   ├── web/                             # Next.js 15 web application
+│   │   ├── app/                         # App Router (pages, layouts, API routes)
+│   │   │   └── api/
+│   │   │       ├── advisories/route.ts  # Fetch & normalize travel.state.gov advisories
+│   │   │       └── countries/route.ts   # Join UN/ISO seeds + advisories into one response
+│   │   ├── lib/                         # Country matching, data joins, utilities
+│   │   ├── data/                        # UN/ISO seed data + normalized datasets
+│   │   └── scripts/
+│   │       └── generate-seeds.mjs       # Idempotent seed generator
+│   │
+│   ├── mobile/                          # React Native (Expo Router) app
+│   │   ├── app/                         # Expo Router entry + screens
+│   │   ├── components/                  # Shared UI components
+│   │   ├── hooks/                       # Custom React hooks
+│   │   ├── context/                     # Auth + state providers
+│   │   └── utils/                       # Overlay builders, helpers, adapters
+│   │
+│   └── ios/                             # Native Swift iOS application
+│       ├── Features/                    # Feature modules (MVVM structured)
+│       ├── Core/                        # Networking, models, shared utilities
+│       └── Resources/                   # Assets and configuration
 │
 ├── packages/
-│   └── shared/                  # Shared TypeScript library (scoring/types)
-│       ├── src/                 # source (score.ts, types.ts, index.ts)
-│       └── dist/                # compiled output after build
+│   └── shared/                          # Shared TypeScript scoring engine
+│       ├── src/                         # score.ts, weights.ts, types.ts, index.ts
+│       └── dist/                        # Compiled output
 │
-└── package.json                 # npm workspaces (monorepo)
-```
+├── data/                                # Canonical country metadata
+│
+└── package.json                         # npm workspaces (monorepo root)
+⸻
 
-## Running Locally
+Mobile Stack
 
-**Requirements**
-- Node 18+ (or 20+ recommended)
-- npm 9+ (uses **npm workspaces**)
+Native iOS:
+	•	Swift
+	•	SwiftUI
+	•	MVVM architecture
+	•	Async/Await concurrency
+	•	RESTful integration
+	•	Real-time state synchronization
+	•	Performance profiling with Instruments
 
-### 1) Clone & install
+Published on the Apple App Store.
 
-```bash
+React Native (Cross-Platform):
+	•	Expo Router
+	•	TypeScript
+	•	Shared domain logic
+	•	Platform-gated modules
+	•	Web-compatible build configuration
+
+⸻
+
+Shared Domain Layer
+
+Package: @travel-af/shared
+
+Responsibilities:
+	•	Score calculation engine
+	•	Weight normalization
+	•	Types and data contracts
+	•	Deterministic score outputs
+	•	Cross-platform logic reuse
+
+This ensures:
+	•	No duplicated scoring logic
+	•	Predictable outputs across platforms
+	•	Clean separation between UI and computation
+
+⸻
+
+Backend and Data
+	•	Supabase (Postgres)
+	•	Row-Level Security (RLS)
+	•	Authentication flows
+	•	Real-time sync
+	•	Structured data modeling
+
+Data sources include:
+	•	US State Department
+	•	UN ISO/M49
+	•	World Bank
+	•	EF English Proficiency Index
+	•	Public visa datasets
+
+All datasets are normalized before scoring to reduce bias and inconsistencies.
+
+⸻
+
+Engineering Principles
+	•	Deterministic scoring logic
+	•	Clear separation of UI and domain layers
+	•	Modular MVVM boundaries
+	•	Idempotent seed generation
+	•	Runtime advisory parsing resilience
+	•	Cross-platform shared contracts
+	•	Performance-focused async workflows
+	•	Incremental refactoring over rewrites
+
+⸻
+
+Reliability and Debugging
+	•	Structured API boundaries
+	•	Deterministic weight normalization
+	•	Advisory parsing guards for runtime failures
+	•	Platform-specific module gating for React Native Web compatibility
+	•	Xcode Instruments profiling
+	•	Incremental feature PR workflow
+
+⸻
+
+Running Locally
+
+Requirements:
+	•	Node 18+
+	•	npm 9+
+	•	Xcode (for iOS)
+	•	Expo CLI (for mobile)
+
+Install:
+
 git clone https://github.com/iitslamaa/travel-af.git
 cd travel-af
 npm install
-```
 
-### 2) Build the Shared Library
+Build shared library:
 
-```
-# from the repo root
 npm run build -w @travel-af/shared
-# (or) cd packages/shared && npm run build
-```
 
-### 3) Start the web app (Next.js)
-```
-# from the repo root
+Run web:
+
 npm run dev -w apps/web
-# open http://localhost:3000
-```
-### (Optional) Refresh seed data
 
-The repo ships with seeds. If you want to regenerate them:
-```
-node apps/web/scripts/generate-seeds.mjs
-```
+Open:
+http://localhost:3000
 
-## Live advisories endpoint (travel.state.gov)
-	•	We fetch advisories at runtime via /api/advisories and join them with UN/ISO seeds in /api/countries.
-	•	If you see a console warning like non-RSS or a captcha snippet in dev logs, that’s expected; the parser handles it.
-	•	To inspect raw joined output: open http://localhost:3000/api/countries.
+Run mobile (Expo):
+
+cd apps/mobile
+npx expo start
+
+⸻
+
+Contribution Activity
+	•	400+ commits in the core repository
+	•	190+ merged pull requests
+	•	Continuous iteration and refactoring
+	•	Active 2026 development cycle
+
+⸻
+
+Purpose
+
+Most travel apps present static information.
+
+Travel Adventure Finder builds a structured scoring system that:
+	•	Abstracts global datasets
+	•	Normalizes inconsistencies
+	•	Enables configurable prioritization
+	•	Supports cross-platform delivery
+	•	Demonstrates production-grade system design
+
+⸻
+
+Author
+
+Lama Yassine
+Mobile and Systems Engineer
+Swift · TypeScript · Systems Architecture · Cross-Platform Mobile
