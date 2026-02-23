@@ -7,5 +7,7 @@ type Props = {
 };
 
 export function AffordabilitySection({ facts }: Props) {
+  if (!facts) return null;
+
   return <AffordabilityDisplay facts={facts} />;
 }

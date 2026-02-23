@@ -34,6 +34,8 @@ export type CountryFacts = {
   affordability?: number;
   affordabilityCategory?: number; // 1 (cheapest) .. 10 (most expensive)
   affordabilityBand?: 'good' | 'warn' | 'bad' | 'danger';
+  affordabilityExplanation?: string;
+  averageDailyCostUsd?: number;
   directFlight?: number;
   infrastructure?: number;
 

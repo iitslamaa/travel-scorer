@@ -15,14 +15,13 @@ struct CountryScoreSection: View {
     let title: String
     let weight: Int
     let score: Int
-    let band: ScorePill.Band?
     let headline: String
     let subtitle: String?
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 16) {
 
-            // Title row (legacy CountryDetail style)
+            // Title row
             HStack {
                 Text(title)
                     .font(.headline)
@@ -34,27 +33,32 @@ struct CountryScoreSection: View {
                     .foregroundStyle(.secondary)
             }
 
-            // Score + description row (MATCHES CountryVisaCard legacy styling)
-            HStack(spacing: 12) {
+            // Score + description row
+            HStack(alignment: .top, spacing: 12) {
 
+                // CountryDetail-specific pill styling (independent from ScorePill)
                 Text("\(score)")
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                     .padding(.horizontal, 14)
                     .padding(.vertical, 6)
                     .background(
                         Capsule()
-                            .fill(CountryScoreStyling.backgroundColor(for: score))
+                            .fill(backgroundColor(for: score))
                     )
                     .overlay(
                         Capsule()
-                            .stroke(CountryScoreStyling.borderColor(for: score), lineWidth: 1)
+                            .stroke(
+                                borderColor(for: score),
+                                lineWidth: 1
+                            )
                     )
 
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
 
                     Text(headline)
                         .font(.subheadline)
                         .fontWeight(.semibold)
+                        .fixedSize(horizontal: false, vertical: true)
 
                     if let subtitle {
                         Text(subtitle)
@@ -66,18 +70,28 @@ struct CountryScoreSection: View {
 
                 Spacer()
             }
-
-            // Footer (Normalized + Weight)
-            HStack(spacing: 12) {
-                Text("Normalized: \(score)")
-                Text("Weight: \(weight)%")
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(.thinMaterial)
         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private func backgroundColor(for score: Int) -> Color {
+        switch score {
+        case 80...100: return Color.green.opacity(0.15)
+        case 60..<80: return Color.yellow.opacity(0.15)
+        case 40..<60: return Color.orange.opacity(0.15)
+        default: return Color.red.opacity(0.15)
+        }
+    }
+
+    private func borderColor(for score: Int) -> Color {
+        switch score {
+        case 80...100: return .green
+        case 60..<80: return .yellow
+        case 40..<60: return .orange
+        default: return .red
+        }
     }
 }

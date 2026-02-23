@@ -48,8 +48,17 @@ struct Country: Identifiable, Hashable {
     let affordabilityCategory: Int?
     let affordabilityScore: Int?
     let affordabilityBand: String?
+    let affordabilityExplanation: String?
+
+
+    var affordabilityHeadline: String? {
+        splitHeadline(from: affordabilityExplanation)
+    }
+
+    var affordabilityBody: String? {
+        splitBody(from: affordabilityExplanation)
+    }
     
-    // Nice combined label for UI, similar to web
     var regionLabel: String? {
         switch (subregion, region) {
         case let (sub?, reg?) where sub != reg:
@@ -93,6 +102,7 @@ struct Country: Identifiable, Hashable {
         affordabilityCategory: Int? = nil,
         affordabilityScore: Int? = nil,
         affordabilityBand: String? = nil,
+        affordabilityExplanation: String? = nil,
         travelSafeScore: Int? = nil
     ) {
         self.iso2 = iso2
@@ -121,11 +131,70 @@ struct Country: Identifiable, Hashable {
         self.affordabilityCategory = affordabilityCategory
         self.affordabilityScore = affordabilityScore
         self.affordabilityBand = affordabilityBand
+        self.affordabilityExplanation = affordabilityExplanation
         self.travelSafeScore = travelSafeScore
     }
 
     var flagEmoji: String {
         iso2.flagEmoji
+    }
+
+    // MARK: - Advisory Headline + Body (for CountryDetail consistency)
+
+    var advisoryHeadline: String? {
+        splitHeadline(from: advisorySummary)
+    }
+
+    var advisoryBody: String? {
+        splitBody(from: advisorySummary)
+    }
+
+    // MARK: - Visa Headline + Body
+
+    var visaHeadline: String? {
+        splitHeadline(from: visaNotes)
+    }
+
+    var visaBody: String? {
+        splitBody(from: visaNotes)
+    }
+
+    // MARK: - Seasonality Headline + Body
+
+    var seasonalityHeadline: String? {
+        splitHeadline(from: seasonalityNotes)
+    }
+
+    var seasonalityBody: String? {
+        splitBody(from: seasonalityNotes)
+    }
+
+    // MARK: - Shared Text Splitting Logic
+
+    private func splitHeadline(from text: String?) -> String? {
+        guard let text = text?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !text.isEmpty else { return nil }
+
+        if let firstSentenceEnd = text.firstIndex(of: ".") {
+            let headline = text[..<text.index(after: firstSentenceEnd)]
+            return String(headline).trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        return text
+    }
+
+    private func splitBody(from text: String?) -> String? {
+        guard let text = text?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !text.isEmpty else { return nil }
+
+        if let firstSentenceEnd = text.firstIndex(of: ".") {
+            let bodyStart = text.index(after: firstSentenceEnd)
+            let body = text[bodyStart...]
+            let trimmed = String(body).trimmingCharacters(in: .whitespacesAndNewlines)
+            return trimmed.isEmpty ? nil : trimmed
+        }
+
+        return nil
     }
 }
 
