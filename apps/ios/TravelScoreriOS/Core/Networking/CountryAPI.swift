@@ -231,6 +231,7 @@ extension CountryAPI {
                     dailySpendActivitiesUsd: dto.dailySpendActivitiesUsd,
                     affordabilityCategory: dto.affordabilityCategory,
                     affordabilityScore: dto.affordabilityScore,
+                    affordabilityBand: dto.affordabilityBand,
                     travelSafeScore: dto.travelSafeScore
                 )
             }
@@ -274,8 +275,8 @@ extension CountryAPI {
     }
 
     private enum CountriesCache {
-        static let lastRefreshKey = "countries_last_refresh_ts_v1"
-        private static let fileName = "countries_cache_v2.json"
+        static let lastRefreshKey = "countries_last_refresh_ts_v2"
+        private static let fileName = "countries_cache_v3.json"
 
         private static var cacheURL: URL {
             let fm = FileManager.default

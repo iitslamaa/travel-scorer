@@ -673,6 +673,61 @@ export async function GET() {
           fxFacts.seasonality = todayScore;
         }
       } catch {}
+
+      // --- Capture average daily cost (USD) for affordability bucketing
+      try {
+        const fxFacts = row.facts as unknown as FactsExtraServer;
+        const avgCostUsd = extractAverageDailyCostUsd(fxFacts);
+        if (avgCostUsd != null && Number.isFinite(avgCostUsd)) {
+          fxFacts.averageDailyCostUsd = avgCostUsd;
+        }
+      } catch {}
+    }
+
+    // --- SECOND PASS: Absolute USD-based affordability buckets
+    const USD_BUCKETS = [
+      40,   // 1
+      60,   // 2
+      80,   // 3
+      100,  // 4
+      130,  // 5
+      170,  // 6
+      220,  // 7
+      300,  // 8
+      400   // 9
+      // 10 = above 400
+    ];
+
+    for (const row of merged) {
+      const fxFacts = row.facts as unknown as FactsExtraServer;
+      const cost = fxFacts?.averageDailyCostUsd;
+
+      if (typeof cost !== 'number' || !Number.isFinite(cost)) continue;
+
+      let category = 10;
+
+      for (let i = 0; i < USD_BUCKETS.length; i++) {
+        if (cost <= USD_BUCKETS[i]) {
+          category = i + 1;
+          break;
+        }
+      }
+
+      const score = (11 - category) * 10;
+
+      fxFacts.affordabilityCategory = category;
+      fxFacts.affordability = score;
+      (fxFacts as any).affordabilityScore = score;
+      fxFacts.affordabilityBand = affordabilityBandFromCategory(category);
+
+      // Recompute total score after affordability injected
+      try {
+        const { total } = buildRows(
+          row.facts as CountryFacts,
+          userWeights
+        );
+        fxFacts.scoreTotal = total;
+      } catch {}
     }
 
     if (merged.length) {
