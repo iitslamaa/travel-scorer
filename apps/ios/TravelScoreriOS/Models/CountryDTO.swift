@@ -55,6 +55,9 @@ struct CountryDTO: Decodable {
     /// Canonical affordability band from backend ("good" | "warn" | "bad" | "danger")
     let affordabilityBand: String?
 
+    /// Canonical affordability explanation from backend
+    let affordabilityExplanation: String?
+
 
     var advisoryLevelText: String? {
         advisoryLevelNumber.map { "Level \($0)" }
@@ -123,6 +126,7 @@ struct CountryDTO: Decodable {
         let affordabilityCategory: Int?
         let affordability: Double?
         let affordabilityBand: String?
+        let affordabilityExplanation: String?
 
 
         private enum CodingKeys: String, CodingKey {
@@ -145,6 +149,7 @@ struct CountryDTO: Decodable {
             case affordabilityCategory
             case affordability
             case affordabilityBand
+            case affordabilityExplanation
         }
 
         init(from decoder: Decoder) throws {
@@ -187,6 +192,7 @@ struct CountryDTO: Decodable {
                 affordability = nil
             }
             affordabilityBand = try? c.decode(String.self, forKey: .affordabilityBand)
+            affordabilityExplanation = try? c.decode(String.self, forKey: .affordabilityExplanation)
         }
     }
 
@@ -367,6 +373,7 @@ struct CountryDTO: Decodable {
             self.affordabilityScore = nil
         }
         self.affordabilityBand = facts?.affordabilityBand
+        self.affordabilityExplanation = facts?.affordabilityExplanation.map { Self.decodeHTML($0) }
 
 
         // Debug (super useful right now)
@@ -402,6 +409,11 @@ struct CountryDTO: Decodable {
                 print("🎨 affordability band for \(name): \(affordabilityBand)")
             } else {
                 print("🎨 affordability band missing for \(name)")
+            }
+            if let affordabilityExplanation {
+                print("📝 affordability explanation for \(name): \(affordabilityExplanation)")
+            } else {
+                print("📝 affordability explanation missing for \(name)")
             }
         }
         #endif

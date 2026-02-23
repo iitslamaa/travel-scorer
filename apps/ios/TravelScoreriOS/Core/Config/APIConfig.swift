@@ -16,8 +16,7 @@ enum APIConfig {
     }
 
     static var baseURL: URL {
-        // 🔒 Hard-locked production backend (Railway)
-        let url = URL(string: "https://travel-app-af-production.up.railway.app")!
+        let url = URL(string: "https://travel-scorer.vercel.app")!
 
         #if DEBUG
         print("🌍 [APIConfig] Using base URL:", url.absoluteString)

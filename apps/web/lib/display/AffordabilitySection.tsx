@@ -5,15 +5,6 @@ type Props = {
   tripLengthDays?: number; // future use when we wire dates
 };
 
-function describeCostBucket(category?: number): string | null {
-  if (category == null || !Number.isFinite(category)) return null;
-  if (category <= 2) return "very cheap compared with other countries";
-  if (category <= 4) return "on the cheaper side overall";
-  if (category <= 7) return "moderate compared with other countries";
-  if (category <= 9) return "on the expensive side overall";
-  return "among the most expensive destinations";
-}
-
 export function AffordabilitySection({ facts, tripLengthDays }: Props) {
   if (!facts) return null;
 
@@ -21,6 +12,7 @@ export function AffordabilitySection({ facts, tripLengthDays }: Props) {
     affordability?: number;           // 0–100, cheap = 100
     affordabilityCategory?: number;   // 1 = cheapest, 10 = most expensive
     averageDailyCostUsd?: number;
+    affordabilityExplanation?: string;
     dailySpend?: {
       totalUsd?: number;
       hotelUsd?: number;
@@ -34,8 +26,6 @@ export function AffordabilitySection({ facts, tripLengthDays }: Props) {
   const score100 = fx.affordability;
   const averageDailyCost = fx.averageDailyCostUsd;
   const spend = fx.dailySpend || {};
-
-  const bucketDescription = describeCostBucket(category);
 
   const hasAnyBreakdown =
     spend.hotelUsd != null ||
@@ -78,14 +68,6 @@ export function AffordabilitySection({ facts, tripLengthDays }: Props) {
                 ? "(most expensive)"
                 : ""}
             </span>
-            {bucketDescription && (
-              <>
-                {" "}
-                <span className="text-xs text-muted-foreground">
-                  – {bucketDescription}.
-                </span>
-              </>
-            )}
           </>
         )}
 
@@ -110,6 +92,12 @@ export function AffordabilitySection({ facts, tripLengthDays }: Props) {
           </>
         )}
       </p>
+
+      {fx.affordabilityExplanation && (
+        <p className="text-sm text-muted-foreground">
+          {fx.affordabilityExplanation}
+        </p>
+      )}
 
       {hasAnyBreakdown && (
         <div className="grid grid-cols-2 gap-3 text-sm">

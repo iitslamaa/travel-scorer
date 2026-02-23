@@ -69,6 +69,7 @@ type FactsExtraServer = Partial<CountryFacts> & {
   averageDailyCostUsd?: number;    // per-person daily cost in USD
   affordabilityCategory?: number;  // 1 (cheapest) .. 10 (most expensive)
   affordabilityBand?: 'good' | 'warn' | 'bad' | 'danger';  // centralized UI band
+  affordabilityExplanation?: string;
 
   // server-computed total
   scoreTotal?: number;
@@ -684,6 +685,25 @@ export async function GET() {
       } catch {}
     }
 
+    // Helper: Generate affordability explanation from category and USD
+    function affordabilityExplanationFromCategory(
+      category: number,
+      usd: number
+    ): string {
+      if (category <= 2) {
+        return `Very low daily costs (≈ $${usd.toFixed(0)}/day). Strong value for accommodation, food, and transport compared to global averages.`;
+      }
+      if (category <= 4) {
+        return `Generally affordable (≈ $${usd.toFixed(0)}/day). Costs are below Western Europe and North America averages.`;
+      }
+      if (category <= 6) {
+        return `Moderate travel costs (≈ $${usd.toFixed(0)}/day). Expect typical mid-range international pricing.`;
+      }
+      if (category <= 8) {
+        return `Higher daily costs (≈ $${usd.toFixed(0)}/day). Accommodation and dining are noticeably above global median levels.`;
+      }
+      return `Premium pricing (≈ $${usd.toFixed(0)}/day). Among the most expensive destinations globally for hotels and services.`;
+    }
     // --- SECOND PASS: Absolute USD-based affordability buckets
     const USD_BUCKETS = [
       40,   // 1
@@ -719,6 +739,9 @@ export async function GET() {
       fxFacts.affordability = score;
       (fxFacts as any).affordabilityScore = score;
       fxFacts.affordabilityBand = affordabilityBandFromCategory(category);
+
+      fxFacts.affordabilityExplanation =
+        affordabilityExplanationFromCategory(category, cost);
 
       // Recompute total score after affordability injected
       try {

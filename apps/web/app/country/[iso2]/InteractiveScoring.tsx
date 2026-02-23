@@ -8,10 +8,18 @@ import { AdvisoryBadge } from '@/lib/display/AdvisoryBadge';
 import { ScorePill } from '@/lib/display/ScorePill';
 import { VisaSection } from './components/VisaSection';
 import { Seasonality } from './components/Seasonality';
+import { AffordabilitySection } from './components/AffordabilitySection';
+
+
+type CountryRowLite = {
+  advisory?: {
+    level?: 1 | 2 | 3 | 4;
+  } | null;
+};
 
 type Props = {
   facts: CountryFacts;
-  row: any;
+  row: CountryRowLite;
 };
 
 export default function InteractiveScoring({ facts, row }: Props) {
@@ -109,14 +117,7 @@ export default function InteractiveScoring({ facts, row }: Props) {
 
       {/* Affordability */}
       <section className="card p-5 mb-8">
-        <h3 className="font-medium mb-2">Affordability</h3>
-        <ScorePill
-          value={
-            typeof rows.find(r => r.key === 'affordability')?.raw === 'number'
-              ? Math.round(rows.find(r => r.key === 'affordability')!.raw as number)
-              : undefined
-          }
-        />
+        <AffordabilitySection facts={facts} />
       </section>
     </>
   );
