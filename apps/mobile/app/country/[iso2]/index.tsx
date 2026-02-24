@@ -6,8 +6,7 @@ import {
   Text,
 } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
-import { useCountries } from '../../../hooks/useCountries';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import HeaderCard from './components/HeaderCard';
 import AdvisoryCard from './components/AdvisoryCard';
 import SeasonalityCard from './components/SeasonalityCard';
@@ -17,10 +16,12 @@ import { lightColors, darkColors } from '../../../theme/colors';
 export default function CountryDetailScreen() {
   const { iso2, name } = useLocalSearchParams<{ iso2: string; name?: string }>();
   const navigation = useNavigation();
-  const { countries } = useCountries();
 
   const scheme = useColorScheme();
   const colors = scheme === 'dark' ? darkColors : lightColors;
+
+  const [country, setCountry] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (name) {
@@ -30,9 +31,26 @@ export default function CountryDetailScreen() {
     }
   }, [navigation, name]);
 
-  const country = useMemo(() => {
-    return countries?.find?.(c => c.iso2 === iso2);
-  }, [countries, iso2]);
+  useEffect(() => {
+    if (!iso2) return;
+
+    const fetchCountry = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(
+          `https://travel-scorer.vercel.app/api/country/${iso2}`
+        );
+        const data = await res.json();
+        setCountry(data);
+      } catch (e) {
+        console.log('Country detail fetch error:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCountry();
+  }, [iso2]);
 
   useEffect(() => {
     if (!country?.name) return;
@@ -42,7 +60,7 @@ export default function CountryDetailScreen() {
     });
   }, [navigation, country?.name]);
 
-  if (!countries || !country) {
+  if (loading || !country) {
     return (
       <View
         style={{
