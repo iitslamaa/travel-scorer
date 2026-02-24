@@ -54,7 +54,13 @@ export default function CountryDetailPreviewDrawer({
 
   const handleNavigate = () => {
     onClose();
-    router.push(`/country/${resolvedCountry?.iso2}`);
+    router.push({
+      pathname: '/country/[iso2]',
+      params: {
+        iso2: resolvedCountry?.iso2,
+        name: resolvedCountry?.name,
+      },
+    });
   };
 
   if (!country) return null;
