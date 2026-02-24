@@ -46,32 +46,50 @@ export default function ProfileScreen() {
   if (!user) {
     return (
       <View
-        style={[
-          styles.container,
-          {
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: colors.background,
-          },
-        ]}
+        style={{
+          flex: 1,
+          paddingHorizontal: 20,
+          paddingTop: 60,
+          paddingBottom: 120,
+          justifyContent: 'center',
+          backgroundColor: colors.background,
+        }}
       >
-        <Text style={[styles.title, { color: colors.textPrimary }]}>
+        <Text
+          style={{
+            fontSize: 34,
+            fontWeight: '700',
+            color: colors.textPrimary,
+          }}
+        >
           Login to customize your profile
         </Text>
 
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+        <Text
+          style={{
+            marginTop: 16,
+            fontSize: 16,
+            color: colors.textMuted,
+            lineHeight: 22,
+            maxWidth: 320,
+          }}
+        >
           Sign in to set your languages, travel style, and destinations.
         </Text>
 
         <Pressable
-          style={styles.loginButton}
-          onPress={() => {
-            exitGuest();
-            router.replace('/');
-          }}
+          onPress={() => router.push('/login')}
+          style={{ marginTop: 24 }}
         >
-          <Text style={styles.loginButtonText}>Go to Login →</Text>
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: '600',
+              color: '#3B82F6',
+            }}
+          >
+            Go to Login →
+          </Text>
         </Pressable>
       </View>
     );
