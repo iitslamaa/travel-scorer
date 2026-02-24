@@ -19,6 +19,12 @@
     <key>APP_REVIEW_MODE</key>
     <false/>
 
+    <key>CFBundleDisplayName</key>
+    <string>Travel Adventure Finder</string>
+
+    <key>CFBundleName</key>
+    <string>Travel Adventure Finder</string>
+
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
