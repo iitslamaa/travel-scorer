@@ -7,6 +7,7 @@ import {
   FlatList,
   useColorScheme,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -52,6 +53,20 @@ export default function FriendsScreen() {
   return (
     <AuthGate>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
+        {loading && (
+          <View
+            style={{
+              flex: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <ActivityIndicator size="large" color={colors.textPrimary} />
+          </View>
+        )}
+
+        {!loading && (
+          <>
         {/* Header */}
         <View style={styles.headerRow}>
           <Text style={[styles.title, { color: colors.textPrimary }]}>
@@ -86,7 +101,7 @@ export default function FriendsScreen() {
             data={friends}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
-            scrollEnabled={false}
+            contentContainerStyle={{ paddingBottom: 40 }}
             ListEmptyComponent={
               !loading ? (
                 <Text style={{ color: colors.textMuted, textAlign: 'center', paddingVertical: 20 }}>
@@ -96,13 +111,8 @@ export default function FriendsScreen() {
             }
           />
         </View>
-
-        {/* Footer Count */}
-        <View style={[styles.footerPill, { backgroundColor: colors.card }]}>
-          <Text style={{ color: colors.textMuted }}>
-            {friends.length} Friends
-          </Text>
-        </View>
+          </>
+        )}
       </View>
     </AuthGate>
   );
@@ -113,6 +123,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 60,
+    paddingBottom: 120,
   },
   headerRow: {
     flexDirection: 'row',
@@ -169,11 +180,5 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 14,
     marginTop: 2,
-  },
-  footerPill: {
-    marginTop: 24,
-    borderRadius: 28,
-    paddingVertical: 16,
-    alignItems: 'center',
   },
 });
