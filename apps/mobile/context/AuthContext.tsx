@@ -68,11 +68,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single(),
       supabase
         .from('user_bucket_list')
-        .select('country_iso2')
+        .select('country_id')
         .eq('user_id', userId),
       supabase
         .from('user_traveled')
-        .select('country_iso2')
+        .select('country_id')
         .eq('user_id', userId),
     ]);
 
@@ -81,11 +81,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     setBucketIsoCodes(
-      bucketRes.data?.map((r: any) => r.country_iso2) ?? []
+      bucketRes.data?.map((r: any) => r.country_id) ?? []
     );
 
     setVisitedIsoCodes(
-      visitedRes.data?.map((r: any) => r.country_iso2) ?? []
+      visitedRes.data?.map((r: any) => r.country_id) ?? []
     );
 
     setProfileLoading(false);
@@ -125,13 +125,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('user_bucket_list')
         .delete()
         .eq('user_id', userId)
-        .eq('country_iso2', iso2);
+        .eq('country_id', iso2);
 
       setBucketIsoCodes(prev => prev.filter(c => c !== iso2));
     } else {
       await supabase
         .from('user_bucket_list')
-        .insert({ user_id: userId, country_iso2: iso2 });
+        .insert({ user_id: userId, country_id: iso2 });
 
       setBucketIsoCodes(prev => [...prev, iso2]);
     }
@@ -146,13 +146,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .from('user_traveled')
         .delete()
         .eq('user_id', userId)
-        .eq('country_iso2', iso2);
+        .eq('country_id', iso2);
 
       setVisitedIsoCodes(prev => prev.filter(c => c !== iso2));
     } else {
       await supabase
         .from('user_traveled')
-        .insert({ user_id: userId, country_iso2: iso2 });
+        .insert({ user_id: userId, country_id: iso2 });
 
       setVisitedIsoCodes(prev => [...prev, iso2]);
     }

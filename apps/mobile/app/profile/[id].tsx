@@ -5,19 +5,18 @@ import {
   Image,
   Pressable,
   ScrollView,
-  useColorScheme,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import CountryFlag from 'react-native-country-flag';
-import { lightColors, darkColors } from '../../theme/colors';
 import { useProfileById } from '../../hooks/useProfileById';
 import { useFriendshipStatus } from '../../hooks/useFriendshipStatus';
 import { useFriendCount } from '../../hooks/useFriendCount';
 import { useUserCounts } from '../../hooks/useUserCounts';
 import { useCountries } from '../../hooks/useCountries';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function FriendProfileScreen() {
   const router = useRouter();
@@ -29,8 +28,7 @@ export default function FriendProfileScreen() {
     });
   }, [navigation]);
   const { id } = useLocalSearchParams();
-  const scheme = useColorScheme();
-  const colors = scheme === 'dark' ? darkColors : lightColors;
+  const colors = useTheme();
 
   const { profile, loading } = useProfileById(id);
   const { isFriend } = useFriendshipStatus(id);
@@ -82,9 +80,14 @@ export default function FriendProfileScreen() {
         <View style={styles.headerRow}>
           <View style={styles.avatarWrap}>
             {profile.avatar_url ? (
-              <Image source={{ uri: profile.avatar_url }} style={styles.avatar} />
+              <Image
+                source={{ uri: profile.avatar_url }}
+                style={styles.avatar}
+                resizeMode="cover"
+                onError={() => console.log('Avatar failed to load:', profile.avatar_url)}
+              />
             ) : (
-              <View style={[styles.avatar, { backgroundColor: '#444' }]} />
+              <View style={[styles.avatar, { backgroundColor: colors.surface }]} />
             )}
           </View>
 
@@ -170,7 +173,7 @@ export default function FriendProfileScreen() {
                 size={18}
                 style={{ marginRight: 6 }}
               />
-              <Text style={[styles.cardValue, { color: colors.textMuted, marginTop: 0 }]}>
+              <Text style={[styles.cardValue, { color: colors.textPrimary, marginTop: 0 }]}>
                 {nextDestinationCountry.name}
               </Text>
             </View>
@@ -184,7 +187,7 @@ export default function FriendProfileScreen() {
           <Text style={[styles.linkText, { color: colors.primary }]}>
             Countries Traveled:
           </Text>
-          <Text style={{ color: '#d2a21b', marginLeft: 8, fontWeight: '700' }}>
+          <Text style={{ color: colors.primary, marginLeft: 8, fontWeight: '700' }}>
             {traveledCount}
           </Text>
         </Pressable>
