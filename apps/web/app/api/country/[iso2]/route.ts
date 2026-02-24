@@ -101,6 +101,11 @@ export async function GET(
 
       if (advisory?.level) {
         enriched.facts.advisoryLevel = advisory.level;
+
+        // Compute normalized advisory score (0–100) same as scoring engine
+        const advisoryScore = ((5 - advisory.level) / 4) * 100;
+        enriched.facts.advisoryScore = advisoryScore;
+
         enriched.advisory = advisory;
       }
     }
