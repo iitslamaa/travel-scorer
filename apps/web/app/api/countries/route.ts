@@ -46,7 +46,7 @@ type FactsExtraServer = Partial<CountryFacts> & {
   redditComposite?: number;
   seasonality?: number;
   visaEase?: number;
-  visaType?: 'visa_free' | 'voa' | 'evisa' | 'visa_required' | 'ban';
+  visaType?: 'visa_free' | 'voa' | 'evisa' | 'visa_required' | 'entry_permit' | 'ban';
   visaAllowedDays?: number;
   visaFeeUsd?: number;
   visaNotes?: string;
@@ -632,7 +632,7 @@ export async function GET() {
         const visa = visaIndex.get(keyUpper);
         if (visa) {
           const fxs = row.facts as unknown as FactsExtraServer;
-          fxs.visaEase = visa.visaEase;
+          fxs.visaEase = visa.visaEase ?? undefined;
           fxs.visaType = visa.visaType;
           fxs.visaAllowedDays = visa.allowedDays;
           fxs.visaFeeUsd = visa.feeUsd;
