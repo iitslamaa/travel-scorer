@@ -5,7 +5,6 @@
 //  Created by Lama Yassine on 11/10/25.
 //
 
-
 import SwiftUI
 import Supabase
 import PostgREST
@@ -133,7 +132,7 @@ struct CountryListView: View {
                 }
             case .score:
                 // Sort ascending, then flip based on order
-                baseSorted = filtered.sorted { $0.score < $1.score }
+                baseSorted = filtered.sorted { ($0.score ?? Int.min) < ($1.score ?? Int.min) }
             }
 
             let result: [Country]
@@ -169,7 +168,22 @@ struct CountryListView: View {
                     Spacer()
 
                     HStack(spacing: 8) {
-                        ScorePill(score: country.score)
+                        if let score = country.score {
+                            ScorePill(score: score)
+                        } else {
+                            Text("—")
+                                .font(.caption.bold())
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(
+                                    Capsule()
+                                        .fill(Color.gray.opacity(0.15))
+                                )
+                                .overlay(
+                                    Capsule()
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                        }
 
                         ZStack {
                             // invisible placeholder to keep layout stable

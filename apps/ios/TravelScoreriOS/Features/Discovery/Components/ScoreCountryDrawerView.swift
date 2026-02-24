@@ -39,16 +39,29 @@ struct ScoreCountryDrawerView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     
-                    Text("\(country.score)")
-                        .font(.largeTitle)
-                        .bold()
-                        .padding(.horizontal, 18)
-                        .padding(.vertical, 8)
-                        .background(
-                            Capsule()
-                                .fill(ScoreColor.background(for: country.score))
-                        )
-                        .foregroundColor(.white)
+                    if let score = country.score {
+                        Text("\(score)")
+                            .font(.largeTitle)
+                            .bold()
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule()
+                                    .fill(ScoreColor.background(for: score))
+                            )
+                            .foregroundColor(.white)
+                    } else {
+                        Text("—")
+                            .font(.largeTitle)
+                            .bold()
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule()
+                                    .fill(Color.gray.opacity(0.15))
+                            )
+                            .foregroundColor(.primary)
+                    }
                 }
                 
                 Spacer()
