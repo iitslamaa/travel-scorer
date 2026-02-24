@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from "react";
-import { View, StyleSheet, Dimensions, Animated, Pressable, Text } from "react-native";
+import { View, StyleSheet, Pressable, Text, useWindowDimensions } from "react-native";
 import MapView, { Polygon } from "react-native-maps";
 import { useRouter } from "expo-router";
 import { useCountries } from "../../hooks/useCountries";
@@ -16,8 +16,6 @@ const mutedMapStyle = [
   { featureType: "water", elementType: "geometry", stylers: [{ color: "#0e1626" }] },
 ];
 
-const { width, height } = Dimensions.get("window");
-
 function getScoreColor(score?: number) {
   if (score == null) return "rgba(180,180,180,0.15)";
   if (score >= 80) return "rgba(52,168,83,0.6)";
@@ -30,6 +28,7 @@ export default function ScoreWorldMap() {
   const router = useRouter();
   const mapRef = useRef<MapView>(null);
   const { countries } = useCountries();
+  const { height } = useWindowDimensions();
 
   const [selected, setSelected] = useState<any>(null);
 
@@ -162,7 +161,17 @@ export default function ScoreWorldMap() {
       </MapView>
 
       {selected && (
-        <View style={styles.card}>
+        <View
+          style={[
+            styles.card,
+            {
+              maxHeight: height * 0.5,
+              alignSelf: 'center',
+              width: '100%',
+              maxWidth: 720,
+            },
+          ]}
+        >
           <Text style={styles.title}>{selected.name}</Text>
           <Text style={styles.score}>Score: {selected.score ?? "N/A"}</Text>
 
@@ -206,8 +215,6 @@ const styles = StyleSheet.create({
   card: {
     position: "absolute",
     bottom: 40,
-    left: 20,
-    right: 20,
     backgroundColor: "#111",
     padding: 20,
     borderRadius: 20,
