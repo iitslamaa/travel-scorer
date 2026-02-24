@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -18,10 +18,19 @@ import HeaderCard from '../../components/profile/HeaderCard';
 import InfoCard from '../../components/profile/InfoCard';
 import DisclosureRow from '../../components/profile/DisclosureRow';
 import CollapsibleCountrySection from '../../components/profile/CollapsibleCountrySection';
+import { useNavigation } from '@react-navigation/native';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: 'Profile',
+    });
+  }, [navigation]);
+
   const {
     session,
     profile,
@@ -110,13 +119,13 @@ export default function ProfileScreen() {
       style={{ backgroundColor }}
       contentContainerStyle={[
         styles.container,
-        { paddingTop: insets.top + 16, paddingBottom: insets.bottom + 80 },
+        { paddingBottom: insets.bottom + 80 },
       ]}
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.topRow}>
         <Text style={[styles.title, { color: titleColor }]}>
-          {displayName}
+          Profile
         </Text>
 
         <Pressable
@@ -184,12 +193,14 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 22,
+    paddingTop: 60,
   },
 
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 14,
     marginBottom: 20,
   },
 

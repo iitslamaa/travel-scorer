@@ -8,6 +8,8 @@ import {
   useColorScheme,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
+import { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import CountryFlag from 'react-native-country-flag';
 import { lightColors, darkColors } from '../../theme/colors';
@@ -19,6 +21,13 @@ import { useCountries } from '../../hooks/useCountries';
 
 export default function FriendProfileScreen() {
   const router = useRouter();
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: 'Profile',
+    });
+  }, [navigation]);
   const { id } = useLocalSearchParams();
   const scheme = useColorScheme();
   const colors = scheme === 'dark' ? darkColors : lightColors;
@@ -48,7 +57,6 @@ export default function FriendProfileScreen() {
   }
 
 
-  const title = `${profile.full_name}'s Profile`;
 
   const languagesText =
     Array.isArray(profile.languages) && profile.languages.length > 0
@@ -66,7 +74,9 @@ export default function FriendProfileScreen() {
       </Pressable>
 
       <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>{title}</Text>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>
+          Profile
+        </Text>
 
         {/* Header block */}
         <View style={styles.headerRow}>
@@ -186,7 +196,7 @@ export default function FriendProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 60, paddingHorizontal: 20 },
   backBtn: { marginBottom: 14 },
-  title: { fontSize: 40, fontWeight: '800', marginBottom: 22 },
+  title: { fontSize: 30, fontWeight: '700', letterSpacing: -0.5, marginBottom: 20 },
   headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 22 },
   avatarWrap: { width: 150, height: 150, borderRadius: 75, overflow: 'hidden' },
   avatar: { width: 150, height: 150, borderRadius: 75 },
