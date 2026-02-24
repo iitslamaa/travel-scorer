@@ -1,11 +1,16 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, useColorScheme } from 'react-native';
 import { Stack, useSegments } from 'expo-router';
 import { Video, ResizeMode } from 'expo-av';
 import { AuthProvider } from '../context/AuthContext';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { useTheme } from '../hooks/useTheme';
 
 function RootLayoutInner() {
   const segments = useSegments();
+  const scheme = useColorScheme();
+  const colors = useTheme();
 
   const isAuthRoute =
     segments.length === 0 ||
@@ -13,7 +18,12 @@ function RootLayoutInner() {
     segments[0] === 'verify';
 
   return (
-    <View style={styles.root}>
+    <SafeAreaView style={[styles.root, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+      <StatusBar
+        style={scheme === 'dark' ? 'light' : 'dark'}
+        backgroundColor={colors.background}
+      />
+
       {isAuthRoute ? (
         <View pointerEvents="none" style={StyleSheet.absoluteFill}>
           <Video
@@ -31,18 +41,20 @@ function RootLayoutInner() {
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: 'transparent' },
+          contentStyle: { backgroundColor: colors.background },
         }}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <RootLayoutInner />
-    </AuthProvider>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <RootLayoutInner />
+      </AuthProvider>
+    </SafeAreaProvider>
   );
 }
 
