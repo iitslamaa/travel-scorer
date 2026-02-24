@@ -58,6 +58,13 @@ export default function TabLayout() {
           ),
         }}
       />
+
+      <Tabs.Screen
+        name="score-map"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
