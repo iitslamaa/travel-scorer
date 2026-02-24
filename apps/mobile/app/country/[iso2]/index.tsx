@@ -76,7 +76,7 @@ export default function CountryDetailScreen() {
     );
   }
 
-  const score = country.facts?.scoreTotal ?? 0;
+  const score = country.scoreTotal ?? country.facts?.scoreTotal ?? 0;
   const advisoryLevel = country.facts?.advisoryLevel ?? '—';
 
   const advisoryScore =
@@ -113,10 +113,10 @@ export default function CountryDetailScreen() {
       />
 
       <SeasonalityCard
-        score={country.facts?.seasonality ?? 0}
+        score={country.facts?.seasonality ?? 50}
         bestMonths={country.facts?.fmSeasonalityBestMonths ?? []}
         description={country.facts?.fmSeasonalityNotes}
-        normalizedLabel={`Normalized: ${country.facts?.seasonality ?? 0}`}
+        normalizedLabel={`Normalized: ${country.facts?.seasonality ?? 50}`}
         weightOnlyLabel={'Weight: 5%'}
       />
 

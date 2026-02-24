@@ -13,6 +13,29 @@ import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { headers } from 'next/headers';
 
+import {
+  COUNTRY_SEASONALITY_DEFINITIONS,
+  type CountrySeasonalityDefinition,
+} from '../../../../../../packages/data/src/countrySeasonality';
+
+function clusterConsecutiveMonths(months: number[]): number[][] {
+  if (!months.length) return [];
+  const sorted = [...new Set(months.filter(m => m >= 1 && m <= 12))].sort((a, b) => a - b);
+  const groups: number[][] = [];
+  let group: number[] = [sorted[0]];
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] === sorted[i - 1] + 1) group.push(sorted[i]);
+    else { groups.push(group); group = [sorted[i]]; }
+  }
+  groups.push(group);
+  const first = groups[0], last = groups[groups.length - 1];
+  if (first && last && first[0] === 1 && last[last.length - 1] === 12) {
+    groups[0] = [...last, ...first];
+    groups.pop();
+  }
+  return groups;
+}
+
 export async function GET(
   _req: NextRequest,
   ctx: { params: Promise<{ iso2: string }> }
@@ -134,10 +157,33 @@ export async function GET(
     enriched.facts.fxLocalPerUSD = fxMap[isoUpper];
   }
 
-  // --- Attach seasonality (if present from facts loader)
-  if (facts?.seasonality != null) {
-    enriched.facts.seasonality = facts.seasonality;
-  }
+  // --- Attach seasonality using same FM override logic as list endpoint
+  try {
+    const todayMonth = new Date().getMonth() + 1;
+
+    const override: CountrySeasonalityDefinition | undefined =
+      COUNTRY_SEASONALITY_DEFINITIONS[isoUpper];
+
+    if (override && override.best && override.best.length) {
+      const allMonths = Array.from(new Set(override.best)).sort((a, b) => a - b);
+      clusterConsecutiveMonths(allMonths); // preserve identical logic path
+
+      const inBest = allMonths.includes(todayMonth);
+      const inShoulder = override.shoulder?.includes(todayMonth) ?? false;
+      const inGood = override.good?.includes(todayMonth) ?? false;
+      const inAvoid = override.avoid?.includes(todayMonth) ?? false;
+
+      let todayScore: number;
+
+      if (inBest) todayScore = 100;
+      else if (inShoulder) todayScore = 80;
+      else if (inGood) todayScore = 40;
+      else if (inAvoid) todayScore = 0;
+      else todayScore = 50;
+
+      enriched.facts.seasonality = todayScore;
+    }
+  } catch {}
 
   // Compute daily spend (lightweight single-country version)
   try {
