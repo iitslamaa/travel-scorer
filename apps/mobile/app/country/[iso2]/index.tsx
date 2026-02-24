@@ -53,20 +53,7 @@ export default function CountryDetailScreen() {
           padding: 24,
         }}
       >
-        {name ? (
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: '600',
-              marginBottom: 16,
-              color: colors.text,
-            }}
-          >
-            {name}
-          </Text>
-        ) : null}
-
-        <ActivityIndicator size="large" color={colors.text} />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
