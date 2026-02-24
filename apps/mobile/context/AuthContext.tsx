@@ -56,31 +56,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const fetchProfile = async (userId: string) => {
     setProfileLoading(true);
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    const [
+      profileRes,
+      bucketRes,
+      visitedRes,
+    ] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single(),
+      supabase
+        .from('user_bucket_list')
+        .select('country_iso2')
+        .eq('user_id', userId),
+      supabase
+        .from('user_traveled')
+        .select('country_iso2')
+        .eq('user_id', userId),
+    ]);
 
-    if (!error && data) {
-      setProfile(data as Profile);
+    if (!profileRes.error && profileRes.data) {
+      setProfile(profileRes.data as Profile);
     }
 
-    // Fetch bucket list
-    const { data: bucketData } = await supabase
-      .from('user_bucket_list')
-      .select('country_id')
-      .eq('user_id', userId);
+    setBucketIsoCodes(
+      bucketRes.data?.map((r: any) => r.country_iso2) ?? []
+    );
 
-    setBucketIsoCodes(bucketData?.map(r => r.country_id) ?? []);
-
-    // Fetch visited list
-    const { data: visitedData } = await supabase
-      .from('user_traveled')
-      .select('country_id')
-      .eq('user_id', userId);
-
-    setVisitedIsoCodes(visitedData?.map(r => r.country_id) ?? []);
+    setVisitedIsoCodes(
+      visitedRes.data?.map((r: any) => r.country_iso2) ?? []
+    );
 
     setProfileLoading(false);
   };
