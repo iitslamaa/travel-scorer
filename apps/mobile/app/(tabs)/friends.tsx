@@ -14,11 +14,14 @@ import { Ionicons } from '@expo/vector-icons';
 import AuthGate from '../../components/AuthGate';
 import { lightColors, darkColors } from '../../theme/colors';
 import { useFriends } from '../../hooks/useFriends';
+import { useAuth } from '../../context/AuthContext';
 
 export default function FriendsScreen() {
   const router = useRouter();
   const scheme = useColorScheme();
   const colors = scheme === 'dark' ? darkColors : lightColors;
+
+  const { isGuest } = useAuth();
 
   const { friends, loading } = useFriends();
 
@@ -49,6 +52,57 @@ export default function FriendsScreen() {
       />
     </Pressable>
   );
+
+  if (isGuest) {
+    return (
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+            justifyContent: 'center',
+          },
+        ]}
+      >
+        <Text
+          style={{
+            fontSize: 34,
+            fontWeight: '700',
+            color: colors.textPrimary,
+          }}
+        >
+          Login to customize your friends
+        </Text>
+
+        <Text
+          style={{
+            marginTop: 16,
+            fontSize: 16,
+            color: colors.textMuted,
+            lineHeight: 22,
+            maxWidth: 320,
+          }}
+        >
+          Sign in to add friends, send requests, and explore profiles.
+        </Text>
+
+        <Pressable
+          onPress={() => router.push('/login')}
+          style={{ marginTop: 24 }}
+        >
+          <Text
+            style={{
+              fontSize: 18,
+              fontWeight: '600',
+              color: '#3B82F6',
+            }}
+          >
+            Go to Login →
+          </Text>
+        </Pressable>
+      </View>
+    );
+  }
 
   return (
     <AuthGate>
