@@ -49,8 +49,8 @@ export default function DiscoveryScreen() {
         const result = a.name.localeCompare(b.name);
         return ascending ? result : -result;
       } else {
-        const aScore = a.facts?.scoreTotal ?? 0;
-        const bScore = b.facts?.scoreTotal ?? 0;
+        const aScore = a.scoreTotal ?? 0;
+        const bScore = b.scoreTotal ?? 0;
         const result = aScore - bScore;
         return ascending ? result : -result;
       }

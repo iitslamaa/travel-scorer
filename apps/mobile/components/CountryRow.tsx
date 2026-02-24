@@ -35,8 +35,8 @@ export default function CountryRow({
   onToggleVisited,
 }: Props) {
   const colors = useTheme();
-  const score = country.facts?.scoreTotal ?? 0;
-  const advisoryLevel = country.facts?.advisoryLevel;
+  const score = country.scoreTotal ?? 0;
+  const advisoryLevel = country.advisory?.level;
   const color = getScoreColor(score);
 
   return (
