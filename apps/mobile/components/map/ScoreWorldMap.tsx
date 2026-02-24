@@ -169,7 +169,13 @@ export default function ScoreWorldMap() {
           <Pressable
             style={styles.button}
             onPress={() => {
-              router.push(`/country/${selected.iso2}`);
+              router.push({
+                pathname: "/country/[iso2]",
+                params: {
+                  iso2: selected.iso2,
+                  name: selected.name,
+                },
+              });
             }}
           >
             <Text style={{ color: "white" }}>View Full Country Page →</Text>

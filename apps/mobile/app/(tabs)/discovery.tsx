@@ -176,7 +176,10 @@ export default function DiscoveryScreen() {
                 onPress={() =>
                   router.push({
                     pathname: '/country/[iso2]',
-                    params: { iso2: item.iso2 },
+                    params: {
+                      iso2: item.iso2,
+                      name: item.name,
+                    },
                   })
                 }
                 isBucketed={isBucketed(item.iso2)}

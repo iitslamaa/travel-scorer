@@ -1,6 +1,9 @@
 import {
   ScrollView,
   useColorScheme,
+  View,
+  ActivityIndicator,
+  Text,
 } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useCountries } from '../../../hooks/useCountries';
@@ -12,12 +15,20 @@ import VisaCard from './components/VisaCard';
 import { lightColors, darkColors } from '../../../theme/colors';
 
 export default function CountryDetailScreen() {
-  const { iso2 } = useLocalSearchParams<{ iso2: string }>();
+  const { iso2, name } = useLocalSearchParams<{ iso2: string; name?: string }>();
   const navigation = useNavigation();
   const { countries } = useCountries();
 
   const scheme = useColorScheme();
   const colors = scheme === 'dark' ? darkColors : lightColors;
+
+  useEffect(() => {
+    if (name) {
+      navigation.setOptions({
+        title: name,
+      });
+    }
+  }, [navigation, name]);
 
   const country = useMemo(() => {
     return countries?.find?.(c => c.iso2 === iso2);
@@ -31,9 +42,34 @@ export default function CountryDetailScreen() {
     });
   }, [navigation, country?.name]);
 
-  if (!countries) return null;
-  if (!country) return null;
-  console.log('FLAG EMOJI:', (country as any).flagEmoji);
+  if (!countries || !country) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: 24,
+        }}
+      >
+        {name ? (
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: '600',
+              marginBottom: 16,
+              color: colors.text,
+            }}
+          >
+            {name}
+          </Text>
+        ) : null}
+
+        <ActivityIndicator size="large" color={colors.text} />
+      </View>
+    );
+  }
 
   const score = country.facts?.scoreTotal ?? 0;
   const advisoryLevel = country.facts?.advisoryLevel ?? '—';
