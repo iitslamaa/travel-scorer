@@ -75,36 +75,35 @@ struct CountryListView: View {
         for country in countries {
             var updated = country
 
-            // Simple 4-factor weighted score recompute
-            let advisory = country.travelSafeScore ?? 50
-            let visa = country.visaEaseScore ?? 50
+            // Weighted score recompute (exclude missing metrics)
+            var components: [(value: Double, weight: Double)] = []
 
-            // Normalize affordability roughly to 0–100 range (fallback 50)
-            let affordabilityRaw = country.dailySpendTotalUsd ?? 50
-            let affordability = min(max(affordabilityRaw, 0), 100)
-
-            let weightedAdvisory = Double(advisory) * weights.advisory
-            let weightedVisa = Double(visa) * weights.visa
-            let weightedAffordability = Double(affordability) * weights.affordability
-
-            let totalWeight =
-                weights.advisory +
-                weights.visa +
-                weights.affordability
-
-            let total =
-                weightedAdvisory +
-                weightedVisa +
-                weightedAffordability
-
-            let normalizedScore: Double
-            if totalWeight > 0 {
-                normalizedScore = total / totalWeight
-            } else {
-                normalizedScore = 0
+            if let advisory = country.travelSafeScore {
+                components.append((Double(advisory), weights.advisory))
             }
 
-            updated.score = Int(normalizedScore.rounded())
+            if let visa = country.visaEaseScore {
+                components.append((Double(visa), weights.visa))
+            }
+
+            if let affordabilityRaw = country.dailySpendTotalUsd {
+                let affordability = Double(min(max(affordabilityRaw, 0), 100))
+                components.append((affordability, weights.affordability))
+            }
+
+            if components.isEmpty {
+                updated.score = nil
+            } else {
+                let totalWeight = components.reduce(0) { $0 + $1.weight }
+                let weightedSum = components.reduce(0) { $0 + ($1.value * $1.weight) }
+
+                if totalWeight > 0 {
+                    let normalizedScore = weightedSum / totalWeight
+                    updated.score = Int(normalizedScore.rounded())
+                } else {
+                    updated.score = nil
+                }
+            }
             recalculatedCountries.append(updated)
         }
 

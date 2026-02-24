@@ -14,42 +14,53 @@ export const DEFAULT_WEIGHTS: Weights = {
 
 // Helper functions
 const clamp = (x: number, lo = 0, hi = 100) => Math.max(lo, Math.min(hi, x));
-const advisoryToPct = (lvl?: 1 | 2 | 3 | 4) => (!lvl ? 50 : clamp(((5 - lvl) / 4) * 100));
+const advisoryToPct = (lvl?: 1 | 2 | 3 | 4) =>
+  lvl ? clamp(((5 - lvl) / 4) * 100) : undefined;
 const shrinkReddit = (score: number | undefined, n: number | undefined) => {
-  const s = score ?? 50;
+  if (score == null) return undefined;
   const k = (n ?? 0) >= 300 ? 1 : 0.7;
-  return Math.round(k * s + (1 - k) * 50);
+  return Math.round(k * score + (1 - k) * score);
 };
 
 // Compute final weighted score
 export function computeScoreFromFacts(
   f: CountryFacts,
   w: Weights = DEFAULT_WEIGHTS
-): number {
+): number | null {
+  const components: Array<{ value: number; weight: number }> = [];
+
   const advisory = advisoryToPct(f.advisoryLevel);
-  const ts = f.travelSafeOverall ?? 50;
-  const sfti = f.soloFemaleIndex ?? 50;
+  if (advisory != null) components.push({ value: advisory, weight: w.advisorySafety });
+
+  if (f.travelSafeOverall != null)
+    components.push({ value: f.travelSafeOverall, weight: w.travelSafe });
+
+  if (f.soloFemaleIndex != null)
+    components.push({ value: f.soloFemaleIndex, weight: w.soloFemale });
+
   const reddit = shrinkReddit(f.redditComposite, f.redditN);
-  const season = f.seasonality ?? 50;
-  const visa = f.visaEase ?? 50;
-  const afford = f.affordability ?? 50;
-  const flight = f.directFlight ?? 50;
-  const infra = f.infrastructure ?? 50;
+  if (reddit != null)
+    components.push({ value: reddit, weight: w.redditComposite });
 
-  const totalW =
-    w.advisorySafety + w.travelSafe + w.soloFemale + w.redditComposite +
-    w.seasonality + w.visaEase + w.affordability + w.directFlight + w.infrastructure || 1;
+  if (f.seasonality != null)
+    components.push({ value: f.seasonality, weight: w.seasonality });
 
-  const weighted =
-    advisory * w.advisorySafety +
-    ts * w.travelSafe +
-    sfti * w.soloFemale +
-    reddit * w.redditComposite +
-    season * w.seasonality +
-    visa * w.visaEase +
-    afford * w.affordability +
-    flight * w.directFlight +
-    infra * w.infrastructure;
+  if (f.visaEase != null)
+    components.push({ value: f.visaEase, weight: w.visaEase });
 
-  return Math.round(weighted / totalW);
+  if (f.affordability != null)
+    components.push({ value: f.affordability, weight: w.affordability });
+
+  if (f.directFlight != null)
+    components.push({ value: f.directFlight, weight: w.directFlight });
+
+  if (f.infrastructure != null)
+    components.push({ value: f.infrastructure, weight: w.infrastructure });
+
+  if (components.length === 0) return null;
+
+  const totalWeight = components.reduce((sum, c) => sum + c.weight, 0);
+  const weightedSum = components.reduce((sum, c) => sum + c.value * c.weight, 0);
+
+  return Math.round(weightedSum / totalWeight);
 }
