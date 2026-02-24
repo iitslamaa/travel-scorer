@@ -5,7 +5,7 @@ export default ({ config }) => ({
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
-  scheme: "mobile",
+  scheme: "travelaf",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
 

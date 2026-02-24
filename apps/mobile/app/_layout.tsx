@@ -6,6 +6,9 @@ import { AuthProvider, useAuth } from '../context/AuthContext';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../hooks/useTheme';
+import * as WebBrowser from 'expo-web-browser';
+
+WebBrowser.maybeCompleteAuthSession();
 
 function RootLayoutInner() {
   const scheme = useColorScheme();

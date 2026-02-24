@@ -17,9 +17,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 
-WebBrowser.maybeCompleteAuthSession();
-
 export default function LandingScreen() {
+  console.log('🟢 LandingScreen render');
   const router = useRouter();
   const {
     session,
@@ -29,14 +28,21 @@ export default function LandingScreen() {
     setHasSeenIntro,
   } = useAuth();
 
+  console.log('🟢 useAuth session:', session);
+  console.log('🟢 useAuth isGuest:', isGuest);
+  console.log('🟢 useAuth hasSeenIntro:', hasSeenIntro);
+
   const [loadingGoogle, setLoadingGoogle] = useState(false);
+  const loginInProgressRef = useRef(false);
 
   const introOpacity = useRef(new Animated.Value(1)).current;
   const buttonsOpacity = useRef(new Animated.Value(0)).current;
 
   // Navigation guard
   useEffect(() => {
+    console.log('🧭 Navigation guard triggered. session:', session, 'isGuest:', isGuest);
     if (session || isGuest) {
+      console.log('🧭 Navigating to /home');
       router.replace('/home');
     }
   }, [session, isGuest, router]);
@@ -49,71 +55,107 @@ export default function LandingScreen() {
     }
   }, [hasSeenIntro]);
 
+  // 🔥 Deep link debugging
+  useEffect(() => {
+    console.log('🔥 Deep link listener mounted');
+
+    const handleUrl = async (event: { url: string }) => {
+      console.log('🔥 DEEP LINK RECEIVED:', event.url);
+      try {
+        const currentSession = await supabase.auth.getSession();
+        console.log('🔥 getSession() after deep link:', currentSession);
+      } catch (err) {
+        console.log('🔥 getSession() error after deep link:', err);
+      }
+    };
+
+    const subscription = Linking.addEventListener('url', handleUrl);
+
+    Linking.getInitialURL().then((url) => {
+      console.log('🔥 INITIAL URL CHECK:', url);
+      supabase.auth.getSession().then((s) => {
+        console.log('🔥 getSession() on mount:', s);
+      });
+    });
+
+    return () => {
+      console.log('🔥 Deep link listener removed');
+      subscription.remove();
+    };
+  }, []);
+
+  const dumpStorage = async (label: string) => {
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      console.log(`[storage.dump] ${label} keys(${keys.length}):`, keys);
+
+      const interesting = keys.filter(k =>
+        k.includes('supabase') ||
+        k.includes('sb-') ||
+        k.includes('pkce') ||
+        k.includes('auth') ||
+        k.includes('travelaf')
+      );
+
+      if (interesting.length) {
+        const pairs = await AsyncStorage.multiGet(interesting);
+        console.log(
+          `[storage.dump] ${label} values:`,
+          pairs.map(([k, v]) => [k, v ? `len=${v.length}` : null])
+        );
+      }
+    } catch (e) {
+      console.log('[storage.dump] error', e);
+    }
+  };
+
   const handleGoogleLogin = async () => {
-    console.log('Google button pressed');
+    console.log('🟡 handleGoogleLogin invoked');
+    const currentBefore = await supabase.auth.getSession();
+    console.log('🟡 getSession BEFORE signIn:', currentBefore);
+
+    if (loginInProgressRef.current) return;
+
+    loginInProgressRef.current = true;
 
     try {
+      console.log('--- GOOGLE LOGIN START ---');
       setLoadingGoogle(true);
+      console.log('Loading state set to true');
 
       const redirectTo = Linking.createURL('auth/callback');
       console.log('redirectTo:', redirectTo);
-
+      await dumpStorage('BEFORE signInWithOAuth');
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo,
-          skipBrowserRedirect: true,
         },
       });
+      console.log('signInWithOAuth data:', data);
+      console.log('signInWithOAuth error:', error);
+      await dumpStorage('AFTER signInWithOAuth');
 
       if (error) {
         Alert.alert('Google Login Error', error.message);
         return;
       }
 
-      const authUrl = data?.url;
-      if (!authUrl) {
-        Alert.alert('Google Login Error', 'No auth URL returned.');
-        return;
+      if (data?.url) {
+        await WebBrowser.openBrowserAsync(data.url);
+        console.log('Browser opened, waiting for deep link...');
+      } else {
+        console.log('No OAuth URL returned');
       }
-
-      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectTo);
-      console.log('OAuth result:', result);
-
-      // If we successfully returned to the app, Supabase (implicit flow)
-      // sends tokens in the URL fragment (#access_token=...)
-      if (result.type === 'success' && result.url) {
-        const hash = result.url.split('#')[1];
-
-        if (!hash) {
-          Alert.alert('Google Login Error', 'Missing auth tokens in redirect URL.');
-          return;
-        }
-
-        const params = new URLSearchParams(hash);
-        const access_token = params.get('access_token');
-        const refresh_token = params.get('refresh_token');
-
-        if (!access_token || !refresh_token) {
-          Alert.alert('Google Login Error', 'Missing access or refresh token.');
-          return;
-        }
-
-        const { error: sessionError } = await supabase.auth.setSession({
-          access_token,
-          refresh_token,
-        });
-
-        if (sessionError) {
-          Alert.alert('Google Login Error', sessionError.message);
-          return;
-        }
-      }
-
     } catch (e: any) {
+      console.log('Google login exception:', e);
       Alert.alert('Google Login Error', e?.message ?? 'Unknown error');
     } finally {
+      const currentAfter = await supabase.auth.getSession();
+      console.log('🟡 getSession AFTER browser return:', currentAfter);
+      console.log('--- GOOGLE LOGIN END ---');
       setLoadingGoogle(false);
+      loginInProgressRef.current = false;
     }
   };
 

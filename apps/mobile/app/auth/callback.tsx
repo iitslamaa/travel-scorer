@@ -1,35 +1,29 @@
-import { View, ActivityIndicator } from 'react-native';
-import { useEffect } from 'react';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { supabase } from '../../lib/supabase';
+import { useEffect } from 'react'
+import { View, ActivityIndicator } from 'react-native'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import { supabase } from '../../lib/supabase'
 
 export default function AuthCallback() {
-  const router = useRouter();
-  const params = useLocalSearchParams();
+  const { code } = useLocalSearchParams()
+  const router = useRouter()
 
   useEffect(() => {
-    const handleAuth = async () => {
-      try {
-        // Supabase sends `code` back in the redirect URL
-        const code = params.code as string | undefined;
+    const exchange = async () => {
+      if (!code) return
 
-        if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+      const { error } = await supabase.auth.exchangeCodeForSession(
+        code as string
+      )
 
-          if (error) {
-            console.error('OAuth exchange error:', error);
-            return;
-          }
-        }
-
-        router.replace('/home');
-      } catch (err) {
-        console.error('Auth callback error:', err);
+      if (!error) {
+        router.replace('/')
+      } else {
+        console.log('Exchange error:', error)
       }
-    };
+    }
 
-    handleAuth();
-  }, [params]);
+    exchange()
+  }, [code])
 
   return (
     <View
@@ -41,5 +35,5 @@ export default function AuthCallback() {
     >
       <ActivityIndicator size="large" />
     </View>
-  );
+  )
 }
