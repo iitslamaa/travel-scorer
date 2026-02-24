@@ -76,7 +76,9 @@ async function fetchWikiTable() {
     const cells = $(row).find("td");
 
     if (cells.length >= 4) {
-      const visitorTo = $(cells[0]).text().trim();
+      const rawName = $(cells[0]).text().trim();
+      // Remove citation markers like [478][479]
+      const visitorTo = rawName.replace(/\[\d+\]/g, '').trim();
       const requirement = $(cells[1]).text().trim();
       const allowedStay = $(cells[2]).text().trim();
       const notes = $(cells[3]).text().trim();
