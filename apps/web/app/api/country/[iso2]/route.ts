@@ -11,6 +11,7 @@ import type { DailySpend } from '@/lib/providers/costs';
 import { buildRows, DEFAULT_WEIGHTS } from '@travel-af/domain/src/scoring';
 import { createServerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 
 export async function GET(
   _req: NextRequest,
@@ -50,11 +51,18 @@ export async function GET(
         .maybeSingle();
 
       if (data) {
+        const prefs = data as {
+          advisory?: number;
+          seasonality?: number;
+          visa?: number;
+          affordability?: number;
+        };
+
         userWeights = {
-          travelGov: (data as any).advisory ?? DEFAULT_WEIGHTS.travelGov,
-          seasonality: (data as any).seasonality ?? DEFAULT_WEIGHTS.seasonality,
-          visa: (data as any).visa ?? DEFAULT_WEIGHTS.visa,
-          affordability: (data as any).affordability ?? DEFAULT_WEIGHTS.affordability,
+          travelGov: prefs.advisory ?? DEFAULT_WEIGHTS.travelGov,
+          seasonality: prefs.seasonality ?? DEFAULT_WEIGHTS.seasonality,
+          visa: prefs.visa ?? DEFAULT_WEIGHTS.visa,
+          affordability: prefs.affordability ?? DEFAULT_WEIGHTS.affordability,
         };
       }
     }
@@ -77,6 +85,29 @@ export async function GET(
     facts: facts ?? {},
   };
 
+  // --- Fetch and attach advisory for this country
+  try {
+    const h = await headers();
+    const host = h.get('host');
+    const proto = h.get('x-forwarded-proto') ?? 'https';
+    const base = host ? `${proto}://${host}` : '';
+
+    const advUrl = base ? `${base}/api/advisories` : '/api/advisories';
+    const advRes = await fetch(advUrl, { cache: 'no-store' });
+
+    if (advRes.ok) {
+      const advisories = await advRes.json();
+      const advisory = advisories.find((a: any) => a.iso2 === isoUpper);
+
+      if (advisory?.level) {
+        enriched.facts.advisoryLevel = advisory.level;
+        enriched.advisory = advisory;
+      }
+    }
+  } catch (e) {
+    console.warn('[country] advisory fetch failed', e);
+  }
+
   const visa = visaIndex.get(isoUpper);
   if (visa) {
     enriched.facts = {
@@ -96,6 +127,11 @@ export async function GET(
 
   if (fxMap[isoUpper]) {
     enriched.facts.fxLocalPerUSD = fxMap[isoUpper];
+  }
+
+  // --- Attach seasonality (if present from facts loader)
+  if (facts?.seasonality != null) {
+    enriched.facts.seasonality = facts.seasonality;
   }
 
   // Compute daily spend (lightweight single-country version)
