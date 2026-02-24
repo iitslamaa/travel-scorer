@@ -1,30 +1,34 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, StyleSheet, useColorScheme } from 'react-native';
-import { Stack, useSegments } from 'expo-router';
+import { Stack } from 'expo-router';
 import { Video, ResizeMode } from 'expo-av';
-import { AuthProvider } from '../context/AuthContext';
+import { AuthProvider, useAuth } from '../context/AuthContext';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../hooks/useTheme';
 
 function RootLayoutInner() {
-  const segments = useSegments();
   const scheme = useColorScheme();
   const colors = useTheme();
 
-  const isAuthRoute =
-    segments.length === 0 ||
-    segments[0] === 'login' ||
-    segments[0] === 'verify';
+  const { session, isGuest } = useAuth();
+
+  const showAuthBackground = useMemo(() => {
+    if (isGuest) return false;
+    return session === null;
+  }, [session, isGuest]);
 
   return (
-    <SafeAreaView style={[styles.root, { backgroundColor: colors.background }]} edges={['top', 'left', 'right']}>
+    <SafeAreaView
+      style={[styles.root, { backgroundColor: colors.background }]}
+      edges={['top', 'left', 'right']}
+    >
       <StatusBar
         style={scheme === 'dark' ? 'light' : 'dark'}
         backgroundColor={colors.background}
       />
 
-      {isAuthRoute ? (
+      {showAuthBackground && (
         <View pointerEvents="none" style={StyleSheet.absoluteFill}>
           <Video
             source={require('../assets/auth_loop.mp4')}
@@ -36,12 +40,16 @@ function RootLayoutInner() {
           />
           <View style={styles.overlay} />
         </View>
-      ) : null}
+      )}
 
       <Stack
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: colors.background },
+          contentStyle: {
+            backgroundColor: showAuthBackground
+              ? 'transparent'
+              : colors.background,
+          },
         }}
       />
     </SafeAreaView>
@@ -64,6 +72,6 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.45)',
   },
 });
