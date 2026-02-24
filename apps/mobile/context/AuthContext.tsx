@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type Profile = {
   id: string;
@@ -37,6 +38,8 @@ type AuthContextType = {
   refreshProfile: () => Promise<void>;
   updateProfile: (patch: Partial<Profile>) => Promise<void>;
   signOut: () => Promise<void>;
+  hasSeenIntro: boolean | null;
+  setHasSeenIntro: (value: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -52,6 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [visitedIsoCodes, setVisitedIsoCodes] = useState<string[]>([]);
 
   const [isGuest, setIsGuest] = useState(false);
+  const [hasSeenIntro, setHasSeenIntro] = useState<boolean | null>(null);
 
   const fetchProfile = async (userId: string) => {
     setProfileLoading(true);
@@ -160,6 +164,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const boot = async () => {
+      const introFlag = await AsyncStorage.getItem('hasSeenIntro');
+      setHasSeenIntro(introFlag === 'true');
+
       const { data } = await supabase.auth.getSession();
       const s = data.session ?? null;
       setSession(s);
@@ -228,8 +235,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       refreshProfile,
       updateProfile,
       signOut,
+      hasSeenIntro,
+      setHasSeenIntro,
     }),
-    [session, loading, profile, profileLoading, bucketIsoCodes, visitedIsoCodes, isGuest]
+    [session, loading, profile, profileLoading, bucketIsoCodes, visitedIsoCodes, isGuest, hasSeenIntro]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

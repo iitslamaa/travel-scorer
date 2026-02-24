@@ -13,26 +13,37 @@ import { useRouter } from 'expo-router';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Video, ResizeMode } from 'expo-av';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LandingScreen() {
   const router = useRouter();
-  const { session, isGuest, continueAsGuest } = useAuth();
+  const {
+    session,
+    isGuest,
+    continueAsGuest,
+    hasSeenIntro,
+    setHasSeenIntro,
+  } = useAuth();
 
   const [loadingGoogle, setLoadingGoogle] = useState(false);
-  const [introFinished, setIntroFinished] = useState(false);
 
   const introOpacity = useRef(new Animated.Value(1)).current;
   const buttonsOpacity = useRef(new Animated.Value(0)).current;
 
+  // Navigation guard
   useEffect(() => {
-    if (session) {
-      router.replace('/home');
-    }
-
-    if (isGuest) {
+    if (session || isGuest) {
       router.replace('/home');
     }
   }, [session, isGuest, router]);
+
+  // If intro already seen, immediately show buttons
+  useEffect(() => {
+    if (hasSeenIntro) {
+      introOpacity.setValue(0);
+      buttonsOpacity.setValue(1);
+    }
+  }, [hasSeenIntro]);
 
   const handleGoogleLogin = async () => {
     setLoadingGoogle(true);
@@ -48,42 +59,46 @@ export default function LandingScreen() {
     }
   };
 
-  const handleIntroFinish = () => {
-    if (introFinished) return;
-    setIntroFinished(true);
+  const finishIntro = async () => {
+    await AsyncStorage.setItem('hasSeenIntro', 'true');
+    setHasSeenIntro(true);
 
     Animated.timing(introOpacity, {
       toValue: 0,
-      duration: 500,
+      duration: 400,
       useNativeDriver: true,
     }).start(() => {
-      setTimeout(() => {
-        Animated.timing(buttonsOpacity, {
-          toValue: 1,
-          duration: 600,
-          useNativeDriver: true,
-        }).start();
-      }, 500);
+      Animated.timing(buttonsOpacity, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }).start();
     });
   };
 
+  const shouldShowIntro = hasSeenIntro === false;
+
   return (
     <View style={styles.container}>
-      <Animated.View style={[StyleSheet.absoluteFill, { opacity: introOpacity }]}> 
-        <Video
-          source={require('../assets/intro.mp4')}
-          style={StyleSheet.absoluteFill}
-          resizeMode={ResizeMode.COVER}
-          shouldPlay
-          isLooping={false}
-          isMuted
-          onPlaybackStatusUpdate={(status) => {
-            if (status.isLoaded && status.didJustFinish) {
-              handleIntroFinish();
-            }
-          }}
-        />
-      </Animated.View>
+      {shouldShowIntro && (
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { opacity: introOpacity }]}
+        >
+          <Video
+            source={require('../assets/intro.mp4')}
+            style={StyleSheet.absoluteFill}
+            resizeMode={ResizeMode.COVER}
+            shouldPlay
+            isLooping={false}
+            isMuted
+            onPlaybackStatusUpdate={(status) => {
+              if (status.isLoaded && status.didJustFinish) {
+                finishIntro();
+              }
+            }}
+          />
+        </Animated.View>
+      )}
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -109,13 +124,8 @@ export default function LandingScreen() {
             </Text>
           </Pressable>
 
-          <Pressable
-            style={styles.guestButton}
-            onPress={continueAsGuest}
-          >
-            <Text style={styles.guestText}>
-              Continue as Guest
-            </Text>
+          <Pressable style={styles.guestButton} onPress={continueAsGuest}>
+            <Text style={styles.guestText}>Continue as Guest</Text>
           </Pressable>
         </Animated.View>
       </KeyboardAvoidingView>
