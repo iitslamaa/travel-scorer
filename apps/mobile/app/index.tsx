@@ -14,6 +14,10 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 import { Video, ResizeMode } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LandingScreen() {
   const router = useRouter();
@@ -46,16 +50,70 @@ export default function LandingScreen() {
   }, [hasSeenIntro]);
 
   const handleGoogleLogin = async () => {
-    setLoadingGoogle(true);
+    console.log('Google button pressed');
 
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-    });
+    try {
+      setLoadingGoogle(true);
 
-    setLoadingGoogle(false);
+      const redirectTo = Linking.createURL('auth/callback');
+      console.log('redirectTo:', redirectTo);
 
-    if (error) {
-      Alert.alert('Google Login Error', error.message);
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error) {
+        Alert.alert('Google Login Error', error.message);
+        return;
+      }
+
+      const authUrl = data?.url;
+      if (!authUrl) {
+        Alert.alert('Google Login Error', 'No auth URL returned.');
+        return;
+      }
+
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectTo);
+      console.log('OAuth result:', result);
+
+      // If we successfully returned to the app, Supabase (implicit flow)
+      // sends tokens in the URL fragment (#access_token=...)
+      if (result.type === 'success' && result.url) {
+        const hash = result.url.split('#')[1];
+
+        if (!hash) {
+          Alert.alert('Google Login Error', 'Missing auth tokens in redirect URL.');
+          return;
+        }
+
+        const params = new URLSearchParams(hash);
+        const access_token = params.get('access_token');
+        const refresh_token = params.get('refresh_token');
+
+        if (!access_token || !refresh_token) {
+          Alert.alert('Google Login Error', 'Missing access or refresh token.');
+          return;
+        }
+
+        const { error: sessionError } = await supabase.auth.setSession({
+          access_token,
+          refresh_token,
+        });
+
+        if (sessionError) {
+          Alert.alert('Google Login Error', sessionError.message);
+          return;
+        }
+      }
+
+    } catch (e: any) {
+      Alert.alert('Google Login Error', e?.message ?? 'Unknown error');
+    } finally {
+      setLoadingGoogle(false);
     }
   };
 
