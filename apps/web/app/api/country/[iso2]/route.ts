@@ -16,7 +16,7 @@ import { headers } from 'next/headers';
 import {
   COUNTRY_SEASONALITY_DEFINITIONS,
   type CountrySeasonalityDefinition,
-} from '../../../../../packages/data/src/countrySeasonality';
+} from '../../../../../../packages/data/src/countrySeasonality';
 
 function clusterConsecutiveMonths(months: number[]): number[][] {
   if (!months.length) return [];
