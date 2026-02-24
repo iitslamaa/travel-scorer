@@ -20,7 +20,7 @@ export function useCountries() {
         console.log('Fetching countries from API...');
 
         const res = await fetch(
-          'https://travel-scorer.vercel.app/api/countries?lite=1',
+          'https://travel-scorer.vercel.app/api/countries',
           {
             headers: {
               Accept: 'application/json',
@@ -37,6 +37,8 @@ export function useCountries() {
         }
 
         const data = await res.json();
+        console.log('FIRST COUNTRY RAW:', data?.[0]);
+        console.log('FIRST COUNTRY scoreTotal:', data?.[0]?.scoreTotal);
         console.log('Countries received:', Array.isArray(data) ? data.length : data);
 
         const mapped = Array.isArray(data)
