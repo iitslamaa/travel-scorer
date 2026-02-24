@@ -159,7 +159,13 @@ export default function ProfileScreen() {
           value={
             nextDestinationCountry ? (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={{ color: colors.textPrimary }}>
+                <Text
+                  style={{
+                    color: colors.textPrimary,
+                    fontSize: 17,
+                    fontWeight: '600',
+                  }}
+                >
                   {nextDestinationCountry.name}
                 </Text>
                 <CountryFlag
