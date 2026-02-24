@@ -8,7 +8,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   Keyboard,
-  useWindowDimensions,
 } from 'react-native';
 import { router } from 'expo-router';
 import { useState, useMemo } from 'react';
@@ -22,7 +21,6 @@ import { useTheme } from '../../hooks/useTheme';
 
 export default function DiscoveryScreen() {
   const { countries, loading } = useCountries();
-  const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
 
   const colors = useTheme();
@@ -219,9 +217,11 @@ export default function DiscoveryScreen() {
           <View
             style={{
               position: 'absolute',
-              bottom: 24,
-              left: 16,
-              right: 16,
+              bottom: insets.bottom + 16,
+              width: '100%',
+              maxWidth: 720,
+              alignSelf: 'center',
+              paddingHorizontal: 16,
             }}
           >
             <View

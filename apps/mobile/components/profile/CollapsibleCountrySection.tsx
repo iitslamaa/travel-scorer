@@ -170,7 +170,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   mapContainer: {
-    height: 250,
+    width: '100%',
+    aspectRatio: 1.6,
+    minHeight: 200,
+    maxHeight: 400,
     marginTop: 16,
     borderRadius: 16,
     overflow: 'hidden',
