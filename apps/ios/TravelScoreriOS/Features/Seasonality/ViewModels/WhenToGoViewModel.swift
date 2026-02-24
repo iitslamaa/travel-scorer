@@ -92,27 +92,29 @@ final class WhenToGoViewModel: ObservableObject {
     private func weightedScore(for country: Country) -> Double {
         let weights = weightsStore.weights
 
-        let advisory = Double(country.travelSafeScore ?? 50)
-        let visa = Double(country.visaEaseScore ?? 50)
+        var components: [(value: Double, weight: Double)] = []
 
-        let affordabilityRaw = country.dailySpendTotalUsd ?? 50
-        let affordability = Double(min(max(affordabilityRaw, 0), 100))
+        if let advisory = country.travelSafeScore {
+            components.append((Double(advisory), weights.advisory))
+        }
 
-        let weightedAdvisory = advisory * weights.advisory
-        let weightedVisa = visa * weights.visa
-        let weightedAffordability = affordability * weights.affordability
+        if let visa = country.visaEaseScore {
+            components.append((Double(visa), weights.visa))
+        }
 
-        let totalWeight =
-            weights.advisory +
-            weights.visa +
-            weights.affordability
+        if let affordabilityRaw = country.dailySpendTotalUsd {
+            let affordability = Double(min(max(affordabilityRaw, 0), 100))
+            components.append((affordability, weights.affordability))
+        }
 
-        let total =
-            weightedAdvisory +
-            weightedVisa +
-            weightedAffordability
-
-        let baseScore: Double = totalWeight > 0 ? total / totalWeight : 0
+        let baseScore: Double
+        if components.isEmpty {
+            baseScore = 0
+        } else {
+            let totalWeight = components.reduce(0) { $0 + $1.weight }
+            let weightedSum = components.reduce(0) { $0 + ($1.value * $1.weight) }
+            baseScore = totalWeight > 0 ? weightedSum / totalWeight : 0
+        }
 
         guard let seasonalityScore = country.seasonalityScore else {
             return baseScore
