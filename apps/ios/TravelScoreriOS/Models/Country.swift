@@ -12,7 +12,7 @@ struct Country: Identifiable, Hashable {
     /// Stable identifier for persistence (do NOT use random UUIDs).
     var id: String { iso2.uppercased() }
     let name: String
-    var score: Int
+    var score: Int?
     let region: String?
     let subregion: String?
     let advisoryScore: Int?
@@ -78,7 +78,7 @@ struct Country: Identifiable, Hashable {
     init(
         iso2: String,
         name: String,
-        score: Int,
+        score: Int?,
         region: String? = nil,
         subregion: String? = nil,
         advisoryScore: Int? = nil,

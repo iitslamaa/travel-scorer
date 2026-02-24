@@ -81,7 +81,7 @@ enum CountryAPI {
             Country(
                 iso2: dto.iso2,
                 name: dto.name,
-                score: dto.score ?? 0,
+                score: dto.score,
                 region: dto.region,
                 subregion: dto.subregion,
                 advisoryScore: dto.advisoryScore,
@@ -130,7 +130,7 @@ extension CountryAPI {
                 Country(
                     iso2: dto.iso2,
                     name: dto.name,
-                    score: dto.score ?? 0,
+                    score: dto.score,
                     region: dto.region,
                     subregion: dto.subregion,
                     advisoryScore: dto.advisoryScore,
@@ -210,7 +210,7 @@ extension CountryAPI {
                 Country(
                     iso2: dto.iso2,
                     name: dto.name,
-                    score: dto.score ?? 0,
+                    score: dto.score,
                     region: dto.region,
                     subregion: dto.subregion,
                     advisoryScore: dto.advisoryScore,

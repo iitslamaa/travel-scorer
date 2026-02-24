@@ -38,7 +38,22 @@ struct MyTravelsView: View {
 
                             Spacer()
 
-                            ScorePill(score: country.score)
+                            if let score = country.score {
+                                ScorePill(score: score)
+                            } else {
+                                Text("—")
+                                    .font(.caption.bold())
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color.gray.opacity(0.15))
+                                    )
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                    )
+                            }
                         }
                         .padding(.vertical, 6)
                     }

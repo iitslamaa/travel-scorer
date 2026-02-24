@@ -45,7 +45,22 @@ struct WhenToGoCountryDrawerView: View {
                     Spacer()
 
                     VStack(alignment: .center, spacing: 4) {
-                        ScorePill(score: country.country.score)
+                        if let overall = country.country.score {
+                            ScorePill(score: overall)
+                        } else {
+                            Text("—")
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(
+                                    Capsule()
+                                        .fill(.gray.opacity(0.15))
+                                )
+                                .overlay(
+                                    Capsule()
+                                        .stroke(.gray.opacity(0.3), lineWidth: 1)
+                                )
+                        }
 
                         Text("Overall")
                             .font(.caption2)
@@ -63,21 +78,21 @@ struct WhenToGoCountryDrawerView: View {
             .padding(.top, 16)
 
             // MARK: - Seasonality Insight
-            if let seasonalityScore = country.country.seasonalityScore {
-                VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 16) {
 
-                    HStack(alignment: .firstTextBaseline) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Seasonality")
-                                .font(.headline)
+                HStack(alignment: .firstTextBaseline) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Seasonality")
+                            .font(.headline)
 
-                            Text("Monthly travel conditions")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
+                        Text("Monthly travel conditions")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
 
-                        Spacer()
+                    Spacer()
 
+                    if let seasonalityScore = country.country.seasonalityScore {
                         Text("\(seasonalityScore)")
                             .font(.system(size: 18, weight: .bold, design: .rounded))
                             .padding(.horizontal, 12)
@@ -90,49 +105,62 @@ struct WhenToGoCountryDrawerView: View {
                                 Capsule()
                                     .stroke(CountryScoreStyling.borderColor(for: seasonalityScore), lineWidth: 1)
                             )
+                    } else {
+                        Text("—")
+                            .font(.system(size: 18, weight: .bold, design: .rounded))
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(.gray.opacity(0.15))
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(.gray.opacity(0.3), lineWidth: 1)
+                            )
                     }
+                }
 
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(CountrySeasonalityHelpers.headline(for: country.country))
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(CountrySeasonalityHelpers.headline(for: country.country))
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
 
-                        Text(CountrySeasonalityHelpers.body(for: country.country))
-                            .font(.footnote)
+                    Text(CountrySeasonalityHelpers.body(for: country.country))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if let months = country.country.seasonalityBestMonths,
+                   !months.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Best months")
+                            .font(.caption)
                             .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
 
-                    if let months = country.country.seasonalityBestMonths,
-                       !months.isEmpty {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text("Best months")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 44), spacing: 8)], spacing: 8) {
-                                ForEach(months, id: \.self) { month in
-                                    Text(CountrySeasonalityHelpers.shortMonthName(for: month))
-                                        .font(.caption2.weight(.medium))
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 6)
-                                        .background(
-                                            Capsule()
-                                                .fill(Color.accentColor.opacity(0.12))
-                                        )
-                                }
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 44), spacing: 8)], spacing: 8) {
+                            ForEach(months, id: \.self) { month in
+                                Text(CountrySeasonalityHelpers.shortMonthName(for: month))
+                                    .font(.caption2.weight(.medium))
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color.accentColor.opacity(0.12))
+                                    )
                             }
                         }
                     }
-
                 }
-                .padding(20)
-                .background(
-                    RoundedRectangle(cornerRadius: 24, style: .continuous)
-                        .fill(Color(.secondarySystemBackground))
-                )
-                .padding(.horizontal, 20)
+
             }
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(Color(.secondarySystemBackground))
+            )
+            .padding(.horizontal, 20)
 
 
             }

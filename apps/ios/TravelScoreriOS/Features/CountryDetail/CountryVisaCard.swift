@@ -28,20 +28,33 @@ struct CountryVisaCard: View {
 
                 // Score pill + description
                 HStack(spacing: 12) {
-                    let ease = country.visaEaseScore ?? 0
-
-                    Text(country.visaEaseScore != nil ? "\(ease)" : "—")
-                        .font(.system(size: 22, weight: .bold, design: .rounded))
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(CountryScoreStyling.backgroundColor(for: country.visaEaseScore))
-                        )
-                        .overlay(
-                            Capsule()
-                                .stroke(CountryScoreStyling.borderColor(for: country.visaEaseScore), lineWidth: 1)
-                        )
+                    if let ease = country.visaEaseScore {
+                        Text("\(ease)")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(CountryScoreStyling.backgroundColor(for: country.visaEaseScore))
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(CountryScoreStyling.borderColor(for: country.visaEaseScore), lineWidth: 1)
+                            )
+                    } else {
+                        Text("—")
+                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(.gray.opacity(0.15))
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(.gray.opacity(0.3), lineWidth: 1)
+                            )
+                    }
 
                     VStack(alignment: .leading, spacing: 4) {
                         Text(CountryVisaHelpers.headline(for: country))

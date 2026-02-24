@@ -30,18 +30,33 @@ struct CountryHeaderCard: View {
 
             Spacer()
 
-            Text("\(country.score)")
-                .font(.title2.bold())
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(
-                    Capsule()
-                        .fill(CountryScoreStyling.backgroundColor(for: country.score))
-                )
-                .overlay(
-                    Capsule()
-                        .stroke(CountryScoreStyling.borderColor(for: country.score), lineWidth: 1)
-                )
+            if let score = country.score {
+                Text("\(score)")
+                    .font(.title2.bold())
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(CountryScoreStyling.backgroundColor(for: score))
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(CountryScoreStyling.borderColor(for: score), lineWidth: 1)
+                    )
+            } else {
+                Text("—")
+                    .font(.title2.bold())
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        Capsule()
+                            .fill(Color.gray.opacity(0.15))
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                    )
+            }
         }
         .padding()
         .frame(maxWidth: .infinity, alignment: .leading)
