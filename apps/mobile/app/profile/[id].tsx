@@ -15,6 +15,7 @@ import { useProfileById } from '../../hooks/useProfileById';
 import { useFriendshipStatus } from '../../hooks/useFriendshipStatus';
 import { useFriendCount } from '../../hooks/useFriendCount';
 import { useUserCounts } from '../../hooks/useUserCounts';
+import CollapsibleCountrySection from '../../components/profile/CollapsibleCountrySection';
 import { useCountries } from '../../hooks/useCountries';
 import { useTheme } from '../../hooks/useTheme';
 
@@ -33,7 +34,7 @@ export default function FriendProfileScreen() {
   const { profile, loading } = useProfileById(id);
   const { isFriend } = useFriendshipStatus(id);
   const { count: friendCount } = useFriendCount(id);
-  const { traveledCount } = useUserCounts(id);
+  const { traveledCount, traveledIsoCodes } = useUserCounts(id);
 
   const { countries } = useCountries();
 
@@ -182,15 +183,10 @@ export default function FriendProfileScreen() {
           )}
         </View>
 
-        <Pressable style={[styles.linkRow, { backgroundColor: colors.card }]}>
-          <Ionicons name="chevron-forward" size={18} color={colors.primary} />
-          <Text style={[styles.linkText, { color: colors.primary }]}>
-            Countries Traveled:
-          </Text>
-          <Text style={{ color: colors.primary, marginLeft: 8, fontWeight: '700' }}>
-            {traveledCount}
-          </Text>
-        </Pressable>
+        <CollapsibleCountrySection
+          title="Countries Traveled"
+          countries={traveledIsoCodes}
+        />
       </ScrollView>
     </View>
   );
