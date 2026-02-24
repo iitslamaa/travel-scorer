@@ -16,6 +16,7 @@ import AuthGate from '../../components/AuthGate';
 import { useCountries } from '../../hooks/useCountries';
 import CountryRow from '../../components/CountryRow';
 import { useAuth } from '../../context/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function DiscoveryScreen() {
   const { countries, loading } = useCountries();
@@ -156,16 +157,23 @@ export default function DiscoveryScreen() {
                   {/* World Map Button */}
                   <Pressable
                     onPress={() => router.push('/score-map')}
+                    android_ripple={{ color: '#E5E7EB', borderless: false }}
                     style={{
                       width: 48,
                       height: 48,
                       borderRadius: 24,
-                      backgroundColor: '#111',
+                      backgroundColor: '#F2F2F7',
+                      borderWidth: 1,
+                      borderColor: '#E5E7EB',
                       alignItems: 'center',
                       justifyContent: 'center',
                     }}
                   >
-                    <Text style={{ color: 'white', fontSize: 20 }}>🗺</Text>
+                    <Ionicons
+                      name="map-outline"
+                      size={20}
+                      color="#111827"
+                    />
                   </Pressable>
                 </View>
               </View>
