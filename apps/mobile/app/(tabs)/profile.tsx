@@ -5,7 +5,6 @@ import {
   View,
   Text,
   Pressable,
-  useColorScheme,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -19,6 +18,7 @@ import InfoCard from '../../components/profile/InfoCard';
 import DisclosureRow from '../../components/profile/DisclosureRow';
 import CollapsibleCountrySection from '../../components/profile/CollapsibleCountrySection';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../../hooks/useTheme';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -39,13 +39,7 @@ export default function ProfileScreen() {
     visitedIsoCodes,
   } = useAuth();
   const { countries } = useCountries();
-  const scheme = useColorScheme();
-  const isDark = scheme === 'dark';
-
-  const backgroundColor = isDark ? '#0F0F10' : '#F7F7F8';
-  const titleColor = isDark ? '#FFFFFF' : '#111827';
-  const subtitleColor = isDark ? '#A1A1AA' : '#6B7280';
-  const iconColor = isDark ? '#FFFFFF' : '#111827';
+  const colors = useTheme();
 
   const user = session?.user ?? null;
 
@@ -58,15 +52,15 @@ export default function ProfileScreen() {
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
-            backgroundColor,
+            backgroundColor: colors.background,
           },
         ]}
       >
-        <Text style={[styles.title, { color: titleColor }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>
           Login to customize your profile
         </Text>
 
-        <Text style={[styles.subtitle, { color: subtitleColor }]}>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           Sign in to set your languages, travel style, and destinations.
         </Text>
 
@@ -116,7 +110,7 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView
-      style={{ backgroundColor }}
+      style={{ backgroundColor: colors.background }}
       contentContainerStyle={[
         styles.container,
         { paddingBottom: insets.bottom + 80 },
@@ -124,7 +118,7 @@ export default function ProfileScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.topRow}>
-        <Text style={[styles.title, { color: titleColor }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>
           Profile
         </Text>
 
@@ -135,7 +129,7 @@ export default function ProfileScreen() {
           <Ionicons
             name="settings-outline"
             size={20}
-            color={iconColor}
+            color={colors.textPrimary}
           />
         </Pressable>
       </View>
@@ -165,7 +159,9 @@ export default function ProfileScreen() {
           value={
             nextDestinationCountry ? (
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text>{nextDestinationCountry.name}</Text>
+                <Text style={{ color: colors.textPrimary }}>
+                  {nextDestinationCountry.name}
+                </Text>
                 <CountryFlag
                   isoCode={nextDestinationCountry.iso2}
                   size={18}

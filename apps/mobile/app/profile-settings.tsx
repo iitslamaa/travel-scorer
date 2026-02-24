@@ -5,7 +5,6 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  useColorScheme,
   ActionSheetIOS,
   Alert,
   Modal,
@@ -15,10 +14,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { lightColors, darkColors } from '../theme/colors';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 import { useCountries } from '../hooks/useCountries';
+import { useTheme } from '../hooks/useTheme';
 
 type EditField = 'full_name' | 'username';
 
@@ -64,14 +63,8 @@ export default function ProfileSettingsScreen() {
     }
   };
 
-  const scheme = useColorScheme();
-  const colors = scheme === 'dark' ? darkColors : lightColors;
-
-  const borderColor =
-    (colors as any).border ??
-    (scheme === 'dark'
-      ? 'rgba(255,255,255,0.12)'
-      : 'rgba(0,0,0,0.08)');
+  const colors = useTheme();
+  const borderColor = colors.border;
 
   /* ---------------- Avatar ---------------- */
 
@@ -275,7 +268,7 @@ export default function ProfileSettingsScreen() {
         </View>
 
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
-          <Text style={{ fontSize: 16, fontWeight: '700', color: '#EF4444', marginBottom: 12 }}>
+          <Text style={{ fontSize: 16, fontWeight: '700', color: colors.redText, marginBottom: 12 }}>
             Danger Zone
           </Text>
 
@@ -283,13 +276,13 @@ export default function ProfileSettingsScreen() {
             onPress={() => setDeleteOpen(true)}
             style={{
               borderWidth: 1,
-              borderColor: '#EF4444',
+              borderColor: colors.redBorder,
               borderRadius: 16,
               paddingVertical: 16,
               alignItems: 'center',
             }}
           >
-            <Text style={{ color: '#EF4444', fontWeight: '700', fontSize: 15 }}>
+            <Text style={{ color: colors.redText, fontWeight: '700', fontSize: 15 }}>
               Delete account
             </Text>
           </Pressable>
@@ -308,7 +301,9 @@ export default function ProfileSettingsScreen() {
             style={[styles.input, { borderColor }]}
           />
           <Pressable onPress={saveEdit}>
-            <Text>Save</Text>
+            <Text style={{ color: colors.primary, fontWeight: '600' }}>
+              Save
+            </Text>
           </Pressable>
         </View>
       </Modal>
@@ -359,10 +354,10 @@ export default function ProfileSettingsScreen() {
                   borderRadius: 14,
                   alignItems: 'center',
                   borderWidth: 1,
-                  borderColor: '#EF4444',
+                  borderColor: colors.redBorder,
                 }}
               >
-                <Text style={{ fontWeight: '700', color: '#EF4444' }}>
+                <Text style={{ fontWeight: '700', color: colors.redText }}>
                   {deleting ? 'Deleting…' : 'Delete'}
                 </Text>
               </Pressable>
@@ -375,10 +370,15 @@ export default function ProfileSettingsScreen() {
 }
 
 function Row({ label, value, onPress }: any) {
+  const colors = useTheme();
   return (
     <Pressable style={styles.row} onPress={onPress}>
-      <Text style={styles.rowText}>{label}</Text>
-      <Text style={styles.rowValue}>{value}</Text>
+      <Text style={[styles.rowText, { color: colors.textPrimary }]}>
+        {label}
+      </Text>
+      <Text style={[styles.rowValue, { color: colors.textSecondary }]}>
+        {value}
+      </Text>
     </Pressable>
   );
 }
@@ -394,7 +394,7 @@ const styles = StyleSheet.create({
   card: { borderRadius: 24, padding: 20, margin: 20 },
   row: { paddingVertical: 18, flexDirection: 'row', justifyContent: 'space-between' },
   rowText: { fontSize: 16 },
-  rowValue: { fontSize: 16, opacity: 0.6 },
+  rowValue: { fontSize: 16 },
   divider: { height: StyleSheet.hairlineWidth },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)' },
   modalSheet: { padding: 20 },
