@@ -1,25 +1,18 @@
-import { useEffect } from 'react';
-import { useRouter, useRootNavigationState } from 'expo-router';
+import { Redirect } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 
 export default function RootIndex() {
-  const router = useRouter();
-  const rootNavigationState = useRootNavigationState();
   const { session, loading } = useAuth();
 
-  useEffect(() => {
-    // Wait until the root navigator is mounted
-    if (!rootNavigationState?.key) return;
+  // While auth is booting, render nothing
+  if (loading) {
+    return null;
+  }
 
-    // Wait until auth has finished booting
-    if (loading) return;
+  // Once auth is ready, synchronously return the correct route
+  if (session) {
+    return <Redirect href="/(tabs)/discovery" />;
+  }
 
-    if (session) {
-      router.replace('/(tabs)');
-    } else {
-      router.replace('/login');
-    }
-  }, [session, loading, rootNavigationState]);
-
-  return null;
+  return <Redirect href="/login" />;
 }

@@ -43,6 +43,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
 
     if (loading || profileLoading) return;
     if (!session || isGuest) return;
+    // If profile has not loaded yet, do not enforce onboarding
+    if (!profile) return;
 
     const onboarded = profile?.onboarding_completed === true;
 
@@ -53,8 +55,8 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     }
 
     if (onboarded && pathname === '/onboarding') {
-      console.log('[AUTHGATE] redirecting to /discovery from onboarding');
-      router.replace('/discovery');
+      console.log('[AUTHGATE] redirecting to /(tabs)/discovery from onboarding');
+      router.replace('/(tabs)/discovery');
     }
   }, [loading, profileLoading, session, isGuest, profile, pathname]);
 
