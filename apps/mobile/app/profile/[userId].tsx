@@ -202,6 +202,8 @@ export default function FriendProfileScreen() {
           </View>
         </View>
 
+        {(isOwnProfile || isFriend) ? (
+        <>
         {/* Cards - (we’ll fill these from profile fields next) */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>
@@ -254,6 +256,14 @@ export default function FriendProfileScreen() {
           title="Countries Traveled"
           countries={traveledIsoCodes}
         />
+        </>
+        ) : (
+          <View style={[styles.lockedCard, { backgroundColor: colors.card }]}>
+            <Text style={[styles.lockedText, { color: colors.textMuted }]}>
+              Learn more about this user by adding them as a friend!
+            </Text>
+          </View>
+        )}
       </ScrollView>
       <Modal visible={ctaOpen} transparent animationType="slide">
         <Pressable
@@ -334,6 +344,17 @@ const styles = StyleSheet.create({
   card: { borderRadius: 24, padding: 18, marginTop: 16 },
   cardTitle: { fontSize: 18, fontWeight: '800' },
   cardValue: { fontSize: 16, marginTop: 8 },
+  lockedCard: {
+    borderRadius: 24,
+    padding: 24,
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  lockedText: {
+    fontSize: 16,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
   linkRow: {
     marginTop: 18,
     borderRadius: 24,
