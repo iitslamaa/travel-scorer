@@ -18,19 +18,21 @@ import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 
 export default function LandingScreen() {
-  console.log('🟢 LandingScreen render');
+  console.log('[LANDING] render', {
+    hasSession: !!session,
+    isGuest,
+    loading,
+    hasSeenIntro,
+  });
   const router = useRouter();
   const {
     session,
     isGuest,
+    loading,
     continueAsGuest,
     hasSeenIntro,
     setHasSeenIntro,
   } = useAuth();
-
-  console.log('🟢 useAuth session:', session);
-  console.log('🟢 useAuth isGuest:', isGuest);
-  console.log('🟢 useAuth hasSeenIntro:', hasSeenIntro);
 
   const [loadingGoogle, setLoadingGoogle] = useState(false);
   const loginInProgressRef = useRef(false);
@@ -40,12 +42,19 @@ export default function LandingScreen() {
 
   // Navigation guard
   useEffect(() => {
-    console.log('🧭 Navigation guard triggered. session:', session, 'isGuest:', isGuest);
+    console.log('[LANDING] nav effect check', {
+      loading,
+      hasSession: !!session,
+      isGuest,
+    });
+
+    if (loading) return;
+
     if (session || isGuest) {
-      console.log('🧭 Navigating to /home');
-      router.replace('/home');
+      console.log('[LANDING] redirecting to /discovery');
+      router.replace('/discovery');
     }
-  }, [session, isGuest, router]);
+  }, [session, isGuest, loading]);
 
   // If intro already seen, immediately show buttons
   useEffect(() => {
@@ -57,7 +66,7 @@ export default function LandingScreen() {
 
   // 🔥 Deep link debugging
   useEffect(() => {
-    console.log('🔥 Deep link listener mounted');
+    console.log('[LANDING] deepLink effect mounted');
 
     const handleUrl = async (event: { url: string }) => {
       console.log('🔥 DEEP LINK RECEIVED:', event.url);
@@ -79,7 +88,7 @@ export default function LandingScreen() {
     });
 
     return () => {
-      console.log('🔥 Deep link listener removed');
+      console.log('[LANDING] deepLink effect cleanup');
       subscription.remove();
     };
   }, []);

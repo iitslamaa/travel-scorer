@@ -30,7 +30,7 @@ export default function ProfileSettingsScreen() {
   const handleLogout = async () => {
     try {
       await signOut();
-      router.replace('/login');
+      // Let AuthGate redirect to landing (/)
     } catch {
       Alert.alert('Logout failed', 'Please try again.');
     }
@@ -53,8 +53,7 @@ export default function ProfileSettingsScreen() {
 
       await signOut();
       await supabase.auth.signOut();
-
-      router.replace('/login');
+      // Let AuthGate redirect to landing (/)
     } catch (e: any) {
       Alert.alert('Delete failed', e?.message ?? 'Please try again.');
     } finally {
