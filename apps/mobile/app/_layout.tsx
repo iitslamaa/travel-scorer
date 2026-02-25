@@ -50,6 +50,8 @@ function RootLayoutInner() {
       <Stack
         screenOptions={{
           headerShown: false,
+          animation: 'fade',
+          animationDuration: 220,
           contentStyle: {
             backgroundColor: showAuthBackground
               ? 'transparent'

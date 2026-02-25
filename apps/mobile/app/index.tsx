@@ -38,7 +38,6 @@ export default function LandingScreen() {
   const loginInProgressRef = useRef(false);
 
   const introOpacity = useRef(new Animated.Value(1)).current;
-  const buttonsOpacity = useRef(new Animated.Value(0)).current;
 
   // Navigation guard
   useEffect(() => {
@@ -60,7 +59,6 @@ export default function LandingScreen() {
   useEffect(() => {
     if (hasSeenIntro) {
       introOpacity.setValue(0);
-      buttonsOpacity.setValue(1);
     }
   }, [hasSeenIntro]);
 
@@ -176,12 +174,17 @@ export default function LandingScreen() {
       toValue: 0,
       duration: 400,
       useNativeDriver: true,
+    }).start();
+  };
+
+  const handleEmailLogin = () => {
+    // Fade out buttons before navigating
+    Animated.timing(introOpacity, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
     }).start(() => {
-      Animated.timing(buttonsOpacity, {
-        toValue: 1,
-        duration: 500,
-        useNativeDriver: true,
-      }).start();
+      router.push('/login');
     });
   };
 
@@ -213,7 +216,7 @@ export default function LandingScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.content}
       >
-        <Animated.View style={{ opacity: buttonsOpacity }}>
+        <View>
           <Pressable
             style={[styles.googleButton, loadingGoogle && { opacity: 0.6 }]}
             onPress={handleGoogleLogin}
@@ -226,7 +229,7 @@ export default function LandingScreen() {
 
           <Pressable
             style={styles.emailButton}
-            onPress={() => router.push('/login')}
+            onPress={handleEmailLogin}
           >
             <Text style={styles.emailText}>
               Continue with Email
@@ -236,7 +239,7 @@ export default function LandingScreen() {
           <Pressable style={styles.guestButton} onPress={continueAsGuest}>
             <Text style={styles.guestText}>Continue as Guest</Text>
           </Pressable>
-        </Animated.View>
+        </View>
       </KeyboardAvoidingView>
     </View>
   );
