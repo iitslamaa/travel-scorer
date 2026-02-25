@@ -65,8 +65,7 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // If we’re not allowed, we render nothing while router redirects.
-  if (!session && !isGuest) return null;
-
+  // Always render children once loading checks pass.
+  // Redirect logic above handles protection.
   return <>{children}</>;
 }
