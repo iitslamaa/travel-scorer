@@ -10,7 +10,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { supabase } from '../../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import AuthGate from '../../components/AuthGate';
 import { lightColors, darkColors } from '../../theme/colors';
@@ -25,6 +26,25 @@ export default function FriendsScreen() {
   const { isGuest } = useAuth();
 
   const { friends, loading } = useFriends();
+
+  const { session } = useAuth();
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    if (!session?.user?.id) return;
+
+    const fetchCount = async () => {
+      const { count } = await supabase
+        .from('friend_requests')
+        .select('*', { count: 'exact', head: true })
+        .eq('receiver_id', session.user.id)
+        .eq('status', 'pending');
+
+      setPendingCount(count ?? 0);
+    };
+
+    fetchCount();
+  }, [session]);
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -143,13 +163,40 @@ export default function FriendsScreen() {
 
           <Pressable
             onPress={() => router.push('/friend-requests')}
-            style={[styles.requestButton, { backgroundColor: colors.card }]}
+            style={[styles.requestButton, { backgroundColor: colors.card, position: 'relative' }]}
           >
             <Ionicons
               name="person-add-outline"
               size={20}
               color={colors.textPrimary}
             />
+
+            {pendingCount > 0 && (
+              <View
+                style={{
+                  position: 'absolute',
+                  top: -4,
+                  right: -4,
+                  minWidth: 16,
+                  height: 16,
+                  borderRadius: 8,
+                  backgroundColor: '#ef4444',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingHorizontal: 4,
+                }}
+              >
+                <Text
+                  style={{
+                    color: 'white',
+                    fontSize: 10,
+                    fontWeight: '700',
+                  }}
+                >
+                  {pendingCount}
+                </Text>
+              </View>
+            )}
           </Pressable>
         </View>
 
