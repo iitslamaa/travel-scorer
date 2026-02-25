@@ -10,7 +10,10 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
+import { useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import AuthGate from '../../components/AuthGate';
@@ -33,22 +36,29 @@ export default function FriendsScreen() {
   const { friends, loading } = useFriends();
 
   const [pendingCount, setPendingCount] = useState(0);
+  const isFocused = useIsFocused();
 
   useEffect(() => {
+    if (!isFocused) return;
     if (!session?.user?.id) return;
 
     const fetchCount = async () => {
-      const { count } = await supabase
+      const { count, error } = await supabase
         .from('friend_requests')
         .select('*', { count: 'exact', head: true })
         .eq('receiver_id', session.user.id)
         .eq('status', 'pending');
 
+      if (error) {
+        console.error('Pending count error:', error);
+        return;
+      }
+
       setPendingCount(count ?? 0);
     };
 
     fetchCount();
-  }, [session]);
+  }, [isFocused, session?.user?.id]);
 
   const [searchQuery, setSearchQuery] = useState('');
 

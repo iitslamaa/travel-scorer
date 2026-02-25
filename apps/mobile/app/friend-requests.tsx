@@ -11,11 +11,13 @@ import {
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { lightColors, darkColors } from '../theme/colors';
-import { useEffect, useState } from 'react';
+import { useState, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
 type RequestProfile = {
+  request_id: string;
   id: string;
   username: string;
   full_name: string;
@@ -27,78 +29,94 @@ export default function FriendRequestsScreen() {
   const scheme = useColorScheme();
   const colors = scheme === 'dark' ? darkColors : lightColors;
   const { session } = useAuth();
+  console.log('RN USER ID:', session?.user?.id);
 
   const [requests, setRequests] = useState<RequestProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const handleAccept = async (senderId: string) => {
+  const handleAccept = async (requestId: string) => {
     if (!session?.user?.id) return;
-    const receiverId = session.user.id;
+    console.log('Clicked requestId:', requestId);
 
-    // Insert into friends table
-    await supabase.from('friends').insert({
-      user_id: receiverId,
-      friend_id: senderId,
-    });
-
-    // Update request status
-    await supabase
-      .from('friend_requests')
-      .update({ status: 'accepted' })
-      .eq('receiver_id', receiverId)
-      .eq('sender_id', senderId);
-
-    setRequests((prev) => prev.filter((r) => r.id !== senderId));
-  };
-
-  const handleDecline = async (senderId: string) => {
-    if (!session?.user?.id) return;
-    const receiverId = session.user.id;
-
-    await supabase
-      .from('friend_requests')
-      .update({ status: 'declined' })
-      .eq('receiver_id', receiverId)
-      .eq('sender_id', senderId);
-
-    setRequests((prev) => prev.filter((r) => r.id !== senderId));
-  };
-
-  useEffect(() => {
-    if (!session?.user?.id) return;
-
-    const userId = session.user.id;
-
-    async function fetchRequests() {
-      setLoading(true);
+    try {
+      // Optimistic removal
+      setRequests((prev) => prev.filter((r) => r.request_id !== requestId));
 
       const { data, error } = await supabase
         .from('friend_requests')
-        .select(`
-          sender_id,
-          profiles!friend_requests_sender_id_fkey (
-            id,
-            username,
-            full_name,
-            avatar_url
-          )
-        `)
-        .eq('receiver_id', userId)
-        .eq('status', 'pending');
+        .update({ status: 'accepted' })
+        .eq('id', requestId)
+        .select();
 
-      if (error) {
-        console.error(error);
+      if (error) throw error;
+
+      console.log('Accepted rows:', data);
+    } catch (err) {
+      console.error('Accept failed:', err);
+    }
+  };
+
+  const handleDecline = async (requestId: string) => {
+    if (!session?.user?.id) return;
+
+    try {
+      // Optimistic removal
+      setRequests((prev) => prev.filter((r) => r.request_id !== requestId));
+
+      const { error } = await supabase
+        .from('friend_requests')
+        .update({ status: 'declined' })
+        .eq('id', requestId);
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Decline failed:', err);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!session?.user?.id) return;
+
+      const userId = session.user.id;
+
+      async function fetchRequests() {
+        setLoading(true);
+
+        const { data, error } = await supabase
+          .from('friend_requests')
+          .select(`
+            id,
+            sender_id,
+            profiles!friend_requests_sender_id_fkey (
+              id,
+              username,
+              full_name,
+              avatar_url
+            )
+          `)
+          .eq('receiver_id', userId)
+          .eq('status', 'pending');
+
+        console.log('Raw friend_requests rows:', data);
+
+        if (!error) {
+          const mapped =
+            data?.map((row: any) => ({
+              request_id: row.id,
+              ...row.profiles,
+            })) ?? [];
+          setRequests(mapped);
+        } else {
+          console.error(error);
+        }
+
         setLoading(false);
-        return;
       }
 
-      const mapped = data?.map((row: any) => row.profiles) ?? [];
-      setRequests(mapped);
-      setLoading(false);
-    }
-
-    fetchRequests();
-  }, [session]);
+      fetchRequests();
+    }, [session])
+  );
 
   const renderItem = ({ item }: { item: RequestProfile }) => (
     <View style={[styles.row, { borderBottomColor: colors.textSecondary }]}>
@@ -118,7 +136,7 @@ export default function FriendRequestsScreen() {
 
         <View style={{ flexDirection: 'row', marginTop: 8, gap: 12 }}>
           <Pressable
-            onPress={() => handleAccept(item.id)}
+            onPress={() => handleAccept(item.request_id)}
             style={{
               paddingVertical: 6,
               paddingHorizontal: 14,
@@ -130,7 +148,7 @@ export default function FriendRequestsScreen() {
           </Pressable>
 
           <Pressable
-            onPress={() => handleDecline(item.id)}
+            onPress={() => handleDecline(item.request_id)}
             style={{
               paddingVertical: 6,
               paddingHorizontal: 14,
@@ -183,7 +201,7 @@ export default function FriendRequestsScreen() {
         <FlatList
           data={requests}
           renderItem={renderItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.request_id}
           contentContainerStyle={{ paddingTop: 24 }}
         />
       )}
