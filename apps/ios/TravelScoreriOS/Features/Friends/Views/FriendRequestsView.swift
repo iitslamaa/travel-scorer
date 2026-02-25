@@ -6,6 +6,8 @@
 //
 
 import SwiftUI
+import NukeUI
+import Nuke
 
 struct FriendRequestsView: View {
     @StateObject private var vm = FriendRequestsViewModel()
@@ -39,37 +41,33 @@ struct FriendRequestsView: View {
                                 Group {
                                     if let urlString = profile.avatarUrl,
                                        let url = URL(string: urlString) {
-                                        AsyncImage(
-                                            url: url,
-                                            transaction: Transaction(animation: .easeInOut(duration: 0.2))
-                                        ) { phase in
-                                            switch phase {
-                                            case .success(let image):
+                                        LazyImage(url: url) { state in
+                                            if let image = state.image {
                                                 image
                                                     .resizable()
                                                     .scaledToFill()
-                                                    .transition(.opacity)
-
-                                            case .failure(_):
+                                            } else if state.error != nil {
                                                 Image(systemName: "person.crop.circle.fill")
                                                     .resizable()
                                                     .scaledToFill()
                                                     .foregroundStyle(.secondary)
-
-                                            case .empty:
+                                            } else {
                                                 ZStack {
                                                     Circle()
                                                         .fill(Color.gray.opacity(0.15))
                                                     ProgressView()
                                                         .scaleEffect(0.7)
                                                 }
-
-                                            @unknown default:
-                                                EmptyView()
                                             }
                                         }
+                                        .processors([
+                                            ImageProcessors.Resize(size: CGSize(width: 120, height: 120))
+                                        ])
+                                        .priority(.high)
                                     } else {
                                         Image(systemName: "person.crop.circle.fill")
+                                            .resizable()
+                                            .scaledToFill()
                                             .foregroundStyle(.secondary)
                                     }
                                 }

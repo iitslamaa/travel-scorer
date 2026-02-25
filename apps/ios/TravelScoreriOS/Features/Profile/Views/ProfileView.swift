@@ -4,6 +4,8 @@
 //
 
 import SwiftUI
+import NukeUI
+import Nuke
 
 extension Color {
     static let gold = Color(red: 0.85, green: 0.68, blue: 0.15)
@@ -43,6 +45,7 @@ struct ProfileView: View {
 
     init(userId: UUID) {
         print("🆕 ProfileView INIT for:", userId)
+
         self.userId = userId
 
         // ✅ VM is now single-identity (no rebinding / no stale reuse)
@@ -245,14 +248,20 @@ struct FriendsListView: View {
                     HStack(spacing: 12) {
                         if let urlString = friend.avatarUrl,
                            let url = URL(string: urlString) {
-                            AsyncImage(url: url) { image in
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                            } placeholder: {
-                                Circle()
-                                    .fill(Color.gray.opacity(0.2))
+                            LazyImage(url: url) { state in
+                                if let image = state.image {
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                } else {
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.2))
+                                }
                             }
+                            .processors([
+                                ImageProcessors.Resize(size: CGSize(width: 120, height: 120))
+                            ])
+                            .priority(.high)
                             .frame(width: 40, height: 40)
                             .clipShape(Circle())
                         } else {

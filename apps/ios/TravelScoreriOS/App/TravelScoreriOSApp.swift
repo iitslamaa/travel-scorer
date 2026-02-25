@@ -5,7 +5,9 @@
 //  Created by Lama Yassine on 11/10/25.
 //
 
+
 import SwiftUI
+import Nuke
 
 @main
 struct TravelScoreriOSApp: App {
@@ -37,6 +39,15 @@ struct TravelScoreriOSApp: App {
         print("⚖️ scoreWeightsStore instance:", ObjectIdentifier(weights))
         print("🔐 sessionManager instance:", ObjectIdentifier(session))
         print("   🔎 SupabaseManager shared instance:", ObjectIdentifier(SupabaseManager.shared))
+
+        // Configure Nuke global image pipeline for avatar stability
+        let dataCache = try? DataCache(name: "com.travelaf.avatarCache")
+        dataCache?.sizeLimit = 200 * 1024 * 1024 // 200 MB disk cache
+
+        var config = ImagePipeline.Configuration()
+        config.dataCache = dataCache
+
+        ImagePipeline.shared = ImagePipeline(configuration: config)
     }
 
     var body: some Scene {
