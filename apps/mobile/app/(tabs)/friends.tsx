@@ -129,9 +129,17 @@ export default function FriendsScreen() {
       style={[styles.row, { borderBottomColor: colors.textSecondary }]}
     >
       {item.avatar_url ? (
-        <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
+        <Image
+          source={{ uri: item.avatar_url }}
+          style={styles.avatar}
+        />
       ) : (
-        <View style={styles.avatar} />
+        <Ionicons
+          name="person-circle"
+          size={44}
+          color={colors.textMuted}
+          style={{ marginRight: 14 }}
+        />
       )}
 
       <View style={{ flex: 1 }}>

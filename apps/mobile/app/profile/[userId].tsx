@@ -162,10 +162,13 @@ export default function FriendProfileScreen() {
                 source={{ uri: profile.avatar_url }}
                 style={styles.avatar}
                 resizeMode="cover"
-                onError={() => console.log('Avatar failed to load:', profile.avatar_url)}
               />
             ) : (
-              <View style={[styles.avatar, { backgroundColor: colors.surface }]} />
+              <Ionicons
+                name="person-circle"
+                size={150}
+                color={colors.textMuted}
+              />
             )}
           </View>
 
