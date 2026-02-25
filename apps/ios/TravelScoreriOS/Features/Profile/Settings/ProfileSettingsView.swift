@@ -47,6 +47,8 @@ struct ProfileSettingsView: View {
     @State private var deleteText = ""
     @State private var isDeleting = false
     @State private var deleteError: String? = nil
+    @State private var showSaveSuccess = false
+    @State private var isSavingProfile = false
 
     private var isFormValid: Bool {
         let trimmedName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -71,6 +73,7 @@ struct ProfileSettingsView: View {
         ZStack {
             Color(.systemBackground)
                 .ignoresSafeArea()
+
 
             ProfileSettingsHeader()
 
@@ -152,6 +155,31 @@ struct ProfileSettingsView: View {
                 .padding(.horizontal, 16)
                 .padding(.top, 90)
             }
+
+            // META-style top overlay toast (above everything)
+            VStack {
+                if showSaveSuccess {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.green)
+                        Text("Profile updated")
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                    }
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 12)
+                    .background(.ultraThinMaterial)
+                    .clipShape(Capsule())
+                    .shadow(color: .black.opacity(0.15), radius: 20, y: 8)
+                    .transition(.move(edge: .top).combined(with: .opacity))
+                }
+
+                Spacer()
+            }
+            .padding(.top, 16)
+            .padding(.horizontal)
+            .zIndex(9999)
+            .allowsHitTesting(false)
         }
         .onAppear {
             guard !hasLoadedProfile else { return }
@@ -196,8 +224,10 @@ struct ProfileSettingsView: View {
                 Button("Cancel") { dismiss() }
             }
             ToolbarItem(placement: .confirmationAction) {
-                Button("Save") {
+                Button {
                     Task {
+                        isSavingProfile = true
+
                         let avatarURL = await resolveAvatarChange()
 
                         let trimmedName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -213,10 +243,35 @@ struct ProfileSettingsView: View {
                             nextDestination: nextDestination,
                             avatarUrl: avatarURL
                         )
-                        dismiss()
+
+                        isSavingProfile = false
+                        // ✅ Clear temporary avatar state so future saves don't re-upload
+                        selectedUIImage = nil
+                        shouldRemoveAvatar = false
+
+                        await MainActor.run {
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+                                showSaveSuccess = true
+                            }
+                        }
+
+                        try? await Task.sleep(nanoseconds: 1_800_000_000)
+
+                        await MainActor.run {
+                            withAnimation(.easeOut(duration: 0.25)) {
+                                showSaveSuccess = false
+                            }
+                        }
+                    }
+                } label: {
+                    if isSavingProfile {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                    } else {
+                        Text("Save")
                     }
                 }
-                .disabled(!isFormValid)
+                .disabled(!isFormValid || isSavingProfile)
                 .opacity(isFormValid ? 1 : 0.5)
             }
         }
@@ -343,7 +398,8 @@ struct ProfileSettingsView: View {
         isUploadingAvatar = true
         defer { isUploadingAvatar = false }
 
-        let fileName = "\(userId).jpg"
+        // 🔥 Versioned filename to avoid image caching
+        let fileName = "\(userId)_\(UUID().uuidString).jpg"
 
         do {
             let publicURL = try await profileVM.uploadAvatar(

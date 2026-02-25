@@ -25,6 +25,7 @@ final class ProfileViewModel: ObservableObject {
     @Published var profile: Profile? {
         didSet {
             print("📦 [\(instanceId)] profile DID SET →", profile?.id as Any)
+            print("🖼️ [\(instanceId)] profile.avatarUrl DID SET →", profile?.avatarUrl as Any)
             logPublishedState("profile updated")
         }
     }
@@ -96,6 +97,7 @@ final class ProfileViewModel: ObservableObject {
     /// This is used by `.refreshable` in ProfileView.
     func reloadProfile() async {
         print("🔄 [\(instanceId)] reloadProfile called for:", userId)
+        print("🖼️ [\(instanceId)] reloadProfile: avatarUrl BEFORE →", profile?.avatarUrl as Any)
 
         isRefreshing = true
         errorMessage = nil
@@ -111,6 +113,7 @@ final class ProfileViewModel: ObservableObject {
 
         await loadTask?.value
 
+        print("🖼️ [\(instanceId)] reloadProfile: avatarUrl AFTER →", profile?.avatarUrl as Any)
         isRefreshing = false
     }
     
@@ -167,5 +170,20 @@ final class ProfileViewModel: ObservableObject {
         print("   traveled.count:", viewedTraveledCountries.count)
         print("   bucket.count:", viewedBucketListCountries.count)
         print("   relationshipState:", relationshipState as Any)
+    }
+    
+    // MARK: - Optimistic Avatar Update (Meta Gold Standard)
+    func updateAvatarLocally(to newUrl: String?) {
+        print("🔥 [\(instanceId)] updateAvatarLocally called →", newUrl as Any)
+
+        guard var current = profile else {
+            print("❌ [\(instanceId)] updateAvatarLocally: profile is nil")
+            return
+        }
+
+        print("🟠 [\(instanceId)] avatarUrl BEFORE local update →", current.avatarUrl as Any)
+        current.avatarUrl = newUrl
+        profile = current
+        print("🟢 [\(instanceId)] avatarUrl AFTER local update →", profile?.avatarUrl as Any)
     }
 }
