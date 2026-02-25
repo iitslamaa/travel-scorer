@@ -18,88 +18,138 @@ struct ProfileSettingsAvatarSection: View {
     let shouldRemoveAvatar: Bool
     let onRemoveAvatar: () -> Void
 
+    @State private var showPhotoOptions = false
+    @State private var showImagePicker = false
+
     var body: some View {
         SectionCard {
-            VStack(spacing: 12) {
+            VStack(spacing: 16) {
 
-                ZStack {
-                    if shouldRemoveAvatar {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .foregroundStyle(.secondary)
+                Button {
+                    showPhotoOptions = true
+                } label: {
+                    ZStack(alignment: .bottomTrailing) {
+                        avatarView
 
-                    } else if let image = selectedUIImage {
-                        Image(uiImage: image)
-                            .resizable()
-                            .scaledToFill()
-
-                    } else if let urlString = profileVM.profile?.avatarUrl,
-                              !urlString.isEmpty,
-                              let url = URL(string: urlString) {
-                        AsyncImage(
-                            url: url,
-                            transaction: Transaction(animation: .easeInOut(duration: 0.2))
-                        ) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFill()
-                                    .transition(.opacity)
-
-                            case .failure(_):
-                                Image(systemName: "person.crop.circle.fill")
-                                    .resizable()
-                                    .scaledToFill()
-                                    .foregroundStyle(.secondary)
-
-                            case .empty:
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.15))
-                                    ProgressView()
-                                        .scaleEffect(0.7)
-                                }
-
-                            @unknown default:
-                                EmptyView()
+                        if isUploadingAvatar {
+                            ZStack {
+                                Circle()
+                                    .fill(.ultraThinMaterial)
+                                ProgressView()
+                                    .progressViewStyle(.circular)
                             }
+                            .frame(width: 120, height: 120)
+                            .clipShape(Circle())
                         }
 
-                    } else {
-                        Image(systemName: "person.crop.circle.fill")
-                            .resizable()
-                            .foregroundStyle(.secondary)
+                        cameraBadge
                     }
+                    .frame(width: 120, height: 120)
                 }
-                .frame(width: 110, height: 110)
-                .clipShape(Circle())
+                .buttonStyle(.plain)
+                .confirmationDialog(
+                    "Profile Photo",
+                    isPresented: $showPhotoOptions,
+                    titleVisibility: .visible
+                ) {
+                    Button(hasAvatar ? "Change Photo" : "Add Photo") {
+                        showImagePicker = true
+                    }
 
-                PhotosPicker(
+                    if hasAvatar {
+                        Button("Remove Photo", role: .destructive) {
+                            onRemoveAvatar()
+                        }
+                    }
+
+                    Button("Cancel", role: .cancel) {}
+                }
+                .photosPicker(
+                    isPresented: $showImagePicker,
                     selection: $selectedPhotoItem,
                     matching: .images
-                ) {
-                    Text("Change profile photo")
-                        .font(.subheadline)
-                        .foregroundStyle(.primary)
-                }
+                )
 
-                if !shouldRemoveAvatar &&
-                   (selectedUIImage != nil ||
-                    (profileVM.profile?.avatarUrl?.isEmpty == false)) {
-                    Button(role: .destructive) {
-                        onRemoveAvatar()
-                    } label: {
-                        Text("Remove profile photo")
-                            .font(.subheadline)
-                    }
-                }
-
-                if isUploadingAvatar {
-                    ProgressView()
-                }
             }
             .frame(maxWidth: .infinity)
         }
+    }
+
+    private var hasAvatar: Bool {
+        if shouldRemoveAvatar { return false }
+        if selectedUIImage != nil { return true }
+        if let url = profileVM.profile?.avatarUrl, !url.isEmpty { return true }
+        return false
+    }
+
+    @ViewBuilder
+    private var avatarView: some View {
+        Group {
+            if shouldRemoveAvatar {
+                placeholderAvatar
+            } else if let image = selectedUIImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else if let urlString = profileVM.profile?.avatarUrl,
+                      !urlString.isEmpty,
+                      let url = URL(string: urlString) {
+                AsyncImage(
+                    url: url,
+                    transaction: Transaction(animation: .easeInOut(duration: 0.2))
+                ) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .transition(.opacity)
+                    case .failure(_):
+                        placeholderAvatar
+                    case .empty:
+                        ZStack {
+                            Circle()
+                                .fill(Color.gray.opacity(0.15))
+                            ProgressView()
+                                .scaleEffect(0.7)
+                        }
+                    @unknown default:
+                        placeholderAvatar
+                    }
+                }
+            } else {
+                placeholderAvatar
+            }
+        }
+        .frame(width: 120, height: 120)
+        .clipShape(Circle())
+        .overlay(
+            Circle()
+                .stroke(Color.white.opacity(0.9), lineWidth: 3)
+        )
+    }
+
+    private var placeholderAvatar: some View {
+        Circle()
+            .fill(Color(.systemGray5))
+            .overlay(
+                Image(systemName: "person.fill")
+                    .font(.system(size: 38, weight: .regular))
+                    .foregroundStyle(.secondary)
+            )
+    }
+
+    private var cameraBadge: some View {
+        ZStack {
+            Circle()
+                .fill(Color(.systemBackground))
+                .frame(width: 34, height: 34)
+                .shadow(color: .black.opacity(0.08), radius: 4, x: 0, y: 2)
+
+            Image(systemName: "camera.fill")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(.primary)
+        }
+        .offset(x: -6, y: -6)
     }
 }

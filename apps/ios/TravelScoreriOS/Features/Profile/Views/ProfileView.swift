@@ -212,7 +212,14 @@ struct ProfileView: View {
         .animation(.easeInOut(duration: 0.25), value: isReadyToRenderProfile)
         
         .onAppear {
-            print("📌 ProfileView onAppear load start for:", userId)
+            print("📌 ProfileView onAppear for:", userId)
+
+            // 🔒 Only load if no profile is currently bound
+            guard profileVM.profile == nil else {
+                print("🛑 Skipping loadIfNeeded — profile already bound")
+                return
+            }
+
             Task {
                 await profileVM.loadIfNeeded()
             }

@@ -52,11 +52,26 @@ extension ProfileViewModel {
                 userId: userId,
                 payload: payload
             )
-            
-            // Reload full profile state
-            await reloadProfile()
 
-            print("💾 Saved + fully reloaded profile state")
+            // 🔥 META GOLD STANDARD: deterministic local state merge (no immediate refetch)
+            if var current = profile {
+                current.username = trimmedUsername
+                current.fullName = trimmedName
+                current.livedCountries = homeCountries ?? current.livedCountries
+                current.languages = languages ?? current.languages
+                current.travelStyle = travelStyle.map { [$0] } ?? current.travelStyle
+                current.travelMode = travelMode.map { [$0] } ?? current.travelMode
+                current.nextDestination = nextDestination
+
+                // Handle avatarUrl explicitly ("" means remove)
+                if let avatarUrl {
+                    current.avatarUrl = avatarUrl.isEmpty ? nil : avatarUrl
+                }
+
+                profile = current
+            }
+
+            print("💾 Saved + locally merged profile state (no reload)")
             
         } catch {
             errorMessage = error.localizedDescription
