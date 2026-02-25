@@ -5,12 +5,11 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  ActionSheetIOS,
   Alert,
   Modal,
   TextInput,
-  Platform,
   Image,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -68,6 +67,10 @@ export default function ProfileSettingsScreen() {
   const colors = useTheme();
   const borderColor = colors.border;
 
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
+
   /* ---------------- Avatar ---------------- */
 
   const pickAvatar = async () => {
@@ -86,9 +89,10 @@ export default function ProfileSettingsScreen() {
 
       if (result.canceled) return;
 
+      setIsUploadingAvatar(true);
+
       const image = result.assets[0];
 
-      // Resize + compress BEFORE upload
       const manipulated = await ImageManipulator.manipulateAsync(
         image.uri,
         [{ resize: { width: 512 } }],
@@ -109,22 +113,34 @@ export default function ProfileSettingsScreen() {
 
       if (uploadError) throw uploadError;
 
-      await updateProfile({ avatar_url: fileName });
+      const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
+
+      await updateProfile({ avatar_url: data.publicUrl });
     } catch (e: any) {
       Alert.alert('Upload failed', e?.message ?? 'Please try again.');
+    } finally {
+      setIsUploadingAvatar(false);
+      setAvatarMenuOpen(false);
     }
   };
 
   const deleteAvatar = async () => {
     try {
       if (!profile?.avatar_url) return;
+
+      setIsUploadingAvatar(true);
+
       const fileName = profile.avatar_url.split('/').pop();
       if (fileName) {
         await supabase.storage.from('avatars').remove([fileName]);
       }
+
       await updateProfile({ avatar_url: null });
     } catch {
       Alert.alert('Error', 'Failed to remove profile photo.');
+    } finally {
+      setIsUploadingAvatar(false);
+      setAvatarMenuOpen(false);
     }
   };
 
@@ -177,6 +193,8 @@ export default function ProfileSettingsScreen() {
 
   const saveAll = async () => {
     try {
+      setIsSavingProfile(true);
+
       await updateProfile({
         travel_mode: draftMode ? [draftMode] : null,
         travel_style: draftStyle ? [draftStyle] : null,
@@ -184,9 +202,12 @@ export default function ProfileSettingsScreen() {
         languages: draftLanguages,
         lived_countries: draftLivedCountries,
       });
+
       router.back();
     } catch {
       Alert.alert('Save failed', 'Please try again.');
+    } finally {
+      setIsSavingProfile(false);
     }
   };
 
@@ -266,10 +287,21 @@ export default function ProfileSettingsScreen() {
             </Text>
           </Pressable>
 
-          <Pressable onPress={saveAll} disabled={!hasChanges}>
-            <Text style={[styles.navBtn, { color: hasChanges ? colors.textPrimary : colors.textSecondary }]}>
-              Save
-            </Text>
+          <Pressable onPress={saveAll} disabled={isSavingProfile}>
+            {isSavingProfile ? (
+              <Text style={[styles.navBtn, { color: colors.textSecondary }]}>
+                Saving…
+              </Text>
+            ) : (
+              <Text
+                style={[
+                  styles.navBtn,
+                  { color: colors.textPrimary },
+                ]}
+              >
+                Save
+              </Text>
+            )}
           </Pressable>
         </View>
 
@@ -279,26 +311,53 @@ export default function ProfileSettingsScreen() {
 
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <Pressable
-            onPress={pickAvatar}
+            onPress={() => setAvatarMenuOpen(true)}
             style={{ alignItems: 'center', marginBottom: 20 }}
           >
-            {profile?.avatar_url ? (
-              <Image
-                source={{ uri: profile.avatar_url }}
-                style={{ width: 100, height: 100, borderRadius: 50 }}
-              />
-            ) : (
-              <View
-                style={{
-                  width: 100,
-                  height: 100,
-                  borderRadius: 50,
-                  backgroundColor: colors.border,
-                }}
-              />
-            )}
-            <Text style={{ marginTop: 8, color: colors.primary }}>
-              Change Photo
+            <View style={{ position: 'relative' }}>
+              {profile?.avatar_url ? (
+                <Image
+                  source={{ uri: profile.avatar_url }}
+                  style={{ width: 110, height: 110, borderRadius: 55 }}
+                />
+              ) : (
+                <View
+                  style={{
+                    width: 110,
+                    height: 110,
+                    borderRadius: 55,
+                    backgroundColor: colors.border,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <Text style={{ fontSize: 32, color: colors.textSecondary }}>
+                    👤
+                  </Text>
+                </View>
+              )}
+
+              {isUploadingAvatar && (
+                <View
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    borderRadius: 55,
+                    backgroundColor: 'rgba(0,0,0,0.4)',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <ActivityIndicator color="#fff" />
+                </View>
+              )}
+            </View>
+
+            <Text style={{ marginTop: 10, color: colors.primary, fontWeight: '600' }}>
+              {profile?.avatar_url ? 'Edit Photo' : 'Add Photo'}
             </Text>
           </Pressable>
           <Divider color={borderColor} />
@@ -314,6 +373,51 @@ export default function ProfileSettingsScreen() {
             onPress={() => openEdit('username')}
           />
         </View>
+
+        <Modal visible={avatarMenuOpen} transparent animationType="fade">
+          <Pressable
+            style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' }}
+            onPress={() => setAvatarMenuOpen(false)}
+          >
+            <View
+              style={{
+                backgroundColor: colors.card,
+                padding: 24,
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+              }}
+            >
+              <Pressable
+                onPress={pickAvatar}
+                style={{ paddingVertical: 16 }}
+              >
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textPrimary }}>
+                  {profile?.avatar_url ? 'Change Photo' : 'Add Photo'}
+                </Text>
+              </Pressable>
+
+              {profile?.avatar_url && (
+                <Pressable
+                  onPress={deleteAvatar}
+                  style={{ paddingVertical: 16 }}
+                >
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: colors.redText }}>
+                    Remove Photo
+                  </Text>
+                </Pressable>
+              )}
+
+              <Pressable
+                onPress={() => setAvatarMenuOpen(false)}
+                style={{ paddingVertical: 16 }}
+              >
+                <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textSecondary }}>
+                  Cancel
+                </Text>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Modal>
 
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <Row label="Travel mode" value={modeLabel} />
@@ -462,7 +566,13 @@ const styles = StyleSheet.create({
   navBar: { flexDirection: 'row', justifyContent: 'space-between', padding: 20 },
   navBtn: { fontSize: 17, fontWeight: '600' },
   largeTitle: { fontSize: 34, fontWeight: '700', paddingHorizontal: 20 },
-  card: { borderRadius: 24, padding: 20, margin: 20 },
+  card: {
+    borderRadius: 20,
+    padding: 20,
+    marginHorizontal: 20,
+    marginTop: 20,
+    elevation: 2,
+  },
   row: { paddingVertical: 18, flexDirection: 'row', justifyContent: 'space-between' },
   rowText: { fontSize: 16 },
   rowValue: { fontSize: 16 },
