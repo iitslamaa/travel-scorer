@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { useMemo, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import AuthGate from '../../components/AuthGate';
 import { lightColors, darkColors } from '../../theme/colors';
@@ -24,6 +25,19 @@ export default function FriendsScreen() {
   const { isGuest } = useAuth();
 
   const { friends, loading } = useFriends();
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredFriends = useMemo(() => {
+    if (!searchQuery.trim()) return friends;
+
+    const q = searchQuery.toLowerCase();
+
+    return friends.filter((f: any) =>
+      (f.full_name?.toLowerCase().includes(q) ?? false) ||
+      (f.username?.toLowerCase().includes(q) ?? false)
+    );
+  }, [friends, searchQuery]);
 
   const renderItem = ({ item }: { item: any }) => (
     <Pressable
@@ -146,13 +160,15 @@ export default function FriendsScreen() {
             placeholder="Search by username"
             placeholderTextColor={colors.textMuted}
             style={[styles.searchInput, { color: colors.textPrimary }]}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
           />
         </View>
 
         {/* Friends List Card */}
         <View style={[styles.card, { backgroundColor: colors.card }]}>
           <FlatList
-            data={friends}
+            data={filteredFriends}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             contentContainerStyle={{ paddingBottom: 40 }}
