@@ -18,11 +18,12 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
     });
 
     if (!loading && !session && !isGuest) {
-      if (
-        pathname !== '/' &&
-        pathname !== '/verify' &&
-        pathname !== '/login'
-      ) {
+      const isPublicRoute =
+        pathname === '/' ||
+        pathname === '/verify' ||
+        pathname.startsWith('/login');
+
+      if (!isPublicRoute) {
         console.log('[AUTHGATE] redirecting to / from', pathname);
         router.replace('/');
       }

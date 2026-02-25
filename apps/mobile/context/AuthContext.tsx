@@ -196,6 +196,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setProfile(null);
         setBucketIsoCodes([]);
         setVisitedIsoCodes([]);
+        setIsGuest(false);
       }
     });
 
