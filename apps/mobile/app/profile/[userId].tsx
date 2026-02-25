@@ -5,10 +5,11 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Modal,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import CountryFlag from 'react-native-country-flag';
 import { useProfileById } from '../../hooks/useProfileById';
@@ -18,6 +19,8 @@ import { useUserCounts } from '../../hooks/useUserCounts';
 import CollapsibleCountrySection from '../../components/profile/CollapsibleCountrySection';
 import { useCountries } from '../../hooks/useCountries';
 import { useTheme } from '../../hooks/useTheme';
+import { useAuth } from '../../context/AuthContext';
+import { supabase } from '../../lib/supabase';
 
 export default function FriendProfileScreen() {
   const router = useRouter();
@@ -28,13 +31,61 @@ export default function FriendProfileScreen() {
       title: 'Profile',
     });
   }, [navigation]);
-  const { id } = useLocalSearchParams();
+  const { userId } = useLocalSearchParams();
+  if (typeof userId !== 'string') return null;
   const colors = useTheme();
 
-  const { profile, loading } = useProfileById(id);
-  const { isFriend } = useFriendshipStatus(id);
-  const { count: friendCount } = useFriendCount(id);
-  const { traveledCount, traveledIsoCodes } = useUserCounts(id);
+  const { session } = useAuth();
+  const isOwnProfile = session?.user?.id === userId;
+
+  const [ctaOpen, setCtaOpen] = useState(false);
+
+  const { isFriend, isPending, refresh: refreshFriendship } = useFriendshipStatus(userId);
+  const { refresh: refreshFriendCount } = useFriendCount(userId);
+
+  const handleUnfriend = async () => {
+    if (!session?.user?.id) return;
+
+    setCtaOpen(false); // optimistic UI
+
+    await supabase
+      .from('friends')
+      .delete()
+      .or(
+        `and(user_id.eq.${session.user.id},friend_id.eq.${userId}),and(user_id.eq.${userId},friend_id.eq.${session.user.id})`
+      );
+
+    await refreshFriendship();
+    await refreshFriendCount();
+  };
+
+  const handleAddFriend = async () => {
+    if (!session?.user?.id) return;
+
+    await supabase.from('friend_requests').insert({
+      sender_id: session.user.id,
+      receiver_id: userId,
+      status: 'pending',
+    });
+
+    refreshFriendship(); // optimistic refresh
+  };
+
+  const handleCancelRequest = async () => {
+    if (!session?.user?.id) return;
+
+    await supabase
+      .from('friend_requests')
+      .delete()
+      .eq('sender_id', session.user.id)
+      .eq('receiver_id', userId);
+
+    refreshFriendship(); // optimistic refresh
+  };
+
+  const { profile, loading } = useProfileById(userId);
+  const { count: friendCount } = useFriendCount(userId);
+  const { traveledCount, traveledIsoCodes } = useUserCounts(userId);
 
   const { countries } = useCountries();
 
@@ -115,23 +166,39 @@ export default function FriendProfileScreen() {
               )}
 
             {/* Friend button */}
-            <Pressable
-              style={[
-                styles.friendBtn,
-                {
-                  borderColor: colors.primary,
-                },
-              ]}
-            >
-              <Ionicons
-                name={isFriend ? 'checkmark' : 'person-add-outline'}
-                size={18}
-                color={colors.primary}
-              />
-              <Text style={[styles.friendBtnText, { color: colors.primary }]}>
-                {friendCount} Friend{friendCount === 1 ? '' : 's'}
-              </Text>
-            </Pressable>
+            {!isOwnProfile && (
+              <Pressable
+                onPress={() => {
+                  if (isFriend) setCtaOpen(true);
+                  else if (isPending) handleCancelRequest();
+                  else handleAddFriend();
+                }}
+                style={[
+                  styles.friendBtn,
+                  { borderColor: colors.primary },
+                ]}
+              >
+                <Ionicons
+                  name={
+                    isFriend
+                      ? 'checkmark'
+                      : isPending
+                      ? 'time-outline'
+                      : 'person-add-outline'
+                  }
+                  size={18}
+                  color={colors.primary}
+                />
+
+                <Text style={[styles.friendBtnText, { color: colors.primary }]}>
+                  {isFriend
+                    ? `${friendCount} Friend${friendCount === 1 ? '' : 's'}`
+                    : isPending
+                    ? 'Requested'
+                    : 'Add Friend'}
+                </Text>
+              </Pressable>
+            )}
           </View>
         </View>
 
@@ -188,12 +255,53 @@ export default function FriendProfileScreen() {
           countries={traveledIsoCodes}
         />
       </ScrollView>
+      <Modal visible={ctaOpen} transparent animationType="slide">
+        <Pressable
+          style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' }}
+          onPress={() => setCtaOpen(false)}
+        >
+          <View
+            style={{
+              backgroundColor: colors.card,
+              padding: 20,
+              borderTopLeftRadius: 24,
+              borderTopRightRadius: 24,
+            }}
+          >
+            <Pressable
+              android_ripple={{ color: '#00000022' }}
+              onPress={() => {
+                setCtaOpen(false);
+                router.push(`/profile/${userId}/friends`);
+              }}
+              style={{ paddingVertical: 16 }}
+            >
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textPrimary }}>
+                View Friends
+              </Text>
+            </Pressable>
+
+            <Pressable
+              android_ripple={{ color: '#ef444422' }}
+              onPress={() => {
+                setCtaOpen(false); // optimistic close
+                handleUnfriend();
+              }}
+              style={{ paddingVertical: 16 }}
+            >
+              <Text style={{ fontSize: 16, fontWeight: '600', color: '#ef4444' }}>
+                Unfriend
+              </Text>
+            </Pressable>
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 60, paddingHorizontal: 20 },
+  container: { flex: 1, paddingHorizontal: 20 },
   backBtn: { marginBottom: 14 },
   title: { fontSize: 30, fontWeight: '700', letterSpacing: -0.5, marginBottom: 20 },
   headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 22 },

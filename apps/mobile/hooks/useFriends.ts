@@ -9,15 +9,16 @@ export type FriendProfile = {
   avatar_url: string | null;
 };
 
-export function useFriends() {
+export function useFriends(targetUserId?: string) {
   const { session } = useAuth();
   const user = session?.user;
+  const effectiveUserId = targetUserId ?? user?.id;
   const [friends, setFriends] = useState<FriendProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchFriends = async () => {
-    if (!user) return;
-    const userId = user.id;
+    if (!effectiveUserId) return;
+    const userId = effectiveUserId;
 
     setLoading(true);
 
@@ -65,13 +66,13 @@ export function useFriends() {
   };
 
   const refresh = async () => {
-    if (!user) return;
+    if (!effectiveUserId) return;
     await fetchFriends();
   };
 
   useEffect(() => {
     fetchFriends();
-  }, [user]);
+  }, [effectiveUserId]);
 
   return { friends, loading, refresh };
 }

@@ -17,17 +17,21 @@ import AuthGate from '../../components/AuthGate';
 import { lightColors, darkColors } from '../../theme/colors';
 import { useFriends } from '../../hooks/useFriends';
 import { useAuth } from '../../context/AuthContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 export default function FriendsScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
+  const tabBarHeight = useBottomTabBarHeight();
+
   const scheme = useColorScheme();
   const colors = scheme === 'dark' ? darkColors : lightColors;
 
-  const { isGuest } = useAuth();
+  const { isGuest, session } = useAuth();
 
   const { friends, loading } = useFriends();
 
-  const { session } = useAuth();
   const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
@@ -61,7 +65,12 @@ export default function FriendsScreen() {
 
   const renderItem = ({ item }: { item: any }) => (
     <Pressable
-      onPress={() => router.push(`/profile/${item.id}`)}
+      onPress={() =>
+        router.push({
+          pathname: '/profile/[userId]',
+          params: { userId: item.id },
+        })
+      }
       style={[styles.row, { borderBottomColor: colors.textSecondary }]}
     >
       {item.avatar_url ? (
@@ -79,11 +88,7 @@ export default function FriendsScreen() {
         </Text>
       </View>
 
-      <Ionicons
-        name="chevron-forward"
-        size={18}
-        color={colors.textMuted}
-      />
+      <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
     </Pressable>
   );
 
@@ -95,6 +100,8 @@ export default function FriendsScreen() {
           {
             backgroundColor: colors.background,
             justifyContent: 'center',
+            paddingTop: insets.top + 16,
+            paddingBottom: insets.bottom + 24,
           },
         ]}
       >
@@ -120,10 +127,7 @@ export default function FriendsScreen() {
           Sign in to add friends, send requests, and explore profiles.
         </Text>
 
-        <Pressable
-          onPress={() => router.push('/login')}
-          style={{ marginTop: 24 }}
-        >
+        <Pressable onPress={() => router.push('/login')} style={{ marginTop: 24 }}>
           <Text
             style={{
               fontSize: 18,
@@ -140,95 +144,75 @@ export default function FriendsScreen() {
 
   return (
     <AuthGate>
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        {loading && (
-          <View
-            style={{
-              flex: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+      <View
+        style={[
+          styles.container,
+          {
+            backgroundColor: colors.background,
+            paddingTop: insets.top + 16,
+          },
+        ]}
+      >
+        {loading ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
             <ActivityIndicator size="large" color={colors.textPrimary} />
           </View>
-        )}
-
-        {!loading && (
-          <>
-        {/* Header */}
-        <View style={styles.headerRow}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>
-            Lama’s Friends
-          </Text>
-
-          <Pressable
-            onPress={() => router.push('/friend-requests')}
-            style={[styles.requestButton, { backgroundColor: colors.card, position: 'relative' }]}
-          >
-            <Ionicons
-              name="person-add-outline"
-              size={20}
-              color={colors.textPrimary}
-            />
-
-            {pendingCount > 0 && (
-              <View
-                style={{
-                  position: 'absolute',
-                  top: -4,
-                  right: -4,
-                  minWidth: 16,
-                  height: 16,
-                  borderRadius: 8,
-                  backgroundColor: '#ef4444',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  paddingHorizontal: 4,
-                }}
-              >
-                <Text
-                  style={{
-                    color: 'white',
-                    fontSize: 10,
-                    fontWeight: '700',
-                  }}
-                >
-                  {pendingCount}
-                </Text>
-              </View>
-            )}
-          </Pressable>
-        </View>
-
-        {/* Search */}
-        <View style={[styles.searchBar, { backgroundColor: colors.card }]}>
-          <Ionicons name="search" size={16} color={colors.textMuted} />
-          <TextInput
-            placeholder="Search by username"
-            placeholderTextColor={colors.textMuted}
-            style={[styles.searchInput, { color: colors.textPrimary }]}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-
-        {/* Friends List Card */}
-        <View style={[styles.card, { backgroundColor: colors.card }]}>
+        ) : (
           <FlatList
             data={filteredFriends}
-            renderItem={renderItem}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={{ paddingBottom: 40 }}
+            renderItem={renderItem}
+            ListHeaderComponent={
+              <>
+                <View style={styles.headerRow}>
+                  <Text style={[styles.title, { color: colors.textPrimary }]}>Friends</Text>
+                  <Pressable
+                    onPress={() => router.push('/friend-requests')}
+                    style={[
+                      styles.requestButton,
+                      {
+                        backgroundColor: colors.card,
+                        marginLeft: 'auto',
+                      },
+                    ]}
+                  >
+                    <Ionicons name="person-add-outline" size={20} color={colors.textPrimary} />
+                    {pendingCount > 0 && (
+                      <View style={styles.badge}>
+                        <Text style={styles.badgeText}>{pendingCount}</Text>
+                      </View>
+                    )}
+                  </Pressable>
+                </View>
+
+                <View style={[styles.searchBar, { backgroundColor: colors.card }]}>
+                  <Ionicons name="search" size={16} color={colors.textMuted} />
+                  <TextInput
+                    placeholder="Search by username"
+                    placeholderTextColor={colors.textMuted}
+                    style={[styles.searchInput, { color: colors.textPrimary }]}
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                  />
+                </View>
+
+                <View style={{ height: 24 }} />
+              </>
+            }
+            ListFooterComponent={<View style={{ height: tabBarHeight + 16 }} />}
+            contentContainerStyle={{ paddingHorizontal: 20 }}
             ListEmptyComponent={
-              !loading ? (
-                <Text style={{ color: colors.textMuted, textAlign: 'center', paddingVertical: 20 }}>
-                  No friends yet.
-                </Text>
-              ) : null
+              <Text
+                style={{
+                  color: colors.textMuted,
+                  textAlign: 'center',
+                  paddingVertical: 20,
+                }}
+              >
+                No friends yet.
+              </Text>
             }
           />
-        </View>
-          </>
         )}
       </View>
     </AuthGate>
@@ -238,17 +222,14 @@ export default function FriendsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 60,
-    paddingBottom: 120,
   },
   headerRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    marginTop: 8,
   },
   title: {
-    fontSize: 34,
+    fontSize: 32,
     fontWeight: '700',
   },
   requestButton: {
@@ -259,7 +240,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   searchBar: {
-    marginTop: 20,
+    marginTop: 16,
     borderRadius: 20,
     paddingHorizontal: 14,
     height: 44,
@@ -270,16 +251,10 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     flex: 1,
   },
-  card: {
-    marginTop: 24,
-    borderRadius: 28,
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
+    paddingVertical: 16,
     paddingHorizontal: 10,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
@@ -297,5 +272,22 @@ const styles = StyleSheet.create({
   username: {
     fontSize: 14,
     marginTop: 2,
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    backgroundColor: '#ef4444',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+  },
+  badgeText: {
+    color: 'white',
+    fontSize: 10,
+    fontWeight: '700',
   },
 });
