@@ -45,7 +45,7 @@ export default function ProfileSettingsScreen() {
     try {
       setDeleting(true);
 
-      const { error } = await supabase.functions.invoke('delete-user', {
+      const { error } = await supabase.functions.invoke('delete-account', {
         body: {},
       });
 
