@@ -3,10 +3,10 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   useColorScheme,
   Animated,
 } from 'react-native';
+import { Image } from 'expo-image';
 import CountryFlag from 'react-native-country-flag';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -44,8 +44,10 @@ export default function HeaderCard({
         <View style={styles.avatarContainer}>
           {avatarUrl ? (
             <Image
-              source={{ uri: avatarUrl }}
+              source={avatarUrl}
               style={styles.avatar}
+              contentFit="cover"
+              cachePolicy="memory-disk"
             />
           ) : (
             <Ionicons

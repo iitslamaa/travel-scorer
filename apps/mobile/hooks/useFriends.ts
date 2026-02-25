@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { getResizedAvatarUrl } from '../utils/avatar';
 
 export type FriendProfile = {
   id: string;
@@ -56,9 +57,16 @@ export function useFriends(targetUserId?: string) {
       console.error(profileError);
     } else {
       const typedProfiles = (profiles as FriendProfile[]) ?? [];
-      const sorted = typedProfiles.sort((a, b) =>
+
+      const normalizedProfiles = typedProfiles.map((p) => ({
+        ...p,
+        avatar_url: getResizedAvatarUrl(p.avatar_url),
+      }));
+
+      const sorted = normalizedProfiles.sort((a, b) =>
         (a.full_name ?? '').localeCompare(b.full_name ?? '')
       );
+
       setFriends(sorted);
     }
 

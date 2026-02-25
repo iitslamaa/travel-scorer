@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Session } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getResizedAvatarUrl } from '../utils/avatar';
 
 export type Profile = {
   id: string;
@@ -81,7 +82,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ]);
 
     if (!profileRes.error && profileRes.data) {
-      setProfile(profileRes.data as Profile);
+      const normalizedProfile = {
+        ...profileRes.data,
+        avatar_url: getResizedAvatarUrl(profileRes.data.avatar_url ?? null),
+      } as Profile;
+
+      setProfile(normalizedProfile);
     }
 
     setBucketIsoCodes(
@@ -113,7 +119,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single();
 
     if (!error && data) {
-      setProfile(data as Profile);
+      const normalizedProfile = {
+        ...data,
+        avatar_url: getResizedAvatarUrl(data.avatar_url ?? null),
+      } as Profile;
+
+      setProfile(normalizedProfile);
     }
   };
 
