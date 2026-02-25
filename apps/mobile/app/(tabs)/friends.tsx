@@ -10,10 +10,9 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useIsFocused } from '@react-navigation/native';
-import { useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Ionicons } from '@expo/vector-icons';
 import AuthGate from '../../components/AuthGate';
@@ -34,6 +33,9 @@ export default function FriendsScreen() {
   const { isGuest, session } = useAuth();
 
   const { friends, loading } = useFriends();
+
+  const [globalResults, setGlobalResults] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const [pendingCount, setPendingCount] = useState(0);
   const isFocused = useIsFocused();
@@ -62,16 +64,36 @@ export default function FriendsScreen() {
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredFriends = useMemo(() => {
-    if (!searchQuery.trim()) return friends;
+  useEffect(() => {
+    const runSearch = async () => {
+      const q = searchQuery.trim();
+      if (!q) {
+        setGlobalResults([]);
+        return;
+      }
+      if (!session?.user?.id) return;
 
-    const q = searchQuery.toLowerCase();
+      setSearchLoading(true);
 
-    return friends.filter((f: any) =>
-      (f.full_name?.toLowerCase().includes(q) ?? false) ||
-      (f.username?.toLowerCase().includes(q) ?? false)
-    );
-  }, [friends, searchQuery]);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, username, avatar_url')
+        .or(`username.ilike.%${q}%,full_name.ilike.%${q}%`)
+        .neq('id', session.user.id)
+        .limit(20);
+
+      if (error) {
+        console.error('Global search error:', error);
+        setSearchLoading(false);
+        return;
+      }
+
+      setGlobalResults(data ?? []);
+      setSearchLoading(false);
+    };
+
+    runSearch();
+  }, [searchQuery, session?.user?.id]);
 
   const renderItem = ({ item }: { item: any }) => (
     <Pressable
@@ -169,7 +191,7 @@ export default function FriendsScreen() {
           </View>
         ) : (
           <FlatList
-            data={filteredFriends}
+            data={searchQuery.trim() ? globalResults : friends}
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
             ListHeaderComponent={
@@ -212,15 +234,19 @@ export default function FriendsScreen() {
             ListFooterComponent={<View style={{ height: tabBarHeight + 16 }} />}
             contentContainerStyle={{ paddingHorizontal: 20 }}
             ListEmptyComponent={
-              <Text
-                style={{
-                  color: colors.textMuted,
-                  textAlign: 'center',
-                  paddingVertical: 20,
-                }}
-              >
-                No friends yet.
-              </Text>
+              searchLoading ? (
+                <ActivityIndicator size="small" color={colors.textPrimary} />
+              ) : (
+                <Text
+                  style={{
+                    color: colors.textMuted,
+                    textAlign: 'center',
+                    paddingVertical: 20,
+                  }}
+                >
+                  {searchQuery.trim() ? 'No users found.' : 'No friends yet.'}
+                </Text>
+              )
             }
           />
         )}
