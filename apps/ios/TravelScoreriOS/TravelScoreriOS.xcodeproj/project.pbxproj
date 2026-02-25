@@ -102,6 +102,8 @@
 		17A4EC802F47BE2400627746 /* ProfileViewModel+Relationship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC7F2F47BE2400627746 /* ProfileViewModel+Relationship.swift */; };
 		17A4EC822F47BE3000627746 /* ProfileViewModel+Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC812F47BE3000627746 /* ProfileViewModel+Friends.swift */; };
 		17A4EC842F47BE3A00627746 /* ProfileViewModel+Countries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC832F47BE3A00627746 /* ProfileViewModel+Countries.swift */; };
+		17E1053D2F4F8A7B00BEED72 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 17E1053C2F4F8A7B00BEED72 /* Nuke */; };
+		17E1053F2F4F8A7B00BEED72 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 17E1053E2F4F8A7B00BEED72 /* NukeUI */; };
 		17EC41DE2F4BB204004B80DA /* ScoreWorldMapRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41DD2F4BB204004B80DA /* ScoreWorldMapRepresentable.swift */; };
 		17EC41E02F4BB213004B80DA /* ScoreWorldMapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41DF2F4BB213004B80DA /* ScoreWorldMapCoordinator.swift */; };
 		17EC41E22F4BB227004B80DA /* ScoreWorldMapRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41E12F4BB227004B80DA /* ScoreWorldMapRenderer.swift */; };
@@ -237,7 +239,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				17E1053F2F4F8A7B00BEED72 /* NukeUI in Frameworks */,
 				17F063882F32747D00F1F4F3 /* Supabase in Frameworks */,
+				17E1053D2F4F8A7B00BEED72 /* Nuke in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -843,6 +847,8 @@
 			name = TravelScoreriOS;
 			packageProductDependencies = (
 				17F063872F32747D00F1F4F3 /* Supabase */,
+				17E1053C2F4F8A7B00BEED72 /* Nuke */,
+				17E1053E2F4F8A7B00BEED72 /* NukeUI */,
 			);
 			productName = TravelScoreriOS;
 			productReference = 17AFEC8A2EC2C3D800B9585B /* Travel Adventure Finder.app */;
@@ -874,6 +880,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				17F0637F2F326FDA00F1F4F3 /* XCRemoteSwiftPackageReference "supabase-swift" */,
+				17E1053B2F4F8A7B00BEED72 /* XCRemoteSwiftPackageReference "Nuke" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 17AFEC8B2EC2C3D800B9585B /* Products */;
@@ -1229,6 +1236,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		17E1053B2F4F8A7B00BEED72 /* XCRemoteSwiftPackageReference "Nuke" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kean/Nuke";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.9.0;
+			};
+		};
 		17F0637F2F326FDA00F1F4F3 /* XCRemoteSwiftPackageReference "supabase-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/supabase-community/supabase-swift";
@@ -1240,6 +1255,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		17E1053C2F4F8A7B00BEED72 /* Nuke */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 17E1053B2F4F8A7B00BEED72 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = Nuke;
+		};
+		17E1053E2F4F8A7B00BEED72 /* NukeUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 17E1053B2F4F8A7B00BEED72 /* XCRemoteSwiftPackageReference "Nuke" */;
+			productName = NukeUI;
+		};
 		17F063872F32747D00F1F4F3 /* Supabase */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 17F0637F2F326FDA00F1F4F3 /* XCRemoteSwiftPackageReference "supabase-swift" */;

@@ -1,4 +1,6 @@
 import SwiftUI
+import NukeUI
+import Nuke
 
 struct ProfileHeaderView: View {
     private let instanceId = UUID()
@@ -112,30 +114,28 @@ struct ProfileHeaderView: View {
             if let urlString = profile?.avatarUrl,
                let url = URL(string: urlString) {
 
-                AsyncImage(url: url) { phase in
-                    switch phase {
-                    case .success(let image):
+                LazyImage(url: url) { state in
+                    if let image = state.image {
                         image
                             .resizable()
                             .scaledToFill()
-
-                    case .failure(_):
+                    } else if state.error != nil {
                         Image(systemName: "person.crop.circle.fill")
                             .resizable()
                             .scaledToFill()
                             .foregroundStyle(.gray)
-
-                    case .empty:
+                    } else {
                         ZStack {
                             Circle()
                                 .fill(Color.gray.opacity(0.15))
                             ProgressView()
                         }
-
-                    @unknown default:
-                        EmptyView()
                     }
                 }
+                .processors([
+                    ImageProcessors.Resize(size: CGSize(width: 300, height: 300))
+                ])
+                .priority(.high)
 
             } else {
                 Image(systemName: "person.crop.circle.fill")

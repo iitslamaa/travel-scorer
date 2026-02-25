@@ -1,4 +1,6 @@
 import SwiftUI
+import NukeUI
+import Nuke
 
 struct FriendsView: View {
     private let userId: UUID
@@ -88,19 +90,27 @@ struct FriendsView: View {
                 ? friendsVM.friends
                 : friendsVM.searchResults
 
-            ForEach(data) { profile in
+            ForEach(data, id: \.id) { profile in
                 NavigationLink(value: profile.id) {
                     HStack(spacing: 14) {
                         if let urlString = profile.avatarUrl,
                            let url = URL(string: urlString) {
-                            AsyncImage(url: url) { image in
-                                image.resizable().scaledToFill()
-                            } placeholder: {
-                                Image(systemName: "person.crop.circle.fill")
-                                    .resizable()
-                                    .scaledToFill()
-                                    .foregroundStyle(.secondary)
+                            LazyImage(url: url) { state in
+                                if let image = state.image {
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                } else {
+                                    Image(systemName: "person.crop.circle.fill")
+                                        .resizable()
+                                        .scaledToFill()
+                                        .foregroundStyle(.secondary)
+                                }
                             }
+                            .processors([
+                                ImageProcessors.Resize(size: CGSize(width: 120, height: 120))
+                            ])
+                            .priority(.high)
                             .frame(width: 44, height: 44)
                             .clipShape(Circle())
                         } else {
