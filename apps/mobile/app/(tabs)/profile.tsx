@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
   View,
   Text,
   Pressable,
+  RefreshControl,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -42,6 +43,21 @@ export default function ProfileScreen() {
   const colors = useTheme();
 
   const user = session?.user ?? null;
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    try {
+      // Small delay to allow auth/profile context to re-sync if updated elsewhere
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (err) {
+      console.error('Profile refresh error:', err);
+    }
+
+    setRefreshing(false);
+  };
 
   if (!user) {
     return (
@@ -134,6 +150,13 @@ export default function ProfileScreen() {
         { paddingBottom: insets.bottom + 80 },
       ]}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={handleRefresh}
+          tintColor={colors.textPrimary}
+        />
+      }
     >
       <View style={styles.topRow}>
         <Text style={[styles.title, { color: colors.textPrimary }]}>

@@ -6,6 +6,7 @@ import {
   Pressable,
   ScrollView,
   Modal,
+  RefreshControl,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
@@ -39,6 +40,7 @@ export default function FriendProfileScreen() {
   const isOwnProfile = session?.user?.id === userId;
 
   const [ctaOpen, setCtaOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const { isFriend, isPending, refresh: refreshFriendship } = useFriendshipStatus(userId);
   const { refresh: refreshFriendCount } = useFriendCount(userId);
@@ -83,6 +85,21 @@ export default function FriendProfileScreen() {
     refreshFriendship(); // optimistic refresh
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+
+    try {
+      await Promise.all([
+        refreshFriendship?.(),
+        refreshFriendCount?.(),
+      ]);
+    } catch (err) {
+      console.error('Profile refresh error:', err);
+    }
+
+    setRefreshing(false);
+  };
+
   const { profile, loading } = useProfileById(userId);
   const { count: friendCount } = useFriendCount(userId);
   const { traveledCount, traveledIsoCodes } = useUserCounts(userId);
@@ -123,7 +140,16 @@ export default function FriendProfileScreen() {
         <Ionicons name="arrow-back" size={22} color={colors.textPrimary} />
       </Pressable>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 40 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={colors.textPrimary}
+          />
+        }
+      >
         <Text style={[styles.title, { color: colors.textPrimary }]}>
           Profile
         </Text>

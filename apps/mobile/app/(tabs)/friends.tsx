@@ -8,6 +8,7 @@ import {
   useColorScheme,
   Image,
   ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useMemo, useState, useCallback, useEffect } from 'react';
@@ -33,6 +34,8 @@ export default function FriendsScreen() {
   const { isGuest, session } = useAuth();
 
   const { friends, loading } = useFriends();
+
+  const [refreshing, setRefreshing] = useState(false);
 
   const [globalResults, setGlobalResults] = useState<any[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
@@ -61,6 +64,26 @@ export default function FriendsScreen() {
 
     fetchCount();
   }, [isFocused, session?.user?.id]);
+
+  const handleRefresh = async () => {
+    if (!session?.user?.id) return;
+
+    setRefreshing(true);
+
+    // Re-fetch pending requests count
+    const { count } = await supabase
+      .from('friend_requests')
+      .select('*', { count: 'exact', head: true })
+      .eq('receiver_id', session.user.id)
+      .eq('status', 'pending');
+
+    setPendingCount(count ?? 0);
+
+    // Small delay for UX smoothness
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 400);
+  };
 
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -192,6 +215,13 @@ export default function FriendsScreen() {
         ) : (
           <FlatList
             data={searchQuery.trim() ? globalResults : friends}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={handleRefresh}
+                tintColor={colors.textPrimary}
+              />
+            }
             keyExtractor={(item) => item.id}
             renderItem={renderItem}
             ListHeaderComponent={
