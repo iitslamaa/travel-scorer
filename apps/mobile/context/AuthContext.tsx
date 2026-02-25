@@ -168,7 +168,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setHasSeenIntro(introFlag === 'true');
 
       const { data } = await supabase.auth.getSession();
+      console.log('[AUTHCTX] boot:getSession raw:', data);
       const s = data.session ?? null;
+      console.log('[AUTHCTX] boot:setSession ->', s ? 'HAS_SESSION' : 'NULL');
       setSession(s);
       setLoading(false);
 
@@ -180,11 +182,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     boot();
 
     const { data: listener } = supabase.auth.onAuthStateChange((event, newSession) => {
-      if (__DEV__) {
-        console.log('AUTH EVENT:', event);
-      }
+      console.log('[AUTHCTX] onAuthStateChange EVENT:', event);
+      console.log('[AUTHCTX] onAuthStateChange newSession:', newSession ? 'HAS_SESSION' : 'NULL');
 
       const s = newSession ?? null;
+      console.log('[AUTHCTX] setting session to', s ? 'HAS_SESSION' : 'NULL');
       setSession(s);
 
       if (s?.user?.id) {
@@ -213,12 +215,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    setSession(null);
-    setProfile(null);
-    setBucketIsoCodes([]);
-    setVisitedIsoCodes([]);
-    setIsGuest(false);
+    try {
+      console.log('[AUTHCTX] signOut() called');
+      // Supabase sign out
+      await supabase.auth.signOut();
+      console.log('[AUTHCTX] signOut() completed');
+
+      // Hard-clear any app-level cached auth/session state
+      // (this prevents "stuck on auth page" loops after logout)
+      await AsyncStorage.removeItem('travelaf-auth');
+
+      // Reset in-memory state
+      setSession(null);
+      setProfile(null);
+      setBucketIsoCodes([]);
+      setVisitedIsoCodes([]);
+      setIsGuest(false);
+    } catch (error) {
+      console.error('signOut error:', error);
+      // Even if signOut fails, ensure UI state is cleared to avoid redirect loops
+      setSession(null);
+      setProfile(null);
+      setBucketIsoCodes([]);
+      setVisitedIsoCodes([]);
+      setIsGuest(false);
+    }
   };
 
   const value = useMemo<AuthContextType>(

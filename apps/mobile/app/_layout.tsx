@@ -14,12 +14,14 @@ function RootLayoutInner() {
   const scheme = useColorScheme();
   const colors = useTheme();
 
-  const { session, isGuest } = useAuth();
+  const { session, isGuest, loading } = useAuth();
 
   const showAuthBackground = useMemo(() => {
+    // Do NOT decide auth UI until initial session check finishes
+    if (loading) return false;
     if (isGuest) return false;
     return session === null;
-  }, [session, isGuest]);
+  }, [session, isGuest, loading]);
 
   return (
     <SafeAreaView
