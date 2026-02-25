@@ -6,10 +6,10 @@ import {
   TextInput,
   FlatList,
   useColorScheme,
-  Image,
   ActivityIndicator,
   RefreshControl,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useMemo, useState, useCallback, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
@@ -22,6 +22,7 @@ import { useFriends } from '../../hooks/useFriends';
 import { useAuth } from '../../context/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { getResizedAvatarUrl } from '../../utils/avatar';
 
 export default function FriendsScreen() {
   const router = useRouter();
@@ -111,7 +112,12 @@ export default function FriendsScreen() {
         return;
       }
 
-      setGlobalResults(data ?? []);
+      const normalized = (data ?? []).map((p: any) => ({
+        ...p,
+        avatar_url: getResizedAvatarUrl(p.avatar_url ?? null),
+      }));
+
+      setGlobalResults(normalized);
       setSearchLoading(false);
     };
 
@@ -130,8 +136,14 @@ export default function FriendsScreen() {
     >
       {item.avatar_url ? (
         <Image
-          source={{ uri: item.avatar_url }}
+          key={item.id}
+          source={item.avatar_url}
           style={styles.avatar}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+          onError={() => {
+            console.log('Avatar failed to load for:', item.username, item.avatar_url);
+          }}
         />
       ) : (
         <Ionicons
@@ -336,7 +348,6 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#444',
     marginRight: 14,
   },
   name: {

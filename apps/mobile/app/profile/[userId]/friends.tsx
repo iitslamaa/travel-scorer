@@ -5,7 +5,6 @@ import {
   Pressable,
   FlatList,
   useColorScheme,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -17,6 +16,7 @@ import { lightColors, darkColors } from '../../../theme/colors';
 import { useFriends } from '../../../hooks/useFriends';
 import { useAuth } from '../../../context/AuthContext';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 
 export default function FriendsScreen() {
   const router = useRouter();
@@ -90,7 +90,12 @@ export default function FriendsScreen() {
       style={[styles.row, { borderBottomColor: colors.textSecondary }]}
     >
       {item.avatar_url ? (
-        <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
+        <Image
+          source={item.avatar_url}
+          style={styles.avatar}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+        />
       ) : (
         <View style={styles.avatar} />
       )}

@@ -5,7 +5,6 @@ import {
   Pressable,
   useColorScheme,
   FlatList,
-  Image,
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -15,6 +14,8 @@ import { useState, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
+import { getResizedAvatarUrl } from '../utils/avatar';
+import { Image } from 'expo-image';
 
 type RequestProfile = {
   request_id: string;
@@ -105,7 +106,9 @@ export default function FriendRequestsScreen() {
             data?.map((row: any) => ({
               request_id: row.id,
               ...row.profiles,
+              avatar_url: getResizedAvatarUrl(row.profiles?.avatar_url ?? null),
             })) ?? [];
+
           setRequests(mapped);
         } else {
           console.error(error);
@@ -121,7 +124,12 @@ export default function FriendRequestsScreen() {
   const renderItem = ({ item }: { item: RequestProfile }) => (
     <View style={[styles.row, { borderBottomColor: colors.textSecondary }]}>
       {item.avatar_url ? (
-        <Image source={{ uri: item.avatar_url }} style={styles.avatar} />
+        <Image
+          source={item.avatar_url}
+          style={styles.avatar}
+          contentFit="cover"
+          cachePolicy="memory-disk"
+        />
       ) : (
         <View style={styles.avatar} />
       )}

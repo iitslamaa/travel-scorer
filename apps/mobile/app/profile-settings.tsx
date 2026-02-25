@@ -19,6 +19,9 @@ import { supabase } from '../lib/supabase';
 import { useCountries } from '../hooks/useCountries';
 import { useTheme } from '../hooks/useTheme';
 
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+
 type EditField = 'full_name' | 'username';
 
 export default function ProfileSettingsScreen() {
@@ -66,6 +69,51 @@ export default function ProfileSettingsScreen() {
   const borderColor = colors.border;
 
   /* ---------------- Avatar ---------------- */
+
+  const pickAvatar = async () => {
+    try {
+      const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permission.granted) {
+        Alert.alert('Permission required', 'Please allow photo access.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
+
+      if (result.canceled) return;
+
+      const image = result.assets[0];
+
+      // Resize + compress BEFORE upload
+      const manipulated = await ImageManipulator.manipulateAsync(
+        image.uri,
+        [{ resize: { width: 512 } }],
+        { compress: 0.7, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      const response = await fetch(manipulated.uri);
+      const blob = await response.blob();
+
+      const fileName = `${profile?.id}-${Date.now()}.jpg`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, blob, {
+          contentType: 'image/jpeg',
+          upsert: true,
+        });
+
+      if (uploadError) throw uploadError;
+
+      await updateProfile({ avatar_url: fileName });
+    } catch (e: any) {
+      Alert.alert('Upload failed', e?.message ?? 'Please try again.');
+    }
+  };
 
   const deleteAvatar = async () => {
     try {
@@ -230,6 +278,30 @@ export default function ProfileSettingsScreen() {
         </Text>
 
         <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Pressable
+            onPress={pickAvatar}
+            style={{ alignItems: 'center', marginBottom: 20 }}
+          >
+            {profile?.avatar_url ? (
+              <Image
+                source={{ uri: profile.avatar_url }}
+                style={{ width: 100, height: 100, borderRadius: 50 }}
+              />
+            ) : (
+              <View
+                style={{
+                  width: 100,
+                  height: 100,
+                  borderRadius: 50,
+                  backgroundColor: colors.border,
+                }}
+              />
+            )}
+            <Text style={{ marginTop: 8, color: colors.primary }}>
+              Change Photo
+            </Text>
+          </Pressable>
+          <Divider color={borderColor} />
           <Row
             label="Name"
             value={profile?.full_name ?? '—'}

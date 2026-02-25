@@ -2,12 +2,12 @@ import {
   View,
   Text,
   StyleSheet,
-  Image,
   Pressable,
   ScrollView,
   Modal,
   RefreshControl,
 } from 'react-native';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useNavigation } from '@react-navigation/native';
 import { useEffect, useState } from 'react';
@@ -159,9 +159,10 @@ export default function FriendProfileScreen() {
           <View style={styles.avatarWrap}>
             {profile.avatar_url ? (
               <Image
-                source={{ uri: profile.avatar_url }}
+                source={profile.avatar_url}
                 style={styles.avatar}
-                resizeMode="cover"
+                contentFit="cover"
+                cachePolicy="memory-disk"
               />
             ) : (
               <Ionicons
