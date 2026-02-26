@@ -57,14 +57,23 @@ export function WorldMap({
 }: WorldMapProps) {
   const { fullFeatures, simplifiedFeatures } = useGeoJson();
 
+  const DATASET_ALIAS_MAP: Record<string, string> = {
+    GB: 'UK',
+    XK: 'RS',
+    AQ: undefined as any,
+  };
+
   const normalizeIso = (value?: string | null) => {
     if (!value) return undefined;
     const upper = value.toUpperCase();
-    // If ISO3 (e.g. FRA), convert to ISO2 (FR)
-    if (upper.length === 3) {
-      return upper.slice(0, 2);
+
+    const base = upper.length === 3 ? upper.slice(0, 2) : upper;
+
+    if (DATASET_ALIAS_MAP.hasOwnProperty(base)) {
+      return DATASET_ALIAS_MAP[base];
     }
-    return upper;
+
+    return base;
   };
 
   const sourceFeatures = selectedIso ? fullFeatures : simplifiedFeatures;
@@ -111,15 +120,52 @@ export function WorldMap({
     });
   }, [sourceFeatures]);
 
+  const datasetIsoSet = useMemo(() => {
+    return new Set(polygons.map((p) => p.iso));
+  }, [polygons]);
+
+  useEffect(() => {
+    const datasetIsos = [...new Set(polygons.map((p) => p.iso))].sort();
+    console.log('MAP DATASET ISOs:', datasetIsos);
+  }, [polygons]);
+
+  useEffect(() => {
+    const normalized = countries
+      .map((c) => normalizeIso(c))
+      .filter((c): c is string => !!c)
+      .sort();
+    console.log('APP COUNTRY LIST ISOs:', normalized);
+  }, [countries]);
+
+  useEffect(() => {
+    const datasetIsos = [...datasetIsoSet].sort();
+    const normalizedAppIsos = countries
+      .map((c) => normalizeIso(c))
+      .filter((c): c is string => !!c)
+      .sort();
+
+    const missingInDataset = normalizedAppIsos.filter(
+      (iso) => !datasetIsoSet.has(iso)
+    );
+
+    const unusedInApp = datasetIsos.filter(
+      (iso) => !normalizedAppIsos.includes(iso)
+    );
+
+    console.log('ISO DIFF → Missing In Dataset:', missingInDataset);
+    console.log('ISO DIFF → Unused In App:', unusedInApp);
+  }, [countries, datasetIsoSet]);
+
   const polygonsForFit = useMemo(() => {
     if (!countries || countries.length === 0) return [];
 
     const normalized = countries
       .map((c) => normalizeIso(c))
-      .filter((c): c is string => !!c);
+      .filter((c): c is string => !!c)
+      .filter((c) => datasetIsoSet.has(c));
 
     return polygons.filter((p) => normalized.includes(p.iso));
-  }, [countries, polygons]);
+  }, [countries, polygons, datasetIsoSet]);
 
 
   useEffect(() => {
@@ -191,6 +237,9 @@ export function WorldMap({
               .filter((p) => p.iso === normalizeIso(selectedIso))
               .map((item) => {
                 const { key, iso, coords } = item;
+                if (!datasetIsoSet.has(iso)) {
+                  console.log('RENDER SKIPPED (not in dataset):', iso);
+                }
                 return (
                   <CountryPolygon
                     key={key}
@@ -199,7 +248,10 @@ export function WorldMap({
                     overlay={buildCountryOverlay({
                       iso,
                       selectedIso: normalizeIso(selectedIso),
-                      highlightedIsos: countries.map((c) => normalizeIso(c)).filter(Boolean) as string[],
+                      highlightedIsos: countries
+                        .map((c) => normalizeIso(c))
+                        .filter((c): c is string => !!c)
+                        .filter((c) => datasetIsoSet.has(c)),
                     })}
                     onPress={(iso) => {
                       onSelect?.(iso);
@@ -209,6 +261,9 @@ export function WorldMap({
               })
           : polygons.map((item) => {
               const { key, iso, coords } = item;
+              if (!datasetIsoSet.has(iso)) {
+                console.log('RENDER SKIPPED (not in dataset):', iso);
+              }
               return (
                 <CountryPolygon
                   key={key}
@@ -217,7 +272,10 @@ export function WorldMap({
                   overlay={buildCountryOverlay({
                     iso,
                     selectedIso: undefined,
-                    highlightedIsos: countries.map((c) => normalizeIso(c)).filter(Boolean) as string[],
+                    highlightedIsos: countries
+                      .map((c) => normalizeIso(c))
+                      .filter((c): c is string => !!c)
+                      .filter((c) => datasetIsoSet.has(c)),
                   })}
                   onPress={(iso) => {
                     onSelect?.(iso);
