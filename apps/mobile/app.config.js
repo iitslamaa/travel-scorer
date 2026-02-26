@@ -1,7 +1,7 @@
 export default ({ config }) => ({
   ...config,
   name: "Travel Adventure Finder",
-  slug: "travel-adventure-finder",
+  slug: "mobile",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
