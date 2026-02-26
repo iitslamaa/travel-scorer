@@ -1,6 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import MapView, { PROVIDER_GOOGLE, LatLng } from 'react-native-maps';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
+import type { LatLng } from 'react-native-maps';
+
+let MapView: any;
+let PROVIDER_GOOGLE: any;
+
+if (Platform.OS !== 'web') {
+  const maps = require('react-native-maps');
+  MapView = maps.default;
+  PROVIDER_GOOGLE = maps.PROVIDER_GOOGLE;
+}
 import { useGeoJson } from '../hooks/useGeoJson';
 import { CountryPolygon } from './CountryPolygon';
 
@@ -19,17 +28,17 @@ function extractPolygons(feature: any): LatLng[][] {
   if (!geometry) return [];
 
   if (geometry.type === 'Polygon') {
-    // geometry.coordinates: number[][][]
-    return geometry.coordinates.map((ring: number[][]) =>
-      convertPolygon(ring)
-    );
+    // Only use outer ring (index 0), ignore holes
+    const outerRing = geometry.coordinates?.[0];
+    return outerRing ? [convertPolygon(outerRing)] : [];
   }
 
   if (geometry.type === 'MultiPolygon') {
-    // geometry.coordinates: number[][][][]
-    return geometry.coordinates.flatMap((polygon: number[][][]) =>
-      polygon.map((ring: number[][]) => convertPolygon(ring))
-    );
+    // Only use outer ring of each polygon
+    return geometry.coordinates
+      .map((polygon: number[][][]) => polygon?.[0])
+      .filter(Boolean)
+      .map((outerRing: number[][]) => convertPolygon(outerRing));
   }
 
   return [];
@@ -46,17 +55,48 @@ export function WorldMap({
   selectedIso,
   onSelect,
 }: WorldMapProps) {
-  const { features } = useGeoJson();
+  const { fullFeatures, simplifiedFeatures } = useGeoJson();
+
+  const normalizeIso = (value?: string | null) => {
+    if (!value) return undefined;
+    const upper = value.toUpperCase();
+    // If ISO3 (e.g. FRA), convert to ISO2 (FR)
+    if (upper.length === 3) {
+      return upper.slice(0, 2);
+    }
+    return upper;
+  };
+
+  const sourceFeatures = selectedIso ? fullFeatures : simplifiedFeatures;
 
   const mapRef = useRef<MapView | null>(null);
   const [isMapReady, setIsMapReady] = useState(false);
 
   const polygons = useMemo(() => {
-    return features.flatMap((feature: any, featureIndex: number) => {
-      const iso =
+    return sourceFeatures.flatMap((feature: any, featureIndex: number) => {
+      const rawIso =
+        feature.properties?.['ISO3166-1-Alpha-2'] ??
         feature.properties?.ISO_A2 ??
-        feature.properties?.iso_a2 ??
-        'NO_ISO';
+        feature.properties?.iso_a2;
+
+      if (featureIndex === 0) {
+        console.log('GeoJSON first feature property keys:', Object.keys(feature.properties ?? {}));
+        console.log('GeoJSON first feature raw ISO candidates:', {
+          ISO3166_1_Alpha_2: feature.properties?.['ISO3166-1-Alpha-2'],
+          ISO_A2: feature.properties?.ISO_A2,
+          iso_a2: feature.properties?.iso_a2,
+        });
+      }
+
+      if (
+        typeof rawIso !== 'string' ||
+        rawIso.length !== 2 ||
+        rawIso === '-99'
+      ) {
+        return [];
+      }
+
+      const iso = rawIso.toUpperCase();
 
       // 🚫 Completely skip Antarctica (huge polygon causes touch issues)
       if (iso === 'AQ') return [];
@@ -69,60 +109,66 @@ export function WorldMap({
         coords,
       }));
     });
-  }, [features]);
+  }, [sourceFeatures]);
 
   const polygonsForFit = useMemo(() => {
     if (!countries || countries.length === 0) return [];
 
-    const upper = countries.map((c) => c.toUpperCase());
-    return polygons.filter((p) => upper.includes(p.iso));
+    const normalized = countries
+      .map((c) => normalizeIso(c))
+      .filter((c): c is string => !!c);
+
+    return polygons.filter((p) => normalized.includes(p.iso));
   }, [countries, polygons]);
 
-  useEffect(() => {
-    console.log('Geo features:', features.length);
-    console.log('Polygon rings:', polygons.length);
-
-    if (!isMapReady) return;
-
-    const target = polygonsForFit.length > 0 ? polygonsForFit : [];
-    if (target.length === 0) return;
-
-    const allCoords: LatLng[] = [];
-    for (const ring of target) {
-      allCoords.push(...ring.coords);
-    }
-
-    // Wait one tick to ensure layout is ready
-    setTimeout(() => {
-      mapRef.current?.fitToCoordinates(allCoords, {
-        edgePadding: { top: 40, right: 40, bottom: 40, left: 40 },
-        animated: false,
-      });
-    }, 0);
-  }, [polygonsForFit, isMapReady]);
 
   useEffect(() => {
     if (!isMapReady) return;
     if (!selectedIso) return;
 
-    const selected = polygonsForFit.filter(
-      (p) => p.iso === selectedIso
+    const selected = polygons.filter(
+      (p) => p.iso === normalizeIso(selectedIso)
     );
 
     if (selected.length === 0) return;
 
-    const coords: LatLng[] = [];
+    // Compute lightweight bounding box instead of passing thousands of points
+    let minLat = Infinity;
+    let maxLat = -Infinity;
+    let minLng = Infinity;
+    let maxLng = -Infinity;
+
     for (const ring of selected) {
-      coords.push(...ring.coords);
+      for (const point of ring.coords) {
+        if (point.latitude < minLat) minLat = point.latitude;
+        if (point.latitude > maxLat) maxLat = point.latitude;
+        if (point.longitude < minLng) minLng = point.longitude;
+        if (point.longitude > maxLng) maxLng = point.longitude;
+      }
     }
 
+    const centerLat = (minLat + maxLat) / 2;
+    const centerLng = (minLng + maxLng) / 2;
+
+    const latitudeDelta = Math.max((maxLat - minLat) * 1.3, 2);
+    const longitudeDelta = Math.max((maxLng - minLng) * 1.3, 2);
+
     setTimeout(() => {
-      mapRef.current?.fitToCoordinates(coords, {
-        edgePadding: { top: 80, right: 80, bottom: 80, left: 80 },
-        animated: true,
-      });
+      mapRef.current?.animateToRegion(
+        {
+          latitude: centerLat,
+          longitude: centerLng,
+          latitudeDelta,
+          longitudeDelta,
+        },
+        500
+      );
     }, 0);
   }, [selectedIso, isMapReady, polygonsForFit]);
+
+  if (!MapView) {
+    return <View style={{ flex: 1 }} />;
+  }
 
   return (
     <View style={{ flex: 1 }}>
@@ -140,23 +186,45 @@ export function WorldMap({
           longitudeDelta: 60,
         }}
       >
-        {polygonsForFit.map((item) => {
-          const { key, iso, coords } = item;
-          return (
-            <CountryPolygon
-              key={key}
-              iso={iso}
-              coordinates={coords}
-              overlay={buildCountryOverlay({
-                iso,
-                selectedIso: selectedIso ?? undefined,
-              })}
-              onPress={(iso) => {
-                onSelect?.(iso);
-              }}
-            />
-          );
-        })}
+        {selectedIso
+          ? polygons
+              .filter((p) => p.iso === normalizeIso(selectedIso))
+              .map((item) => {
+                const { key, iso, coords } = item;
+                return (
+                  <CountryPolygon
+                    key={key}
+                    iso={iso}
+                    coordinates={coords}
+                    overlay={buildCountryOverlay({
+                      iso,
+                      selectedIso: normalizeIso(selectedIso),
+                      highlightedIsos: countries.map((c) => normalizeIso(c)).filter(Boolean) as string[],
+                    })}
+                    onPress={(iso) => {
+                      onSelect?.(iso);
+                    }}
+                  />
+                );
+              })
+          : polygons.map((item) => {
+              const { key, iso, coords } = item;
+              return (
+                <CountryPolygon
+                  key={key}
+                  iso={iso}
+                  coordinates={coords}
+                  overlay={buildCountryOverlay({
+                    iso,
+                    selectedIso: undefined,
+                    highlightedIsos: countries.map((c) => normalizeIso(c)).filter(Boolean) as string[],
+                  })}
+                  onPress={(iso) => {
+                    onSelect?.(iso);
+                  }}
+                />
+              );
+            })}
       </MapView>
     </View>
   );

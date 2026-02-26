@@ -12,20 +12,6 @@ class CountryPolygon: MKMultiPolygon {
 
 struct WorldGeoJSONLoader {
 
-    private static func isoFromCountryName(_ name: String) -> String? {
-        let upper = name.uppercased()
-
-        for code in Locale.isoRegionCodes {
-            if let localized = Locale(identifier: "en_US")
-                .localizedString(forRegionCode: code)?
-                .uppercased(),
-               localized == upper {
-                return code
-            }
-        }
-        return nil
-    }
-
     // Cache polygons so we decode only once
     private static var cachedPolygons: [CountryPolygon]?
 
@@ -73,35 +59,18 @@ struct WorldGeoJSONLoader {
                     ?? (jsonObject["ADM0_A3"] as? String)
                     ?? (jsonObject["iso_a3"] as? String)
 
-                // Normalize ISO (prefer ISO_A2, fallback to ISO_A3)
+                // Canonical ISO handling (Option B: no heuristics, no derived ISO)
                 if let iso2 = isoA2?.trimmingCharacters(in: .whitespacesAndNewlines),
-                   iso2 != "-99",
-                   iso2.count == 2 {
+                   iso2.count == 2,
+                   iso2 != "-99" {
                     iso = iso2.uppercased()
-                } else if let iso3 = isoA3?.trimmingCharacters(in: .whitespacesAndNewlines),
-                          iso3 != "-99",
-                          iso3.count == 3 {
-                    // Fallback: convert ISO_A3 (e.g., FRA) to ISO2 (FR)
-                    iso = String(iso3.prefix(2)).uppercased()
-                } else if let countryName = name,
-                          let derivedISO = isoFromCountryName(countryName) {
-
-                    iso = derivedISO.uppercased()
-                    print("🧠 Derived ISO from name:", countryName, "→", iso ?? "nil")
-
                 } else {
+                    // Skip features without a valid ISO_A2
                     iso = nil
                 }
 
                 if let countryName = name?.uppercased(), countryName.contains("FRANCE") {
                     print("🇫🇷 [GeoJSON] France feature detected name=\(countryName) iso=\(iso ?? "nil") rawISO_A2=\(isoA2 ?? "nil") rawISO_A3=\(isoA3 ?? "nil")")
-                }
-
-                // Explicit Taiwan fallback
-                if let countryName = name?.lowercased(),
-                   countryName.contains("taiwan") {
-                    iso = "TW"
-                    name = "Taiwan"
                 }
             }
 
