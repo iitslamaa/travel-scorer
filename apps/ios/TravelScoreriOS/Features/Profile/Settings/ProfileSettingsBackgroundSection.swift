@@ -19,19 +19,21 @@ struct ProfileSettingsBackgroundSection: View {
             Button {
                 showHomePicker = true
             } label: {
-                VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
 
-                    Text("Which countries do you consider home?")
-                        .foregroundStyle(.primary)
+                    Text("My flags:")
+                        .fontWeight(.bold)
 
                     if !homeCountries.isEmpty {
-                        HStack(spacing: 8) {
-                            ForEach(homeCountries.sorted(), id: \.self) { code in
-                                Text(flag(for: code))
-                                    .font(.largeTitle)
-                            }
+                        ForEach(homeCountries.sorted(), id: \.self) { code in
+                            Text(flag(for: code))
                         }
+                    } else {
+                        Text("None")
+                            .foregroundStyle(.secondary)
                     }
+
+                    Spacer()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
