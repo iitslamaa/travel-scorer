@@ -15,9 +15,9 @@ struct ProfileSettingsLanguagesSection: View {
 
     private func displayName(for entry: LanguageEntry) -> String {
         LanguageRepository.shared.allLanguages
-            .first(where: { $0.code == entry.name })?
+            .first(where: { $0.code == entry.code })?
             .displayName
-            ?? entry.name
+            ?? entry.code
     }
 
     var body: some View {
@@ -28,9 +28,32 @@ struct ProfileSettingsLanguagesSection: View {
                     .foregroundStyle(.secondary)
             } else {
                 ForEach(languages.indices, id: \.self) { index in
-                    HStack {
-                        Text(displayName(for: languages[index]))
-                            .foregroundStyle(.primary)
+                    let entry = languages[index]
+
+                    HStack(alignment: .top, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text(displayName(for: entry))
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.primary)
+
+                            HStack(spacing: 6) {
+                                Text(entry.comfort.label)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+
+                                if entry.isLearning {
+                                    Text("• Learning")
+                                        .font(.caption)
+                                        .foregroundStyle(.blue)
+                                }
+
+                                if entry.isPreferred {
+                                    Text("• Preferred")
+                                        .font(.caption)
+                                        .foregroundStyle(.green)
+                                }
+                            }
+                        }
 
                         Spacer()
 

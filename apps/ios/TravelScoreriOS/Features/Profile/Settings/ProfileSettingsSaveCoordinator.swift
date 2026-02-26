@@ -41,7 +41,14 @@ struct ProfileSettingsSaveCoordinator {
             firstName: trimmedName,
             username: trimmedUsername,
             homeCountries: Array(homeCountries).sorted(),
-            languages: languages.map { $0.name },
+            languages: languages.map { entry in
+                [
+                    "code": AnyCodable(value: entry.code),
+                    "comfort": AnyCodable(value: entry.comfort.rawValue),
+                    "learning": AnyCodable(value: entry.isLearning),
+                    "preferred": AnyCodable(value: entry.isPreferred)
+                ]
+            },
             travelMode: travelMode?.rawValue,
             travelStyle: travelStyle?.rawValue,
             nextDestination: nextDestination,

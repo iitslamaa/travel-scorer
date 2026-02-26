@@ -66,8 +66,23 @@ struct ProfileSettingsView: View {
         let originalTravelMode = profile.travelMode.first.flatMap { TravelMode(rawValue: $0) }
         let originalTravelStyle = profile.travelStyle.first.flatMap { TravelStyle(rawValue: $0) }
         let originalNextDestination = profile.nextDestination
-        let originalLanguages = profile.languages.map { ($0, "native") }
-        let currentLanguages = languages.map { ($0.name, $0.proficiency) }
+
+        let originalLanguages = profile.languages.map { dict in
+            (
+                dict["code"] as? String ?? "",
+                LanguageComfort(rawValue: dict["comfort"] as? String ?? "nativeLevel") ?? .nativeLevel,
+                dict["learning"] as? Bool ?? false,
+                dict["preferred"] as? Bool ?? false
+            )
+        }
+
+        let currentLanguages = languages.map {
+            ($0.code, $0.comfort, $0.isLearning, $0.isPreferred)
+        }
+
+        let languagesChanged =
+            currentLanguages.count != originalLanguages.count
+            || zip(currentLanguages, originalLanguages).contains { $0 != $1 }
 
         let avatarChanged = shouldRemoveAvatar || selectedUIImage != nil
 
@@ -77,7 +92,7 @@ struct ProfileSettingsView: View {
             || travelMode != originalTravelMode
             || travelStyle != originalTravelStyle
             || nextDestination != originalNextDestination
-            || !currentLanguages.elementsEqual(originalLanguages, by: { $0 == $1 })
+            || languagesChanged
             || avatarChanged
     }
 
@@ -95,6 +110,11 @@ struct ProfileSettingsView: View {
     }
 
     private var settingsContent: some View {
+        contentContainer
+    }
+
+    // Extracted to reduce type-check complexity
+    private var contentContainer: some View {
         VStack(spacing: 0) {
 
             ScrollView {
@@ -243,8 +263,7 @@ struct ProfileSettingsView: View {
                 .padding(.top, 8)
                 .transition(.move(edge: .top).combined(with: .opacity))
                 .zIndex(1)
-            }
-        }
+}
         .onAppear {
             guard !hasLoadedProfile else { return }
             hasLoadedProfile = true
@@ -265,11 +284,12 @@ struct ProfileSettingsView: View {
 
                 // languages is NON-optional [String]
                 languages = profile.languages.map { raw in
-                    if let match = LanguageRepository.shared.allLanguages.first(where: { $0.displayName == raw }) {
-                        return LanguageEntry(name: match.code, proficiency: "native")
-                    } else {
-                        return LanguageEntry(name: raw, proficiency: "native")
-                    }
+                    LanguageEntry(
+                        code: raw,
+                        comfort: .nativeLevel,
+                        isLearning: false,
+                        isPreferred: false
+                    )
                 }
             }
         }
@@ -381,7 +401,7 @@ struct ProfileSettingsView: View {
 
         .sheet(isPresented: $showAddLanguage) {
             AddLanguageView { entry in
-                if !languages.contains(where: { $0.name == entry.name }) {
+                if !languages.contains(where: { $0.code == entry.code }) {
                     languages.append(entry)
                 }
             }
@@ -436,8 +456,9 @@ struct ProfileSettingsView: View {
             }
         }
     }
+}
 
-    // MARK: - Display helpers
+// MARK: - Display helpers
 
     private var homeCountriesDisplay: String {
         guard !homeCountries.isEmpty else { return "Not set" }

@@ -32,12 +32,34 @@ enum TravelStyle: String, CaseIterable, Identifiable {
     }
 }
 
+enum LanguageComfort: String, CaseIterable, Identifiable {
+    case nativeLevel
+    case fluent
+    case comfortable
+    case conversational
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .nativeLevel: return "Native-level"
+        case .fluent: return "Fluent"
+        case .comfortable: return "Comfortable"
+        case .conversational: return "Conversational"
+        }
+    }
+}
+
 struct LanguageEntry: Identifiable, Equatable {
     let id = UUID()
-    let name: String
-    let proficiency: String
+    let code: String
+    var comfort: LanguageComfort
+    var isLearning: Bool
+    var isPreferred: Bool
 
     var display: String {
-        "\(name) (\(proficiency))"
+        var parts = [comfort.label]
+        if isLearning { parts.append("Learning") }
+        return parts.joined(separator: " • ")
     }
 }

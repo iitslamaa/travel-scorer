@@ -25,7 +25,7 @@ struct ProfileUpdate: Encodable {
     let username: String?
     let fullName: String?
     let avatarUrl: String?
-    let languages: [String]?
+    let languages: [[String: AnyCodable]]?
     let livedCountries: [String]?
     let travelStyle: [String]?
     let travelMode: [String]?
