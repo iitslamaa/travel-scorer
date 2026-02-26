@@ -102,6 +102,11 @@
 		17A4EC802F47BE2400627746 /* ProfileViewModel+Relationship.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC7F2F47BE2400627746 /* ProfileViewModel+Relationship.swift */; };
 		17A4EC822F47BE3000627746 /* ProfileViewModel+Friends.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC812F47BE3000627746 /* ProfileViewModel+Friends.swift */; };
 		17A4EC842F47BE3A00627746 /* ProfileViewModel+Countries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC832F47BE3A00627746 /* ProfileViewModel+Countries.swift */; };
+		17AE40592F50E9EA00495208 /* CountryMultiSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AE40582F50E9EA00495208 /* CountryMultiSelectView.swift */; };
+		17AE405B2F50E9F700495208 /* CountrySingleSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AE405A2F50E9F700495208 /* CountrySingleSelectView.swift */; };
+		17AE405D2F50EA0200495208 /* AddLanguageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AE405C2F50EA0200495208 /* AddLanguageView.swift */; };
+		17AE405F2F50EBB700495208 /* ProfileSettingsSaveCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AE405E2F50EBB700495208 /* ProfileSettingsSaveCoordinator.swift */; };
+		17AE40612F50EBC300495208 /* ProfileSettingsDeletionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AE40602F50EBC300495208 /* ProfileSettingsDeletionCoordinator.swift */; };
 		17E1053D2F4F8A7B00BEED72 /* Nuke in Frameworks */ = {isa = PBXBuildFile; productRef = 17E1053C2F4F8A7B00BEED72 /* Nuke */; };
 		17E1053F2F4F8A7B00BEED72 /* NukeUI in Frameworks */ = {isa = PBXBuildFile; productRef = 17E1053E2F4F8A7B00BEED72 /* NukeUI */; };
 		17EC41DE2F4BB204004B80DA /* ScoreWorldMapRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EC41DD2F4BB204004B80DA /* ScoreWorldMapRepresentable.swift */; };
@@ -218,6 +223,11 @@
 		17A4EC7F2F47BE2400627746 /* ProfileViewModel+Relationship.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Relationship.swift"; sourceTree = "<group>"; };
 		17A4EC812F47BE3000627746 /* ProfileViewModel+Friends.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Friends.swift"; sourceTree = "<group>"; };
 		17A4EC832F47BE3A00627746 /* ProfileViewModel+Countries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Countries.swift"; sourceTree = "<group>"; };
+		17AE40582F50E9EA00495208 /* CountryMultiSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryMultiSelectView.swift; sourceTree = "<group>"; };
+		17AE405A2F50E9F700495208 /* CountrySingleSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountrySingleSelectView.swift; sourceTree = "<group>"; };
+		17AE405C2F50EA0200495208 /* AddLanguageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLanguageView.swift; sourceTree = "<group>"; };
+		17AE405E2F50EBB700495208 /* ProfileSettingsSaveCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsSaveCoordinator.swift; sourceTree = "<group>"; };
+		17AE40602F50EBC300495208 /* ProfileSettingsDeletionCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileSettingsDeletionCoordinator.swift; sourceTree = "<group>"; };
 		17AFEC8A2EC2C3D800B9585B /* Travel Adventure Finder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Travel Adventure Finder.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		17EC41DD2F4BB204004B80DA /* ScoreWorldMapRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreWorldMapRepresentable.swift; sourceTree = "<group>"; };
 		17EC41DF2F4BB213004B80DA /* ScoreWorldMapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreWorldMapCoordinator.swift; sourceTree = "<group>"; };
@@ -780,6 +790,11 @@
 				170C20E02F4790E00090BA78 /* ProfileSettingsTravelSection.swift */,
 				170C20E12F4790E00090BA78 /* ProfileSettingsView.swift */,
 				170C20E22F4790E00090BA78 /* SectionCard.swift */,
+				17AE40582F50E9EA00495208 /* CountryMultiSelectView.swift */,
+				17AE405A2F50E9F700495208 /* CountrySingleSelectView.swift */,
+				17AE405C2F50EA0200495208 /* AddLanguageView.swift */,
+				17AE405E2F50EBB700495208 /* ProfileSettingsSaveCoordinator.swift */,
+				17AE40602F50EBC300495208 /* ProfileSettingsDeletionCoordinator.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -913,6 +928,7 @@
 			files = (
 				17F063852F32734800F1F4F3 /* EmailAuthView.swift in Sources */,
 				170C21272F4790E00090BA78 /* CountryAdvisoryCard.swift in Sources */,
+				17AE40592F50E9EA00495208 /* CountryMultiSelectView.swift in Sources */,
 				17EC41EC2F4BBA4B004B80DA /* CustomWeightsView.swift in Sources */,
 				17A4EC802F47BE2400627746 /* ProfileViewModel+Relationship.swift in Sources */,
 				170C21282F4790E00090BA78 /* CountryDetailView.swift in Sources */,
@@ -937,6 +953,7 @@
 				170C21392F4790E00090BA78 /* ProfileView.swift in Sources */,
 				170C213A2F4790E00090BA78 /* ProfileSettingsAccountSection.swift in Sources */,
 				170C213B2F4790E00090BA78 /* ProfileSettingsAvatarSection.swift in Sources */,
+				17AE405D2F50EA0200495208 /* AddLanguageView.swift in Sources */,
 				170C213C2F4790E00090BA78 /* ProfileSettingsBackgroundSection.swift in Sources */,
 				17EE81642F49081000C8CEF2 /* ProfileSkeletonView.swift in Sources */,
 				1797962A2F49353000053B0B /* ProfileLoadingView.swift in Sources */,
@@ -945,6 +962,7 @@
 				170C213F2F4790E00090BA78 /* ProfileSettingsModels.swift in Sources */,
 				170C21402F4790E00090BA78 /* ProfileSettingsNextDestinationSection.swift in Sources */,
 				170C21412F4790E00090BA78 /* ProfileSettingsTravelSection.swift in Sources */,
+				17AE405F2F50EBB700495208 /* ProfileSettingsSaveCoordinator.swift in Sources */,
 				170C21422F4790E00090BA78 /* ProfileSettingsView.swift in Sources */,
 				170C21432F4790E00090BA78 /* SectionCard.swift in Sources */,
 				170C21442F4790E00090BA78 /* CountryMetadataResolver.swift in Sources */,
@@ -963,6 +981,7 @@
 				17EC41E22F4BB227004B80DA /* ScoreWorldMapRenderer.swift in Sources */,
 				170C214E2F4790E00090BA78 /* AppRootView.swift in Sources */,
 				170C214F2F4790E00090BA78 /* AuthGate.swift in Sources */,
+				17AE405B2F50E9F700495208 /* CountrySingleSelectView.swift in Sources */,
 				170C21502F4790E00090BA78 /* AuthLandingView.swift in Sources */,
 				170C21512F4790E00090BA78 /* AuthRequiredView.swift in Sources */,
 				170C21522F4790E00090BA78 /* AuthSheetView.swift in Sources */,
@@ -991,6 +1010,7 @@
 				170C21652F4790E00090BA78 /* FriendsViewModel.swift in Sources */,
 				170C21662F4790E00090BA78 /* FrostedCard.swift in Sources */,
 				170C21692F4790E00090BA78 /* LegalView.swift in Sources */,
+				17AE40612F50EBC300495208 /* ProfileSettingsDeletionCoordinator.swift in Sources */,
 				170C216A2F4790E00090BA78 /* MyTravelsView.swift in Sources */,
 				170C216B2F4790E00090BA78 /* ProfileViewModel.swift in Sources */,
 				170C216C2F4790E00090BA78 /* RootTabView.swift in Sources */,

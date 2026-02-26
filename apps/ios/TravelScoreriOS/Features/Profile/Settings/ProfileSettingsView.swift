@@ -275,42 +275,34 @@ struct ProfileSettingsView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button {
                     Task {
-                        isSavingProfile = true
-
-                        let avatarURL = await resolveAvatarChange()
-
-                        let trimmedName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
-                        let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
-
-                        await profileVM.saveProfile(
-                            firstName: trimmedName,
-                            username: trimmedUsername,
-                            homeCountries: Array(homeCountries),
-                            languages: languages.map { $0.name },
-                            travelMode: travelMode?.rawValue,
-                            travelStyle: travelStyle?.rawValue,
+                        await ProfileSettingsSaveCoordinator.handleSave(
+                            profileVM: profileVM,
+                            firstName: firstName,
+                            username: username,
+                            homeCountries: homeCountries,
+                            languages: languages,
+                            travelMode: travelMode,
+                            travelStyle: travelStyle,
                             nextDestination: nextDestination,
-                            avatarUrl: avatarURL
+                            selectedUIImage: selectedUIImage,
+                            shouldRemoveAvatar: shouldRemoveAvatar,
+                            setSaving: { isSavingProfile = $0 },
+                            setAvatarUploading: { isUploadingAvatar = $0 },
+                            setAvatarCleared: {
+                                selectedUIImage = nil
+                                shouldRemoveAvatar = false
+                            },
+                            showSuccess: {
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+                                    showSaveSuccess = true
+                                }
+                            },
+                            hideSuccess: {
+                                withAnimation(.easeOut(duration: 0.25)) {
+                                    showSaveSuccess = false
+                                }
+                            }
                         )
-
-                        isSavingProfile = false
-                        // ✅ Clear temporary avatar state so future saves don't re-upload
-                        selectedUIImage = nil
-                        shouldRemoveAvatar = false
-
-                        await MainActor.run {
-                            withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
-                                showSaveSuccess = true
-                            }
-                        }
-
-                        try? await Task.sleep(nanoseconds: 1_800_000_000)
-
-                        await MainActor.run {
-                            withAnimation(.easeOut(duration: 0.25)) {
-                                showSaveSuccess = false
-                            }
-                        }
                     }
                 } label: {
                     if isSavingProfile {
@@ -389,7 +381,15 @@ struct ProfileSettingsView: View {
                     }
 
                     Button(role: .destructive) {
-                        Task { await handleDelete() }
+                        Task {
+                            await ProfileSettingsDeletionCoordinator.handleDelete(
+                                sessionManager: sessionManager,
+                                dismiss: { dismiss() },
+                                setDeleting: { isDeleting = $0 },
+                                setError: { deleteError = $0 },
+                                closeSheet: { showDeleteSheet = false }
+                            )
+                        }
                     } label: {
                         if isDeleting {
                             ProgressView()
@@ -435,42 +435,6 @@ struct ProfileSettingsView: View {
             .joined()
     }
 
-    // MARK: - Avatar upload helper
-    private func uploadAvatarIfNeeded() async -> String? {
-        guard let image = selectedUIImage,
-              let userId = profileVM.profile?.id,
-              let data = image.jpegData(compressionQuality: 0.85)
-        else {
-            return nil
-        }
-
-        isUploadingAvatar = true
-        defer { isUploadingAvatar = false }
-
-        // 🔥 Versioned filename to avoid image caching
-        let fileName = "\(userId)_\(UUID().uuidString).jpg"
-
-        do {
-            let publicURL = try await profileVM.uploadAvatar(
-                data: data,
-                fileName: fileName
-            )
-            return publicURL
-        } catch {
-            print("🔴 Avatar upload failed:", error)
-            return nil
-        }
-    }
-
-    private func resolveAvatarChange() async -> String? {
-        // If user chose to remove avatar
-        if shouldRemoveAvatar {
-            return ""
-        }
-
-        // Otherwise upload if new image selected
-        return await uploadAvatarIfNeeded()
-    }
 
     func markAvatarForRemoval() {
         selectedUIImage = nil
@@ -478,218 +442,7 @@ struct ProfileSettingsView: View {
         shouldRemoveAvatar = true
     }
 
-    private func handleDelete() async {
-        isDeleting = true
-        deleteError = nil
-
-        do {
-            try await SupabaseManager.shared.deleteAccount()
-            showDeleteSheet = false
-
-            // Force app back to auth screen even if a stale local session briefly exists
-            sessionManager.handleAccountDeleted()
-
-            dismiss()
-        } catch {
-            deleteError = "Failed to delete account. Please try again."
-        }
-
-        isDeleting = false
-    }
 }
 
 
 
-// MARK: - Temporary picker views (UI only)
-
-private struct CountryMultiSelectView: View {
-    let title: String
-    let subtitle: String?
-    @Binding var selection: Set<String>
-    @Environment(\.dismiss) private var dismiss
-    @State private var searchText = ""
-    @State private var hasChanges = false
-
-    let initialSelection: Set<String>
-
-    init(title: String, subtitle: String? = nil, selection: Binding<Set<String>>) {
-        self.title = title
-        self.subtitle = subtitle
-        self._selection = selection
-        self.initialSelection = selection.wrappedValue
-    }
-
-    let countries = Locale.isoRegionCodes
-        .compactMap { code -> (String, String)? in
-            let name = Locale.current.localizedString(forRegionCode: code)
-            return name.map { (code, $0) }
-        }
-        .sorted { $0.1 < $1.1 }
-
-    var body: some View {
-        NavigationStack {
-
-            let filtered = searchText.isEmpty
-                ? countries
-                : countries.filter { $0.1.localizedCaseInsensitiveContains(searchText) }
-
-            VStack(alignment: .leading, spacing: 12) {
-
-                if let subtitle {
-                    Text(subtitle)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                        .multilineTextAlignment(.center)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.horizontal, 24)
-                }
-
-                HStack(spacing: 8) {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundStyle(.secondary)
-
-                    TextField("Search", text: $searchText)
-                        .textInputAutocapitalization(.never)
-                        .autocorrectionDisabled()
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(Color(.systemGray6))
-                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                .padding(.horizontal, 16)
-
-                List {
-                    Section {
-                        ForEach(filtered, id: \.0) { (code, name) in
-                            Button {
-                                if selection.contains(code) {
-                                    selection.remove(code)
-                                } else {
-                                    selection.insert(code)
-                                }
-                                hasChanges = selection != initialSelection
-                            } label: {
-                                HStack(spacing: 12) {
-                                    Text(countryCodeToFlag(code))
-                                        .font(.title3)
-
-                                    Text(name)
-
-                                    Spacer()
-
-                                    if selection.contains(code) {
-                                        Image(systemName: "checkmark")
-                                    }
-                                }
-                                .padding(.vertical, 8)
-                            }
-                        }
-                    }
-                }
-                .listStyle(.insetGrouped)
-            }
-            .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        dismiss()
-                    }
-                    .fontWeight(.semibold)
-                    .foregroundStyle(hasChanges ? .blue : .secondary)
-                    .disabled(!hasChanges)
-                }
-            }
-        }
-    }
-    
-    private func countryCodeToFlag(_ code: String) -> String {
-        guard code.count == 2 else { return code }
-        let base: UInt32 = 127397
-        return code.unicodeScalars
-            .compactMap { UnicodeScalar(base + $0.value) }
-            .map { String($0) }
-            .joined()
-    }
-}
-
-private struct CountrySingleSelectView: View {
-    let title: String
-    @Binding var selection: String?
-    @Environment(\.dismiss) private var dismiss
-    @State private var searchText = ""
-
-    let countries = Locale.isoRegionCodes
-        .compactMap { code -> (String, String)? in
-            let name = Locale.current.localizedString(forRegionCode: code)
-            return name.map { (code, $0) }
-        }
-        .sorted { $0.1 < $1.1 }
-
-    var body: some View {
-        NavigationStack {
-            let filtered = searchText.isEmpty
-                ? countries
-                : countries.filter { $0.1.localizedCaseInsensitiveContains(searchText) }
-
-            List(filtered, id: \.0) { (code, name) in
-                Button {
-                    selection = code
-                    dismiss()
-                } label: {
-                    HStack {
-                        Text(countryCodeToFlag(code))
-                        Text(name)
-                        Spacer()
-                        if selection == code {
-                            Image(systemName: "checkmark")
-                        }
-                    }
-                }
-            }
-            .searchable(text: $searchText)
-            .navigationTitle(title)
-        }
-    }
-
-    private func countryCodeToFlag(_ code: String) -> String {
-        guard code.count == 2 else { return code }
-        let base: UInt32 = 127397
-        return code.unicodeScalars
-            .compactMap { UnicodeScalar(base + $0.value) }
-            .map { String($0) }
-            .joined()
-    }
-}
-
-private struct AddLanguageView: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var language = ""
-    @State private var proficiency = "native"
-
-    let onAdd: (LanguageEntry) -> Void
-
-    var body: some View {
-        NavigationStack {
-            Form {
-                TextField("Language", text: $language)
-
-                Picker("Proficiency", selection: $proficiency) {
-                    Text("Native").tag("native")
-                    Text("Fluent").tag("fluent")
-                    Text("Learning").tag("learning")
-                }
-            }
-            .navigationTitle("Add language")
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        onAdd(LanguageEntry(name: language, proficiency: proficiency))
-                        dismiss()
-                    }
-                    .disabled(language.isEmpty)
-                }
-            }
-        }
-    }
-}
