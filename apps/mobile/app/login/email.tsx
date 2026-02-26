@@ -17,6 +17,9 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const [showBypass, setShowBypass] = useState(false);
+  const [bypassKey, setBypassKey] = useState('');
+
   const handleEmailLogin = async () => {
     if (!email) return;
 
@@ -37,6 +40,29 @@ export default function LoginScreen() {
         params: { email },
       });
     }
+  };
+
+  const handleBypassLogin = async () => {
+    if (!email || !bypassKey) {
+      Alert.alert('Enter email and bypass key');
+      return;
+    }
+
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password: bypassKey,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      Alert.alert('Invalid bypass key', error.message);
+      return;
+    }
+
+    router.replace('/discovery');
   };
 
   return (
@@ -66,6 +92,38 @@ export default function LoginScreen() {
             {loading ? 'Sending...' : 'Send Code'}
           </Text>
         </Pressable>
+
+        <Pressable
+          style={styles.bypassToggle}
+          onPress={() => setShowBypass(true)}
+        >
+          <Text style={styles.bypassToggleText}>Bypass Key</Text>
+        </Pressable>
+
+        {showBypass && (
+          <View style={styles.bypassContainer}>
+            <TextInput
+              value={bypassKey}
+              onChangeText={setBypassKey}
+              placeholder="Enter bypass key"
+              placeholderTextColor="rgba(255,255,255,0.6)"
+              secureTextEntry
+              autoCapitalize="none"
+              autoCorrect={false}
+              style={styles.bypassInput}
+            />
+
+            <Pressable
+              style={[styles.bypassSubmit, loading && { opacity: 0.6 }]}
+              onPress={handleBypassLogin}
+              disabled={loading}
+            >
+              <Text style={styles.bypassSubmitText}>
+                {loading ? 'Verifying...' : 'Submit'}
+              </Text>
+            </Pressable>
+          </View>
+        )}
 
         <Pressable onPress={() => router.back()}>
           <Text style={styles.link}>Back</Text>
@@ -112,5 +170,35 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
     color: 'rgba(255,255,255,0.8)',
+  },
+  bypassToggle: {
+    alignItems: 'center',
+    marginTop: 12,
+  },
+  bypassToggleText: {
+    color: 'rgba(255,255,255,0.85)',
+    fontSize: 14,
+    textDecorationLine: 'underline',
+  },
+  bypassContainer: {
+    marginTop: 12,
+  },
+  bypassInput: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    color: 'white',
+  },
+  bypassSubmit: {
+    marginTop: 10,
+    backgroundColor: 'white',
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  bypassSubmitText: {
+    fontWeight: '600',
+    fontSize: 15,
   },
 });
