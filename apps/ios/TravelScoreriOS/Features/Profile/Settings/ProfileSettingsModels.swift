@@ -32,7 +32,7 @@ enum TravelStyle: String, CaseIterable, Identifiable {
     }
 }
 
-struct LanguageEntry: Identifiable {
+struct LanguageEntry: Identifiable, Equatable {
     let id = UUID()
     let name: String
     let proficiency: String

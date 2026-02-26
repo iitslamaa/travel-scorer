@@ -56,6 +56,31 @@ struct ProfileSettingsView: View {
         return !trimmedName.isEmpty && !trimmedUsername.isEmpty
     }
 
+    private var hasChanges: Bool {
+        guard hasLoadedProfile else { return false }
+        guard let profile = profileVM.profile else { return false }
+
+        let originalFirstName = profile.fullName
+        let originalUsername = profile.username
+        let originalHomeCountries = Set(profile.livedCountries)
+        let originalTravelMode = profile.travelMode.first.flatMap { TravelMode(rawValue: $0) }
+        let originalTravelStyle = profile.travelStyle.first.flatMap { TravelStyle(rawValue: $0) }
+        let originalNextDestination = profile.nextDestination
+        let originalLanguages = profile.languages.map { ($0, "native") }
+        let currentLanguages = languages.map { ($0.name, $0.proficiency) }
+
+        let avatarChanged = shouldRemoveAvatar || selectedUIImage != nil
+
+        return firstName != originalFirstName
+            || username != originalUsername
+            || homeCountries != originalHomeCountries
+            || travelMode != originalTravelMode
+            || travelStyle != originalTravelStyle
+            || nextDestination != originalNextDestination
+            || !currentLanguages.elementsEqual(originalLanguages, by: { $0 == $1 })
+            || avatarChanged
+    }
+
     var body: some View {
         Group {
             if SupabaseManager.shared.currentUserId != viewedUserId {
@@ -202,6 +227,24 @@ struct ProfileSettingsView: View {
             }
         }
         .background(Color(.systemBackground))
+        .overlay(alignment: .top) {
+            if showSaveSuccess {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    Text("Profile updated")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(.ultraThinMaterial)
+                .clipShape(Capsule())
+                .shadow(radius: 8)
+                .padding(.top, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .zIndex(1)
+            }
+        }
         .onAppear {
             guard !hasLoadedProfile else { return }
             hasLoadedProfile = true
@@ -285,8 +328,9 @@ struct ProfileSettingsView: View {
                         Text("Save")
                     }
                 }
-                .disabled(!isFormValid || isSavingProfile)
-                .opacity(isFormValid ? 1 : 0.5)
+                .tint(hasChanges && isFormValid ? .blue : .gray)
+                .disabled(!hasChanges || !isFormValid || isSavingProfile)
+                .opacity(hasChanges && isFormValid ? 1 : 0.5)
             }
         }
 
