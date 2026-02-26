@@ -70,12 +70,7 @@ struct ProfileSettingsView: View {
     }
 
     private var settingsContent: some View {
-        ZStack {
-            Color(.systemBackground)
-                .ignoresSafeArea()
-
-
-            ProfileSettingsHeader()
+        VStack(spacing: 0) {
 
             ScrollView {
                 VStack(spacing: 20) {
@@ -202,34 +197,11 @@ struct ProfileSettingsView: View {
                 }
                 .foregroundStyle(.primary)
                 .padding(.horizontal, 16)
-                .padding(.top, 90)
+                .padding(.top, 20)
+                .padding(.bottom, 40)
             }
-
-            // META-style top overlay toast (above everything)
-            VStack {
-                if showSaveSuccess {
-                    HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundColor(.green)
-                        Text("Profile updated")
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-                    }
-                    .padding(.horizontal, 18)
-                    .padding(.vertical, 12)
-                    .background(.ultraThinMaterial)
-                    .clipShape(Capsule())
-                    .shadow(color: .black.opacity(0.15), radius: 20, y: 8)
-                    .transition(.move(edge: .top).combined(with: .opacity))
-                }
-
-                Spacer()
-            }
-            .padding(.top, 16)
-            .padding(.horizontal)
-            .zIndex(9999)
-            .allowsHitTesting(false)
         }
+        .background(Color(.systemBackground))
         .onAppear {
             guard !hasLoadedProfile else { return }
             hasLoadedProfile = true
@@ -267,7 +239,8 @@ struct ProfileSettingsView: View {
                 }
             }
         }
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationTitle("Profile Settings")
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") { dismiss() }
