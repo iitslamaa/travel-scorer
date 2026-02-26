@@ -80,21 +80,70 @@ struct ProfileSettingsView: View {
             ScrollView {
                 VStack(spacing: 20) {
 
-                    ProfileSettingsAvatarSection(
-                        selectedUIImage: selectedUIImage,
-                        profileVM: profileVM,
-                        selectedPhotoItem: $selectedPhotoItem,
-                        isUploadingAvatar: isUploadingAvatar,
-                        shouldRemoveAvatar: shouldRemoveAvatar,
-                        onRemoveAvatar: {
-                            markAvatarForRemoval()
-                        }
-                    )
+                    SectionCard {
+                        HStack(alignment: .center, spacing: 16) {
 
-                    ProfileSettingsAccountSection(
-                        firstName: $firstName,
-                        username: $username
-                    )
+                            ProfileSettingsAvatarSection(
+                                selectedUIImage: selectedUIImage,
+                                profileVM: profileVM,
+                                selectedPhotoItem: $selectedPhotoItem,
+                                isUploadingAvatar: isUploadingAvatar,
+                                shouldRemoveAvatar: shouldRemoveAvatar,
+                                onRemoveAvatar: {
+                                    markAvatarForRemoval()
+                                }
+                            )
+                            .frame(width: 120)
+
+                            VStack(spacing: 14) {
+
+                                TextField(
+                                    "",
+                                    text: $firstName,
+                                    prompt:
+                                        (Text("Name")
+                                            .foregroundStyle(.secondary)
+                                         +
+                                         Text(" *")
+                                            .foregroundStyle(.red))
+                                )
+                                .padding(12)
+                                .background(.regularMaterial)
+                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
+                                .foregroundStyle(.primary)
+                                .tint(.primary)
+
+                                HStack(spacing: 6) {
+                                    Text("@")
+                                        .foregroundStyle(.secondary)
+
+                                    TextField(
+                                        "",
+                                        text: $username,
+                                        prompt:
+                                            (Text("username")
+                                                .foregroundStyle(.secondary)
+                                             +
+                                             Text(" *")
+                                                .foregroundStyle(.red))
+                                    )
+                                    .textInputAutocapitalization(.never)
+                                    .autocorrectionDisabled(true)
+                                    .foregroundStyle(.primary)
+                                    .tint(.primary)
+                                }
+                                .padding(12)
+                                .background(.regularMaterial)
+                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
+
+                            }
+                            .frame(maxHeight: .infinity, alignment: .center)
+
+                            Spacer()
+                        }
+                    }
 
                     ProfileSettingsBackgroundSection(
                         homeCountries: homeCountries,
