@@ -18,7 +18,7 @@ extension ProfileViewModel {
         firstName: String,
         username: String,
         homeCountries: [String]?,
-        languages: [String]?,
+        languages: [[String: AnyCodable]]?,
         travelMode: String?,
         travelStyle: String?,
         nextDestination: String?,
@@ -58,7 +58,9 @@ extension ProfileViewModel {
                 current.username = trimmedUsername
                 current.fullName = trimmedName
                 current.livedCountries = homeCountries ?? current.livedCountries
-                current.languages = languages ?? current.languages
+                if let languages {
+                    current.languages = languages
+                }
                 current.travelStyle = travelStyle.map { [$0] } ?? current.travelStyle
                 current.travelMode = travelMode.map { [$0] } ?? current.travelMode
                 current.nextDestination = nextDestination

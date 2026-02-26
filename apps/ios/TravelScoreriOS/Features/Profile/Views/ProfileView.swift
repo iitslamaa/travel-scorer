@@ -62,7 +62,12 @@ struct ProfileView: View {
 
     private var username: String { profileVM.profile?.username ?? "" }
     private var homeCountryCodes: [String] { profileVM.profile?.livedCountries ?? [] }
-    private var languages: [String] { profileVM.profile?.languages ?? [] }
+    private var languages: [String] {
+        guard let raw = profileVM.profile?.languages else { return [] }
+        return raw.compactMap { dict in
+            dict["code"] as? String
+        }
+    }
     private var friendCount: Int { profileVM.friendCount }
 
     private var isReadyToRenderProfile: Bool {
