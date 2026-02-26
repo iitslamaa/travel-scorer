@@ -1,5 +1,5 @@
 import { View, ActivityIndicator } from 'react-native';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 
@@ -8,14 +8,11 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
+  const hasRedirectedRef = useRef(false);
+
   // Not logged in and not guest -> must be on landing/login flow
   useEffect(() => {
-    console.log('[AUTHGATE] effect#1 check', {
-      loading,
-      hasSession: !!session,
-      isGuest,
-      pathname,
-    });
+    if (hasRedirectedRef.current) return;
 
     if (!loading && !session && !isGuest) {
       const isPublicRoute =
@@ -24,41 +21,32 @@ export default function AuthGate({ children }: { children: React.ReactNode }) {
         pathname.startsWith('/login');
 
       if (!isPublicRoute) {
-        console.log('[AUTHGATE] redirecting to / from', pathname);
+        hasRedirectedRef.current = true;
         router.replace('/');
       }
     }
-  }, [loading, session, isGuest, pathname]);
+  }, [loading, session, isGuest]);
 
   // Logged in -> enforce onboarding gate (guest bypasses)
   useEffect(() => {
-    console.log('[AUTHGATE] effect#2 check', {
-      loading,
-      profileLoading,
-      hasSession: !!session,
-      isGuest,
-      pathname,
-      onboarded: profile?.onboarding_completed,
-    });
-
+    if (hasRedirectedRef.current) return;
     if (loading || profileLoading) return;
     if (!session || isGuest) return;
-    // If profile has not loaded yet, do not enforce onboarding
     if (!profile) return;
 
     const onboarded = profile?.onboarding_completed === true;
 
     if (!onboarded && pathname !== '/onboarding') {
-      console.log('[AUTHGATE] redirecting to /onboarding from', pathname);
+      hasRedirectedRef.current = true;
       router.replace('/onboarding');
       return;
     }
 
     if (onboarded && pathname === '/onboarding') {
-      console.log('[AUTHGATE] redirecting to /(tabs)/discovery from onboarding');
+      hasRedirectedRef.current = true;
       router.replace('/(tabs)/discovery');
     }
-  }, [loading, profileLoading, session, isGuest, profile, pathname]);
+  }, [loading, profileLoading, session, isGuest, profile]);
 
   if (loading || (session && !isGuest && profileLoading)) {
     return (

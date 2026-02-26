@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import { View, StyleSheet, Pressable, Text, useWindowDimensions } from "react-native";
-import MapView, { Polygon } from "react-native-maps";
+import MapView, { Polygon, PROVIDER_GOOGLE } from "react-native-maps";
 import { useRouter } from "expo-router";
 import { useCountries } from "../../hooks/useCountries";
 import worldGeo from "../../src/assets/geo/world.geo.json";
@@ -41,13 +41,6 @@ export default function ScoreWorldMap() {
     });
     return map;
   }, [countries]);
-
-  const scoreStats = useMemo(() => {
-    const values = Object.values(scoreLookup);
-    const nonZero = values.filter((v) => (v ?? 0) > 0).length;
-    const max = values.length ? Math.max(...values) : 0;
-    return { total: values.length, nonZero, max };
-  }, [scoreLookup]);
 
   const handlePress = (feature: any) => {
     if (!feature) return;
@@ -95,21 +88,16 @@ export default function ScoreWorldMap() {
     mapRef.current?.animateToRegion({
       latitude: centerLat,
       longitude: centerLng,
-      latitudeDelta: Math.max(5, (maxLat - minLat) * 1.5),
-      longitudeDelta: Math.max(5, (maxLng - minLng) * 1.5),
+      latitudeDelta: Math.max(2, (maxLat - minLat) * 1.2),
+      longitudeDelta: Math.max(2, (maxLng - minLng) * 1.2),
     });
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.debugPill}>
-        <Text style={styles.debugText}>
-          Scores: {scoreStats.nonZero}/{scoreStats.total} non-zero (max {scoreStats.max})
-        </Text>
-      </View>
       <MapView
         ref={mapRef}
-        style={StyleSheet.absoluteFill}
+        style={{ flex: 1 }}
         initialRegion={{
           latitude: 20,
           longitude: 0,
@@ -117,7 +105,7 @@ export default function ScoreWorldMap() {
           longitudeDelta: 60,
         }}
         mapType="standard"
-        provider={undefined}
+        provider={PROVIDER_GOOGLE}
         customMapStyle={mutedMapStyle}
       >
         {worldGeo.features.map((feature: any, index: number) => {
@@ -197,21 +185,6 @@ export default function ScoreWorldMap() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "black" },
-  debugPill: {
-    position: "absolute",
-    top: 14,
-    left: 14,
-    zIndex: 999,
-    backgroundColor: "rgba(0,0,0,0.65)",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 14,
-  },
-  debugText: {
-    color: "white",
-    fontSize: 12,
-    fontWeight: "600",
-  },
   card: {
     position: "absolute",
     bottom: 40,

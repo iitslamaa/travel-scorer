@@ -1,3 +1,4 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   View,
   Text,
@@ -16,6 +17,8 @@ import { useAuth } from '../../context/AuthContext';
 import { Video, ResizeMode } from 'expo-av';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LandingScreen() {
   console.log('[LANDING] render', {
@@ -135,7 +138,7 @@ export default function LandingScreen() {
       setLoadingGoogle(true);
       console.log('Loading state set to true');
 
-      const redirectTo = Linking.createURL('auth/callback');
+      const redirectTo = 'travelaf://auth/callback';
       console.log('redirectTo:', redirectTo);
       await dumpStorage('BEFORE signInWithOAuth');
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -154,8 +157,11 @@ export default function LandingScreen() {
       }
 
       if (data?.url) {
-        await WebBrowser.openBrowserAsync(data.url);
-        console.log('Browser opened, waiting for deep link...');
+        const result = await WebBrowser.openAuthSessionAsync(
+          data.url,
+          redirectTo
+        );
+        console.log('Auth session result:', result);
       } else {
         console.log('No OAuth URL returned');
       }
