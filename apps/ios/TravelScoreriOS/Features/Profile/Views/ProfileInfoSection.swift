@@ -94,6 +94,13 @@ struct ProfileInfoSection: View {
         }
     }
 
+    private func displayName(for code: String) -> String {
+        LanguageRepository.shared.allLanguages
+            .first(where: { $0.code == code })?
+            .displayName
+            ?? code
+    }
+
     private var languagesCard: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Languages")
@@ -105,7 +112,8 @@ struct ProfileInfoSection: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
-                Text(languages.joined(separator: " · "))
+                let displayLanguages = languages.map { displayName(for: $0) }
+                Text(displayLanguages.joined(separator: " · "))
                     .font(.subheadline)
                     .foregroundStyle(.primary)
             }

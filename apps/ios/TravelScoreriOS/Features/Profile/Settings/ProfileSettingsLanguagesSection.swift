@@ -10,8 +10,15 @@ import SwiftUI
 
 struct ProfileSettingsLanguagesSection: View {
 
-    let languages: [LanguageEntry]
+    @Binding var languages: [LanguageEntry]
     @Binding var showAddLanguage: Bool
+
+    private func displayName(for entry: LanguageEntry) -> String {
+        LanguageRepository.shared.allLanguages
+            .first(where: { $0.code == entry.name })?
+            .displayName
+            ?? entry.name
+    }
 
     var body: some View {
         SectionCard(title: "Languages spoken") {
@@ -20,9 +27,21 @@ struct ProfileSettingsLanguagesSection: View {
                 Text("Add languages you speak or are learning")
                     .foregroundStyle(.secondary)
             } else {
-                ForEach(languages) { entry in
-                    Text(entry.display)
-                        .foregroundStyle(.primary)
+                ForEach(languages.indices, id: \.self) { index in
+                    HStack {
+                        Text(displayName(for: languages[index]))
+                            .foregroundStyle(.primary)
+
+                        Spacer()
+
+                        Button {
+                            languages.remove(at: index)
+                        } label: {
+                            Image(systemName: "minus.circle.fill")
+                                .foregroundStyle(.red)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
             }
 

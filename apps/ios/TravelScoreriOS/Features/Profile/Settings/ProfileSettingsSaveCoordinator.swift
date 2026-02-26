@@ -40,7 +40,7 @@ struct ProfileSettingsSaveCoordinator {
         await profileVM.saveProfile(
             firstName: trimmedName,
             username: trimmedUsername,
-            homeCountries: Array(homeCountries),
+            homeCountries: Array(homeCountries).sorted(),
             languages: languages.map { $0.name },
             travelMode: travelMode?.rawValue,
             travelStyle: travelStyle?.rawValue,

@@ -178,7 +178,7 @@ struct ProfileSettingsView: View {
                     )
 
                     ProfileSettingsLanguagesSection(
-                        languages: languages,
+                        languages: $languages,
                         showAddLanguage: $showAddLanguage
                     )
 
@@ -264,8 +264,12 @@ struct ProfileSettingsView: View {
                 nextDestination = profile.nextDestination
 
                 // languages is NON-optional [String]
-                languages = profile.languages.map {
-                    LanguageEntry(name: $0, proficiency: "native")
+                languages = profile.languages.map { raw in
+                    if let match = LanguageRepository.shared.allLanguages.first(where: { $0.displayName == raw }) {
+                        return LanguageEntry(name: match.code, proficiency: "native")
+                    } else {
+                        return LanguageEntry(name: raw, proficiency: "native")
+                    }
                 }
             }
         }
@@ -377,7 +381,9 @@ struct ProfileSettingsView: View {
 
         .sheet(isPresented: $showAddLanguage) {
             AddLanguageView { entry in
-                languages.append(entry)
+                if !languages.contains(where: { $0.name == entry.name }) {
+                    languages.append(entry)
+                }
             }
         }
         .sheet(isPresented: $showDeleteSheet) {
