@@ -1,0 +1,22 @@
+[
+  { "code": "en", "displayName": "English", "base": "English" },
+  { "code": "en-US", "displayName": "English (United States)", "base": "English" },
+  { "code": "en-GB", "displayName": "English (United Kingdom)", "base": "English" },
+
+  { "code": "ar", "displayName": "Arabic", "base": "Arabic" },
+  { "code": "ar-LB", "displayName": "Arabic (Lebanon)", "base": "Arabic" },
+  { "code": "ar-EG", "displayName": "Arabic (Egypt)", "base": "Arabic" },
+  { "code": "ar-MA", "displayName": "Arabic (Morocco)", "base": "Arabic" },
+
+  { "code": "fr", "displayName": "French", "base": "French" },
+  { "code": "fr-FR", "displayName": "French (France)", "base": "French" },
+  { "code": "fr-CA", "displayName": "French (Canada)", "base": "French" },
+
+  { "code": "es", "displayName": "Spanish", "base": "Spanish" },
+  { "code": "es-ES", "displayName": "Spanish (Spain)", "base": "Spanish" },
+  { "code": "es-MX", "displayName": "Spanish (Mexico)", "base": "Spanish" },
+
+  { "code": "zh", "displayName": "Chinese", "base": "Chinese" },
+  { "code": "zh-Hans", "displayName": "Chinese (Simplified)", "base": "Chinese" },
+  { "code": "zh-Hant", "displayName": "Chinese (Traditional)", "base": "Chinese" }
+]

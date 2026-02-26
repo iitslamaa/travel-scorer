@@ -96,6 +96,9 @@
 		172A74C92F357340003EF4DF /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172A74C82F357340003EF4DF /* SessionManager.swift */; };
 		176796142F4CF4BC0011EC0E /* CountryAffordabilityCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176796132F4CF4BC0011EC0E /* CountryAffordabilityCard.swift */; };
 		176968BB2F4E6B3C0011661A /* OAuthPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176968BA2F4E6B3C0011661A /* OAuthPresenter.swift */; };
+		1776C9632F50FCE800AFC488 /* global_languages.json in Resources */ = {isa = PBXBuildFile; fileRef = 1776C9622F50FCE300AFC488 /* global_languages.json */; };
+		1776C9652F50FD6F00AFC488 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1776C9642F50FD6F00AFC488 /* AppLanguage.swift */; };
+		1776C9672F50FD8800AFC488 /* LanguageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1776C9662F50FD8800AFC488 /* LanguageRepository.swift */; };
 		1797962A2F49353000053B0B /* ProfileLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 179796292F49353000053B0B /* ProfileLoadingView.swift */; };
 		17A4EC7C2F47BE0F00627746 /* ProfileViewModel+Load.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC7B2F47BE0F00627746 /* ProfileViewModel+Load.swift */; };
 		17A4EC7E2F47BE1A00627746 /* ProfileViewModel+Save.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17A4EC7D2F47BE1A00627746 /* ProfileViewModel+Save.swift */; };
@@ -217,6 +220,9 @@
 		172A74C82F357340003EF4DF /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		176796132F4CF4BC0011EC0E /* CountryAffordabilityCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryAffordabilityCard.swift; sourceTree = "<group>"; };
 		176968BA2F4E6B3C0011661A /* OAuthPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthPresenter.swift; sourceTree = "<group>"; };
+		1776C9622F50FCE300AFC488 /* global_languages.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = global_languages.json; sourceTree = "<group>"; };
+		1776C9642F50FD6F00AFC488 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
+		1776C9662F50FD8800AFC488 /* LanguageRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageRepository.swift; sourceTree = "<group>"; };
 		179796292F49353000053B0B /* ProfileLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileLoadingView.swift; sourceTree = "<group>"; };
 		17A4EC7B2F47BE0F00627746 /* ProfileViewModel+Load.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Load.swift"; sourceTree = "<group>"; };
 		17A4EC7D2F47BE1A00627746 /* ProfileViewModel+Save.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ProfileViewModel+Save.swift"; sourceTree = "<group>"; };
@@ -315,6 +321,7 @@
 				170C21192F4790E00090BA78 /* SeasonalityModels.swift */,
 				170C20CE2F4790E00090BA78 /* Profile.swift */,
 				17EC41E72F4BB8B7004B80DA /* ScoreWeights.swift */,
+				1776C9642F50FD6F00AFC488 /* AppLanguage.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -749,6 +756,7 @@
 				170C20EA2F4790E00090BA78 /* MetaService.swift */,
 				170C20EB2F4790E00090BA78 /* ProfileService.swift */,
 				170C20EC2F4790E00090BA78 /* SeasonalityService.swift */,
+				1776C9662F50FD8800AFC488 /* LanguageRepository.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -772,6 +780,7 @@
 		170C227D2F47A77B0090BA78 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				1776C9622F50FCE300AFC488 /* global_languages.json */,
 				170C21102F4790E00090BA78 /* intro.mp4 */,
 			);
 			path = Resources;
@@ -913,6 +922,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				170C217C2F4790E00090BA78 /* Assets.xcassets in Resources */,
+				1776C9632F50FCE800AFC488 /* global_languages.json in Resources */,
 				170C217D2F4790E00090BA78 /* auth_loop.mp4 in Resources */,
 				170C217E2F4790E00090BA78 /* countries.geojson in Resources */,
 				170C21812F4790E00090BA78 /* intro.mp4 in Resources */,
@@ -943,6 +953,7 @@
 				170C212F2F4790E00090BA78 /* CountryTravelSafeHelpers.swift in Sources */,
 				170C21302F4790E00090BA78 /* CountryVisaCard.swift in Sources */,
 				170C21312F4790E00090BA78 /* CountryVisaHelpers.swift in Sources */,
+				1776C9652F50FD6F00AFC488 /* AppLanguage.swift in Sources */,
 				170C21322F4790E00090BA78 /* MetaDTO.swift in Sources */,
 				170C21332F4790E00090BA78 /* Profile.swift in Sources */,
 				170C21342F4790E00090BA78 /* CollapsibleCountrySection.swift in Sources */,
@@ -1003,6 +1014,7 @@
 				17A4EC822F47BE3000627746 /* ProfileViewModel+Friends.swift in Sources */,
 				17EC41DE2F4BB204004B80DA /* ScoreWorldMapRepresentable.swift in Sources */,
 				170C21612F4790E00090BA78 /* FriendRequestsViewModel.swift in Sources */,
+				1776C9672F50FD8800AFC488 /* LanguageRepository.swift in Sources */,
 				170C21622F4790E00090BA78 /* FriendsActionSheetView.swift in Sources */,
 				170C21632F4790E00090BA78 /* FriendsSection.swift in Sources */,
 				176796142F4CF4BC0011EC0E /* CountryAffordabilityCard.swift in Sources */,

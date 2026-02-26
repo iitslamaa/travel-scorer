@@ -6,53 +6,38 @@
 import SwiftUI
 
 struct AddLanguageView: View {
+
     @Environment(\.dismiss) private var dismiss
 
-    @State private var language = ""
-    @State private var proficiency = "native"
+    @State private var searchText = ""
 
-    let onAdd: (LanguageEntry) -> Void
+    let onSelect: (LanguageEntry) -> Void
+
+    private var languages: [AppLanguage] {
+        let all = LanguageRepository.shared.allLanguages
+
+        guard !searchText.isEmpty else { return all }
+
+        return all.filter {
+            $0.displayName.localizedCaseInsensitiveContains(searchText)
+        }
+    }
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section {
-                    TextField("Language", text: $language)
-                        .textInputAutocapitalization(.words)
-                }
-
-                Section {
-                    Picker("Proficiency", selection: $proficiency) {
-                        Text("Native").tag("native")
-                        Text("Fluent").tag("fluent")
-                        Text("Learning").tag("learning")
-                    }
-                    .pickerStyle(.segmented)
+            List(languages) { language in
+                Button {
+                    onSelect(LanguageEntry(name: language.code, proficiency: "native"))
+                    dismiss()
+                } label: {
+                    Text(language.displayName)
                 }
             }
-            .navigationTitle("Add Language")
-            .navigationBarTitleDisplayMode(.inline)
+            .searchable(text: $searchText)
+            .navigationTitle("Select Language")
             .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Add") {
-                        let trimmed = language.trimmingCharacters(in: .whitespacesAndNewlines)
-                        guard !trimmed.isEmpty else { return }
-
-                        onAdd(
-                            LanguageEntry(
-                                name: trimmed,
-                                proficiency: proficiency
-                            )
-                        )
-                        dismiss()
-                    }
-                    .disabled(language.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                }
-
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Cancel") { dismiss() }
                 }
             }
         }
