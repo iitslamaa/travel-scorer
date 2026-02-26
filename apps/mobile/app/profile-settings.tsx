@@ -67,7 +67,7 @@ export default function ProfileSettingsScreen() {
   const colors = useTheme();
   const borderColor = colors.border;
 
-  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved'>('idle');
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
 
@@ -146,11 +146,16 @@ export default function ProfileSettingsScreen() {
 
   /* ---------------- Draft State ---------------- */
 
+  const [selectorOpen, setSelectorOpen] = useState<
+    null | 'mode' | 'style' | 'next' | 'languages' | 'lived'
+  >(null);
   const [draftMode, setDraftMode] = useState<string | null>(null);
   const [draftStyle, setDraftStyle] = useState<string | null>(null);
   const [draftNextDestination, setDraftNextDestination] = useState<string | null>(null);
   const [draftLivedCountries, setDraftLivedCountries] = useState<string[]>([]);
   const [draftLanguages, setDraftLanguages] = useState<any[]>([]);
+  const [draftName, setDraftName] = useState(profile?.full_name ?? '');
+  const [draftUsername, setDraftUsername] = useState(profile?.username ?? '');
 
   const { countries } = useCountries();
 
@@ -174,28 +179,60 @@ export default function ProfileSettingsScreen() {
     }
 
     if (Array.isArray(profile?.lived_countries)) {
-      setDraftLivedCountries(profile.lived_countries);
+      setDraftLivedCountries(
+        profile.lived_countries
+          .map((c: any) =>
+            typeof c === 'string'
+              ? c.toUpperCase()
+              : c?.iso2?.toUpperCase()
+          )
+          .filter(Boolean)
+      );
     } else {
       setDraftLivedCountries([]);
     }
+    setDraftName(profile?.full_name ?? '');
+    setDraftUsername(profile?.username ?? '');
   }, [profile]);
 
   /* ---------------- Change Detection ---------------- */
 
+  const normalizedProfileLived = Array.isArray(profile?.lived_countries)
+    ? profile.lived_countries
+        .map((c: any) =>
+          typeof c === 'string'
+            ? c.toUpperCase()
+            : c?.iso2?.toUpperCase()
+        )
+        .filter(Boolean)
+    : [];
+
   const hasChanges =
+    draftName !== (profile?.full_name ?? '') ||
+    draftUsername !== (profile?.username ?? '') ||
     draftMode !== currentMode ||
     draftStyle !== currentStyle ||
     draftNextDestination !== profile?.next_destination ||
-    JSON.stringify(draftLanguages) !== JSON.stringify(profile?.languages ?? []) ||
-    JSON.stringify(draftLivedCountries) !== JSON.stringify(profile?.lived_countries ?? []);
+    JSON.stringify(draftLanguages ?? []) !== JSON.stringify(profile?.languages ?? []) ||
+    JSON.stringify(draftLivedCountries ?? []) !== JSON.stringify(normalizedProfileLived);
+
+  useEffect(() => {
+    if (hasChanges && saveState === 'saved') {
+      setSaveState('idle');
+    }
+  }, [hasChanges, saveState]);
 
   /* ---------------- Save ---------------- */
 
   const saveAll = async () => {
+    if (!hasChanges) return;
+
     try {
-      setIsSavingProfile(true);
+      setSaveState('saving');
 
       await updateProfile({
+        full_name: draftName,
+        username: draftUsername.replace(/^@/, ''),
         travel_mode: draftMode ? [draftMode] : null,
         travel_style: draftStyle ? [draftStyle] : null,
         next_destination: draftNextDestination,
@@ -203,11 +240,16 @@ export default function ProfileSettingsScreen() {
         lived_countries: draftLivedCountries,
       });
 
-      router.back();
+      setSaveState('saved');
+
+      // reset back to idle after visible confirmation
+      setTimeout(() => {
+        setSaveState('idle');
+      }, 900);
+
     } catch {
       Alert.alert('Save failed', 'Please try again.');
-    } finally {
-      setIsSavingProfile(false);
+      setSaveState('idle');
     }
   };
 
@@ -220,40 +262,6 @@ export default function ProfileSettingsScreen() {
     router.back();
   };
 
-  /* ---------------- Name / Username Edit ---------------- */
-
-  const [editOpen, setEditOpen] = useState(false);
-  const [editField, setEditField] = useState<EditField>('full_name');
-  const [editValue, setEditValue] = useState('');
-
-  const openEdit = (field: EditField) => {
-    setEditField(field);
-    setEditValue(
-      field === 'full_name'
-        ? profile?.full_name ?? ''
-        : profile?.username ?? ''
-    );
-    setEditOpen(true);
-  };
-
-  const saveEdit = async () => {
-    const trimmed = editValue.trim();
-    if (!trimmed) {
-      Alert.alert('Required', 'Field cannot be empty.');
-      return;
-    }
-
-    try {
-      if (editField === 'full_name') {
-        await updateProfile({ full_name: trimmed });
-      } else {
-        await updateProfile({ username: trimmed.replace(/^@/, '') });
-      }
-      setEditOpen(false);
-    } catch {
-      Alert.alert('Update failed', 'Please try again.');
-    }
-  };
 
   /* ---------------- Labels ---------------- */
 
@@ -287,10 +295,18 @@ export default function ProfileSettingsScreen() {
             </Text>
           </Pressable>
 
-          <Pressable onPress={saveAll} disabled={isSavingProfile}>
-            {isSavingProfile ? (
-              <Text style={[styles.navBtn, { color: colors.textSecondary }]}>
+          <Pressable
+            onPress={saveAll}
+            disabled={saveState === 'saving' || !hasChanges}
+            style={{ opacity: !hasChanges ? 0.4 : 1 }}
+          >
+            {saveState === 'saving' ? (
+              <Text style={[styles.navBtn, { color: colors.textSecondary }]}> 
                 Saving…
+              </Text>
+            ) : saveState === 'saved' ? (
+              <Text style={[styles.navBtn, { color: '#22C55E', fontWeight: '700' }]}> 
+                ✓ Saved
               </Text>
             ) : (
               <Text
@@ -361,17 +377,35 @@ export default function ProfileSettingsScreen() {
             </Text>
           </Pressable>
           <Divider color={borderColor} />
-          <Row
-            label="Name"
-            value={profile?.full_name ?? '—'}
-            onPress={() => openEdit('full_name')}
-          />
+
+          <View style={{ paddingVertical: 14 }}>
+            <Text style={{ color: colors.textPrimary, marginBottom: 6 }}>
+              Name
+            </Text>
+            <TextInput
+              value={draftName}
+              onChangeText={setDraftName}
+              style={[styles.input, { borderColor, color: colors.textPrimary }]}
+              placeholder="Full name"
+              placeholderTextColor={colors.textSecondary}
+            />
+          </View>
+
           <Divider color={borderColor} />
-          <Row
-            label="Username"
-            value={profile?.username ? `@${profile.username}` : '—'}
-            onPress={() => openEdit('username')}
-          />
+
+          <View style={{ paddingVertical: 14 }}>
+            <Text style={{ color: colors.textPrimary, marginBottom: 6 }}>
+              Username
+            </Text>
+            <TextInput
+              value={draftUsername}
+              onChangeText={setDraftUsername}
+              style={[styles.input, { borderColor, color: colors.textPrimary }]}
+              placeholder="Username"
+              placeholderTextColor={colors.textSecondary}
+              autoCapitalize="none"
+            />
+          </View>
         </View>
 
         <Modal visible={avatarMenuOpen} transparent animationType="fade">
@@ -420,9 +454,48 @@ export default function ProfileSettingsScreen() {
         </Modal>
 
         <View style={[styles.card, { backgroundColor: colors.card }]}>
-          <Row label="Travel mode" value={modeLabel} />
+          <Row
+            label="Travel mode"
+            value={modeLabel}
+            onPress={() => setSelectorOpen('mode')}
+          />
           <Divider color={borderColor} />
-          <Row label="Travel style" value={styleLabel} />
+          <Row
+            label="Travel style"
+            value={styleLabel}
+            onPress={() => setSelectorOpen('style')}
+          />
+        </View>
+
+        <View style={[styles.card, { backgroundColor: colors.card }]}>
+          <Row
+            label="Languages"
+            value={
+              draftLanguages.length
+                ? draftLanguages
+                    .map((l: any) => (typeof l === 'string' ? l : l?.name))
+                    .filter(Boolean)
+                    .join(' · ')
+                : '—'
+            }
+            onPress={() => setSelectorOpen('languages')}
+          />
+          <Divider color={borderColor} />
+          <Row
+            label="Next destination"
+            value={
+              draftNextDestination
+                ? countries.find(c => c.iso2 === draftNextDestination)?.name ?? draftNextDestination
+                : '—'
+            }
+            onPress={() => setSelectorOpen('next')}
+          />
+          <Divider color={borderColor} />
+          <Row
+            label="Lived countries"
+            value={draftLivedCountries.length ? `${draftLivedCountries.length} selected` : '—'}
+            onPress={() => setSelectorOpen('lived')}
+          />
         </View>
 
         <View style={[styles.card, { backgroundColor: colors.card }]}> 
@@ -463,25 +536,112 @@ export default function ProfileSettingsScreen() {
           </Pressable>
         </View>
       </ScrollView>
+      <Modal visible={!!selectorOpen} animationType="slide" transparent>
+        <Pressable style={styles.modalBackdrop} onPress={() => setSelectorOpen(null)} />
+        <View style={[styles.modalSheet, { backgroundColor: colors.card, maxHeight: '70%' }]}>
+          {selectorOpen === 'mode' && (
+            <>
+              {['solo','group','both'].map(option => (
+                <Pressable
+                  key={option}
+                  style={{ paddingVertical: 14 }}
+                  onPress={() => {
+                    setDraftMode(option);
+                    setSelectorOpen(null);
+                  }}
+                >
+                  <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>
+                    {option === 'solo' ? 'Solo' : option === 'group' ? 'Group' : 'Solo + Group'}
+                  </Text>
+                </Pressable>
+              ))}
+            </>
+          )}
 
-      <Modal visible={editOpen} animationType="slide" transparent>
-        <Pressable style={styles.modalBackdrop} onPress={() => setEditOpen(false)} />
-        <View style={[styles.modalSheet, { backgroundColor: colors.card }]}>
-          <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
-            {editField === 'full_name' ? 'Edit Name' : 'Edit Username'}
-          </Text>
-          <TextInput
-            value={editValue}
-            onChangeText={setEditValue}
-            style={[styles.input, { borderColor }]}
-          />
-          <Pressable onPress={saveEdit}>
-            <Text style={{ color: colors.primary, fontWeight: '600' }}>
-              Save
-            </Text>
-          </Pressable>
+          {selectorOpen === 'style' && (
+            <>
+              {['budget','comfortable','luxury'].map(option => (
+                <Pressable
+                  key={option}
+                  style={{ paddingVertical: 14 }}
+                  onPress={() => {
+                    setDraftStyle(option);
+                    setSelectorOpen(null);
+                  }}
+                >
+                  <Text style={{ color: colors.textPrimary, fontWeight: '600' }}>
+                    {option.charAt(0).toUpperCase() + option.slice(1)}
+                  </Text>
+                </Pressable>
+              ))}
+            </>
+          )}
+
+          {selectorOpen === 'next' && (
+            <ScrollView>
+              {countries.map(c => (
+                <Pressable
+                  key={c.iso2}
+                  style={{ paddingVertical: 12 }}
+                  onPress={() => {
+                    setDraftNextDestination(c.iso2);
+                    setSelectorOpen(null);
+                  }}
+                >
+                  <Text style={{ color: colors.textPrimary }}>{c.name}</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          )}
+
+          {selectorOpen === 'languages' && (
+            <View>
+              <Text style={{ marginBottom: 8, color: colors.textSecondary }}>
+                Enter languages separated by commas
+              </Text>
+              <TextInput
+                value={draftLanguages.join(', ')}
+                onChangeText={text =>
+                  setDraftLanguages(
+                    text
+                      .split(',')
+                      .map(t => t.trim())
+                      .filter(Boolean)
+                  )
+                }
+                style={[styles.input, { borderColor }]}
+              />
+            </View>
+          )}
+
+          {selectorOpen === 'lived' && (
+            <ScrollView>
+              {countries.map(c => {
+                const iso = c.iso2.toUpperCase();
+                const selected = draftLivedCountries.includes(iso);
+                return (
+                  <Pressable
+                    key={c.iso2}
+                    style={{ paddingVertical: 12 }}
+                    onPress={() => {
+                      setDraftLivedCountries(prev =>
+                        selected
+                          ? prev.filter(i => i !== iso)
+                          : [...prev, iso]
+                      );
+                    }}
+                  >
+                    <Text style={{ color: colors.textPrimary }}>
+                      {selected ? '✓ ' : ''}{c.name}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          )}
         </View>
       </Modal>
+
 
       <Modal visible={deleteOpen} animationType="fade" transparent>
         <Pressable
@@ -546,15 +706,34 @@ export default function ProfileSettingsScreen() {
 
 function Row({ label, value, onPress }: any) {
   const colors = useTheme();
+
+  const Container: any = onPress ? Pressable : View;
+
   return (
-    <Pressable style={styles.row} onPress={onPress}>
-      <Text style={[styles.rowText, { color: colors.textPrimary }]}>
+    <Container
+      style={styles.row}
+      onPress={onPress}
+    >
+      <Text
+        style={[
+          styles.rowText,
+          { color: colors.textPrimary, marginRight: 12 }
+        ]}
+        numberOfLines={1}
+      >
         {label}
       </Text>
-      <Text style={[styles.rowValue, { color: colors.textSecondary }]}>
+
+      <Text
+        style={[
+          styles.rowValue,
+          { color: colors.textSecondary, flexShrink: 1, textAlign: 'right' }
+        ]}
+        numberOfLines={1}
+      >
         {value}
       </Text>
-    </Pressable>
+    </Container>
   );
 }
 
@@ -568,12 +747,18 @@ const styles = StyleSheet.create({
   largeTitle: { fontSize: 34, fontWeight: '700', paddingHorizontal: 20 },
   card: {
     borderRadius: 20,
-    padding: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
     marginHorizontal: 20,
-    marginTop: 20,
-    elevation: 2,
+    marginTop: 18,
+    backgroundColor: 'transparent',
   },
-  row: { paddingVertical: 18, flexDirection: 'row', justifyContent: 'space-between' },
+  row: {
+    paddingVertical: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
   rowText: { fontSize: 16 },
   rowValue: { fontSize: 16 },
   divider: { height: StyleSheet.hairlineWidth },
