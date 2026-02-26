@@ -112,8 +112,11 @@ export default function ProfileScreen() {
   }
 
   const languages =
-    Array.isArray(profile?.languages)
-      ? profile.languages.join(' · ')
+    Array.isArray(profile?.languages) && profile.languages.length
+      ? profile.languages
+          .map((l: any) => (typeof l === 'string' ? l : l?.name))
+          .filter(Boolean)
+          .join(' · ')
       : '—';
 
   const travelMode =
