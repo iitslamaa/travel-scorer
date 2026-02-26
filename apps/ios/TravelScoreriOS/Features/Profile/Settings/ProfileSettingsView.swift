@@ -528,66 +528,81 @@ private struct CountryMultiSelectView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
+
+            let filtered = searchText.isEmpty
+                ? countries
+                : countries.filter { $0.1.localizedCaseInsensitiveContains(searchText) }
+
+            VStack(alignment: .leading, spacing: 12) {
 
                 if let subtitle {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(title)
-                            .font(.title2)
-                            .fontWeight(.semibold)
-
-                        Text(subtitle)
-                            .font(.subheadline)
-                            .foregroundStyle(.secondary)
-                    }
-                    .padding(.horizontal)
-                    .padding(.top)
+                    Text(subtitle)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.horizontal, 24)
                 }
 
-                let filtered = searchText.isEmpty
-                    ? countries
-                    : countries.filter { $0.1.localizedCaseInsensitiveContains(searchText) }
+                HStack(spacing: 8) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundStyle(.secondary)
 
-                List(filtered, id: \.0) { (code, name) in
-                    Button {
-                        if selection.contains(code) {
-                            selection.remove(code)
-                        } else {
-                            selection.insert(code)
-                        }
-                        hasChanges = selection != initialSelection
-                    } label: {
-                        HStack {
-                            Text(countryCodeToFlag(code))
-                            Text(name)
-                            Spacer()
-                            if selection.contains(code) {
-                                Image(systemName: "checkmark")
+                    TextField("Search", text: $searchText)
+                        .textInputAutocapitalization(.never)
+                        .autocorrectionDisabled()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(Color(.systemGray6))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                .padding(.horizontal, 16)
+
+                List {
+                    Section {
+                        ForEach(filtered, id: \.0) { (code, name) in
+                            Button {
+                                if selection.contains(code) {
+                                    selection.remove(code)
+                                } else {
+                                    selection.insert(code)
+                                }
+                                hasChanges = selection != initialSelection
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Text(countryCodeToFlag(code))
+                                        .font(.title3)
+
+                                    Text(name)
+
+                                    Spacer()
+
+                                    if selection.contains(code) {
+                                        Image(systemName: "checkmark")
+                                    }
+                                }
+                                .padding(.vertical, 8)
                             }
                         }
                     }
                 }
-                .searchable(text: $searchText)
+                .listStyle(.insetGrouped)
             }
-            .navigationTitle(subtitle == nil ? title : "")
+            .navigationTitle(title)
+            .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button {
-                        dismiss()
-                    } label: {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(hasChanges ? .blue : .secondary)
-                    }
-                    .disabled(!hasChanges)
-                }
-
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Done") { dismiss() }
+                    Button("Save") {
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                    .foregroundStyle(hasChanges ? .blue : .secondary)
+                    .disabled(!hasChanges)
                 }
             }
         }
     }
-
+    
     private func countryCodeToFlag(_ code: String) -> String {
         guard code.count == 2 else { return code }
         let base: UInt32 = 127397
