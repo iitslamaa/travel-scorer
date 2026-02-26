@@ -83,6 +83,7 @@ extension ProfileViewModel {
             logPublishedState("after bucket assignment")
 
             // Reset mutuals before computing
+            mutualLanguages = []
             mutualBucketCountries = []
             mutualTraveledCountries = []
 
@@ -127,6 +128,16 @@ extension ProfileViewModel {
 
                     mutualBucketCountries =
                         Array(normalizedMyBucket.intersection(normalizedViewedBucket))
+
+                    // Compute mutual languages (canonical codes)
+                    if let viewedLanguages = profile?.languages {
+                        if let myProfile = try? await profileService.fetchOrCreateProfile(userId: currentUserId) {
+                            let myLanguages = Set(myProfile.languages)
+                            let normalizedViewedLanguages = Set(viewedLanguages)
+
+                            mutualLanguages = Array(myLanguages.intersection(normalizedViewedLanguages))
+                        }
+                    }
 
                     logPublishedState("after mutual computation")
                 }

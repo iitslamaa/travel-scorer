@@ -17,6 +17,7 @@ struct ProfileInfoSection: View {
     let orderedBucketListCountries: [String]
     let mutualTraveledCountries: [String]
     let mutualBucketCountries: [String]
+    let mutualLanguages: [String]
     let languages: [String]
     let travelMode: String?
     let travelStyle: String?
@@ -41,6 +42,11 @@ struct ProfileInfoSection: View {
         let _ = print("   nextDestination:", nextDestination as Any)
         LazyVStack(spacing: 28) {
             languagesCard
+
+            if relationshipState == .friends && !mutualLanguages.isEmpty {
+                sharedLanguagesCard
+            }
+
             travelModeCard
             travelStyleCard
             nextDestinationCard
@@ -117,6 +123,24 @@ struct ProfileInfoSection: View {
                     .font(.subheadline)
                     .foregroundStyle(.primary)
             }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var sharedLanguagesCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Shared Languages")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+
+            let displayShared = mutualLanguages.map { displayName(for: $0) }
+
+            Text(displayShared.joined(separator: " · "))
+                .font(.subheadline)
+                .foregroundStyle(.blue)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
