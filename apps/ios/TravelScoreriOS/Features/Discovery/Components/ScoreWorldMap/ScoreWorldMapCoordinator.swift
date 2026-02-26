@@ -84,30 +84,9 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
     func zoomToCountry(iso: String) {
         guard let mapView = mapView else { return }
         
-        let targetNameLocal = Locale.current.localizedString(forRegionCode: iso)?.uppercased()
-        let targetNameEN = Locale(identifier: "en_US")
-            .localizedString(forRegionCode: iso)?
-            .uppercased()
-        
         let matching = mapView.overlays
             .compactMap { $0 as? CountryPolygon }
-            .filter {
-                let geoISO = $0.isoCode?.uppercased()
-                let geoName = $0.countryName?.uppercased()
-                
-                if let geoISO {
-                    if geoISO == iso || geoISO.prefix(2) == iso {
-                        return true
-                    }
-                }
-                
-                if let geoName {
-                    if let targetNameLocal, geoName == targetNameLocal { return true }
-                    if let targetNameEN, geoName == targetNameEN { return true }
-                }
-                
-                return false
-            }
+            .filter { $0.isoCode?.uppercased() == iso }
         
         guard !matching.isEmpty else { return }
         
@@ -132,34 +111,9 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
         for polygon in polygons.dropFirst() {
             combinedRect = combinedRect.union(polygon.boundingMapRect)
         }
-        
-        let centerMapPoint = MKMapPoint(
-            x: combinedRect.midX,
-            y: combinedRect.midY
-        )
-        
-        let center = centerMapPoint.coordinate
-        let metersPerPoint = MKMetersPerMapPointAtLatitude(center.latitude)
-        
-        let latMeters = combinedRect.size.height * metersPerPoint
-        let lonMeters = combinedRect.size.width * metersPerPoint
-        
-        let latitudeDelta = latMeters / 111_000.0
-        let longitudeDelta = lonMeters / (111_000.0 * cos(center.latitude * .pi / 180))
-        
-        var safeLatitudeDelta = max(latitudeDelta * 1.3, 2.0)
-        var safeLongitudeDelta = max(longitudeDelta * 1.3, 2.0)
-        
-        safeLatitudeDelta = min(safeLatitudeDelta, 170)
-        safeLongitudeDelta = min(safeLongitudeDelta, 350)
-        
-        let span = MKCoordinateSpan(
-            latitudeDelta: safeLatitudeDelta,
-            longitudeDelta: safeLongitudeDelta
-        )
-        
-        let region = MKCoordinateRegion(center: center, span: span)
-        mapView.setRegion(region, animated: true)
+
+        let padding = UIEdgeInsets(top: 40, left: 40, bottom: 40, right: 40)
+        mapView.setVisibleMapRect(combinedRect, edgePadding: padding, animated: true)
     }
     
     // MARK: - Renderer
