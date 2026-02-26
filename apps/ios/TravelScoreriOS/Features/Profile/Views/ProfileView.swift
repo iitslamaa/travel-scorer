@@ -142,6 +142,7 @@ struct ProfileView: View {
                                 orderedBucketListCountries: profileVM.orderedBucketListCountries,
                                 mutualTraveledCountries: profileVM.mutualTraveledCountries,
                                 mutualBucketCountries: profileVM.mutualBucketCountries,
+                                mutualLanguages: profileVM.mutualLanguages,
                                 languages: languages,
                                 travelMode: travelModeLabel,
                                 travelStyle: travelStyleLabel,

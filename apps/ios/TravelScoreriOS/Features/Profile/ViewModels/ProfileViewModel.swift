@@ -55,6 +55,7 @@ final class ProfileViewModel: ObservableObject {
     }
     @Published var mutualBucketCountries: [String] = []
     @Published var mutualTraveledCountries: [String] = []
+    @Published var mutualLanguages: [String] = []
     @Published var pendingRequestCount: Int = 0
     @Published var mutualFriends: [Profile] = []
     @Published var orderedBucketListCountries: [String] = [] {
@@ -137,6 +138,7 @@ final class ProfileViewModel: ObservableObject {
         mutualFriends = []
         mutualBucketCountries = []
         mutualTraveledCountries = []
+        mutualLanguages = []
         friendCount = 0
 
         cancelInFlightWork()
