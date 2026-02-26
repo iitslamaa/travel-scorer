@@ -17,8 +17,6 @@ export function useCountries() {
   useEffect(() => {
     const fetchCountries = async () => {
       try {
-        console.log('Fetching countries from API...');
-
         const res = await fetch(
           'https://travel-scorer.vercel.app/api/countries',
           {
@@ -28,18 +26,12 @@ export function useCountries() {
           }
         );
 
-        console.log('Countries response status:', res.status);
-
         if (!res.ok) {
           const errorText = await res.text();
-          console.log('Non-200 response body:', errorText);
           throw new Error(`API error: ${res.status}`);
         }
 
         const data = await res.json();
-        console.log('FIRST COUNTRY RAW:', data?.[0]);
-        console.log('FIRST COUNTRY scoreTotal:', data?.[0]?.scoreTotal);
-        console.log('Countries received:', Array.isArray(data) ? data.length : data);
 
         const mapped = Array.isArray(data)
           ? data.map((c: any) => ({
@@ -51,7 +43,6 @@ export function useCountries() {
 
         setCountries(mapped);
       } catch (error) {
-        console.log('Countries fetch error:', error);
       } finally {
         setLoading(false);
       }

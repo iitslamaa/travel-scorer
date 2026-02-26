@@ -1,0 +1,35 @@
+{
+  "cli": {
+    "version": ">= 18.0.5",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "node": "20.11.1",
+      "env": {
+        "EXPO_USE_PNPM": "1"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "node": "20.11.1",
+      "environment": "preview",
+      "env": {
+        "EXPO_USE_PNPM": "1"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "node": "20.11.1",
+      "environment": "production",
+      "env": {
+        "EXPO_USE_PNPM": "1"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

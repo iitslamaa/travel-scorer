@@ -1,7 +1,7 @@
 export default ({ config }) => ({
   ...config,
-  name: "mobile",
-  slug: "mobile",
+  name: "Travel Adventure Finder",
+  slug: "travel-adventure-finder",
   version: "1.0.0",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
@@ -56,5 +56,10 @@ export default ({ config }) => ({
   experiments: {
     typedRoutes: true,
     reactCompiler: true,
+  },
+  extra: {
+    eas: {
+      projectId: "93f107b6-3588-44e1-88bc-74b5ad9f0af8",
+    },
   },
 });

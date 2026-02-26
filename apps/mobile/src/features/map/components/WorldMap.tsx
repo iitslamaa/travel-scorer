@@ -10,9 +10,9 @@ if (Platform.OS !== 'web') {
   MapView = maps.default;
   PROVIDER_GOOGLE = maps.PROVIDER_GOOGLE;
 }
+
 import { useGeoJson } from '../hooks/useGeoJson';
 import { CountryPolygon } from './CountryPolygon';
-
 import { buildCountryOverlay } from '../utils/buildCountryOverlay';
 
 function convertPolygon(coords: number[][]): LatLng[] {
@@ -28,13 +28,11 @@ function extractPolygons(feature: any): LatLng[][] {
   if (!geometry) return [];
 
   if (geometry.type === 'Polygon') {
-    // Only use outer ring (index 0), ignore holes
     const outerRing = geometry.coordinates?.[0];
     return outerRing ? [convertPolygon(outerRing)] : [];
   }
 
   if (geometry.type === 'MultiPolygon') {
-    // Only use outer ring of each polygon
     return geometry.coordinates
       .map((polygon: number[][][]) => polygon?.[0])
       .filter(Boolean)
@@ -44,7 +42,7 @@ function extractPolygons(feature: any): LatLng[][] {
   return [];
 }
 
- type WorldMapProps = {
+type WorldMapProps = {
   countries?: string[];
   selectedIso?: string | null;
   onSelect?: (iso: string) => void;
@@ -66,7 +64,6 @@ export function WorldMap({
   const normalizeIso = (value?: string | null) => {
     if (!value) return undefined;
     const upper = value.toUpperCase();
-
     const base = upper.length === 3 ? upper.slice(0, 2) : upper;
 
     if (DATASET_ALIAS_MAP.hasOwnProperty(base)) {
@@ -88,15 +85,6 @@ export function WorldMap({
         feature.properties?.ISO_A2 ??
         feature.properties?.iso_a2;
 
-      if (featureIndex === 0) {
-        console.log('GeoJSON first feature property keys:', Object.keys(feature.properties ?? {}));
-        console.log('GeoJSON first feature raw ISO candidates:', {
-          ISO3166_1_Alpha_2: feature.properties?.['ISO3166-1-Alpha-2'],
-          ISO_A2: feature.properties?.ISO_A2,
-          iso_a2: feature.properties?.iso_a2,
-        });
-      }
-
       if (
         typeof rawIso !== 'string' ||
         rawIso.length !== 2 ||
@@ -107,7 +95,6 @@ export function WorldMap({
 
       const iso = rawIso.toUpperCase();
 
-      // 🚫 Completely skip Antarctica (huge polygon causes touch issues)
       if (iso === 'AQ') return [];
 
       const rings = extractPolygons(feature);
@@ -124,38 +111,6 @@ export function WorldMap({
     return new Set(polygons.map((p) => p.iso));
   }, [polygons]);
 
-  useEffect(() => {
-    const datasetIsos = [...new Set(polygons.map((p) => p.iso))].sort();
-    console.log('MAP DATASET ISOs:', datasetIsos);
-  }, [polygons]);
-
-  useEffect(() => {
-    const normalized = countries
-      .map((c) => normalizeIso(c))
-      .filter((c): c is string => !!c)
-      .sort();
-    console.log('APP COUNTRY LIST ISOs:', normalized);
-  }, [countries]);
-
-  useEffect(() => {
-    const datasetIsos = [...datasetIsoSet].sort();
-    const normalizedAppIsos = countries
-      .map((c) => normalizeIso(c))
-      .filter((c): c is string => !!c)
-      .sort();
-
-    const missingInDataset = normalizedAppIsos.filter(
-      (iso) => !datasetIsoSet.has(iso)
-    );
-
-    const unusedInApp = datasetIsos.filter(
-      (iso) => !normalizedAppIsos.includes(iso)
-    );
-
-    console.log('ISO DIFF → Missing In Dataset:', missingInDataset);
-    console.log('ISO DIFF → Unused In App:', unusedInApp);
-  }, [countries, datasetIsoSet]);
-
   const polygonsForFit = useMemo(() => {
     if (!countries || countries.length === 0) return [];
 
@@ -167,7 +122,6 @@ export function WorldMap({
     return polygons.filter((p) => normalized.includes(p.iso));
   }, [countries, polygons, datasetIsoSet]);
 
-
   useEffect(() => {
     if (!isMapReady) return;
     if (!selectedIso) return;
@@ -178,7 +132,6 @@ export function WorldMap({
 
     if (selected.length === 0) return;
 
-    // Compute lightweight bounding box instead of passing thousands of points
     let minLat = Infinity;
     let maxLat = -Infinity;
     let minLng = Infinity;
@@ -237,9 +190,6 @@ export function WorldMap({
               .filter((p) => p.iso === normalizeIso(selectedIso))
               .map((item) => {
                 const { key, iso, coords } = item;
-                if (!datasetIsoSet.has(iso)) {
-                  console.log('RENDER SKIPPED (not in dataset):', iso);
-                }
                 return (
                   <CountryPolygon
                     key={key}
@@ -261,9 +211,6 @@ export function WorldMap({
               })
           : polygons.map((item) => {
               const { key, iso, coords } = item;
-              if (!datasetIsoSet.has(iso)) {
-                console.log('RENDER SKIPPED (not in dataset):', iso);
-              }
               return (
                 <CountryPolygon
                   key={key}
