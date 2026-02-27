@@ -24,12 +24,13 @@ struct WhenToGoView: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 16) {
+            VStack(spacing: 12) {
                 header
                 monthScroller
                 content
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top, 8)
             .navigationTitle("When to Go")
             .navigationBarTitleDisplayMode(.inline)
             .task { }
@@ -46,14 +47,10 @@ struct WhenToGoView: View {
     }
     
     private var header: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("When to Go")
-                .font(.title2.bold())
-            Text("Select a month to explore where it's peak or shoulder season around the world.")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        Text("Select a month to explore where it's peak or shoulder season around the world.")
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
     
     private var monthScroller: some View {
