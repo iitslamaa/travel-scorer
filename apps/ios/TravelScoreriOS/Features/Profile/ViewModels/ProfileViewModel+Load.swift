@@ -14,7 +14,7 @@ extension ProfileViewModel {
     func load(generation: UUID) async {
         let startingUserId = userId
 
-        print("🟣 load() START — instance:", instanceId)
+        
         print("   generation:", generation)
         print("   current loadGeneration:", loadGeneration)
         print("   userId at start:", startingUserId)
@@ -43,7 +43,6 @@ extension ProfileViewModel {
 
             print("🟢 assigning profile id:", fetchedProfile.id)
             profile = fetchedProfile
-            logPublishedState("after profile assignment")
 
             let fetchedFriends =
                 try await friendService.fetchFriends(for: startingUserId)
@@ -56,7 +55,6 @@ extension ProfileViewModel {
 
             friends = fetchedFriends
             friendCount = fetchedFriends.count
-            logPublishedState("after friends assignment")
 
             let traveled =
                 try await profileService.fetchTraveledCountries(userId: startingUserId)
@@ -68,7 +66,6 @@ extension ProfileViewModel {
             }
 
             viewedTraveledCountries = traveled
-            logPublishedState("after traveled assignment")
 
             let bucket =
                 try await profileService.fetchBucketListCountries(userId: startingUserId)
@@ -80,7 +77,6 @@ extension ProfileViewModel {
             }
 
             viewedBucketListCountries = bucket
-            logPublishedState("after bucket assignment")
 
             // Reset mutuals before computing
             mutualLanguages = []
@@ -88,7 +84,6 @@ extension ProfileViewModel {
             mutualTraveledCountries = []
 
             computeOrderedLists()
-            logPublishedState("after computeOrderedLists")
 
             // If viewing a friend, compute mutual country intersections
             if startingUserId != supabase.currentUserId {
@@ -138,8 +133,6 @@ extension ProfileViewModel {
                             mutualLanguages = Array(myLanguages.intersection(normalizedViewedLanguages))
                         }
                     }
-
-                    logPublishedState("after mutual computation")
                 }
             }
 
@@ -152,7 +145,6 @@ extension ProfileViewModel {
             isRelationshipLoading = true
             try await refreshRelationshipState()
             isRelationshipLoading = false
-            logPublishedState("after refreshRelationshipState")
 
             guard generation == loadGeneration,
                   self.userId == startingUserId else {
@@ -161,7 +153,6 @@ extension ProfileViewModel {
             }
 
             await loadPendingRequestCount()
-            logPublishedState("after loadPendingRequestCount")
 
             guard generation == loadGeneration,
                   self.userId == startingUserId else {
@@ -170,10 +161,8 @@ extension ProfileViewModel {
             }
 
             await loadMutualFriends()
-            logPublishedState("after loadMutualFriends")
 
-            print("✅ load() COMPLETE — instance:", instanceId, "user:", startingUserId)
-            logPublishedState("load complete")
+            print("✅ load() COMPLETE — user:", startingUserId)
 
         } catch {
             print("❌ load() failed:", error)

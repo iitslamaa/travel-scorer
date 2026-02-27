@@ -91,9 +91,8 @@ struct CountryListView: View {
                 components.append((Double(visa), weights.visa))
             }
 
-            if let affordabilityRaw = country.dailySpendTotalUsd {
-                let affordability = Double(min(max(affordabilityRaw, 0), 100))
-                components.append((affordability, weights.affordability))
+            if let affordabilityScore = country.affordabilityScore {
+                components.append((Double(affordabilityScore), weights.affordability))
             }
 
             if components.isEmpty {
@@ -135,16 +134,22 @@ struct CountryListView: View {
                     $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
                 }
             case .score:
-                // Sort ascending, then flip based on order
-                baseSorted = filtered.sorted { ($0.score ?? Int.min) < ($1.score ?? Int.min) }
+                // Always sort highest score first
+                baseSorted = filtered.sorted { ($0.score ?? Int.min) > ($1.score ?? Int.min) }
             }
 
             let result: [Country]
-            switch snapshotSortOrder {
-            case .ascending:
+
+            if snapshotSort == .score {
+                // Ignore sortOrder for score; always highest first
                 result = baseSorted
-            case .descending:
-                result = Array(baseSorted.reversed())
+            } else {
+                switch snapshotSortOrder {
+                case .ascending:
+                    result = baseSorted
+                case .descending:
+                    result = Array(baseSorted.reversed())
+                }
             }
 
             // Publish back on main
@@ -158,83 +163,22 @@ struct CountryListView: View {
 
     var body: some View {
         List(visibleCountries, id: \.id) { country in
-            let idStr = country.id
-            let showConfirm = quickConfirmByCountryId[idStr] != nil
-
-            NavigationLink {
-                CountryDetailView(country: country)
-            } label: {
-                HStack(spacing: 12) {
-                    Text(country.flagEmoji).font(.largeTitle)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(country.name).font(.headline)
+            CountryRow(
+                country: country,
+                showConfirm: quickConfirmByCountryId[country.id] != nil,
+                onBucket: {
+                    Task {
+                        await profileVM.toggleBucket(country.id)
+                        flashConfirm(.bucket, for: country.id)
                     }
-                    Spacer()
-
-                    HStack(spacing: 8) {
-                        if let score = country.score {
-                            ScorePill(score: score)
-                        } else {
-                            Text("—")
-                                .font(.caption.bold())
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(
-                                    Capsule()
-                                        .fill(Color.gray.opacity(0.15))
-                                )
-                                .overlay(
-                                    Capsule()
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
-                        }
-
-                        ZStack {
-                            // invisible placeholder to keep layout stable
-                            Image(systemName: "checkmark.circle.fill")
-                                .opacity(0)
-                        }
-                        .frame(width: 22, height: 22)
-                        .overlay {
-                            if showConfirm {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .transition(.opacity)
-                            }
-                        }
-                        .animation(.easeInOut(duration: 0.18), value: showConfirm)
+                },
+                onVisited: {
+                    Task {
+                        await profileVM.toggleTraveled(country.id)
+                        flashConfirm(.visited, for: country.id)
                     }
                 }
-                .padding(.vertical, 6)
-                .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                    Button {
-                        Task {
-                            await profileVM.toggleBucket(idStr)
-                            flashConfirm(.bucket, for: idStr)
-                        }
-                    } label: {
-                        Text(
-                            profileVM.viewedBucketListCountries.contains(idStr)
-                            ? "🪣 Unbucket"
-                            : "🪣 Bucket"
-                        )
-                    }
-                    .tint(.blue)
-
-                    Button {
-                        Task {
-                            await profileVM.toggleTraveled(idStr)
-                            flashConfirm(.visited, for: idStr)
-                        }
-                    } label: {
-                        Text(
-                            profileVM.viewedTraveledCountries.contains(idStr)
-                            ? "📝 Unvisit"
-                            : "📝 Visited"
-                        )
-                    }
-                    .tint(.green)
-                }
-            }
+            )
         }
         .listStyle(.plain)
         // Recompute visible list when inputs change
@@ -247,11 +191,83 @@ struct CountryListView: View {
         .onChange(of: sortOrder) { _, _ in
             scheduleRecomputeVisible()
         }
+        .onReceive(weightsStore.$weights) { _ in
+            scheduleRecomputeVisible()
+        }
         .onAppear {
             scheduleRecomputeVisible()
         }
         .onChange(of: countries) { _, _ in
             scheduleRecomputeVisible()
+        }
+    }
+}
+
+private struct CountryRow: View {
+    let country: Country
+    let showConfirm: Bool
+    let onBucket: () -> Void
+    let onVisited: () -> Void
+
+    var body: some View {
+        NavigationLink {
+            CountryDetailView(country: country)
+        } label: {
+            HStack(spacing: 12) {
+                Text(country.flagEmoji)
+                    .font(.largeTitle)
+
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(country.name)
+                        .font(.headline)
+                }
+
+                Spacer()
+
+                HStack(spacing: 8) {
+                    if let score = country.score {
+                        ScorePill(score: score)
+                    } else {
+                        Text("—")
+                            .font(.caption.bold())
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(
+                                Capsule()
+                                    .fill(Color.gray.opacity(0.15))
+                            )
+                            .overlay(
+                                Capsule()
+                                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                            )
+                    }
+
+                    ZStack {
+                        Image(systemName: "checkmark.circle.fill")
+                            .opacity(0)
+                    }
+                    .frame(width: 22, height: 22)
+                    .overlay {
+                        if showConfirm {
+                            Image(systemName: "checkmark.circle.fill")
+                                .transition(.opacity)
+                        }
+                    }
+                    .animation(.easeInOut(duration: 0.18), value: showConfirm)
+                }
+            }
+            .padding(.vertical, 6)
+            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                Button(action: onBucket) {
+                    Text("🪣 Bucket")
+                }
+                .tint(.blue)
+
+                Button(action: onVisited) {
+                    Text("📝 Visited")
+                }
+                .tint(.green)
+            }
         }
     }
 }

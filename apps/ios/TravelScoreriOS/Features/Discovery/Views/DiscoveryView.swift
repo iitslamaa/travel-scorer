@@ -14,8 +14,18 @@ struct DiscoveryView: View {
     @State private var searchText = ""
     @State private var showingWeights = false
     @State private var sort: CountrySort = .name
-    @State private var sortOrder: SortOrder = .descending
+    @State private var sortOrder: SortOrder = .ascending
     @State private var countries: [Country] = []
+
+    @MainActor
+    private func reloadCountries() async {
+        // Force reload from source instead of just recomputing locally
+        if let fresh = CountryAPI.loadCachedCountries(), !fresh.isEmpty {
+            countries = fresh
+        }
+
+        await profileVM.loadIfNeeded()
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -34,6 +44,9 @@ struct DiscoveryView: View {
                 sort: $sort,
                 sortOrder: $sortOrder
             )
+        }
+        .refreshable {
+            await reloadCountries()
         }
         .task {
             if countries.isEmpty {
