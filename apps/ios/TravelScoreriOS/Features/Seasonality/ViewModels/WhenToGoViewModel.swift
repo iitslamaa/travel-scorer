@@ -25,9 +25,16 @@ final class WhenToGoViewModel: ObservableObject {
 
     private let allCountries: [Country]
 
+    private var cancellables = Set<AnyCancellable>()
+
     init(countries: [Country], weightsStore: ScoreWeightsStore) {
         self.allCountries = countries
         self.weightsStore = weightsStore
+        weightsStore.$weights
+            .sink { [weak self] _ in
+                self?.recalculateForSelectedMonth()
+            }
+            .store(in: &cancellables)
         recalculateForSelectedMonth()
     }
 
@@ -54,13 +61,19 @@ final class WhenToGoViewModel: ObservableObject {
     var totalCount: Int { peakCount + shoulderCount }
 
     func recalculateForSelectedMonth() {
-        countriesForSelectedMonth = allCountries.compactMap { country in
+        countriesForSelectedMonth = allCountries.compactMap { country -> WhenToGoItem? in
             guard let seasonType = computeSeasonType(for: country),
                   let seasonalityScore = computeSeasonalityScore(for: country)
             else { return nil }
 
+            // Create a month-adjusted copy so UI reflects the selected month
+            var adjustedCountry = country
+
+            let computedOverall = weightedScore(for: adjustedCountry)
+            adjustedCountry.score = Int(computedOverall.rounded())
+
             return WhenToGoItem(
-                country: country,
+                country: adjustedCountry,
                 seasonType: seasonType,
                 seasonalityScore: seasonalityScore
             )
@@ -69,16 +82,15 @@ final class WhenToGoViewModel: ObservableObject {
 
     private func computeSeasonType(for country: Country) -> SeasonType? {
         guard let bestMonths = country.seasonalityBestMonths,
-              !bestMonths.isEmpty,
-              let score = country.seasonalityScore
+              !bestMonths.isEmpty
         else { return nil }
 
         if bestMonths.contains(selectedMonthIndex) {
             return .peak
         }
 
-        // If not peak but has a seasonality score, treat as shoulder
-        if score > 0 {
+        // If not peak but country has some seasonality data, treat as shoulder
+        if country.seasonalityScore ?? 0 > 0 {
             return .shoulder
         }
 
@@ -86,7 +98,17 @@ final class WhenToGoViewModel: ObservableObject {
     }
 
     private func computeSeasonalityScore(for country: Country) -> Int? {
-        return country.seasonalityScore
+        guard let bestMonths = country.seasonalityBestMonths,
+              !bestMonths.isEmpty
+        else { return nil }
+
+        // If selected month is a best month, treat as strong seasonality
+        if bestMonths.contains(selectedMonthIndex) {
+            return 100
+        }
+
+        // Otherwise treat as off-season (0)
+        return 0
     }
 
     private func weightedScore(for country: Country) -> Double {
@@ -102,9 +124,8 @@ final class WhenToGoViewModel: ObservableObject {
             components.append((Double(visa), weights.visa))
         }
 
-        if let affordabilityRaw = country.dailySpendTotalUsd {
-            let affordability = Double(min(max(affordabilityRaw, 0), 100))
-            components.append((affordability, weights.affordability))
+        if let affordabilityScore = country.affordabilityScore {
+            components.append((Double(affordabilityScore), weights.affordability))
         }
 
         let baseScore: Double
