@@ -101,7 +101,7 @@ struct ProfileSettingsView: View {
                 VStack(spacing: 20) {
 
                     SectionCard {
-                        HStack(alignment: .center, spacing: 16) {
+                        HStack(alignment: .top, spacing: 20) {
 
                             ProfileSettingsAvatarSection(
                                 selectedUIImage: selectedUIImage,
@@ -113,26 +113,26 @@ struct ProfileSettingsView: View {
                                     markAvatarForRemoval()
                                 }
                             )
-                            .frame(width: 120)
+                            .frame(width: 96)
+                            .padding(.top, 4)
 
-                            VStack(spacing: 14) {
+                            VStack(alignment: .leading, spacing: 12) {
 
                                 TextField(
                                     "",
                                     text: $firstName,
                                     prompt:
-                                        (Text("Name")
+                                        (Text("Full name")
                                             .foregroundStyle(.secondary)
                                          +
                                          Text(" *")
                                             .foregroundStyle(.red))
                                 )
-                                .padding(12)
-                                .background(.regularMaterial)
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                                .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
-                                .foregroundStyle(.primary)
-                                .tint(.primary)
+                                .font(.system(size: 18, weight: .semibold))
+                                .padding(.vertical, 10)
+                                .padding(.horizontal, 12)
+                                .background(Color(.secondarySystemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
 
                                 HStack(spacing: 6) {
                                     Text("@")
@@ -150,19 +150,16 @@ struct ProfileSettingsView: View {
                                     )
                                     .textInputAutocapitalization(.never)
                                     .autocorrectionDisabled(true)
-                                    .foregroundStyle(.primary)
-                                    .tint(.primary)
                                 }
-                                .padding(12)
-                                .background(.regularMaterial)
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                                .shadow(color: .black.opacity(0.12), radius: 8, y: 4)
-
+                                .padding(.vertical, 10)
+                                .padding(.horizontal, 12)
+                                .background(Color(.secondarySystemBackground))
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             }
-                            .frame(maxHeight: .infinity, alignment: .center)
 
-                            Spacer()
+                            Spacer(minLength: 0)
                         }
+                        .padding(16)
                     }
 
                     ProfileSettingsBackgroundSection(
