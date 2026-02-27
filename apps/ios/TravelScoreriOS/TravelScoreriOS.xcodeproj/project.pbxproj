@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1700C6822F5120D300906A35 /* DiscoveryControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1700C6812F5120D300906A35 /* DiscoveryControlsView.swift */; };
 		170C21272F4790E00090BA78 /* CountryAdvisoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170C20C02F4790E00090BA78 /* CountryAdvisoryCard.swift */; };
 		170C21282F4790E00090BA78 /* CountryDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170C20C12F4790E00090BA78 /* CountryDetailView.swift */; };
 		170C21292F4790E00090BA78 /* CountryHeaderCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170C20C22F4790E00090BA78 /* CountryHeaderCard.swift */; };
@@ -129,6 +130,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1700C6812F5120D300906A35 /* DiscoveryControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryControlsView.swift; sourceTree = "<group>"; };
 		170C20C02F4790E00090BA78 /* CountryAdvisoryCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryAdvisoryCard.swift; sourceTree = "<group>"; };
 		170C20C12F4790E00090BA78 /* CountryDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryDetailView.swift; sourceTree = "<group>"; };
 		170C20C22F4790E00090BA78 /* CountryHeaderCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryHeaderCard.swift; sourceTree = "<group>"; };
@@ -690,6 +692,7 @@
 				170C21012F4790E00090BA78 /* CountryListView.swift */,
 				170C21022F4790E00090BA78 /* CountryPreviewCardMobile.swift */,
 				17EC41EB2F4BBA4B004B80DA /* CustomWeightsView.swift */,
+				1700C6812F5120D300906A35 /* DiscoveryControlsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -965,6 +968,7 @@
 				170C213A2F4790E00090BA78 /* ProfileSettingsAccountSection.swift in Sources */,
 				170C213B2F4790E00090BA78 /* ProfileSettingsAvatarSection.swift in Sources */,
 				17AE405D2F50EA0200495208 /* AddLanguageView.swift in Sources */,
+				1700C6822F5120D300906A35 /* DiscoveryControlsView.swift in Sources */,
 				170C213C2F4790E00090BA78 /* ProfileSettingsBackgroundSection.swift in Sources */,
 				17EE81642F49081000C8CEF2 /* ProfileSkeletonView.swift in Sources */,
 				1797962A2F49353000053B0B /* ProfileLoadingView.swift in Sources */,
