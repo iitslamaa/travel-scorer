@@ -26,20 +26,28 @@ struct MapPlaceholderView: View {
 struct CountryListView: View {
     let showsSearchBar: Bool
     let searchText: String
+    let countries: [Country]
+    @Binding var sort: CountrySort
+    @Binding var sortOrder: SortOrder
 
-    init(showsSearchBar: Bool = true, searchText: String = "") {
+    init(
+        showsSearchBar: Bool = true,
+        searchText: String = "",
+        countries: [Country],
+        sort: Binding<CountrySort>,
+        sortOrder: Binding<SortOrder>
+    ) {
         self.showsSearchBar = showsSearchBar
         self.searchText = searchText
+        self.countries = countries
+        self._sort = sort
+        self._sortOrder = sortOrder
     }
 
     @EnvironmentObject private var sessionManager: SessionManager
     @EnvironmentObject private var weightsStore: ScoreWeightsStore
 
-    @State private var sort: CountrySort = .name
-    @State private var sortOrder: SortOrder = .descending
-    @State private var countries: [Country] = []
     @State private var visibleCountries: [Country] = []
-    @State private var hasLoaded = false
     @State private var bucketCountryIds: Set<String> = []
     @State private var traveledCountryIds: Set<String> = []
 
@@ -257,81 +265,7 @@ struct CountryListView: View {
                 }
             }
         }
-        .refreshable {
-            do {
-                // Always attempt a refresh, but never block the UI indefinitely
-                if let fresh = await CountryAPI.refreshCountriesIfNeeded(minInterval: 0),
-                   !fresh.isEmpty {
-                    countries = fresh
-
-                    // Recompute visible list once, after refresh completes
-                    DispatchQueue.main.async {
-                        scheduleRecomputeVisible()
-                    }
-                }
-            } catch {
-                // Swallow errors so the refresh control always ends
-                print("🔴 Pull-to-refresh failed, keeping cached data:", error)
-            }
-        }
         .listStyle(.plain)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                HStack(spacing: 12) {
-                    // Sort picker
-                    Picker("Sort", selection: $sort) {
-                        ForEach(CountrySort.allCases, id: \.self) { s in
-                            Text(s.rawValue).tag(s)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .frame(width: 180)
-
-                    // Sort order button
-                    Button {
-                        sortOrder = (sortOrder == .ascending) ? .descending : .ascending
-                    } label: {
-                        Image(systemName: sortOrder == .ascending ? "arrow.up" : "arrow.down")
-                    }
-
-                    // 🗺️ Score Map button
-                    NavigationLink {
-                        ScoreWorldMapView(countries: countries)
-                    } label: {
-                        Text("🗺️")
-                    }
-                }
-            }
-        }
-        .task {
-            guard !hasLoaded else { return }
-            hasLoaded = true
-
-            // 1) Show cached data immediately (fast/offline)
-            if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
-                countries = cached
-                scheduleRecomputeVisible()
-            }
-
-            // 2) Refresh from API (skips if refreshed recently)
-            if let fresh = await CountryAPI.refreshCountriesIfNeeded(minInterval: 60),
-               !fresh.isEmpty {
-                countries = fresh
-                scheduleRecomputeVisible()
-                return
-            }
-
-            // Fetch identity-scoped bucket + traveled state
-            if let userId = sessionManager.userId {
-                let service = ProfileService(supabase: SupabaseManager.shared)
-                if let bucket = try? await service.fetchBucketListCountries(userId: userId) {
-                    bucketCountryIds = bucket
-                }
-                if let traveled = try? await service.fetchTraveledCountries(userId: userId) {
-                    traveledCountryIds = traveled
-                }
-            }
-        }
         // Recompute visible list when inputs change
         .onChange(of: searchText) { _, _ in
             scheduleRecomputeVisible()
@@ -342,7 +276,10 @@ struct CountryListView: View {
         .onChange(of: sortOrder) { _, _ in
             scheduleRecomputeVisible()
         }
-        .onChange(of: countries.count) { _, _ in
+        .onAppear {
+            scheduleRecomputeVisible()
+        }
+        .onChange(of: countries) { _, _ in
             scheduleRecomputeVisible()
         }
     }
@@ -363,5 +300,5 @@ extension View {
 }
 
 #Preview {
-    CountryListView(showsSearchBar: true, searchText: "")
+    CountryListView(showsSearchBar: true, searchText: "", countries: [], sort: .constant(.name), sortOrder: .constant(.descending))
 }

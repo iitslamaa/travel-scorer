@@ -11,23 +11,53 @@ struct DiscoveryView: View {
 
     @State private var searchText = ""
     @State private var showingWeights = false
+    @State private var sort: CountrySort = .name
+    @State private var sortOrder: SortOrder = .descending
+    @State private var countries: [Country] = []
 
     var body: some View {
-        ZStack {
+        VStack(spacing: 0) {
 
-            // Scrollable content (countries only)
+            DiscoveryControlsView(
+                sort: $sort,
+                sortOrder: $sortOrder
+            )
+            .padding(.horizontal)
+            .padding(.top, 8)
+
             CountryListView(
                 showsSearchBar: false,
-                searchText: searchText
+                searchText: searchText,
+                countries: countries,
+                sort: $sort,
+                sortOrder: $sortOrder
             )
-
         }
+        .task {
+            if countries.isEmpty {
+                if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
+                    countries = cached
+                }
+            }
+        }
+        .navigationTitle("Discover")
+        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
+            // Filters (leading)
             ToolbarItem(placement: .navigationBarLeading) {
                 Button {
                     showingWeights = true
                 } label: {
                     Image(systemName: "slider.horizontal.3")
+                }
+            }
+
+            // Map (trailing)
+            ToolbarItem(placement: .navigationBarTrailing) {
+                NavigationLink {
+                    ScoreWorldMapView(countries: countries)
+                } label: {
+                    Image(systemName: "map")
                 }
             }
         }
