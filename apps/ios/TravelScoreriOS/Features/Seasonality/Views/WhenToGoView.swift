@@ -33,7 +33,6 @@ struct WhenToGoView: View {
             .padding(.top, 8)
             .navigationTitle("When to Go")
             .navigationBarTitleDisplayMode(.inline)
-            .task { }
             .sheet(isPresented: $isDrawerOpen) {
                 if let selected = viewModel.selectedCountry {
                     NavigationStack {
@@ -101,6 +100,9 @@ struct WhenToGoView: View {
                     )
                 }
             }
+        }
+        .refreshable {
+            viewModel.recalculateForSelectedMonth()
         }
     }
     
