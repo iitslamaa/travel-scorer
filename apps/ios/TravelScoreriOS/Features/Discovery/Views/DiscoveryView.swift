@@ -9,6 +9,8 @@ import SwiftUI
 
 struct DiscoveryView: View {
 
+    @EnvironmentObject private var profileVM: ProfileViewModel
+
     @State private var searchText = ""
     @State private var showingWeights = false
     @State private var sort: CountrySort = .name
@@ -39,6 +41,8 @@ struct DiscoveryView: View {
                     countries = cached
                 }
             }
+
+            await profileVM.loadIfNeeded()
         }
         .navigationTitle("Discover")
         .navigationBarTitleDisplayMode(.inline)
