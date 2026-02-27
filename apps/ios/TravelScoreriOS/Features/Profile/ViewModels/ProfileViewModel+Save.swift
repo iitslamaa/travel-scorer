@@ -23,7 +23,7 @@ extension ProfileViewModel {
         travelStyle: String?,
         nextDestination: String?,
         avatarUrl: String?
-    ) async {
+    ) async throws {
         let userId = self.userId
         errorMessage = nil
         
@@ -31,52 +31,45 @@ extension ProfileViewModel {
         let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard !trimmedName.isEmpty, !trimmedUsername.isEmpty else {
-            errorMessage = "Name and username are required."
-            return
+            throw NSError(domain: "ProfileValidation", code: 1, userInfo: [NSLocalizedDescriptionKey: "Name and username are required."])
         }
         
-        do {
-            let payload = ProfileUpdate(
-                username: trimmedUsername,
-                fullName: trimmedName,
-                avatarUrl: avatarUrl,
-                languages: languages,
-                livedCountries: homeCountries,
-                travelStyle: travelStyle.map { [$0] },
-                travelMode: travelMode.map { [$0] },
-                nextDestination: nextDestination,
-                onboardingCompleted: true
-            )
-            
-            try await profileService.updateProfile(
-                userId: userId,
-                payload: payload
-            )
+        let payload = ProfileUpdate(
+            username: trimmedUsername,
+            fullName: trimmedName,
+            avatarUrl: avatarUrl,
+            languages: languages,
+            livedCountries: homeCountries,
+            travelStyle: travelStyle.map { [$0] },
+            travelMode: travelMode.map { [$0] },
+            nextDestination: nextDestination,
+            onboardingCompleted: true
+        )
+        
+        try await profileService.updateProfile(
+            userId: userId,
+            payload: payload
+        )
 
-            // 🔥 META GOLD STANDARD: deterministic local state merge (no immediate refetch)
-            if var current = profile {
-                current.username = trimmedUsername
-                current.fullName = trimmedName
-                current.livedCountries = homeCountries ?? current.livedCountries
-                current.languages = languages ?? current.languages
-                current.travelStyle = travelStyle.map { [$0] } ?? current.travelStyle
-                current.travelMode = travelMode.map { [$0] } ?? current.travelMode
-                current.nextDestination = nextDestination
+        // 🔥 META GOLD STANDARD: deterministic local state merge (no immediate refetch)
+        if var current = profile {
+            current.username = trimmedUsername
+            current.fullName = trimmedName
+            current.livedCountries = homeCountries ?? current.livedCountries
+            current.languages = languages ?? current.languages
+            current.travelStyle = travelStyle.map { [$0] } ?? current.travelStyle
+            current.travelMode = travelMode.map { [$0] } ?? current.travelMode
+            current.nextDestination = nextDestination
 
-                // Handle avatarUrl explicitly ("" means remove)
-                if let avatarUrl {
-                    current.avatarUrl = avatarUrl.isEmpty ? nil : avatarUrl
-                }
-
-                profile = current
+            // Handle avatarUrl explicitly ("" means remove)
+            if let avatarUrl {
+                current.avatarUrl = avatarUrl.isEmpty ? nil : avatarUrl
             }
 
-            print("💾 Saved + locally merged profile state (no reload)")
-            
-        } catch {
-            errorMessage = error.localizedDescription
-            print("❌ saveProfile failed:", error)
+            profile = current
         }
+
+        print("💾 Saved + locally merged profile state (no reload)")
     }
     
     func uploadAvatar(data: Data, fileName: String) async throws -> String {

@@ -5,6 +5,12 @@
 
 import UIKit
 
+enum ProfileSaveResult {
+    case success
+    case usernameTaken
+    case failure(String)
+}
+
 struct ProfileSettingsSaveCoordinator {
 
     static func handleSave(
@@ -20,10 +26,8 @@ struct ProfileSettingsSaveCoordinator {
         shouldRemoveAvatar: Bool,
         setSaving: @escaping (Bool) -> Void,
         setAvatarUploading: @escaping (Bool) -> Void,
-        setAvatarCleared: @escaping () -> Void,
-        showSuccess: @escaping () -> Void,
-        hideSuccess: @escaping () -> Void
-    ) async {
+        setAvatarCleared: @escaping () -> Void
+    ) async -> ProfileSaveResult {
 
         setSaving(true)
 
@@ -37,27 +41,33 @@ struct ProfileSettingsSaveCoordinator {
         let trimmedName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        await profileVM.saveProfile(
-            firstName: trimmedName,
-            username: trimmedUsername,
-            homeCountries: Array(homeCountries).sorted(),
-            languages: languages.map { $0.name },
-            travelMode: travelMode?.rawValue,
-            travelStyle: travelStyle?.rawValue,
-            nextDestination: nextDestination,
-            avatarUrl: avatarURL
-        )
+        do {
+            try await profileVM.saveProfile(
+                firstName: trimmedName,
+                username: trimmedUsername,
+                homeCountries: Array(homeCountries).sorted(),
+                languages: languages.map { $0.name },
+                travelMode: travelMode?.rawValue,
+                travelStyle: travelStyle?.rawValue,
+                nextDestination: nextDestination,
+                avatarUrl: avatarURL
+            )
 
-        setSaving(false)
+            setSaving(false)
+            setAvatarCleared()
+            return .success
 
-        // Clear temporary avatar state
-        setAvatarCleared()
+        } catch {
+            setSaving(false)
 
-        showSuccess()
+            let errorString = "\(error)"
+            if errorString.contains("23505") ||
+               errorString.localizedCaseInsensitiveContains("duplicate key") {
+                return .usernameTaken
+            }
 
-        try? await Task.sleep(nanoseconds: 1_800_000_000)
-
-        hideSuccess()
+            return .failure(error.localizedDescription)
+        }
     }
 
     // MARK: - Avatar Handling
