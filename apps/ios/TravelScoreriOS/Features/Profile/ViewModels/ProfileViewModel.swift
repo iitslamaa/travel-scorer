@@ -19,15 +19,9 @@ enum RelationshipState {
 @MainActor
 final class ProfileViewModel: ObservableObject {
     
-    let instanceId = UUID()
-    
     // MARK: - Published state
     @Published var profile: Profile? {
-        didSet {
-            print("📦 [\(instanceId)] profile DID SET →", profile?.id as Any)
-            print("🖼️ [\(instanceId)] profile.avatarUrl DID SET →", profile?.avatarUrl as Any)
-            logPublishedState("profile updated")
-        }
+        didSet { }
     }
     @Published var isLoading = false
     @Published var errorMessage: String?
@@ -37,21 +31,14 @@ final class ProfileViewModel: ObservableObject {
     @Published var isRelationshipLoading: Bool = false
     @Published var isRefreshing: Bool = false
     @Published var viewedTraveledCountries: Set<String> = [] {
-        didSet {
-            print("✈️ [\(instanceId)] traveled DID SET → count:", viewedTraveledCountries.count)
-        }
+        didSet { }
     }
     @Published var viewedBucketListCountries: Set<String> = [] {
-        didSet {
-            print("🪣 [\(instanceId)] bucket DID SET → count:", viewedBucketListCountries.count)
-        }
+        didSet { }
     }
     @Published var friendCount: Int = 0
     @Published var friends: [Profile] = [] {
-        didSet {
-            print("👥 [\(instanceId)] friends DID SET → count:", friends.count)
-            logPublishedState("friends updated")
-        }
+        didSet { }
     }
     @Published var mutualBucketCountries: [String] = []
     @Published var mutualTraveledCountries: [String] = []
@@ -59,14 +46,10 @@ final class ProfileViewModel: ObservableObject {
     @Published var pendingRequestCount: Int = 0
     @Published var mutualFriends: [Profile] = []
     @Published var orderedBucketListCountries: [String] = [] {
-        didSet {
-            print("📊 [\(instanceId)] orderedBucket DID SET →", orderedBucketListCountries)
-        }
+        didSet { }
     }
     @Published var orderedTraveledCountries: [String] = [] {
-        didSet {
-            print("📊 [\(instanceId)] orderedTraveled DID SET →", orderedTraveledCountries)
-        }
+        didSet { }
     }
     
     // MARK: - Dependencies
@@ -86,7 +69,6 @@ final class ProfileViewModel: ObservableObject {
         profileService: ProfileService,
         friendService: FriendService
     ) {
-        print("🧠 ProfileViewModel INIT — instance:", instanceId)
         self.userId = userId
         self.profileService = profileService
         self.friendService = friendService
@@ -97,9 +79,6 @@ final class ProfileViewModel: ObservableObject {
     /// Forces a full reload even if the same user is already bound.
     /// This is used by `.refreshable` in ProfileView.
     func reloadProfile() async {
-        print("🔄 [\(instanceId)] reloadProfile called for:", userId)
-        print("🖼️ [\(instanceId)] reloadProfile: avatarUrl BEFORE →", profile?.avatarUrl as Any)
-
         isRefreshing = true
         errorMessage = nil
 
@@ -114,7 +93,6 @@ final class ProfileViewModel: ObservableObject {
 
         await loadTask?.value
 
-        print("🖼️ [\(instanceId)] reloadProfile: avatarUrl AFTER →", profile?.avatarUrl as Any)
         isRefreshing = false
     }
     
@@ -160,32 +138,10 @@ final class ProfileViewModel: ObservableObject {
         loadTask = nil
     }
     
-    deinit {
-        print("💀 ProfileViewModel DEINIT — instance:", instanceId, "userId:", userId as Any)
-    }
-    
-    func logPublishedState(_ label: String) {
-        print("📡 [\(instanceId)] \(label)")
-        print("   userId:", userId)
-        print("   profile.id:", profile?.id as Any)
-        print("   friends.count:", friends.count)
-        print("   traveled.count:", viewedTraveledCountries.count)
-        print("   bucket.count:", viewedBucketListCountries.count)
-        print("   relationshipState:", relationshipState as Any)
-    }
-    
     // MARK: - Optimistic Avatar Update (Meta Gold Standard)
     func updateAvatarLocally(to newUrl: String?) {
-        print("🔥 [\(instanceId)] updateAvatarLocally called →", newUrl as Any)
-
-        guard var current = profile else {
-            print("❌ [\(instanceId)] updateAvatarLocally: profile is nil")
-            return
-        }
-
-        print("🟠 [\(instanceId)] avatarUrl BEFORE local update →", current.avatarUrl as Any)
+        guard var current = profile else { return }
         current.avatarUrl = newUrl
         profile = current
-        print("🟢 [\(instanceId)] avatarUrl AFTER local update →", profile?.avatarUrl as Any)
     }
 }
