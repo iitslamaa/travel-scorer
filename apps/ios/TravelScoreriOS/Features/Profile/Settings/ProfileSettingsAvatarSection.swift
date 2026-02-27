@@ -22,56 +22,53 @@ struct ProfileSettingsAvatarSection: View {
     @State private var showImagePicker = false
 
     var body: some View {
-        SectionCard {
-            VStack(spacing: 16) {
+        VStack(spacing: 0) {
 
-                Button {
-                    showPhotoOptions = true
-                } label: {
-                    ZStack(alignment: .bottomTrailing) {
-                        avatarView
+            Button {
+                showPhotoOptions = true
+            } label: {
+                ZStack(alignment: .bottomTrailing) {
+                    avatarView
 
-                        if isUploadingAvatar {
-                            ZStack {
-                                Circle()
-                                    .fill(.ultraThinMaterial)
-                                ProgressView()
-                                    .progressViewStyle(.circular)
-                            }
-                            .frame(width: 120, height: 120)
-                            .clipShape(Circle())
+                    if isUploadingAvatar {
+                        ZStack {
+                            Circle()
+                                .fill(.ultraThinMaterial)
+                            ProgressView()
+                                .progressViewStyle(.circular)
                         }
-
-                        cameraBadge
+                        .frame(width: 96, height: 96)
+                        .clipShape(Circle())
                     }
-                    .frame(width: 120, height: 120)
+
+                    cameraBadge
                 }
-                .buttonStyle(.plain)
-                .confirmationDialog(
-                    "Profile Photo",
-                    isPresented: $showPhotoOptions,
-                    titleVisibility: .visible
-                ) {
-                    Button(hasAvatar ? "Change Photo" : "Add Photo") {
-                        showImagePicker = true
-                    }
-
-                    if hasAvatar {
-                        Button("Remove Photo", role: .destructive) {
-                            onRemoveAvatar()
-                        }
-                    }
-
-                    Button("Cancel", role: .cancel) {}
-                }
-                .photosPicker(
-                    isPresented: $showImagePicker,
-                    selection: $selectedPhotoItem,
-                    matching: .images
-                )
-
+                .frame(width: 96, height: 96)
             }
-            .frame(maxWidth: .infinity)
+            .buttonStyle(.plain)
+            .confirmationDialog(
+                "Profile Photo",
+                isPresented: $showPhotoOptions,
+                titleVisibility: .visible
+            ) {
+                Button(hasAvatar ? "Change Photo" : "Add Photo") {
+                    showImagePicker = true
+                }
+
+                if hasAvatar {
+                    Button("Remove Photo", role: .destructive) {
+                        onRemoveAvatar()
+                    }
+                }
+
+                Button("Cancel", role: .cancel) {}
+            }
+            .photosPicker(
+                isPresented: $showImagePicker,
+                selection: $selectedPhotoItem,
+                matching: .images
+            )
+
         }
     }
 
@@ -121,7 +118,7 @@ struct ProfileSettingsAvatarSection: View {
                 placeholderAvatar
             }
         }
-        .frame(width: 120, height: 120)
+        .frame(width: 96, height: 96)
         .clipShape(Circle())
         .overlay(
             Circle()
@@ -134,7 +131,7 @@ struct ProfileSettingsAvatarSection: View {
             .fill(Color(.systemGray5))
             .overlay(
                 Image(systemName: "person.fill")
-                    .font(.system(size: 38, weight: .regular))
+                    .font(.system(size: 30, weight: .regular))
                     .foregroundStyle(.secondary)
             )
     }
@@ -150,6 +147,6 @@ struct ProfileSettingsAvatarSection: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(.primary)
         }
-        .offset(x: -6, y: -6)
+        .offset(x: 4, y: 4)
     }
 }
