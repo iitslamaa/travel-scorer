@@ -120,10 +120,14 @@ struct ProfileView: View {
                             friendCount: friendCount,
                             onToggleFriend: {
                                 switch relationshipState {
-                                case .friends, .requestSent:
+                                case .friends:
                                     showFriendsDrawer = true
+                                case .requestSent:
+                                    showFriendsDrawer = true
+                                case .requestReceived:
+                                    Task { await profileVM.toggleFriend() } // accept
                                 case .none:
-                                    Task { await profileVM.toggleFriend() }
+                                    Task { await profileVM.toggleFriend() } // send
                                 case .selfProfile:
                                     break
                                 }

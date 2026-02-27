@@ -34,7 +34,7 @@ extension ProfileViewModel {
             isRelationshipLoading = false
             return
         }
-        
+
         // Friends?
         if try await friendService.isFriend(
             currentUserId: currentUserId,
@@ -42,8 +42,19 @@ extension ProfileViewModel {
         ) {
             print("   🤝 Users are friends — setting .friends")
             relationshipState = .friends
-            // logPublishedState("set friends")
             isFriend = true
+            isRelationshipLoading = false
+            return
+        }
+        
+        // Incoming request?
+        if try await friendService.hasIncomingRequest(
+            from: userId,
+            to: currentUserId
+        ) {
+            print("   📥 Incoming friend request — setting .requestReceived")
+            relationshipState = .requestReceived
+            isFriend = false
             isRelationshipLoading = false
             return
         }
@@ -109,6 +120,16 @@ extension ProfileViewModel {
                     try? await refreshRelationshipState()
                 }
                 
+            case .requestReceived:
+                print("   ✅ Accepting incoming friend request...")
+                guard let currentUserId = supabase.currentUserId else { return }
+                try await friendService.acceptRequest(
+                    myUserId: currentUserId,
+                    from: profileId
+                )
+                try await refreshRelationshipState()
+                print("   ✅ Friend request accepted:", profileId)
+                
             case .friends:
                 print("   ➖ Attempting to remove friend...")
                 guard let currentUserId = supabase.currentUserId else { return }
@@ -118,7 +139,8 @@ extension ProfileViewModel {
                 print("➖ Removed friend:", profileId)
                 
             case .requestSent:
-                print("   ℹ️ toggleFriend hit .requestSent — no-op")
+                print("   ❌ Cancelling sent friend request...")
+                await cancelFriendRequest()
                 
             case .selfProfile:
                 break

@@ -158,6 +158,8 @@ struct ProfileHeaderView: View {
             return "Add Friend"
         case .requestSent:
             return "Request Sent"
+        case .requestReceived:
+            return "Accept"
         case .friends:
             return friendCount == 1 ? "1 Friend" : "\(friendCount) Friends"
         case .selfProfile:
