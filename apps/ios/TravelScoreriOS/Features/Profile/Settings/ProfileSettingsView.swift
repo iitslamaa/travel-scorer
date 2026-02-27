@@ -49,6 +49,7 @@ struct ProfileSettingsView: View {
     @State private var deleteError: String? = nil
     @State private var showSaveSuccess = false
     @State private var isSavingProfile = false
+    @State private var usernameError: String? = nil
 
     private var isFormValid: Bool {
         let trimmedName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -155,6 +156,11 @@ struct ProfileSettingsView: View {
                                 .padding(.horizontal, 12)
                                 .background(Color(.secondarySystemBackground))
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                if let usernameError {
+                                    Text(usernameError)
+                                        .font(.caption)
+                                        .foregroundStyle(.red)
+                                }
                             }
 
                             Spacer(minLength: 0)
@@ -292,7 +298,7 @@ struct ProfileSettingsView: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button {
                     Task {
-                        await ProfileSettingsSaveCoordinator.handleSave(
+                        let result = await ProfileSettingsSaveCoordinator.handleSave(
                             profileVM: profileVM,
                             firstName: firstName,
                             username: username,
@@ -308,18 +314,22 @@ struct ProfileSettingsView: View {
                             setAvatarCleared: {
                                 selectedUIImage = nil
                                 shouldRemoveAvatar = false
-                            },
-                            showSuccess: {
-                                withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
-                                    showSaveSuccess = true
-                                }
-                            },
-                            hideSuccess: {
-                                withAnimation(.easeOut(duration: 0.25)) {
-                                    showSaveSuccess = false
-                                }
                             }
                         )
+
+                        switch result {
+                        case .success:
+                            withAnimation(.spring(response: 0.35, dampingFraction: 0.9)) {
+                                showSaveSuccess = true
+                            }
+                            usernameError = nil
+
+                        case .usernameTaken:
+                            usernameError = "Username is already taken"
+
+                        case .failure(let message):
+                            usernameError = message
+                        }
                     }
                 } label: {
                     if isSavingProfile {
