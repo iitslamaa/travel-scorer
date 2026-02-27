@@ -13,6 +13,7 @@ enum RelationshipState {
     case selfProfile
     case none
     case requestSent
+    case requestReceived
     case friends
 }
 
