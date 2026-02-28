@@ -54,14 +54,15 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: MKMapView, context: Context) {
+        context.coordinator.selectedCountryISO = selectedCountryISO
         context.coordinator.updateHighlights(highlightedISOs)
-        
+
         guard let iso = selectedCountryISO?
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .uppercased()
-        else { return }
-        
-        if context.coordinator.lastZoomedISO == iso { return }
+        else {
+            return
+        }
         
         // Ensure full dataset overlays are loaded when selecting
         if Self.cachedFull == nil {
@@ -175,10 +176,13 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
             ),
         ]
 
-        if let override = overrides[iso] {
-            uiView.setRegion(override, animated: true)
-        } else {
-            context.coordinator.zoomToCountry(iso: iso)
+        if context.coordinator.lastZoomedISO != iso {
+            if let override = overrides[iso] {
+                uiView.setRegion(override, animated: true)
+                context.coordinator.lastZoomedISO = iso
+            } else {
+                context.coordinator.zoomToCountry(iso: iso)
+            }
         }
     }
     
@@ -189,11 +193,18 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
     }
     
     func makeCoordinator() -> ScoreWorldMapCoordinator {
-        ScoreWorldMapCoordinator(
+        let coordinator = ScoreWorldMapCoordinator(
             countries: countries,
-            highlightedISOs: highlightedISOs,
-            selectedCountryISO: $selectedCountryISO
+            highlightedISOs: highlightedISOs
         )
+
+        coordinator.onSelectionChange = { newValue in
+            DispatchQueue.main.async {
+                self.selectedCountryISO = newValue
+            }
+        }
+
+        return coordinator
     }
 }
 

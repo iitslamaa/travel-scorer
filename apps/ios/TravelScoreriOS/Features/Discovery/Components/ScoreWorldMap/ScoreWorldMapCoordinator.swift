@@ -11,13 +11,67 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
     
     private let coordinatorId = UUID()
     
+    // MARK: - Debug
+    private let debugMapStyling = true
+    private let debugTap = true
+    private let debugRenderer = true
+
+    private func dlog(_ items: Any...) {
+        guard debugMapStyling else { return }
+        let msg = items.map { String(describing: $0) }.joined(separator: " ")
+        print("🗺️ [ScoreWorldMapCoordinator \(coordinatorId)]", msg)
+    }
+
+    private func dlogAlways(_ items: Any...) {
+        let msg = items.map { String(describing: $0) }.joined(separator: " ")
+        print("🗺️ [ScoreWorldMapCoordinator \(coordinatorId)]", msg)
+    }
+
+    private func normalizeISO(_ value: String?) -> String? {
+        value?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+    }
+    
+    private func selectedBorderWidth(for mapView: MKMapView) -> CGFloat {
+        // Stroke width must scale down at world-zoom for very complex polygons (e.g. China),
+        // otherwise MapKit’s path simplification + anti-aliasing makes edges look “blobby/jagged”.
+        let delta = mapView.region.span.longitudeDelta
+
+        if delta > 120 { return 0.8 }   // very zoomed out (whole world)
+        if delta > 60  { return 1.1 }   // continent-scale
+        if delta > 30  { return 1.4 }   // country-scale
+        if delta > 15  { return 1.7 }   // regional
+        return 2.0                     // close-in
+    }
+
+    private func polygonIdentifier(for polygon: CountryPolygon) -> String? {
+        if let iso = polygon.isoCode, iso != "-99" {
+            return iso.uppercased()
+        }
+        return polygon.countryName?.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    }
+    
+    private func overlaysSummary(_ mapView: MKMapView) -> String {
+        let total = mapView.overlays.count
+        let countryPolys = mapView.overlays.compactMap { $0 as? CountryPolygon }
+        let isoCount = countryPolys.compactMap { $0.isoCode }.count
+        let nameCount = countryPolys.compactMap { $0.countryName }.count
+        let dash99Count = countryPolys.filter { $0.isoCode == "-99" }.count
+        return "overlays=\(total) countryPolys=\(countryPolys.count) iso=\(isoCount) name=\(nameCount) iso(-99)=\(dash99Count)"
+    }
+
+    private func gestureSummary(_ gesture: UITapGestureRecognizer, in mapView: MKMapView) -> String {
+        let p = gesture.location(in: mapView)
+        let c = mapView.convert(p, toCoordinateFrom: mapView)
+        return "point=(\(String(format: "%.1f", p.x)),\(String(format: "%.1f", p.y))) coord=(\(String(format: "%.4f", c.latitude)),\(String(format: "%.4f", c.longitude)))"
+    }
+    
     // MARK: - State
     
     var highlightedISOs: [String]
-    var highlightedTokens: Set<String>
-    let countryLookup: [String: Country]
-    
-    @Binding var selectedCountryISO: String?
+    var selectedCountryISO: String?
+    var onSelectionChange: ((String?) -> Void)?
     weak var mapView: MKMapView?
     
     var lastZoomedISO: String?
@@ -26,14 +80,9 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
     
     init(
         countries: [Country],
-        highlightedISOs: [String],
-        selectedCountryISO: Binding<String?>
+        highlightedISOs: [String]
     ) {
         self.highlightedISOs = highlightedISOs.map { $0.uppercased() }
-        self.highlightedTokens = ScoreWorldMapRenderer.buildHighlightTokens(from: highlightedISOs)
-        self.countryLookup = CountryLookupBuilder.build(from: countries)
-        self._selectedCountryISO = selectedCountryISO
-        
         super.init()
     }
     
@@ -42,13 +91,37 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
     @objc func handleTap(_ gesture: UITapGestureRecognizer) {
         guard let mapView = mapView else { return }
         
+        if debugTap {
+            dlogAlways("Tap BEGIN", gestureSummary(gesture, in: mapView), overlaysSummary(mapView), "selected(before)=", normalizeISO(selectedCountryISO) as Any)
+        }
+        
         let tapPoint = gesture.location(in: mapView)
         let coordinate = mapView.convert(tapPoint, toCoordinateFrom: mapView)
         let mapPoint = MKMapPoint(coordinate)
         
+        var checked: Int = 0
+        var rendererMissing: Int = 0
+        var notCountryPoly: Int = 0
+        var hitCount: Int = 0
+
         for overlay in mapView.overlays {
-            guard let polygon = overlay as? CountryPolygon,
-                  let renderer = mapView.renderer(for: overlay) as? MKMultiPolygonRenderer else { continue }
+            checked += 1
+            guard let polygon = overlay as? CountryPolygon else {
+                notCountryPoly += 1
+                continue
+            }
+
+            guard let renderer = mapView.renderer(for: overlay) as? MKMultiPolygonRenderer else {
+                rendererMissing += 1
+                if debugTap, checked <= 5 {
+                    dlogAlways("Tap scan:", "renderer missing for overlay", String(describing: type(of: overlay)), "isoCode=", polygon.isoCode as Any, "countryName=", polygon.countryName as Any)
+                }
+                continue
+            }
+
+            if debugTap, checked <= 5 {
+                dlogAlways("Tap scan:", "renderer ok", "isoCode=", polygon.isoCode as Any, "countryName=", polygon.countryName as Any)
+            }
             
             renderer.createPath()
             let point = renderer.point(for: mapPoint)
@@ -56,27 +129,115 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
             if let path = renderer.path,
                path.contains(point) {
                 
+                hitCount += 1
+
                 let identifier: String? = {
                     if let iso = polygon.isoCode, iso != "-99" {
                         return iso
                     }
                     return polygon.countryName
                 }()
-                
+
+                let polyId = polygonIdentifier(for: polygon)
+
+                if debugTap {
+                    dlogAlways(
+                        "Tap HIT",
+                        "hitCount=", hitCount,
+                        "overlayIndex=", checked,
+                        "isoCode=", polygon.isoCode as Any,
+                        "countryName=", polygon.countryName as Any,
+                        "polyId=", polyId as Any,
+                        "identifier=", identifier as Any,
+                        "selected(before)=", normalizeISO(selectedCountryISO) as Any
+                    )
+                }
+
                 if selectedCountryISO != identifier {
                     selectedCountryISO = identifier
+                    onSelectionChange?(identifier)
                 }
-                
+
+                if debugTap {
+                    dlogAlways("Tap selection set", "selected(after)=", normalizeISO(selectedCountryISO) as Any)
+                }
+
+                // Force repaint immediately after selection
+                rebuildOverlays()
+
+                if debugTap {
+                    dlogAlways("Tap END", "checked=", checked, "notCountryPoly=", notCountryPoly, "rendererMissing=", rendererMissing, "hitCount=", hitCount)
+                }
+
                 break
             }
+        }
+        
+        if debugTap, hitCount == 0 {
+            dlogAlways("Tap NO HIT", "checked=", checked, "notCountryPoly=", notCountryPoly, "rendererMissing=", rendererMissing, "selected(still)=", normalizeISO(selectedCountryISO) as Any)
         }
     }
     
     // MARK: - Highlight Updates
     
     func updateHighlights(_ newISOs: [String]) {
+        let oldCount = highlightedISOs.count
+        let oldHash = highlightedISOs.sorted().joined(separator: "|").hashValue
+
         self.highlightedISOs = newISOs.map { $0.uppercased() }
-        self.highlightedTokens = ScoreWorldMapRenderer.buildHighlightTokens(from: newISOs)
+
+        let newCount = highlightedISOs.count
+        let newHash = highlightedISOs.sorted().joined(separator: "|").hashValue
+
+        if debugMapStyling {
+            dlogAlways(
+                "Highlights update",
+                "oldCount=", oldCount,
+                "newCount=", newCount,
+                "oldHash=", oldHash,
+                "newHash=", newHash,
+                "selected=", normalizeISO(selectedCountryISO) as Any,
+                "mapView?=", mapView != nil
+            )
+        }
+
+        rebuildOverlays()
+    }
+    
+    // MARK: - Overlay Rebuild (Deterministic Redraw)
+    
+    func rebuildOverlays() {
+        guard let mapView = mapView else {
+            dlogAlways("Rebuild overlays FAILED: mapView nil")
+            return
+        }
+
+        let overlays = mapView.overlays
+
+        if debugMapStyling {
+            dlogAlways(
+                "Rebuild overlays",
+                "selected=", normalizeISO(selectedCountryISO) as Any,
+                overlaysSummary(mapView)
+            )
+        }
+
+        // Remove all overlays
+        mapView.removeOverlays(overlays)
+
+        // Re-add all overlays (forces rendererFor to run again)
+        mapView.addOverlays(overlays)
+
+        // Ensure selected country overlays render on top
+        if let selected = normalizeISO(selectedCountryISO) {
+            let selectedOverlays = overlays.compactMap { $0 as? CountryPolygon }
+                .filter { polygonIdentifier(for: $0) == selected }
+
+            if !selectedOverlays.isEmpty {
+                mapView.removeOverlays(selectedOverlays)
+                mapView.addOverlays(selectedOverlays)
+            }
+        }
     }
     
     // MARK: - Zoom
@@ -84,34 +245,29 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
     func zoomToCountry(iso: String) {
         guard let mapView = mapView else { return }
         
+        if debugMapStyling {
+            dlogAlways("Zoom request", "iso=", iso, overlaysSummary(mapView), "lastZoomed=", lastZoomedISO as Any)
+        }
+        
         let matching = mapView.overlays
             .compactMap { $0 as? CountryPolygon }
             .filter { $0.isoCode?.uppercased() == iso }
         
+        if debugMapStyling {
+            dlogAlways("Zoom matching", "iso=", iso, "matchingCount=", matching.count)
+        }
+        
         guard !matching.isEmpty else { return }
         
-        zoomToCountry(polygons: matching)
-    }
-    
-    private func zoomToCountry(polygons: [CountryPolygon]) {
-        guard let mapView = mapView else { return }
-        
-        let iso = polygons.first?.isoCode?.uppercased()
-        if lastZoomedISO == iso { return }
-        lastZoomedISO = iso
-        
-        if iso == "US" || iso == "USA" {
-            let center = CLLocationCoordinate2D(latitude: 39.5, longitude: -98.35)
-            let span = MKCoordinateSpan(latitudeDelta: 28.0, longitudeDelta: 60.0)
-            mapView.setRegion(MKCoordinateRegion(center: center, span: span), animated: true)
-            return
-        }
-        
-        var combinedRect = polygons.first!.boundingMapRect
-        for polygon in polygons.dropFirst() {
+        var combinedRect = matching.first!.boundingMapRect
+        for polygon in matching.dropFirst() {
             combinedRect = combinedRect.union(polygon.boundingMapRect)
         }
-
+        
+        if debugMapStyling {
+            dlogAlways("Zoom setVisibleMapRect", "iso=", iso, "rect=", String(describing: combinedRect))
+        }
+        
         let padding = UIEdgeInsets(top: 40, left: 40, bottom: 40, right: 40)
         mapView.setVisibleMapRect(combinedRect, edgePadding: padding, animated: true)
     }
@@ -125,11 +281,57 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
             return MKOverlayRenderer(overlay: overlay)
         }
         
-        return ScoreWorldMapRenderer.makeRenderer(
-            for: polygon,
-            selectedISO: selectedCountryISO,
-            highlightedTokens: highlightedTokens,
-            countryLookup: countryLookup
-        )
+        let renderer = MKMultiPolygonRenderer(overlay: polygon)
+        
+        let normalizedSelected = selectedCountryISO?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .uppercased()
+        
+        let identifier = polygonIdentifier(for: polygon)
+        
+        if debugRenderer {
+            // Log only for selected/highlighted to reduce spam
+            let isHighlighted = highlightedISOs.contains(identifier ?? "")
+            let isSelected = (identifier == normalizedSelected)
+            if isSelected || isHighlighted {
+                dlogAlways(
+                    "Renderer",
+                    "id=", identifier as Any,
+                    "isoCode=", polygon.isoCode as Any,
+                    "countryName=", polygon.countryName as Any,
+                    "selected=", isSelected,
+                    "highlighted=", isHighlighted,
+                    "selectedISO=", normalizedSelected as Any
+                )
+            }
+        }
+        
+        let isHighlighted = highlightedISOs.contains(identifier ?? "")
+        let isSelected = (identifier == normalizedSelected)
+        
+        // Default
+        renderer.lineWidth = 0.5
+        renderer.strokeColor = UIColor.clear
+        renderer.fillColor = UIColor.clear
+        renderer.alpha = 1.0
+        
+        if isSelected {
+            renderer.fillColor = UIColor(red: 1.0, green: 0.82, blue: 0.0, alpha: 1.0)
+            renderer.strokeColor = UIColor(red: 1.0, green: 0.45, blue: 0.0, alpha: 0.9)
+            renderer.lineWidth = selectedBorderWidth(for: mapView)
+            renderer.lineJoin = .round
+            renderer.lineCap = .round
+        }
+        else if isHighlighted {
+            renderer.fillColor = UIColor(red: 1.0, green: 0.82, blue: 0.0, alpha: 0.25)
+        }
+        
+        if debugRenderer {
+            if isSelected {
+                dlogAlways("Renderer style selected", identifier as Any, "lineWidth=", renderer.lineWidth)
+            }
+        }
+        
+        return renderer
     }
 }

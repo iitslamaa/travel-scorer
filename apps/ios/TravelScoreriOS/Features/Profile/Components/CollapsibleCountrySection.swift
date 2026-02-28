@@ -112,6 +112,7 @@ struct CollapsibleCountrySection: View {
                             selectedCountryISO: $selectedCountryISO,
                             isLoading: $isLoadingMap
                         )
+                        .id(title + normalizedISOs.joined())
                         .onAppear {
                             print("🧩 ScoreWorldMapRepresentable onAppear — title:", title,
                                   " highlightedISOs:", normalizedISOs,
