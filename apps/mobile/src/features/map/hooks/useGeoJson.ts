@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import worldFull from '../../../../assets/geo/countries.geo.json';
-import worldSimplified from '../../../../assets/geo/countries.simplified.geo.json';
+
+import worldFull from '../../../../assets/geo/travelaf.world.full.geo.json';
+import worldSimplified from '../../../../assets/geo/travelaf.world.simplified.geo.json';
 
 export function useGeoJson() {
   const fullFeatures = useMemo(() => {
