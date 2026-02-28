@@ -99,7 +99,7 @@ struct FloatingSearchBar: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.secondary)
 
-                TextField("Search destinations by country or code", text: $text)
+                TextField("Search countries and territories", text: $text)
                     .focused($isFocused)
                     .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
