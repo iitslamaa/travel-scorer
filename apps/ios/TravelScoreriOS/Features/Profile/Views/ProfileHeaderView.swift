@@ -62,8 +62,17 @@ struct ProfileHeaderView: View {
                         }) {
                             HStack(spacing: 6) {
 
-                                if effectiveState == .friends {
+                                switch effectiveState {
+                                case .friends:
                                     Image(systemName: "checkmark")
+                                case .requestSent:
+                                    Image(systemName: "clock")
+                                case .requestReceived:
+                                    Image(systemName: "checkmark.circle.fill")
+                                case .none:
+                                    Image(systemName: "person.badge.plus")
+                                case .selfProfile:
+                                    EmptyView()
                                 }
 
                                 Text(buttonLabel(for: effectiveState))
@@ -74,12 +83,9 @@ struct ProfileHeaderView: View {
                             .padding(.vertical, 9)
                             .background(
                                 Capsule()
-                                    .fill(
-                                        effectiveState == .friends
-                                        ? Color.blue.opacity(0.18)
-                                        : Color.blue.opacity(0.12)
-                                    )
+                                    .fill(backgroundColor(for: effectiveState))
                             )
+                            .foregroundStyle(foregroundColor(for: effectiveState))
                         }
                     }
                 }
@@ -164,6 +170,32 @@ struct ProfileHeaderView: View {
             return friendCount == 1 ? "1 Friend" : "\(friendCount) Friends"
         case .selfProfile:
             return ""
+        }
+    }
+
+    private func backgroundColor(for state: RelationshipState) -> Color {
+        switch state {
+        case .none:
+            return Color.blue.opacity(0.12)
+        case .requestSent:
+            return Color.gray.opacity(0.15)
+        case .requestReceived:
+            return Color.green.opacity(0.18)
+        case .friends:
+            return Color.blue.opacity(0.18)
+        case .selfProfile:
+            return .clear
+        }
+    }
+
+    private func foregroundColor(for state: RelationshipState) -> Color {
+        switch state {
+        case .requestSent:
+            return .gray
+        case .requestReceived:
+            return .green
+        default:
+            return .blue
         }
     }
 
