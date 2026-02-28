@@ -122,9 +122,10 @@ struct FloatingSearchBar: View {
             .padding(.horizontal)
             .padding(.bottom, 8)
         }
+        .padding(.top, 10)
         .background(.ultraThinMaterial)
         .shadow(radius: 6)
-        .padding(.top, 6)
+        .padding(.top, 0)
     }
 }
 
