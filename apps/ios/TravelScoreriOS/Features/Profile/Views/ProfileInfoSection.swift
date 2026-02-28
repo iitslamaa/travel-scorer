@@ -22,6 +22,8 @@ struct ProfileInfoSection: View {
     let travelMode: String?
     let travelStyle: String?
     let nextDestination: String?
+    let currentCountry: String?
+    let favoriteCountries: [String]
 
     @Environment(\.colorScheme) private var colorScheme
 
@@ -50,6 +52,8 @@ struct ProfileInfoSection: View {
             travelModeCard
             travelStyleCard
             nextDestinationCard
+            currentCountryCard
+            favoriteCountriesCard
             infoCards
         }
         .padding(.horizontal, 20)
@@ -150,7 +154,7 @@ struct ProfileInfoSection: View {
 
     private var travelModeCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Travel Mode: Solo or Group?")
+            Text("Travel Mode")
                 .font(.subheadline)
                 .fontWeight(.semibold)
 
@@ -172,7 +176,7 @@ struct ProfileInfoSection: View {
 
     private var travelStyleCard: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Travel Style: Budget, Comfortable, or In Between?")
+            Text("Travel Style")
                 .font(.subheadline)
                 .fontWeight(.semibold)
 
@@ -193,21 +197,88 @@ struct ProfileInfoSection: View {
     }
 
     private var nextDestinationCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
+
+            Text("Next Destination")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+
             if let code = nextDestination, !code.isEmpty {
                 let upper = code.uppercased()
                 let flag = flagEmoji(for: upper)
                 let name = countryName(for: upper)
 
-                Text("Next Destination: \(name) \(flag)")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
+                HStack(spacing: 6) {
+                    Text(name)
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
+
+                    Text(flag)
+                        .font(.subheadline)
+                }
             } else {
-                Text("Next Destination: Not set")
-                    .font(.subheadline)
+                Text("Not set")
+                    .font(.caption)
                     .foregroundStyle(.secondary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var currentCountryCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+
+            Text("Current Country")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+
+            if let code = currentCountry, !code.isEmpty {
+                let upper = code.uppercased()
+                let flag = flagEmoji(for: upper)
+                let name = countryName(for: upper)
+
+                HStack(spacing: 6) {
+                    Text(name)
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
+
+                    Text(flag)
+                        .font(.subheadline)
+                }
+            } else {
+                Text("Not set")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var favoriteCountriesCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+
+            Text("Favorite Countries")
+                .font(.subheadline)
+                .fontWeight(.semibold)
+
+            if favoriteCountries.isEmpty {
+                Text("Not set")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } else {
+                HStack(spacing: 8) {
+                    ForEach(favoriteCountries, id: \.self) { code in
+                        let upper = code.uppercased()
+                        Text(flagEmoji(for: upper))
+                            .font(.title3)
+                    }
+                }
             }
         }
         .padding(12)

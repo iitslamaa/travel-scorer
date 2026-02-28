@@ -22,6 +22,8 @@ struct ProfileSettingsSaveCoordinator {
         travelMode: TravelMode?,
         travelStyle: TravelStyle?,
         nextDestination: String?,
+        currentCountry: String?,
+        favoriteCountries: [String],
         selectedUIImage: UIImage?,
         shouldRemoveAvatar: Bool,
         setSaving: @escaping (Bool) -> Void,
@@ -50,6 +52,8 @@ struct ProfileSettingsSaveCoordinator {
                 travelMode: travelMode?.rawValue,
                 travelStyle: travelStyle?.rawValue,
                 nextDestination: nextDestination,
+                currentCountry: currentCountry,
+                favoriteCountries: favoriteCountries,
                 avatarUrl: avatarURL
             )
 

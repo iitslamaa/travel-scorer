@@ -13,14 +13,28 @@ struct ProfileSettingsTravelSection: View {
     @Binding var travelMode: TravelMode?
     @Binding var travelStyle: TravelStyle?
 
-    @Binding var showTravelModeDialog: Bool
-    @Binding var showTravelStyleDialog: Bool
-
     var body: some View {
         SectionCard(title: "Travel preferences") {
 
-            Button {
-                showTravelModeDialog = true
+            NavigationLink {
+                List {
+                    ForEach(TravelMode.allCases) { mode in
+                        Button {
+                            travelMode = mode
+                        } label: {
+                            HStack {
+                                Text(mode.label)
+                                Spacer()
+                                if travelMode == mode {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(.blue)
+                                }
+                            }
+                        }
+                    }
+                }
+                .navigationTitle("Travel Mode")
+                .navigationBarTitleDisplayMode(.inline)
             } label: {
                 HStack {
                     Text("Travel mode")
@@ -31,11 +45,27 @@ struct ProfileSettingsTravelSection: View {
                     Text(travelMode?.label ?? "Not set")
                         .foregroundStyle(travelMode == nil ? .secondary : .primary)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            Button {
-                showTravelStyleDialog = true
+            NavigationLink {
+                List {
+                    ForEach(TravelStyle.allCases) { style in
+                        Button {
+                            travelStyle = style
+                        } label: {
+                            HStack {
+                                Text(style.label)
+                                Spacer()
+                                if travelStyle == style {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(.blue)
+                                }
+                            }
+                        }
+                    }
+                }
+                .navigationTitle("Travel Style")
+                .navigationBarTitleDisplayMode(.inline)
             } label: {
                 HStack {
                     Text("Travel style")
@@ -46,7 +76,6 @@ struct ProfileSettingsTravelSection: View {
                     Text(travelStyle?.label ?? "Not set")
                         .foregroundStyle(travelStyle == nil ? .secondary : .primary)
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
     }

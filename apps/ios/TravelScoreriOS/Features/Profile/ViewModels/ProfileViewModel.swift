@@ -52,6 +52,8 @@ final class ProfileViewModel: ObservableObject {
     @Published var orderedTraveledCountries: [String] = [] {
         didSet { }
     }
+    @Published var currentCountry: String? = nil
+    @Published var favoriteCountries: [String] = []
     
     // MARK: - Dependencies
     let profileService: ProfileService
@@ -114,6 +116,8 @@ final class ProfileViewModel: ObservableObject {
         viewedBucketListCountries = []
         orderedBucketListCountries = []
         orderedTraveledCountries = []
+        currentCountry = nil
+        favoriteCountries = []
         mutualFriends = []
         mutualBucketCountries = []
         mutualTraveledCountries = []
