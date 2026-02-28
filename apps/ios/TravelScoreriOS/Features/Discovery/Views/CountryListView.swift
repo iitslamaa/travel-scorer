@@ -51,6 +51,12 @@ struct CountryListView: View {
     // Keep a handle to the latest recompute task so we can cancel stale work
     @State private var recomputeTask: Task<Void, Never>?
 
+    private var groupedCountries: [String: [Country]] {
+        Dictionary(grouping: visibleCountries) { country in
+            String(country.name.prefix(1)).uppercased()
+        }
+    }
+
     // MARK: - Quick swipe confirmation (brief checkmark)
 
     private enum QuickConfirm {
@@ -162,28 +168,46 @@ struct CountryListView: View {
     }
 
     var body: some View {
-        List(visibleCountries, id: \.id) { country in
-            CountryRow(
-                country: country,
-                isBucketed: profileVM.viewedBucketListCountries.contains(country.id),
-                isVisited: profileVM.viewedTraveledCountries.contains(country.id),
-                showConfirm: quickConfirmByCountryId[country.id] != nil,
-                onBucket: {
-                    Task {
-                        await profileVM.toggleBucket(country.id)
-                        flashConfirm(.bucket, for: country.id)
+        ScrollViewReader { proxy in
+            List {
+                ForEach(groupedCountries.keys.sorted(), id: \.self) { letter in
+                    Section(header: Text(letter)) {
+                        ForEach(groupedCountries[letter] ?? [], id: \.id) { country in
+                            CountryRow(
+                                country: country,
+                                isBucketed: profileVM.viewedBucketListCountries.contains(country.id),
+                                isVisited: profileVM.viewedTraveledCountries.contains(country.id),
+                                showConfirm: quickConfirmByCountryId[country.id] != nil,
+                                onBucket: {
+                                    Task {
+                                        await profileVM.toggleBucket(country.id)
+                                        flashConfirm(.bucket, for: country.id)
+                                    }
+                                },
+                                onVisited: {
+                                    Task {
+                                        await profileVM.toggleTraveled(country.id)
+                                        flashConfirm(.visited, for: country.id)
+                                    }
+                                }
+                            )
+                        }
                     }
-                },
-                onVisited: {
-                    Task {
-                        await profileVM.toggleTraveled(country.id)
-                        flashConfirm(.visited, for: country.id)
+                    .id(letter)
+                }
+            }
+            .listStyle(.plain)
+            .overlay(alignment: .trailing) {
+                AlphabetIndexView(
+                    letters: groupedCountries.keys.sorted()
+                ) { letter in
+                    withAnimation(.easeInOut) {
+                        proxy.scrollTo(letter, anchor: .top)
                     }
                 }
-            )
+                .padding(.trailing, 4)
+            }
         }
-        .listStyle(.plain)
-        // Recompute visible list when inputs change
         .onChange(of: searchText) { _, _ in
             scheduleRecomputeVisible()
         }
