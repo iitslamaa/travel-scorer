@@ -72,3 +72,4 @@ next-env.d.ts
 *.xcscmblueprint
 DerivedData/
 build/
+data/build-geo/
