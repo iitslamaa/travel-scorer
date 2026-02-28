@@ -94,7 +94,7 @@ struct ScoreWorldMapRepresentable: UIViewRepresentable {
             // China (mainland)
             "CN": MKCoordinateRegion(
                 center: CLLocationCoordinate2D(latitude: 35.0, longitude: 103.0),
-                span: MKCoordinateSpan(latitudeDelta: 36.0, longitudeDelta: 36.0)
+                span: MKCoordinateSpan(latitudeDelta: 28.0, longitudeDelta: 28.0)
             ),
 
             // Algeria
