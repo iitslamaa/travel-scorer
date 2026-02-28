@@ -339,14 +339,18 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
             renderer.fillColor = UIColor(red: 1.0, green: 0.82, blue: 0.0, alpha: 1.0)
             let delta = mapView.region.span.longitudeDelta
             let vertexCount = polygon.polygons.reduce(0) { $0 + $1.pointCount }
-
-            // Only suppress stroke for extremely complex coastlines at wide zoom levels
             let isComplex = vertexCount > 5000
 
-            if isComplex && delta > 60 {
+            // Always show stroke for China and Antarctica
+            if polygon.isoCode == "CN" || polygon.isoCode == "AQ" {
+                renderer.strokeColor = UIColor(red: 1.0, green: 0.45, blue: 0.0, alpha: 0.9)
+                renderer.lineWidth = 2.0
+            }
+            else if isComplex && delta > 60 {
                 renderer.strokeColor = UIColor.clear
                 renderer.lineWidth = 0
-            } else {
+            }
+            else {
                 renderer.strokeColor = UIColor(red: 1.0, green: 0.45, blue: 0.0, alpha: 0.9)
                 renderer.lineWidth = 2.0
             }

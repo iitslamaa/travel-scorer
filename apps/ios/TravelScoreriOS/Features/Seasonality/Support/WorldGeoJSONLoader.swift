@@ -145,8 +145,6 @@ struct WorldGeoJSONLoader {
 
         for (isoCode, polygons) in countryPolygonsByISO {
 
-            // Skip Antarctica
-            if isoCode == "AQ" { continue }
 
             guard !polygons.isEmpty else { continue }
 
