@@ -32,12 +32,24 @@ enum TravelStyle: String, CaseIterable, Identifiable {
     }
 }
 
-struct LanguageEntry: Identifiable, Equatable {
-    let id = UUID()
+enum LanguageProficiency: String, CaseIterable, Codable {
+    case learning = "Learning"
+    case conversational = "Conversational"
+    case fluent = "Fluent"
+}
+
+struct LanguageEntry: Identifiable, Equatable, Codable {
+    let id: UUID
     let name: String
-    let proficiency: String
+    let proficiency: LanguageProficiency
+
+    init(id: UUID = UUID(), name: String, proficiency: LanguageProficiency) {
+        self.id = id
+        self.name = name
+        self.proficiency = proficiency
+    }
 
     var display: String {
-        "\(name) (\(proficiency))"
+        "\(name) (\(proficiency.rawValue))"
     }
 }

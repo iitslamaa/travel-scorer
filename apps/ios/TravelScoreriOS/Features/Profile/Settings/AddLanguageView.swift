@@ -26,9 +26,27 @@ struct AddLanguageView: View {
     var body: some View {
         NavigationStack {
             List(languages) { language in
-                Button {
-                    onSelect(LanguageEntry(name: language.code, proficiency: "native"))
-                    dismiss()
+                NavigationLink {
+                    List {
+                        ForEach(LanguageProficiency.allCases, id: \.self) { level in
+                            Button {
+                                onSelect(
+                                    LanguageEntry(
+                                        name: language.code,
+                                        proficiency: level
+                                    )
+                                )
+                                dismiss()
+                            } label: {
+                                HStack {
+                                    Text(level.rawValue)
+                                    Spacer()
+                                }
+                            }
+                        }
+                    }
+                    .navigationTitle(language.displayName)
+                    .navigationBarTitleDisplayMode(.inline)
                 } label: {
                     Text(language.displayName)
                 }

@@ -22,6 +22,8 @@ extension ProfileViewModel {
         travelMode: String?,
         travelStyle: String?,
         nextDestination: String?,
+        currentCountry: String?,
+        favoriteCountries: [String]?,
         avatarUrl: String?
     ) async throws {
         let userId = self.userId
@@ -43,6 +45,8 @@ extension ProfileViewModel {
             travelStyle: travelStyle.map { [$0] },
             travelMode: travelMode.map { [$0] },
             nextDestination: nextDestination,
+            currentCountry: currentCountry,
+            favoriteCountries: favoriteCountries,
             onboardingCompleted: true
         )
         
@@ -60,6 +64,8 @@ extension ProfileViewModel {
             current.travelStyle = travelStyle.map { [$0] } ?? current.travelStyle
             current.travelMode = travelMode.map { [$0] } ?? current.travelMode
             current.nextDestination = nextDestination
+            current.currentCountry = currentCountry
+            current.favoriteCountries = favoriteCountries ?? current.favoriteCountries
 
             // Handle avatarUrl explicitly ("" means remove)
             if let avatarUrl {

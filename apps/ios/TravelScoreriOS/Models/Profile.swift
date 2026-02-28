@@ -17,6 +17,8 @@ struct Profile: Codable, Identifiable {
     var travelStyle: [String]
     var travelMode: [String]
     var nextDestination: String?
+    var currentCountry: String?
+    var favoriteCountries: [String]
 
     var onboardingCompleted: Bool?
 
@@ -30,6 +32,8 @@ struct Profile: Codable, Identifiable {
         case travelStyle = "travel_style"
         case travelMode = "travel_mode"
         case nextDestination = "next_destination"
+        case currentCountry = "current_country"
+        case favoriteCountries = "favorite_countries"
         case onboardingCompleted = "onboarding_completed"
     }
 
@@ -59,6 +63,8 @@ struct Profile: Codable, Identifiable {
         travelStyle = try container.decodeIfPresent([String].self, forKey: .travelStyle) ?? []
         travelMode = try container.decodeIfPresent([String].self, forKey: .travelMode) ?? []
         nextDestination = try container.decodeIfPresent(String.self, forKey: .nextDestination)
+        currentCountry = try container.decodeIfPresent(String.self, forKey: .currentCountry)
+        favoriteCountries = try container.decodeIfPresent([String].self, forKey: .favoriteCountries) ?? []
         onboardingCompleted = try container.decodeIfPresent(Bool.self, forKey: .onboardingCompleted)
     }
 }

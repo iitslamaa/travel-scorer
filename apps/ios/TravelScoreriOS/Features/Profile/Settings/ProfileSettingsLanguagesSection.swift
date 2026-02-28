@@ -12,6 +12,7 @@ struct ProfileSettingsLanguagesSection: View {
 
     @Binding var languages: [LanguageEntry]
     @Binding var showAddLanguage: Bool
+    @State private var editingLanguage: LanguageEntry? = nil
 
     private func displayName(for entry: LanguageEntry) -> String {
         LanguageRepository.shared.allLanguages
@@ -26,30 +27,89 @@ struct ProfileSettingsLanguagesSection: View {
             if languages.isEmpty {
                 Text("Add languages you speak or are learning")
                     .foregroundStyle(.secondary)
+                    .padding(.vertical, 4)
             } else {
-                ForEach(languages.indices, id: \.self) { index in
-                    HStack {
-                        Text(displayName(for: languages[index]))
-                            .foregroundStyle(.primary)
+                VStack(spacing: 14) {
+                    ForEach(languages.indices, id: \.self) { index in
+                        HStack(alignment: .center) {
 
-                        Spacer()
+                            Button {
+                                editingLanguage = languages[index]
+                            } label: {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(displayName(for: languages[index]))
+                                        .font(.body)
+                                        .foregroundStyle(.primary)
 
-                        Button {
-                            languages.remove(at: index)
-                        } label: {
-                            Image(systemName: "minus.circle.fill")
-                                .foregroundStyle(.red)
+                                    Text(languages[index].proficiency.rawValue)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            .buttonStyle(.plain)
+
+                            Spacer()
+
+                            Button {
+                                languages.remove(at: index)
+                            } label: {
+                                Image(systemName: "minus.circle.fill")
+                                    .foregroundStyle(.red)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                 }
             }
 
+            Divider()
+
             Button {
                 showAddLanguage = true
             } label: {
-                Label("Add language", systemImage: "plus")
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                HStack {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundStyle(.blue)
+                    Text("Add language")
+                        .fontWeight(.medium)
+                    Spacer()
+                }
+            }
+        }
+        .sheet(item: $editingLanguage) { entry in
+            NavigationStack {
+                List {
+                    ForEach(LanguageProficiency.allCases, id: \.self) { level in
+                        Button {
+                            if let index = languages.firstIndex(where: { $0.id == entry.id }) {
+                                languages[index] = LanguageEntry(
+                                    id: entry.id,
+                                    name: entry.name,
+                                    proficiency: level
+                                )
+                            }
+                            editingLanguage = nil
+                        } label: {
+                            HStack {
+                                Text(level.rawValue)
+                                Spacer()
+                                if entry.proficiency == level {
+                                    Image(systemName: "checkmark")
+                                        .foregroundStyle(.blue)
+                                }
+                            }
+                        }
+                    }
+                }
+                .navigationTitle("Proficiency")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Close") {
+                            editingLanguage = nil
+                        }
+                    }
+                }
             }
         }
     }

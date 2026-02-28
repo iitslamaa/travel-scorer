@@ -150,7 +150,9 @@ struct ProfileView: View {
                                 languages: languages,
                                 travelMode: travelModeLabel,
                                 travelStyle: travelStyleLabel,
-                                nextDestination: nextDestination
+                                nextDestination: nextDestination,
+                                currentCountry: profileVM.currentCountry,
+                                favoriteCountries: profileVM.favoriteCountries
                             )
 
                         } else {

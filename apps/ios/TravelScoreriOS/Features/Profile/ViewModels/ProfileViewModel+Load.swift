@@ -43,6 +43,9 @@ extension ProfileViewModel {
 
             print("🟢 assigning profile id:", fetchedProfile.id)
             profile = fetchedProfile
+            // Wire extended profile fields
+            currentCountry = fetchedProfile.currentCountry
+            favoriteCountries = fetchedProfile.favoriteCountries
 
             let fetchedFriends =
                 try await friendService.fetchFriends(for: startingUserId)
