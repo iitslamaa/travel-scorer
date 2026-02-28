@@ -269,7 +269,27 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
         }
         
         let padding = UIEdgeInsets(top: 40, left: 40, bottom: 40, right: 40)
-        mapView.setVisibleMapRect(combinedRect, edgePadding: padding, animated: true)
+
+        // Determine if country is extremely large in map space
+        let worldWidth = MKMapRect.world.size.width
+        let countryWidthRatio = combinedRect.size.width / worldWidth
+
+        // If country spans a large portion of the world, zoom slightly tighter
+        if countryWidthRatio > 0.15 {
+            let insetX = combinedRect.size.width * 0.15
+            let insetY = combinedRect.size.height * 0.15
+
+            let tighterRect = MKMapRect(
+                x: combinedRect.origin.x + insetX,
+                y: combinedRect.origin.y + insetY,
+                width: combinedRect.size.width - (insetX * 2),
+                height: combinedRect.size.height - (insetY * 2)
+            )
+
+            mapView.setVisibleMapRect(tighterRect, edgePadding: padding, animated: true)
+        } else {
+            mapView.setVisibleMapRect(combinedRect, edgePadding: padding, animated: true)
+        }
     }
     
     // MARK: - Renderer
@@ -317,8 +337,19 @@ final class ScoreWorldMapCoordinator: NSObject, MKMapViewDelegate {
         
         if isSelected {
             renderer.fillColor = UIColor(red: 1.0, green: 0.82, blue: 0.0, alpha: 1.0)
-            renderer.strokeColor = UIColor(red: 1.0, green: 0.45, blue: 0.0, alpha: 0.9)
-            renderer.lineWidth = selectedBorderWidth(for: mapView)
+            let delta = mapView.region.span.longitudeDelta
+            let vertexCount = polygon.polygons.reduce(0) { $0 + $1.pointCount }
+
+            // Only suppress stroke for extremely complex coastlines at wide zoom levels
+            let isComplex = vertexCount > 5000
+
+            if isComplex && delta > 60 {
+                renderer.strokeColor = UIColor.clear
+                renderer.lineWidth = 0
+            } else {
+                renderer.strokeColor = UIColor(red: 1.0, green: 0.45, blue: 0.0, alpha: 0.9)
+                renderer.lineWidth = 2.0
+            }
             renderer.lineJoin = .round
             renderer.lineCap = .round
         }
