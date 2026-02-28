@@ -165,6 +165,8 @@ struct CountryListView: View {
         List(visibleCountries, id: \.id) { country in
             CountryRow(
                 country: country,
+                isBucketed: profileVM.viewedBucketListCountries.contains(country.id),
+                isVisited: profileVM.viewedTraveledCountries.contains(country.id),
                 showConfirm: quickConfirmByCountryId[country.id] != nil,
                 onBucket: {
                     Task {
@@ -205,6 +207,8 @@ struct CountryListView: View {
 
 private struct CountryRow: View {
     let country: Country
+    let isBucketed: Bool
+    let isVisited: Bool
     let showConfirm: Bool
     let onBucket: () -> Void
     let onVisited: () -> Void
@@ -259,12 +263,12 @@ private struct CountryRow: View {
             .padding(.vertical, 6)
             .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                 Button(action: onBucket) {
-                    Text("🪣 Bucket")
+                    Text(isBucketed ? "🪣 Unbucket" : "🪣 Bucket")
                 }
                 .tint(.blue)
 
                 Button(action: onVisited) {
-                    Text("📝 Visited")
+                    Text(isVisited ? "📝 Unvisit" : "📝 Visited")
                 }
                 .tint(.green)
             }
