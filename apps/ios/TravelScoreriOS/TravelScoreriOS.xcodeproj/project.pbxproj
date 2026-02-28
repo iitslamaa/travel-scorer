@@ -94,6 +94,9 @@
 		170C227F2F47A9880090BA78 /* ScorePill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170C227E2F47A9880090BA78 /* ScorePill.swift */; };
 		170F3EC02F218C6C0083E900 /* APIConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 170F3EBF2F218C6C0083E900 /* APIConfig.swift */; };
 		17104CD72F49697500864630 /* WhenToGoCountryDrawerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17104CD62F49697500864630 /* WhenToGoCountryDrawerView.swift */; };
+		171EC56C2F5358A700FCB4AB /* travelaf.world.full.geo.json in Resources */ = {isa = PBXBuildFile; fileRef = 171EC56A2F5358A700FCB4AB /* travelaf.world.full.geo.json */; };
+		171EC56D2F5358A700FCB4AB /* travelaf.world.simplified.geo.json in Resources */ = {isa = PBXBuildFile; fileRef = 171EC56B2F5358A700FCB4AB /* travelaf.world.simplified.geo.json */; };
+		171EC56F2F53590600FCB4AB /* GeoJsonLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171EC56E2F53590600FCB4AB /* GeoJsonLoader.swift */; };
 		172A74C92F357340003EF4DF /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172A74C82F357340003EF4DF /* SessionManager.swift */; };
 		176796142F4CF4BC0011EC0E /* CountryAffordabilityCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176796132F4CF4BC0011EC0E /* CountryAffordabilityCard.swift */; };
 		176968BB2F4E6B3C0011661A /* OAuthPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176968BA2F4E6B3C0011661A /* OAuthPresenter.swift */; };
@@ -219,6 +222,9 @@
 		170C227E2F47A9880090BA78 /* ScorePill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScorePill.swift; sourceTree = "<group>"; };
 		170F3EBF2F218C6C0083E900 /* APIConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConfig.swift; sourceTree = "<group>"; };
 		17104CD62F49697500864630 /* WhenToGoCountryDrawerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhenToGoCountryDrawerView.swift; sourceTree = "<group>"; };
+		171EC56A2F5358A700FCB4AB /* travelaf.world.full.geo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = travelaf.world.full.geo.json; path = "/Users/lamayassine/travel-af/apps/mobile/assets/geo/travelaf.world.full.geo.json"; sourceTree = "<absolute>"; };
+		171EC56B2F5358A700FCB4AB /* travelaf.world.simplified.geo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = travelaf.world.simplified.geo.json; path = "/Users/lamayassine/travel-af/apps/mobile/assets/geo/travelaf.world.simplified.geo.json"; sourceTree = "<absolute>"; };
+		171EC56E2F53590600FCB4AB /* GeoJsonLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoJsonLoader.swift; sourceTree = "<group>"; };
 		172A74C82F357340003EF4DF /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		176796132F4CF4BC0011EC0E /* CountryAffordabilityCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryAffordabilityCard.swift; sourceTree = "<group>"; };
 		176968BA2F4E6B3C0011661A /* OAuthPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthPresenter.swift; sourceTree = "<group>"; };
@@ -814,6 +820,9 @@
 		17AFEC812EC2C3D800B9585B = {
 			isa = PBXGroup;
 			children = (
+				171EC56E2F53590600FCB4AB /* GeoJsonLoader.swift */,
+				171EC56A2F5358A700FCB4AB /* travelaf.world.full.geo.json */,
+				171EC56B2F5358A700FCB4AB /* travelaf.world.simplified.geo.json */,
 				170C22482F479B070090BA78 /* Models */,
 				170C22462F479AED0090BA78 /* Shared */,
 				170C22452F479AE60090BA78 /* Features */,
@@ -929,6 +938,8 @@
 				170C217D2F4790E00090BA78 /* auth_loop.mp4 in Resources */,
 				170C217E2F4790E00090BA78 /* countries.geojson in Resources */,
 				170C21812F4790E00090BA78 /* intro.mp4 in Resources */,
+				171EC56C2F5358A700FCB4AB /* travelaf.world.full.geo.json in Resources */,
+				171EC56D2F5358A700FCB4AB /* travelaf.world.simplified.geo.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -955,6 +966,7 @@
 				170C212E2F4790E00090BA78 /* CountryTravelSafeCard.swift in Sources */,
 				170C212F2F4790E00090BA78 /* CountryTravelSafeHelpers.swift in Sources */,
 				170C21302F4790E00090BA78 /* CountryVisaCard.swift in Sources */,
+				171EC56F2F53590600FCB4AB /* GeoJsonLoader.swift in Sources */,
 				170C21312F4790E00090BA78 /* CountryVisaHelpers.swift in Sources */,
 				1776C9652F50FD6F00AFC488 /* AppLanguage.swift in Sources */,
 				170C21322F4790E00090BA78 /* MetaDTO.swift in Sources */,
