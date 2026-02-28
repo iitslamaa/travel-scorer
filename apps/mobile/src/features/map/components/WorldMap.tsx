@@ -184,7 +184,7 @@ export function WorldMap({
     let zoomRings;
 
     if (normalized === 'BQ') {
-      // Bonaire: zoom only to largest island (previous behavior was correct)
+      // Bonaire: largest ring only
       const largest = ringAreas.reduce((a, b) => (b.area > a.area ? b : a), ringAreas[0]);
       zoomRings = largest ? [largest.poly] : [];
     } else if (normalized === 'AG') {
@@ -199,11 +199,53 @@ export function WorldMap({
 
     // Hardcoded mainland zoom overrides (ignore overseas territories)
     const ZOOM_OVERRIDES: Record<string, { latitude: number; longitude: number; latitudeDelta: number; longitudeDelta: number }> = {
-      'GB': { latitude: 54.5, longitude: -3, latitudeDelta: 8, longitudeDelta: 8 },
+      // Antarctica
+      'AQ': { latitude: -82, longitude: 0, latitudeDelta: 35, longitudeDelta: 35 },
+
+      // Antigua & Barbuda
+      'AG': { latitude: 17.18, longitude: -61.79, latitudeDelta: 1.2, longitudeDelta: 1.2 },
+
+      // Bouvet Island (more zoomed-out framing)
+      'BV': { latitude: -54.43, longitude: 3.36, latitudeDelta: 2.5, longitudeDelta: 2.5 },
+
+      // China (zoom out more)
+      'CN': { latitude: 35, longitude: 103, latitudeDelta: 34, longitudeDelta: 34 },
+
+      // Christmas Island (slightly tighter)
+      'CX': { latitude: -10.45, longitude: 105.65, latitudeDelta: 2.0, longitudeDelta: 2.0 },
+
+      // United Kingdom
+      'GB': { latitude: 54.5, longitude: -3, latitudeDelta: 10, longitudeDelta: 10 },
+
+      // Greenland (zoomed out and moved much lower)
+      'GL': { latitude: 52, longitude: -42, latitudeDelta: 70, longitudeDelta: 70 },
+
+      // Russia (zoom out more)
+      'RU': { latitude: 61, longitude: 105, latitudeDelta: 60, longitudeDelta: 120 },
+
+      // United States (zoom out more incl. Alaska)
+      'US': { latitude: 39, longitude: -98, latitudeDelta: 55, longitudeDelta: 90 },
+
+      // Canada (shift down slightly)
+      'CA': { latitude: 56, longitude: -96, latitudeDelta: 50, longitudeDelta: 80 },
+
+      // Singapore (tight zoom)
+      'SG': { latitude: 1.35, longitude: 103.82, latitudeDelta: 0.4, longitudeDelta: 0.4 },
+
+      // Vatican City (very tight zoom)
+      'VA': { latitude: 41.9029, longitude: 12.4534, latitudeDelta: 0.08, longitudeDelta: 0.08 },
+
+      // Sierra Leone (force mainland framing)
+      'SL': { latitude: 8.6, longitude: -11.8, latitudeDelta: 4.5, longitudeDelta: 4.5 },
+
+      // France (mainland only feel)
       'FR': { latitude: 46.5, longitude: 2.5, latitudeDelta: 10, longitudeDelta: 10 },
-      'NL': { latitude: 52.2, longitude: 5.3, latitudeDelta: 4, longitudeDelta: 4 },
-      'CN': { latitude: 35, longitude: 103, latitudeDelta: 20, longitudeDelta: 20 },
-      'LY': { latitude: 27, longitude: 17, latitudeDelta: 18, longitudeDelta: 18 },
+
+      // Netherlands (mainland only feel)
+      'NL': { latitude: 52.2, longitude: 5.3, latitudeDelta: 5, longitudeDelta: 5 },
+
+      // Libya
+      'LY': { latitude: 27, longitude: 17, latitudeDelta: 20, longitudeDelta: 20 },
     };
 
     if (ZOOM_OVERRIDES[normalized]) {
