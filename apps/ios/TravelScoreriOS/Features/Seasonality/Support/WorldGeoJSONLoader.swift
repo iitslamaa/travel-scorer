@@ -78,10 +78,14 @@ struct WorldGeoJSONLoader {
                     ?? (jsonObject["ADMIN"] as? String)
                     ?? (jsonObject["NAME"] as? String)
 
-                // Exclude Northern Cyprus entirely to prevent artifact highlighting
-                if let upperName = name?.uppercased(),
-                   upperName.contains("NORTHERN CYPRUS") {
-                    continue
+                // Force all Cyprus-related geometries (including Northern Cyprus and UN buffer zone)
+                // to map to Republic of Cyprus ISO code
+                if let upperName = name?.uppercased() {
+                    if upperName.contains("CYPRUS") ||
+                       upperName.contains("NORTHERN CYPRUS") ||
+                       upperName.contains("BUFFER ZONE") {
+                        iso = "CY"
+                    }
                 }
 
                 // RN-style layered ISO resolution
@@ -112,7 +116,9 @@ struct WorldGeoJSONLoader {
                     ?? (isoA3?.count == 3 ? normalizeIso(String(isoA3!.prefix(2))) : nil)
                     ?? (shapeGroup != nil ? iso3ToIso2[shapeGroup!.uppercased()] : nil)
 
-                iso = normalizeIso(rawIso)
+                if iso == nil {
+                    iso = normalizeIso(rawIso)
+                }
             }
 
             guard let isoCode = iso else { continue }
