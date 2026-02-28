@@ -14,6 +14,8 @@ struct CustomWeightsView: View {
     @EnvironmentObject private var weightsStore: ScoreWeightsStore
     @EnvironmentObject private var sessionManager: SessionManager
     @State private var isSaving: Bool = false
+    @State private var originalWeights: ScoreWeights? = nil
+    @State private var hasSaved: Bool = false
     
     // MARK: - Derived State
     
@@ -27,10 +29,17 @@ struct CustomWeightsView: View {
         totalWeight <= 0.0001
     }
     
+    private var isDirty: Bool {
+        guard let original = originalWeights else { return false }
+        return original.advisory != weightsStore.weights.advisory ||
+               original.visa != weightsStore.weights.visa ||
+               original.affordability != weightsStore.weights.affordability
+    }
+    
     var body: some View {
         Form {
             
-            Section(header: Text("Customize Your Travel Priorities")) {
+            Section {
                 
                 if isZeroSum {
                     Text("At least one category must have weight.")
@@ -52,22 +61,46 @@ struct CustomWeightsView: View {
                     title: "Travel Advisory",
                     value: $weightsStore.weights.advisory
                 )
+                
+                Text("Your selected weights determine how Travelability Scores are calculated throughout the app. All country rankings, comparisons, and visualizations will reflect these preferences once saved.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.top, 8)
             }
             
             Section {
-                Button("Save Preferences") {
+                Button {
                     Task {
                         await saveWeightsToBackend()
                     }
+                } label: {
+                    Text(hasSaved ? "Saved ✓" : "Save Preferences")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(isDirty ? Color.blue : Color.gray.opacity(0.3))
+                        .foregroundColor(.white)
+                        .cornerRadius(12)
                 }
-                .disabled(sessionManager.userId == nil || isSaving || isZeroSum)
+                .disabled(sessionManager.userId == nil || isSaving || isZeroSum || !isDirty)
+                .animation(.easeInOut, value: isDirty)
 
-                Button("Reset to Default") {
+                Button {
                     withAnimation(.easeInOut(duration: 0.25)) {
                         weightsStore.resetToDefault()
                     }
+                } label: {
+                    Text("Reset to Default")
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.gray.opacity(0.15))
+                        .foregroundColor(.primary)
+                        .cornerRadius(12)
                 }
-                .foregroundColor(.red)
+            }
+        }
+        .onAppear {
+            if originalWeights == nil {
+                originalWeights = weightsStore.weights
             }
         }
         .navigationTitle("Travel Preferences")
@@ -89,7 +122,18 @@ struct CustomWeightsView: View {
                     .foregroundStyle(.secondary)
             }
 
-            Slider(value: value, in: 0...1, step: 0.05)
+            Slider(
+                value: Binding(
+                    get: { value.wrappedValue },
+                    set: { newValue in
+                        let clamped = min(max(newValue, 0), 1)
+                        value.wrappedValue = clamped
+                    }
+                ),
+                in: 0...1,
+                step: 0.05
+            )
+            .animation(.easeInOut, value: value.wrappedValue)
         }
         .padding(.vertical, 6)
     }
@@ -137,6 +181,12 @@ struct CustomWeightsView: View {
                 .execute()
 
             print("✅ Weights saved to Supabase")
+            originalWeights = weightsStore.weights
+            hasSaved = true
+
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                hasSaved = false
+            }
         } catch {
             print("❌ Failed saving weights:", error)
         }
