@@ -13,8 +13,11 @@ class CountryPolygon: MKMultiPolygon {
 
 struct WorldGeoJSONLoader {
 
-    // Single cache — always full dataset
+    // Full-detail cache
     private static var cachedPolygons: [CountryPolygon]?
+
+    // Simplified (LOD) cache for world/low-zoom rendering
+    private static var cachedSimplifiedPolygons: [CountryPolygon]?
 
     // RN parity: ISO3 -> ISO2 map (optional file: iso3_to_iso2.json)
     private static var iso3ToIso2: [String: String] = {
@@ -38,6 +41,62 @@ struct WorldGeoJSONLoader {
         if raw == "UK" { return "GB" }
         if raw.count == 2 { return raw }
         return nil
+    }
+
+    // MARK: - Simplification (Basic LOD)
+
+    private static func simplifiedPolygon(from polygon: MKPolygon) -> MKPolygon {
+        let count = polygon.pointCount
+
+        // For small polygons, do not simplify
+        if count < 200 {
+            return polygon
+        }
+
+        let points = polygon.points()
+        var coords: [CLLocationCoordinate2D] = []
+        coords.reserveCapacity(count)
+
+        for i in 0..<count {
+            let coord = points[i].coordinate
+            coords.append(coord)
+        }
+
+        // Downsample aggressively for very large coastlines
+        let strideAmount: Int
+        if count > 8000 {
+            strideAmount = 12
+        } else if count > 4000 {
+            strideAmount = 8
+        } else if count > 2000 {
+            strideAmount = 5
+        } else {
+            strideAmount = 3
+        }
+
+        var simplified: [CLLocationCoordinate2D] = []
+        simplified.reserveCapacity(coords.count / strideAmount + 1)
+
+        for i in stride(from: 0, to: coords.count, by: strideAmount) {
+            simplified.append(coords[i])
+        }
+
+        // Ensure ring closes properly
+        if let first = simplified.first,
+           let last = simplified.last,
+           first.latitude != last.latitude || first.longitude != last.longitude {
+            simplified.append(first)
+        }
+
+        return MKPolygon(coordinates: simplified, count: simplified.count)
+    }
+
+    private static func simplifiedCountryPolygon(from country: CountryPolygon) -> CountryPolygon {
+        let simplifiedPolygons = country.polygons.map { simplifiedPolygon(from: $0) }
+        let newCountry = CountryPolygon(simplifiedPolygons)
+        newCountry.isoCode = country.isoCode
+        newCountry.countryName = country.countryName
+        return newCountry
     }
 
     static func loadPolygons(selectedIso: String? = nil) -> [CountryPolygon] {
@@ -147,8 +206,27 @@ struct WorldGeoJSONLoader {
 
         cachedPolygons = finalPolygons
 
+        // Build simplified dataset once
+        cachedSimplifiedPolygons = finalPolygons.map {
+            simplifiedCountryPolygon(from: $0)
+        }
+
         print("🌎 Loaded FULL dataset overlay count:", finalPolygons.count)
 
         return finalPolygons
+    }
+
+    static func loadSimplifiedPolygons() -> [CountryPolygon] {
+        if let cached = cachedSimplifiedPolygons {
+            return cached
+        }
+
+        // Ensure full dataset is loaded first
+        let full = loadPolygons()
+        cachedSimplifiedPolygons = full.map {
+            simplifiedCountryPolygon(from: $0)
+        }
+
+        return cachedSimplifiedPolygons ?? []
     }
 }
