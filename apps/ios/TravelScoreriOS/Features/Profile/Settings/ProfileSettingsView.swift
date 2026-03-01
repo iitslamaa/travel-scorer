@@ -467,8 +467,10 @@ struct SettingsScrollContent: View {
                     homeCountries: homeCountries,
                     currentCountry: currentCountry ?? "",
                     favoriteCountries: favoriteCountries,
+                    nextDestination: nextDestination,
                     showHomePicker: $showHomePicker,
                     showCurrentCountryPicker: $showCurrentCountryPicker,
+                    showNextDestinationPicker: $showNextDestinationPicker,
                     showFavoriteCountriesPicker: $showFavoriteCountriesPicker
                 )
 
@@ -482,11 +484,6 @@ struct SettingsScrollContent: View {
                     travelStyle: $travelStyle,
                     showTravelModeDialog: $showTravelModeDialog,
                     showTravelStyleDialog: $showTravelStyleDialog
-                )
-
-                ProfileSettingsNextDestinationSection(
-                    nextDestination: nextDestination,
-                    showNextDestinationPicker: $showNextDestinationPicker
                 )
 
                 Spacer(minLength: 40)
