@@ -23,25 +23,15 @@ struct ProfileInfoSection: View {
     let travelStyle: String?
     let nextDestination: String?
 
+    let currentCountry: String?
+    let favoriteCountries: [String]
+
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        let _ = print("🧩 ProfileInfoSection BODY")
-        let _ = print("   relationshipState:", relationshipState)
-        let _ = print("   orderedTraveledCountries count:", orderedTraveledCountries.count)
-        let _ = print("   orderedTraveledCountries:", orderedTraveledCountries)
-        let _ = print("   orderedBucketListCountries count:", orderedBucketListCountries.count)
-        let _ = print("   orderedBucketListCountries:", orderedBucketListCountries)
-        let _ = print("   viewedTraveledCountries count:", viewedTraveledCountries.count)
-        let _ = print("   viewedBucketListCountries count:", viewedBucketListCountries.count)
-        let _ = print("   mutualTraveledCountries:", mutualTraveledCountries)
-        let _ = print("   mutualBucketCountries:", mutualBucketCountries)
-        let _ = print("   languages:", languages)
-        let _ = print("   travelMode:", travelMode as Any)
-        let _ = print("   travelStyle:", travelStyle as Any)
-        let _ = print("   nextDestination:", nextDestination as Any)
         LazyVStack(spacing: 28) {
             languagesCard
+            locationCard
 
             if relationshipState == .friends && !mutualLanguages.isEmpty {
                 sharedLanguagesCard
@@ -49,7 +39,6 @@ struct ProfileInfoSection: View {
 
             travelModeCard
             travelStyleCard
-            nextDestinationCard
             infoCards
         }
         .padding(.horizontal, 20)
@@ -67,14 +56,12 @@ struct ProfileInfoSection: View {
                     countryCodes: orderedTraveledCountries,
                     highlightColor: .gold
                 )
-                .id("traveled-\(orderedTraveledCountries.joined(separator: ","))")
 
                 CollapsibleCountrySection(
                     title: "Bucket List",
                     countryCodes: orderedBucketListCountries,
                     highlightColor: .blue
                 )
-                .id("bucket-\(orderedBucketListCountries.joined(separator: ","))")
 
             } else if relationshipState == .friends {
 
@@ -84,7 +71,6 @@ struct ProfileInfoSection: View {
                     highlightColor: .gold,
                     mutualCountries: Set(mutualTraveledCountries)
                 )
-                .id("traveled-\(orderedTraveledCountries.joined(separator: ","))")
 
                 CollapsibleCountrySection(
                     title: "Bucket List",
@@ -92,19 +78,11 @@ struct ProfileInfoSection: View {
                     highlightColor: .blue,
                     mutualCountries: Set(mutualBucketCountries)
                 )
-                .id("bucket-\(orderedBucketListCountries.joined(separator: ","))")
 
             } else {
                 lockedProfileMessage
             }
         }
-    }
-
-    private func displayName(for code: String) -> String {
-        LanguageRepository.shared.allLanguages
-            .first(where: { $0.code == code })?
-            .displayName
-            ?? code
     }
 
     private var languagesCard: some View {
@@ -118,8 +96,7 @@ struct ProfileInfoSection: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
-                let displayLanguages = languages.map { displayName(for: $0) }
-                Text(displayLanguages.joined(separator: " · "))
+                Text(languages.joined(separator: " · "))
                     .font(.subheadline)
                     .foregroundStyle(.primary)
             }
@@ -136,11 +113,82 @@ struct ProfileInfoSection: View {
                 .font(.subheadline)
                 .fontWeight(.semibold)
 
-            let displayShared = mutualLanguages.map { displayName(for: $0) }
-
-            Text(displayShared.joined(separator: " · "))
+            Text(mutualLanguages.joined(separator: " · "))
                 .font(.subheadline)
                 .foregroundStyle(.blue)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private var locationCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+
+            if let currentCountry, !currentCountry.isEmpty {
+                let upper = currentCountry.uppercased()
+                let flag = flagEmoji(for: upper)
+                let name = countryName(for: upper)
+
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Current Country")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+
+                    Spacer(minLength: 12)
+
+                    Text("\(name) \(flag)")
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                }
+            }
+
+            if currentCountry != nil && nextDestination != nil {
+                Divider()
+                    .opacity(0.12)
+            }
+
+            if let code = nextDestination, !code.isEmpty {
+                let upper = code.uppercased()
+                let flag = flagEmoji(for: upper)
+                let name = countryName(for: upper)
+
+                HStack(alignment: .firstTextBaseline) {
+                    Text("Next Destination")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+
+                    Spacer(minLength: 12)
+
+                    Text("\(name) \(flag)")
+                        .font(.subheadline)
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                }
+            }
+
+            if nextDestination != nil && !favoriteCountries.isEmpty {
+                Divider()
+                    .opacity(0.12)
+            }
+
+            if !favoriteCountries.isEmpty {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text("Favorite Countries")
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+
+                    Spacer(minLength: 12)
+
+                    HStack(spacing: 6) {
+                        ForEach(favoriteCountries.sorted(), id: \.self) { code in
+                            Text(flagEmoji(for: code.uppercased()))
+                        }
+                    }
+                }
+            }
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -192,30 +240,6 @@ struct ProfileInfoSection: View {
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
-    private var nextDestinationCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if let code = nextDestination, !code.isEmpty {
-                let upper = code.uppercased()
-                let flag = flagEmoji(for: upper)
-                let name = countryName(for: upper)
-
-                Text("Next Destination: \(name) \(flag)")
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-            } else {
-                Text("Next Destination: Not set")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-    }
-
     private func flagEmoji(for countryCode: String) -> String {
         countryCode
             .uppercased()
@@ -248,5 +272,4 @@ struct ProfileInfoSection: View {
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
-
 }

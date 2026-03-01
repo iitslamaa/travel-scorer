@@ -62,7 +62,17 @@ struct ProfileView: View {
 
     private var username: String { profileVM.profile?.username ?? "" }
     private var homeCountryCodes: [String] { profileVM.profile?.livedCountries ?? [] }
-    private var languages: [String] { profileVM.profile?.languages ?? [] }
+    private var languages: [String] {
+        guard let entries = profileVM.profile?.languages else { return [] }
+
+        return entries.map { entry in
+            let displayName = LanguageRepository.shared.allLanguages
+                .first(where: { $0.code == entry.code })?
+                .displayName ?? entry.code
+
+            return "\(displayName) — \(entry.proficiency)"
+        }
+    }
     private var friendCount: Int { profileVM.friendCount }
 
     private var isReadyToRenderProfile: Bool {
@@ -110,8 +120,7 @@ struct ProfileView: View {
                 let relationshipState = profileVM.relationshipState
 
                 ScrollView {
-                    VStack(spacing: 0) {
-
+                    VStack(spacing: 24) {
                         ProfileHeaderView(
                             profile: profileVM.profile,
                             username: username,
@@ -150,14 +159,18 @@ struct ProfileView: View {
                                 languages: languages,
                                 travelMode: travelModeLabel,
                                 travelStyle: travelStyleLabel,
-                                nextDestination: nextDestination
+                                nextDestination: nextDestination,
+                                currentCountry: profileVM.profile?.currentCountry,
+                                favoriteCountries: profileVM.profile?.favoriteCountries ?? []
                             )
+                            .padding(.horizontal, 16)
 
                         } else {
                             LockedProfileView()
                                 .padding(.top, 40)
                         }
                     }
+                    .padding(.top, 8)
                 }
                 .refreshable {
                     await profileVM.reloadProfile()
