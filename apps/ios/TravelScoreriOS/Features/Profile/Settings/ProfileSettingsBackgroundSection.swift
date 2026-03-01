@@ -13,9 +13,11 @@ struct ProfileSettingsBackgroundSection: View {
     let homeCountries: Set<String>
     let currentCountry: String?
     let favoriteCountries: [String]
+    let nextDestination: String?
 
     @Binding var showHomePicker: Bool
     @Binding var showCurrentCountryPicker: Bool
+    @Binding var showNextDestinationPicker: Bool
     @Binding var showFavoriteCountriesPicker: Bool
 
     var body: some View {
@@ -69,6 +71,41 @@ struct ProfileSettingsBackgroundSection: View {
 
                         if let currentCountry {
                             let upper = currentCountry.uppercased()
+                            HStack(spacing: 6) {
+                                Text(flag(for: upper))
+                                Text(localizedName(for: upper))
+                            }
+                            .foregroundStyle(.primary)
+                            .font(.subheadline)
+                        } else {
+                            Text("Not set")
+                                .foregroundStyle(.secondary)
+                                .font(.subheadline)
+                        }
+
+                        Image(systemName: "chevron.right")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 14)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                Divider().opacity(0.18)
+
+                // Next Destination
+                Button {
+                    showNextDestinationPicker = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Text("Next destination")
+                            .foregroundStyle(.primary)
+
+                        Spacer()
+
+                        if let nextDestination {
+                            let upper = nextDestination.uppercased()
                             HStack(spacing: 6) {
                                 Text(flag(for: upper))
                                 Text(localizedName(for: upper))
