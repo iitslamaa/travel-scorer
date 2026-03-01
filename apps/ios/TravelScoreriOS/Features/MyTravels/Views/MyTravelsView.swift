@@ -74,7 +74,6 @@ struct MyTravelsView: View {
             // 2) Try to refresh from API
             if let fresh = await CountryAPI.refreshCountriesIfNeeded(minInterval: 60), !fresh.isEmpty {
                 countries = fresh
-                return
             }
 
             // Fetch traveled countries for current user (identity-scoped)
