@@ -153,6 +153,10 @@ struct MoreView: View {
                 ListsView()
             }
 
+            NavigationLink("Send Feedback") {
+                FeedbackView()
+            }
+
             NavigationLink("Legal") {
                 LegalView()
             }
