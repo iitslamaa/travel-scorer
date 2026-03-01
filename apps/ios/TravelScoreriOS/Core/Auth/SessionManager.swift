@@ -33,7 +33,7 @@ final class SessionManager: ObservableObject {
     @Published private(set) var isAuthSuppressed: Bool = false
 
 
-    private let supabase: SupabaseManager
+    let supabase: SupabaseManager
     private var cancellables = Set<AnyCancellable>()
 
     private let bucketListStore: BucketListStore
