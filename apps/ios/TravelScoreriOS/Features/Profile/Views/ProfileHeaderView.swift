@@ -21,13 +21,13 @@ struct ProfileHeaderView: View {
                       " relationshipState:", relationshipState as Any,
                       " effectiveState:", effectiveState,
                       " friendCount:", friendCount)
-        HStack(alignment: .top, spacing: 16) {
+        HStack(alignment: .top, spacing: 24) {
 
             // LEFT COLUMN — Identity
             VStack(alignment: .center, spacing: 12) {
 
                 avatarView
-                    .frame(width: 120, height: 120)
+                    .frame(width: 104, height: 104)
 
                 VStack(alignment: .center, spacing: 6) {
 
@@ -94,17 +94,15 @@ struct ProfileHeaderView: View {
                     }
                 }
             }
-            .frame(maxWidth: 140)
-
-            Spacer().frame(width: 0)
+            .frame(width: 140)
 
             // RIGHT COLUMN — Improved countries block (always show fields with fallback)
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 16) {
 
                 // Current Country
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Current")
-                        .font(.caption)
+                        .font(.caption.weight(.medium))
                         .foregroundStyle(.secondary)
 
                     if let country = profile?.currentCountry,
@@ -122,7 +120,7 @@ struct ProfileHeaderView: View {
                 // Next Destination
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Next")
-                        .font(.caption)
+                        .font(.caption.weight(.medium))
                         .foregroundStyle(.secondary)
 
                     if let destination = profile?.nextDestination,
@@ -140,7 +138,7 @@ struct ProfileHeaderView: View {
                 // Favorites
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Favorites")
-                        .font(.caption)
+                        .font(.caption.weight(.medium))
                         .foregroundStyle(.secondary)
 
                     if let favorites = profile?.favoriteCountries,
@@ -171,7 +169,6 @@ struct ProfileHeaderView: View {
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .layoutPriority(1)
-            .padding(.leading, -4)
         }
         .onChange(of: profile?.id) { oldValue, newValue in
             print("🔁 ProfileHeaderView profile.id changed — instance:", instanceId,
