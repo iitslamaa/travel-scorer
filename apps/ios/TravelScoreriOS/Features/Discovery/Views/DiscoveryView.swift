@@ -12,6 +12,7 @@ struct DiscoveryView: View {
     @EnvironmentObject private var profileVM: ProfileViewModel
 
     @State private var searchText = ""
+    @FocusState private var isSearchFocused: Bool
     @State private var showingWeights = false
     @State private var sort: CountrySort = .name
     @State private var sortOrder: SortOrder = .ascending
@@ -44,6 +45,7 @@ struct DiscoveryView: View {
                 sort: $sort,
                 sortOrder: $sortOrder
             )
+            .scrollDismissesKeyboard(.interactively)
         }
         .refreshable {
             await reloadCountries()
@@ -76,6 +78,11 @@ struct DiscoveryView: View {
                 } label: {
                     Image(systemName: "map")
                 }
+                .simultaneousGesture(
+                    TapGesture().onEnded {
+                        isSearchFocused = false
+                    }
+                )
             }
         }
         .sheet(isPresented: $showingWeights) {
@@ -83,15 +90,29 @@ struct DiscoveryView: View {
                 CustomWeightsView()
             }
         }
+        .onChange(of: showingWeights) { _, newValue in
+            if newValue {
+                isSearchFocused = false
+            }
+        }
         .safeAreaInset(edge: .bottom) {
-            FloatingSearchBar(text: $searchText)
+            FloatingSearchBar(text: $searchText, isFocused: $isSearchFocused)
+        }
+        .contentShape(Rectangle())
+        .simultaneousGesture(
+            TapGesture().onEnded {
+                isSearchFocused = false
+            }
+        )
+        .onDisappear {
+            isSearchFocused = false
         }
     }
 }
 
 struct FloatingSearchBar: View {
     @Binding var text: String
-    @FocusState private var isFocused: Bool
+    var isFocused: FocusState<Bool>.Binding
 
     var body: some View {
         VStack {
@@ -100,13 +121,27 @@ struct FloatingSearchBar: View {
                     .foregroundStyle(.secondary)
 
                 TextField("Search countries and territories", text: $text)
-                    .focused($isFocused)
+                    .focused(isFocused)
+                    .submitLabel(.search)
                     .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
+                    .onSubmit {
+                        isFocused.wrappedValue = false
+                    }
 
-                if isFocused {
+                if isFocused.wrappedValue && !text.isEmpty {
                     Button {
-                        isFocused = false
+                        text = ""
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .foregroundStyle(.secondary)
+                    }
+                    .buttonStyle(.plain)
+                }
+
+                if isFocused.wrappedValue {
+                    Button {
+                        isFocused.wrappedValue = false
                     } label: {
                         Image(systemName: "chevron.down")
                             .foregroundStyle(.secondary)
