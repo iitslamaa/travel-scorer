@@ -21,34 +21,36 @@ struct ProfileHeaderView: View {
                       " relationshipState:", relationshipState as Any,
                       " effectiveState:", effectiveState,
                       " friendCount:", friendCount)
-        VStack(alignment: .leading, spacing: 16) {
+        HStack(alignment: .top, spacing: 16) {
 
-            HStack(alignment: .center, spacing: 20) {
+            // LEFT COLUMN — Identity
+            VStack(alignment: .center, spacing: 12) {
 
                 avatarView
-                    .frame(width: 110, height: 110)
+                    .frame(width: 120, height: 120)
 
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .center, spacing: 6) {
 
                     Text(profile?.fullName ?? "")
                         .font(.title2)
-                        .fontWeight(.bold)
+                        .fontWeight(.semibold)
+                        .multilineTextAlignment(.center)
 
                     if !username.isEmpty {
                         Text("@\(username)")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
                     }
 
                     if !homeCountryCodes.isEmpty {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 6) {
-                                ForEach(homeCountryCodes, id: \.self) { code in
-                                    Text(flagEmoji(for: code))
-                                        .font(.title3)
-                                }
+                        HStack(spacing: 6) {
+                            ForEach(homeCountryCodes, id: \.self) { code in
+                                Text(flagEmoji(for: code))
+                                    .font(.title3)
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
                     }
 
                     if effectiveState != .selfProfile {
@@ -76,22 +78,100 @@ struct ProfileHeaderView: View {
                                 }
 
                                 Text(buttonLabel(for: effectiveState))
-                                    .font(.caption)
+                                    .font(.subheadline)
                                     .fontWeight(.semibold)
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 9)
+                            .padding(.horizontal, 18)
+                            .padding(.vertical, 10)
                             .background(
                                 Capsule()
                                     .fill(backgroundColor(for: effectiveState))
                             )
                             .foregroundStyle(foregroundColor(for: effectiveState))
                         }
+                        .padding(.top, 4)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                }
+            }
+            .frame(maxWidth: 140)
+
+            Spacer().frame(width: 0)
+
+            // RIGHT COLUMN — Improved countries block (always show fields with fallback)
+            VStack(alignment: .leading, spacing: 14) {
+
+                // Current Country
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Current")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if let country = profile?.currentCountry,
+                       !country.isEmpty {
+                        Text(formattedCountry(country))
+                            .font(.subheadline.weight(.medium))
+                            .lineLimit(1)
+                    } else {
+                        Text("Not set")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
                 }
 
-                Spacer()
+                // Next Destination
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Next")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if let destination = profile?.nextDestination,
+                       !destination.isEmpty {
+                        Text(formattedCountry(destination))
+                            .font(.subheadline.weight(.medium))
+                            .lineLimit(1)
+                    } else {
+                        Text("Not set")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                // Favorites
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Favorites")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if let favorites = profile?.favoriteCountries,
+                       !favorites.isEmpty {
+
+                        let visible = Array(favorites.prefix(10))
+                        let remaining = favorites.count - visible.count
+
+                        HStack(spacing: 6) {
+                            ForEach(visible, id: \.self) { code in
+                                Text(flagEmoji(for: code.uppercased()))
+                                    .font(.title3)
+                            }
+
+                            if remaining > 0 {
+                                Text("+\(remaining)")
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                            }
+                        }
+
+                    } else {
+                        Text("Not set")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                    }
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .layoutPriority(1)
+            .padding(.leading, -4)
         }
         .onChange(of: profile?.id) { oldValue, newValue in
             print("🔁 ProfileHeaderView profile.id changed — instance:", instanceId,
@@ -109,7 +189,9 @@ struct ProfileHeaderView: View {
                   " new:", newValue)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 8)
         .background(Color(.systemBackground))
     }
 
@@ -206,5 +288,12 @@ struct ProfileHeaderView: View {
             .compactMap { UnicodeScalar(127397 + $0.value) }
             .map { String($0) }
             .joined()
+    }
+
+    private func formattedCountry(_ code: String) -> String {
+        let upper = code.uppercased()
+        let locale = Locale(identifier: "en_US")
+        let name = locale.localizedString(forRegionCode: upper) ?? upper
+        return "\(name) \(flagEmoji(for: upper))"
     }
 }

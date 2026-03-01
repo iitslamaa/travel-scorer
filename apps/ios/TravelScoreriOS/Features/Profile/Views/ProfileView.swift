@@ -120,7 +120,7 @@ struct ProfileView: View {
                 let relationshipState = profileVM.relationshipState
 
                 ScrollView {
-                    VStack(spacing: 24) {
+                    VStack(spacing: 32) {
                         ProfileHeaderView(
                             profile: profileVM.profile,
                             username: username,
@@ -163,14 +163,15 @@ struct ProfileView: View {
                                 currentCountry: profileVM.profile?.currentCountry,
                                 favoriteCountries: profileVM.profile?.favoriteCountries ?? []
                             )
-                            .padding(.horizontal, 16)
 
                         } else {
                             LockedProfileView()
                                 .padding(.top, 40)
                         }
                     }
-                    .padding(.top, 8)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 20)
+                    .padding(.bottom, 60)
                 }
                 .refreshable {
                     await profileVM.reloadProfile()
