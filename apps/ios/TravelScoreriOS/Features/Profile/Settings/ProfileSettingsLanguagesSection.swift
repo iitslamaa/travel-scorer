@@ -23,33 +23,61 @@ struct ProfileSettingsLanguagesSection: View {
     var body: some View {
         SectionCard(title: "Languages spoken") {
 
-            if languages.isEmpty {
-                Text("Add languages you speak or are learning")
-                    .foregroundStyle(.secondary)
-            } else {
-                ForEach(languages.indices, id: \.self) { index in
-                    HStack {
-                        Text(displayName(for: languages[index]))
-                            .foregroundStyle(.primary)
+            VStack(spacing: 0) {
 
-                        Spacer()
+                if languages.isEmpty {
+                    Text("Add languages you speak or are learning")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 12)
+                } else {
+                    ForEach(Array(languages.enumerated()), id: \.offset) { index, entry in
+                        VStack(spacing: 8) {
 
-                        Button {
-                            languages.remove(at: index)
-                        } label: {
-                            Image(systemName: "minus.circle.fill")
-                                .foregroundStyle(.red)
+                            HStack {
+                                Text(displayName(for: entry))
+                                    .foregroundStyle(.primary)
+
+                                Spacer()
+
+                                Button {
+                                    languages.remove(at: index)
+                                } label: {
+                                    Image(systemName: "minus.circle.fill")
+                                        .foregroundStyle(.red)
+                                }
+                                .buttonStyle(.plain)
+                            }
+
+                            Picker(
+                                "Proficiency",
+                                selection: Binding(
+                                    get: { languages[index].proficiency },
+                                    set: { languages[index].proficiency = $0 }
+                                )
+                            ) {
+                                Text("Beginner").tag("Beginner")
+                                Text("Conversational").tag("Conversational")
+                                Text("Fluent").tag("Fluent")
+                            }
+                            .pickerStyle(.segmented)
                         }
-                        .buttonStyle(.plain)
+                        .padding(.vertical, 14)
+
+                        if index != languages.count - 1 {
+                            Divider().opacity(0.18)
+                        }
                     }
                 }
-            }
 
-            Button {
-                showAddLanguage = true
-            } label: {
-                Label("Add language", systemImage: "plus")
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                Spacer(minLength: 8)
+
+                Button {
+                    showAddLanguage = true
+                } label: {
+                    Label("Add language", systemImage: "plus")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
         }
     }

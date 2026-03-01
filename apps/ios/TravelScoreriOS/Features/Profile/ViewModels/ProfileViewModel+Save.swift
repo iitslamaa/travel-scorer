@@ -18,10 +18,12 @@ extension ProfileViewModel {
         firstName: String,
         username: String,
         homeCountries: [String]?,
-        languages: [String]?,
+        languages: [[String: String]]?,
         travelMode: String?,
         travelStyle: String?,
         nextDestination: String?,
+        currentCountry: String?,
+        favoriteCountries: [String]?,
         avatarUrl: String?
     ) async throws {
         let userId = self.userId
@@ -29,6 +31,15 @@ extension ProfileViewModel {
         
         let trimmedName = firstName.trimmingCharacters(in: .whitespacesAndNewlines)
         let trimmedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        let normalizedCurrentCountry: String? = {
+            guard let currentCountry,
+                  !currentCountry.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            else { return nil }
+            return currentCountry
+        }()
+
+        let normalizedFavoriteCountries = favoriteCountries?.sorted()
 
         guard !trimmedName.isEmpty, !trimmedUsername.isEmpty else {
             throw NSError(domain: "ProfileValidation", code: 1, userInfo: [NSLocalizedDescriptionKey: "Name and username are required."])
@@ -43,6 +54,8 @@ extension ProfileViewModel {
             travelStyle: travelStyle.map { [$0] },
             travelMode: travelMode.map { [$0] },
             nextDestination: nextDestination,
+            currentCountry: normalizedCurrentCountry,
+            favoriteCountries: normalizedFavoriteCountries,
             onboardingCompleted: true
         )
         
@@ -56,10 +69,18 @@ extension ProfileViewModel {
             current.username = trimmedUsername
             current.fullName = trimmedName
             current.livedCountries = homeCountries ?? current.livedCountries
-            current.languages = languages ?? current.languages
+            if let languages {
+                current.languages = languages.compactMap { dict in
+                    guard let code = dict["code"],
+                          let proficiency = dict["proficiency"] else { return nil }
+                    return Profile.LanguageJSON(code: code, proficiency: proficiency)
+                }
+            }
             current.travelStyle = travelStyle.map { [$0] } ?? current.travelStyle
             current.travelMode = travelMode.map { [$0] } ?? current.travelMode
             current.nextDestination = nextDestination
+            current.currentCountry = normalizedCurrentCountry
+            current.favoriteCountries = normalizedFavoriteCountries ?? current.favoriteCountries
 
             // Handle avatarUrl explicitly ("" means remove)
             if let avatarUrl {

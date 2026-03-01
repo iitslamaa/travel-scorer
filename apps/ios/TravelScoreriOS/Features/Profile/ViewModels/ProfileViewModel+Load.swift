@@ -127,10 +127,10 @@ extension ProfileViewModel {
                     // Compute mutual languages (canonical codes)
                     if let viewedLanguages = profile?.languages {
                         if let myProfile = try? await profileService.fetchOrCreateProfile(userId: currentUserId) {
-                            let myLanguages = Set(myProfile.languages)
-                            let normalizedViewedLanguages = Set(viewedLanguages)
+                            let myLanguageCodes = Set(myProfile.languages.map { $0.code.uppercased() })
+                            let viewedLanguageCodes = Set(viewedLanguages.map { $0.code.uppercased() })
 
-                            mutualLanguages = Array(myLanguages.intersection(normalizedViewedLanguages))
+                            mutualLanguages = Array(myLanguageCodes.intersection(viewedLanguageCodes))
                         }
                     }
                 }

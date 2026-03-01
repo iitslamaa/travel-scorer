@@ -20,6 +20,8 @@ struct ProfileSettingsView: View {
 
     @State private var homeCountries: Set<String> = []
     @State private var nextDestination: String? = nil
+    @State private var currentCountry: String? = nil
+    @State private var favoriteCountries: [String] = []
 
     @State private var travelMode: TravelMode? = nil
     @State private var travelStyle: TravelStyle? = nil
@@ -35,11 +37,20 @@ struct ProfileSettingsView: View {
     @State private var shouldRemoveAvatar = false
 
     // Sheets / dialogs
-    @State private var showTravelModeDialog = false
-    @State private var showTravelStyleDialog = false
-    @State private var showHomePicker = false
-    @State private var showNextDestinationPicker = false
-    @State private var showAddLanguage = false
+
+    private enum ActiveSheet: Identifiable {
+        case home
+        case currentCountry
+        case favoriteCountries
+        case nextDestination
+        case addLanguage
+        case travelMode
+        case travelStyle
+
+        var id: Int { hashValue }
+    }
+
+    @State private var activeSheet: ActiveSheet?
 
     // Delete account state
     @State private var showDeleteConfirm = false
@@ -67,7 +78,9 @@ struct ProfileSettingsView: View {
         let originalTravelMode = profile.travelMode.first.flatMap { TravelMode(rawValue: $0) }
         let originalTravelStyle = profile.travelStyle.first.flatMap { TravelStyle(rawValue: $0) }
         let originalNextDestination = profile.nextDestination
-        let originalLanguages = profile.languages.map { ($0, "native") }
+        let originalCurrentCountry = profile.currentCountry
+        let originalFavoriteCountries = profile.favoriteCountries ?? []
+        let originalLanguages = profile.languages.map { ($0.code, $0.proficiency) }
         let currentLanguages = languages.map { ($0.name, $0.proficiency) }
 
         let avatarChanged = shouldRemoveAvatar || selectedUIImage != nil
@@ -78,6 +91,8 @@ struct ProfileSettingsView: View {
             || travelMode != originalTravelMode
             || travelStyle != originalTravelStyle
             || nextDestination != originalNextDestination
+            || currentCountry != originalCurrentCountry
+            || favoriteCountries.sorted() != originalFavoriteCountries.sorted()
             || !currentLanguages.elementsEqual(originalLanguages, by: { $0 == $1 })
             || avatarChanged
     }
@@ -90,211 +105,42 @@ struct ProfileSettingsView: View {
                         dismiss()
                     }
             } else {
-                settingsContent
-            }
-        }
-    }
+                settingsContent()
+                    .onAppear {
+                        guard !hasLoadedProfile else { return }
+                        hasLoadedProfile = true
 
-    private var settingsContent: some View {
-        VStack(spacing: 0) {
+                        if let profile = profileVM.profile {
+                            firstName = profile.fullName ?? ""
+                            username = profile.username ?? ""
 
-            ScrollView {
-                VStack(spacing: 20) {
+                            homeCountries = Set(profile.livedCountries)
+                            travelMode = profile.travelMode.first.flatMap { TravelMode(rawValue: $0) }
+                            travelStyle = profile.travelStyle.first.flatMap { TravelStyle(rawValue: $0) }
+                            nextDestination = profile.nextDestination
 
-                    SectionCard {
-                        HStack(alignment: .top, spacing: 20) {
+                            currentCountry = profile.currentCountry
+                            favoriteCountries = profile.favoriteCountries ?? []
 
-                            ProfileSettingsAvatarSection(
-                                selectedUIImage: selectedUIImage,
-                                profileVM: profileVM,
-                                selectedPhotoItem: $selectedPhotoItem,
-                                isUploadingAvatar: isUploadingAvatar,
-                                shouldRemoveAvatar: shouldRemoveAvatar,
-                                onRemoveAvatar: {
-                                    markAvatarForRemoval()
-                                }
-                            )
-                            .frame(width: 96)
-                            .padding(.top, 4)
-
-                            VStack(alignment: .leading, spacing: 12) {
-
-                                TextField(
-                                    "",
-                                    text: $firstName,
-                                    prompt:
-                                        (Text("Full name")
-                                            .foregroundStyle(.secondary)
-                                         +
-                                         Text(" *")
-                                            .foregroundStyle(.red))
+                            languages = profile.languages.map {
+                                LanguageEntry(
+                                    name: $0.code,
+                                    proficiency: $0.proficiency
                                 )
-                                .font(.system(size: 18, weight: .semibold))
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 12)
-                                .background(Color(.secondarySystemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-
-                                HStack(spacing: 6) {
-                                    Text("@")
-                                        .foregroundStyle(.secondary)
-
-                                    TextField(
-                                        "",
-                                        text: $username,
-                                        prompt:
-                                            (Text("username")
-                                                .foregroundStyle(.secondary)
-                                             +
-                                             Text(" *")
-                                                .foregroundStyle(.red))
-                                    )
-                                    .textInputAutocapitalization(.never)
-                                    .autocorrectionDisabled(true)
-                                }
-                                .padding(.vertical, 10)
-                                .padding(.horizontal, 12)
-                                .background(Color(.secondarySystemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                if let usernameError {
-                                    Text(usernameError)
-                                        .font(.caption)
-                                        .foregroundStyle(.red)
-                                }
                             }
-
-                            Spacer(minLength: 0)
-                        }
-                        .padding(16)
-                    }
-
-                    ProfileSettingsBackgroundSection(
-                        homeCountries: homeCountries,
-                        showHomePicker: $showHomePicker
-                    )
-
-                    ProfileSettingsTravelSection(
-                        travelMode: $travelMode,
-                        travelStyle: $travelStyle,
-                        showTravelModeDialog: $showTravelModeDialog,
-                        showTravelStyleDialog: $showTravelStyleDialog
-                    )
-
-                    ProfileSettingsLanguagesSection(
-                        languages: $languages,
-                        showAddLanguage: $showAddLanguage
-                    )
-
-                    ProfileSettingsNextDestinationSection(
-                        nextDestination: nextDestination,
-                        showNextDestinationPicker: $showNextDestinationPicker
-                    )
-
-                    SectionCard {
-                        Button(role: .destructive) {
-                            Task {
-                                await sessionManager.signOut()
-                                dismiss()
-                            }
-                        } label: {
-                            HStack {
-                                Image(systemName: "arrow.backward.square")
-                                Text("Sign Out")
-                                    .fontWeight(.semibold)
-                                Spacer()
-                            }
-                            .foregroundStyle(.red)
                         }
                     }
-
-                    SectionCard {
-                        Button(role: .destructive) {
-                            showDeleteConfirm = true
-                        } label: {
-                            HStack {
-                                Image(systemName: "trash")
-                                Text("Delete Account")
-                                    .fontWeight(.semibold)
-                                Spacer()
-                            }
-                            .foregroundStyle(.red)
-                        }
-                    }
-
-                    Spacer(minLength: 40)
-                }
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 16)
-                .padding(.top, 20)
-                .padding(.bottom, 40)
-            }
-        }
-        .background(Color(.systemBackground))
-        .overlay(alignment: .top) {
-            if showSaveSuccess {
-                HStack(spacing: 8) {
-                    Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(.green)
-                    Text("Profile updated")
-                        .font(.subheadline.weight(.semibold))
-                }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(.ultraThinMaterial)
-                .clipShape(Capsule())
-                .shadow(radius: 8)
-                .padding(.top, 8)
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .zIndex(1)
-            }
-        }
-        .onAppear {
-            guard !hasLoadedProfile else { return }
-            hasLoadedProfile = true
-
-            if let profile = profileVM.profile {
-                firstName = profile.fullName ?? ""
-                username = profile.username ?? ""
-
-                // livedCountries is NON-optional [String]
-                homeCountries = Set(profile.livedCountries)
-
-                // travelMode / travelStyle are [String]
-                travelMode = profile.travelMode.first.flatMap { TravelMode(rawValue: $0) }
-                travelStyle = profile.travelStyle.first.flatMap { TravelStyle(rawValue: $0) }
-
-                // next destination
-                nextDestination = profile.nextDestination
-
-                // languages is NON-optional [String]
-                languages = profile.languages.map { raw in
-                    if let match = LanguageRepository.shared.allLanguages.first(where: { $0.displayName == raw }) {
-                        return LanguageEntry(name: match.code, proficiency: "native")
-                    } else {
-                        return LanguageEntry(name: raw, proficiency: "native")
-                    }
-                }
-            }
-        }
-        .onChange(of: selectedPhotoItem) { _, newItem in
-            guard let newItem else { return }
-
-            Task {
-                if let data = try? await newItem.loadTransferable(type: Data.self),
-                   let uiImage = UIImage(data: data) {
-                    await MainActor.run {
-                        selectedUIImage = uiImage
-                        shouldRemoveAvatar = false
-                    }
-                }
             }
         }
         .navigationTitle("Profile Settings")
         .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
-                Button("Cancel") { dismiss() }
+                Button("Cancel") {
+                    dismiss()
+                }
             }
+
             ToolbarItem(placement: .confirmationAction) {
                 Button {
                     Task {
@@ -307,6 +153,8 @@ struct ProfileSettingsView: View {
                             travelMode: travelMode,
                             travelStyle: travelStyle,
                             nextDestination: nextDestination,
+                            currentCountry: currentCountry,
+                            favoriteCountries: favoriteCountries,
                             selectedUIImage: selectedUIImage,
                             shouldRemoveAvatar: shouldRemoveAvatar,
                             setSaving: { isSavingProfile = $0 },
@@ -334,7 +182,6 @@ struct ProfileSettingsView: View {
                 } label: {
                     if isSavingProfile {
                         ProgressView()
-                            .progressViewStyle(.circular)
                     } else {
                         Text("Save")
                     }
@@ -344,102 +191,144 @@ struct ProfileSettingsView: View {
                 .opacity(hasChanges && isFormValid ? 1 : 0.5)
             }
         }
+        .sheet(item: $activeSheet) { sheet in
+            switch sheet {
 
-        // MARK: - Dialogs
+            case .home:
+                CountryMultiSelectView(
+                    title: "Home Countries",
+                    subtitle: "Add any flag that represents you!",
+                    selection: $homeCountries
+                )
 
-        .confirmationDialog("Travel Mode", isPresented: $showTravelModeDialog) {
-            ForEach(TravelMode.allCases) { mode in
-                Button(mode.label) { travelMode = mode }
-            }
-            Button("Cancel", role: .cancel) {}
-        }
+            case .currentCountry:
+                CountrySingleSelectView(
+                    title: "Select current country",
+                    selection: $currentCountry
+                )
 
-        .confirmationDialog("Travel Style", isPresented: $showTravelStyleDialog) {
-            ForEach(TravelStyle.allCases) { style in
-                Button(style.label) { travelStyle = style }
-            }
-            Button("Cancel", role: .cancel) {}
-        }
-        .alert("Delete Account?", isPresented: $showDeleteConfirm) {
-            Button("Continue", role: .destructive) {
-                showDeleteSheet = true
-            }
-            Button("Cancel", role: .cancel) {}
-        } message: {
-            Text("This action cannot be undone.")
-        }
+            case .favoriteCountries:
+                CountryMultiSelectView(
+                    title: "Favorite Countries",
+                    subtitle: "Select your favorite destinations.",
+                    selection: Binding(
+                        get: { Set(favoriteCountries) },
+                        set: { favoriteCountries = Array($0) }
+                    )
+                )
 
-        // MARK: - Sheets (temporary pickers)
+            case .nextDestination:
+                CountrySingleSelectView(
+                    title: "Select next destination",
+                    selection: $nextDestination
+                )
 
-        .sheet(isPresented: $showHomePicker) {
-            CountryMultiSelectView(
-                title: "Home Countries",
-                subtitle: "Add any flag that represents you! Your home country, background, places you've lived, ethnicity, etc.",
-                selection: $homeCountries
-            )
-        }
-
-        .sheet(isPresented: $showNextDestinationPicker) {
-            CountrySingleSelectView(
-                title: "Select next destination",
-                selection: $nextDestination
-            )
-        }
-
-        .sheet(isPresented: $showAddLanguage) {
-            AddLanguageView { entry in
-                if !languages.contains(where: { $0.name == entry.name }) {
-                    languages.append(entry)
-                }
-            }
-        }
-        .sheet(isPresented: $showDeleteSheet) {
-            NavigationStack {
-                VStack(spacing: 20) {
-                    Text("Type DELETE to confirm")
-                        .font(.headline)
-
-                    TextField("DELETE", text: $deleteText)
-                        .textInputAutocapitalization(.characters)
-                        .autocorrectionDisabled()
-                        .textFieldStyle(.roundedBorder)
-
-                    if let deleteError {
-                        Text(deleteError)
-                            .foregroundColor(.red)
-                            .font(.footnote)
-                    }
-
-                    Button(role: .destructive) {
-                        Task {
-                            await ProfileSettingsDeletionCoordinator.handleDelete(
-                                sessionManager: sessionManager,
-                                dismiss: { dismiss() },
-                                setDeleting: { isDeleting = $0 },
-                                setError: { deleteError = $0 },
-                                closeSheet: { showDeleteSheet = false }
-                            )
-                        }
-                    } label: {
-                        if isDeleting {
-                            ProgressView()
-                        } else {
-                            Text("Permanently Delete")
-                        }
-                    }
-                    .disabled(deleteText.uppercased() != "DELETE" || isDeleting)
-
-                    Spacer()
-                }
-                .padding()
-                .navigationTitle("Delete Account")
-                .toolbar {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Button("Close") {
-                            showDeleteSheet = false
-                        }
+            case .addLanguage:
+                AddLanguageView { entry in
+                    if !languages.contains(where: { $0.name == entry.name }) {
+                        languages.append(entry)
                     }
                 }
+
+            case .travelMode:
+                NavigationStack {
+                    List {
+                        ForEach(TravelMode.allCases) { mode in
+                            Button(mode.label) {
+                                travelMode = mode
+                                activeSheet = nil
+                            }
+                        }
+                    }
+                    .navigationTitle("Travel Mode")
+                    .navigationBarTitleDisplayMode(.inline)
+                }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+
+            case .travelStyle:
+                NavigationStack {
+                    List {
+                        ForEach(TravelStyle.allCases) { style in
+                            Button(style.label) {
+                                travelStyle = style
+                                activeSheet = nil
+                            }
+                        }
+                    }
+                    .navigationTitle("Travel Style")
+                    .navigationBarTitleDisplayMode(.inline)
+                }
+                .presentationDetents([.medium])
+                .presentationDragIndicator(.visible)
+            }
+        }
+    }
+
+    private func settingsContent() -> some View {
+        SettingsScrollContent(
+            profileVM: profileVM,
+            firstName: $firstName,
+            username: $username,
+            homeCountries: $homeCountries,
+            currentCountry: $currentCountry,
+            favoriteCountries: $favoriteCountries,
+            travelMode: $travelMode,
+            travelStyle: $travelStyle,
+            languages: $languages,
+            nextDestination: $nextDestination,
+            showHomePicker: Binding(
+                get: { false },
+                set: { if $0 { activeSheet = .home } }
+            ),
+            showCurrentCountryPicker: Binding(
+                get: { false },
+                set: { if $0 { activeSheet = .currentCountry } }
+            ),
+            showFavoriteCountriesPicker: Binding(
+                get: { false },
+                set: { if $0 { activeSheet = .favoriteCountries } }
+            ),
+            showTravelModeDialog: Binding(
+                get: { false },
+                set: { if $0 { activeSheet = .travelMode } }
+            ),
+            showTravelStyleDialog: Binding(
+                get: { false },
+                set: { if $0 { activeSheet = .travelStyle } }
+            ),
+            showNextDestinationPicker: Binding(
+                get: { false },
+                set: { if $0 { activeSheet = .nextDestination } }
+            ),
+            showAddLanguage: Binding(
+                get: { false },
+                set: { if $0 { activeSheet = .addLanguage } }
+            ),
+            selectedUIImage: selectedUIImage,
+            selectedPhotoItem: $selectedPhotoItem,
+            isUploadingAvatar: isUploadingAvatar,
+            shouldRemoveAvatar: shouldRemoveAvatar,
+            usernameError: usernameError,
+            onRemoveAvatar: { markAvatarForRemoval() }
+        )
+        .background(Color(.systemBackground))
+        .overlay(alignment: .top) {
+            if showSaveSuccess {
+                HStack(spacing: 8) {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                    Text("Profile updated")
+                        .font(.subheadline.weight(.semibold))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(.ultraThinMaterial)
+                .clipShape(Capsule())
+                .shadow(radius: 8)
+                .padding(.top, 8)
+                .transition(.move(edge: .top).combined(with: .opacity))
+                .zIndex(1)
             }
         }
     }
@@ -475,4 +364,137 @@ struct ProfileSettingsView: View {
 }
 
 
+struct SettingsScrollContent: View {
+    @ObservedObject var profileVM: ProfileViewModel
 
+    @Binding var firstName: String
+    @Binding var username: String
+    @Binding var homeCountries: Set<String>
+    @Binding var currentCountry: String?
+    @Binding var favoriteCountries: [String]
+    @Binding var travelMode: TravelMode?
+    @Binding var travelStyle: TravelStyle?
+    @Binding var languages: [LanguageEntry]
+    @Binding var nextDestination: String?
+
+    @Binding var showHomePicker: Bool
+    @Binding var showCurrentCountryPicker: Bool
+    @Binding var showFavoriteCountriesPicker: Bool
+    @Binding var showTravelModeDialog: Bool
+    @Binding var showTravelStyleDialog: Bool
+    @Binding var showNextDestinationPicker: Bool
+    @Binding var showAddLanguage: Bool
+
+    let selectedUIImage: UIImage?
+    @Binding var selectedPhotoItem: PhotosPickerItem?
+    let isUploadingAvatar: Bool
+    let shouldRemoveAvatar: Bool
+    let usernameError: String?
+    let onRemoveAvatar: () -> Void
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 20) {
+
+                SectionCard {
+                    HStack(alignment: .top, spacing: 20) {
+
+                        ProfileSettingsAvatarSection(
+                            selectedUIImage: selectedUIImage,
+                            profileVM: profileVM,
+                            selectedPhotoItem: $selectedPhotoItem,
+                            isUploadingAvatar: isUploadingAvatar,
+                            shouldRemoveAvatar: shouldRemoveAvatar,
+                            onRemoveAvatar: onRemoveAvatar
+                        )
+                        .frame(width: 96)
+                        .padding(.top, 4)
+
+                        VStack(alignment: .leading, spacing: 12) {
+
+                            TextField(
+                                "",
+                                text: $firstName,
+                                prompt:
+                                    (Text("Full name")
+                                        .foregroundStyle(.secondary)
+                                     +
+                                     Text(" *")
+                                        .foregroundStyle(.red))
+                            )
+                            .font(.system(size: 18, weight: .semibold))
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 12)
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                            HStack(spacing: 6) {
+                                Text("@")
+                                    .foregroundStyle(.secondary)
+
+                                TextField(
+                                    "",
+                                    text: $username,
+                                    prompt:
+                                        (Text("username")
+                                            .foregroundStyle(.secondary)
+                                         +
+                                         Text(" *")
+                                            .foregroundStyle(.red))
+                                )
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled(true)
+                            }
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 12)
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+
+                            if let usernameError {
+                                Text(usernameError)
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                            }
+                        }
+
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                }
+
+                ProfileSettingsBackgroundSection(
+                    homeCountries: homeCountries,
+                    currentCountry: currentCountry ?? "",
+                    favoriteCountries: favoriteCountries,
+                    showHomePicker: $showHomePicker,
+                    showCurrentCountryPicker: $showCurrentCountryPicker,
+                    showFavoriteCountriesPicker: $showFavoriteCountriesPicker
+                )
+
+                ProfileSettingsLanguagesSection(
+                    languages: $languages,
+                    showAddLanguage: $showAddLanguage
+                )
+
+                ProfileSettingsTravelSection(
+                    travelMode: $travelMode,
+                    travelStyle: $travelStyle,
+                    showTravelModeDialog: $showTravelModeDialog,
+                    showTravelStyleDialog: $showTravelStyleDialog
+                )
+
+                ProfileSettingsNextDestinationSection(
+                    nextDestination: nextDestination,
+                    showNextDestinationPicker: $showNextDestinationPicker
+                )
+
+                Spacer(minLength: 40)
+            }
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 32)
+        }
+    }
+}

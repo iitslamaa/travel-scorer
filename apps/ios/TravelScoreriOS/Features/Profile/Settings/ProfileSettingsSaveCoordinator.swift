@@ -22,6 +22,8 @@ struct ProfileSettingsSaveCoordinator {
         travelMode: TravelMode?,
         travelStyle: TravelStyle?,
         nextDestination: String?,
+        currentCountry: String?,
+        favoriteCountries: [String],
         selectedUIImage: UIImage?,
         shouldRemoveAvatar: Bool,
         setSaving: @escaping (Bool) -> Void,
@@ -46,10 +48,15 @@ struct ProfileSettingsSaveCoordinator {
                 firstName: trimmedName,
                 username: trimmedUsername,
                 homeCountries: Array(homeCountries).sorted(),
-                languages: languages.map { $0.name },
+                languages: languages.map { [
+                    "code": $0.name,
+                    "proficiency": $0.proficiency
+                ] },
                 travelMode: travelMode?.rawValue,
                 travelStyle: travelStyle?.rawValue,
                 nextDestination: nextDestination,
+                currentCountry: currentCountry,
+                favoriteCountries: favoriteCountries,
                 avatarUrl: avatarURL
             )
 

@@ -11,33 +11,126 @@ import SwiftUI
 struct ProfileSettingsBackgroundSection: View {
 
     let homeCountries: Set<String>
+    let currentCountry: String?
+    let favoriteCountries: [String]
+
     @Binding var showHomePicker: Bool
+    @Binding var showCurrentCountryPicker: Bool
+    @Binding var showFavoriteCountriesPicker: Bool
 
     var body: some View {
         SectionCard(title: "Your background") {
 
-            Button {
-                showHomePicker = true
-            } label: {
-                HStack(spacing: 8) {
+            VStack(spacing: 0) {
 
-                    Text("My flags:")
-                        .fontWeight(.bold)
+                // My Flags
+                Button {
+                    showHomePicker = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Text("My flags")
+                            .foregroundStyle(.primary)
 
-                    if !homeCountries.isEmpty {
-                        ForEach(homeCountries.sorted(), id: \.self) { code in
-                            Text(flag(for: code))
+                        Spacer()
+
+                        if homeCountries.isEmpty {
+                            Text("None")
+                                .foregroundStyle(.secondary)
+                                .font(.subheadline)
+                        } else {
+                            HStack(spacing: 6) {
+                                ForEach(homeCountries.sorted(), id: \.self) { code in
+                                    Text(flag(for: code))
+                                }
+                            }
+                            .font(.subheadline)
                         }
-                    } else {
-                        Text("None")
+
+                        Image(systemName: "chevron.right")
+                            .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
-
-                    Spacer()
+                    .padding(.vertical, 14)
+                    .contentShape(Rectangle())
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+                .buttonStyle(.plain)
+
+                Divider().opacity(0.18)
+
+                // Current Country
+                Button {
+                    showCurrentCountryPicker = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Text("Current country")
+                            .foregroundStyle(.primary)
+
+                        Spacer()
+
+                        if let currentCountry {
+                            let upper = currentCountry.uppercased()
+                            HStack(spacing: 6) {
+                                Text(flag(for: upper))
+                                Text(localizedName(for: upper))
+                            }
+                            .foregroundStyle(.primary)
+                            .font(.subheadline)
+                        } else {
+                            Text("Not set")
+                                .foregroundStyle(.secondary)
+                                .font(.subheadline)
+                        }
+
+                        Image(systemName: "chevron.right")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 14)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+
+                Divider().opacity(0.18)
+
+                // Favorite Countries
+                Button {
+                    showFavoriteCountriesPicker = true
+                } label: {
+                    HStack(spacing: 12) {
+                        Text("Favorite countries")
+                            .foregroundStyle(.primary)
+
+                        Spacer()
+
+                        if favoriteCountries.isEmpty {
+                            Text("None")
+                                .foregroundStyle(.secondary)
+                                .font(.subheadline)
+                        } else {
+                            HStack(spacing: 6) {
+                                ForEach(favoriteCountries.sorted(), id: \.self) { code in
+                                    Text(flag(for: code))
+                                }
+                            }
+                            .font(.subheadline)
+                        }
+
+                        Image(systemName: "chevron.right")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(.vertical, 14)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
         }
+    }
+
+    private func localizedName(for code: String) -> String {
+        let upper = code.uppercased()
+        let locale = Locale(identifier: "en_US")
+        return locale.localizedString(forRegionCode: upper) ?? upper
     }
 
     private func flag(for code: String) -> String {

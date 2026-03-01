@@ -34,8 +34,8 @@ enum TravelStyle: String, CaseIterable, Identifiable {
 
 struct LanguageEntry: Identifiable, Equatable {
     let id = UUID()
-    let name: String
-    let proficiency: String
+    var name: String
+    var proficiency: String
 
     var display: String {
         "\(name) (\(proficiency))"
