@@ -2,8 +2,6 @@
 //  ProfileInfoSection.swift
 //  TravelScoreriOS
 //
-//  Created by Lama Yassine on 2/13/26.
-//
 
 import Foundation
 import SwiftUI
@@ -22,32 +20,109 @@ struct ProfileInfoSection: View {
     let travelMode: String?
     let travelStyle: String?
     let nextDestination: String?
-
     let currentCountry: String?
     let favoriteCountries: [String]
 
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        LazyVStack(spacing: 28) {
-            languagesCard
-            locationCard
+        LazyVStack(spacing: 32) {
+            languagesSection
 
             if relationshipState == .friends && !mutualLanguages.isEmpty {
-                sharedLanguagesCard
+                sharedLanguagesSection
             }
 
-            travelModeCard
-            travelStyleCard
-            infoCards
+            combinedPreferencesSection
+
+            countriesSection
         }
         .padding(.horizontal, 20)
-        .padding(.top, 28)
-        .padding(.bottom, 32)
+        .padding(.top, 20)
+        .padding(.bottom, 48)
     }
 
-    private var infoCards: some View {
-        LazyVStack(spacing: 12) {
+    // MARK: - Languages
+
+    private var languagesSection: some View {
+        card {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeader("Languages")
+
+                if languages.isEmpty {
+                    secondaryText("Not set")
+                } else {
+                    VStack(spacing: 14) {
+                        ForEach(languages, id: \.self) { language in
+                            languageRow(language)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private var sharedLanguagesSection: some View {
+        card {
+            VStack(alignment: .leading, spacing: 16) {
+                sectionHeader("Shared Languages")
+
+                VStack(spacing: 14) {
+                    ForEach(mutualLanguages, id: \.self) { language in
+                        sharedLanguageRow(language)
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Preferences
+
+    private var combinedPreferencesSection: some View {
+        card {
+            VStack(spacing: 18) {
+
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Travel Mode")
+                            .font(.subheadline.weight(.semibold))
+
+                        if let travelMode, !travelMode.isEmpty {
+                            Text(travelMode)
+                                .font(.subheadline)
+                                .foregroundStyle(.primary)
+                        } else {
+                            Text("Not set")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Spacer()
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Travel Style")
+                            .font(.subheadline.weight(.semibold))
+
+                        if let travelStyle, !travelStyle.isEmpty {
+                            Text(travelStyle)
+                                .font(.subheadline)
+                                .foregroundStyle(.primary)
+                        } else {
+                            Text("Not set")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // MARK: - Countries
+
+    private var countriesSection: some View {
+        LazyVStack(spacing: 16) {
 
             if relationshipState == .selfProfile {
 
@@ -85,159 +160,93 @@ struct ProfileInfoSection: View {
         }
     }
 
-    private var languagesCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Languages")
-                .font(.subheadline)
-                .fontWeight(.semibold)
+    // MARK: - Reusable Components
 
-            if languages.isEmpty {
-                Text("Not set")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } else {
-                Text(languages.joined(separator: " · "))
+    private func card<Content: View>(
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        content()
+            .padding(.vertical, 22)
+            .padding(.horizontal, 20)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(Color(.secondarySystemBackground))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .stroke(Color.black.opacity(colorScheme == .dark ? 0.15 : 0.05), lineWidth: 1)
+            )
+    }
+
+    private func sectionHeader(_ text: String) -> some View {
+        Text(text)
+            .font(.headline)
+    }
+
+    private func secondaryText(_ text: String) -> some View {
+        Text(text)
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+    }
+
+    private func languageRow(_ text: String) -> some View {
+        let components = text.split(separator: "—").map { $0.trimmingCharacters(in: .whitespaces) }
+
+        return HStack {
+            Text(components.first ?? "")
+                .font(.subheadline.weight(.semibold))
+
+            Spacer()
+
+            if components.count > 1 {
+                Text(components[1])
                     .font(.subheadline)
-                    .foregroundStyle(.primary)
-            }
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-    }
-
-    private var sharedLanguagesCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Shared Languages")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-
-            Text(mutualLanguages.joined(separator: " · "))
-                .font(.subheadline)
-                .foregroundStyle(.blue)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-    }
-
-    private var locationCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
-
-            if let currentCountry, !currentCountry.isEmpty {
-                let upper = currentCountry.uppercased()
-                let flag = flagEmoji(for: upper)
-                let name = countryName(for: upper)
-
-                HStack(alignment: .firstTextBaseline) {
-                    Text("Current Country")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-
-                    Spacer(minLength: 12)
-
-                    Text("\(name) \(flag)")
-                        .font(.subheadline)
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                }
-            }
-
-            if currentCountry != nil && nextDestination != nil {
-                Divider()
-                    .opacity(0.12)
-            }
-
-            if let code = nextDestination, !code.isEmpty {
-                let upper = code.uppercased()
-                let flag = flagEmoji(for: upper)
-                let name = countryName(for: upper)
-
-                HStack(alignment: .firstTextBaseline) {
-                    Text("Next Destination")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-
-                    Spacer(minLength: 12)
-
-                    Text("\(name) \(flag)")
-                        .font(.subheadline)
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                }
-            }
-
-            if nextDestination != nil && !favoriteCountries.isEmpty {
-                Divider()
-                    .opacity(0.12)
-            }
-
-            if !favoriteCountries.isEmpty {
-                HStack(alignment: .firstTextBaseline, spacing: 8) {
-                    Text("Favorite Countries")
-                        .font(.subheadline)
-                        .fontWeight(.semibold)
-
-                    Spacer(minLength: 12)
-
-                    HStack(spacing: 6) {
-                        ForEach(favoriteCountries.sorted(), id: \.self) { code in
-                            Text(flagEmoji(for: code.uppercased()))
-                        }
-                    }
-                }
-            }
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-    }
-
-    private var travelModeCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Travel Mode: Solo or Group?")
-                .font(.subheadline)
-                .fontWeight(.semibold)
-
-            if let travelMode, !travelMode.isEmpty {
-                Text(travelMode)
-                    .font(.subheadline)
-                    .foregroundStyle(.primary)
-            } else {
-                Text("Not set")
-                    .font(.caption)
                     .foregroundStyle(.secondary)
             }
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
-    private var travelStyleCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Travel Style: Budget, Comfortable, or In Between?")
-                .font(.subheadline)
-                .fontWeight(.semibold)
+    private func sharedLanguageRow(_ text: String) -> some View {
+        let components = text.split(separator: "—").map { $0.trimmingCharacters(in: .whitespaces) }
 
-            if let travelStyle, !travelStyle.isEmpty {
-                Text(travelStyle)
+        return HStack {
+            Text(components.first ?? "")
+                .font(.subheadline.weight(.semibold))
+
+            Spacer()
+
+            if components.count > 1 {
+                Text(components[1])
                     .font(.subheadline)
-                    .foregroundStyle(.primary)
-            } else {
-                Text("Not set")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(.blue)
             }
         }
-        .padding(12)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+    }
+
+    private func infoRow(title: String, value: String) -> some View {
+        HStack {
+            Text(title)
+                .font(.subheadline.weight(.semibold))
+
+            Spacer()
+
+            Text(value)
+                .font(.subheadline)
+                .lineLimit(1)
+        }
+    }
+
+    private var subtleDivider: some View {
+        Divider()
+            .opacity(0.08)
+    }
+
+    // MARK: - Helpers
+
+    private func formattedCountry(_ code: String) -> String {
+        let upper = code.uppercased()
+        return "\(countryName(for: upper)) \(flagEmoji(for: upper))"
     }
 
     private func flagEmoji(for countryCode: String) -> String {
@@ -256,20 +265,18 @@ struct ProfileInfoSection: View {
     }
 
     private var lockedProfileMessage: some View {
-        VStack(spacing: 8) {
-            Image(systemName: "lock.fill")
-                .font(.title2)
-                .foregroundStyle(.secondary)
+        card {
+            VStack(spacing: 12) {
+                Image(systemName: "lock.fill")
+                    .font(.title3)
+                    .foregroundStyle(.secondary)
 
-            Text("Learn more about this user by adding them as a friend!")
-                .font(.subheadline)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
+                Text("Add this user as a friend to see more details.")
+                    .font(.subheadline)
+                    .multilineTextAlignment(.center)
+                    .foregroundStyle(.secondary)
+            }
+            .frame(maxWidth: .infinity)
         }
-        .padding(.vertical, 24)
-        .frame(maxWidth: .infinity)
-        .background(colorScheme == .dark ? .ultraThinMaterial : .regularMaterial)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .shadow(color: .black.opacity(0.06), radius: 8, y: 4)
     }
 }
