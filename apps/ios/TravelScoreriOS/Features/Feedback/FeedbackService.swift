@@ -11,6 +11,14 @@ import Supabase
 
 struct FeedbackService {
     
+    struct FeedbackEmailPayload: Encodable {
+        let message: String
+        let user_id: String
+        let device: String
+        let app_version: String
+        let created_at: String
+    }
+
     static func submitFeedback(
         message: String,
         userId: UUID,
@@ -29,5 +37,18 @@ struct FeedbackService {
                 "app_version": version ?? "unknown"
             ])
             .execute()
+        
+        let payload = FeedbackEmailPayload(
+            message: message,
+            user_id: userId.uuidString,
+            device: device,
+            app_version: version ?? "unknown",
+            created_at: ISO8601DateFormatter().string(from: Date())
+        )
+
+        try await supabase.client.functions.invoke(
+            "send-feedback-email",
+            options: .init(body: payload)
+        )
     }
 }
