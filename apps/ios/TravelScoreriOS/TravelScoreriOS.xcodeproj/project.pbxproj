@@ -101,6 +101,10 @@
 		172A74C92F357340003EF4DF /* SessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 172A74C82F357340003EF4DF /* SessionManager.swift */; };
 		176796142F4CF4BC0011EC0E /* CountryAffordabilityCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176796132F4CF4BC0011EC0E /* CountryAffordabilityCard.swift */; };
 		176968BB2F4E6B3C0011661A /* OAuthPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 176968BA2F4E6B3C0011661A /* OAuthPresenter.swift */; };
+		17744B0E2F54E366001D3396 /* DiscoveryMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17744B0B2F54E366001D3396 /* DiscoveryMapView.swift */; };
+		17744B112F54E366001D3396 /* DiscoveryMapRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17744B092F54E366001D3396 /* DiscoveryMapRenderer.swift */; };
+		17744B122F54E366001D3396 /* DiscoveryMapCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17744B082F54E366001D3396 /* DiscoveryMapCoordinator.swift */; };
+		17744B132F54E366001D3396 /* DiscoveryMapRepresentable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17744B0A2F54E366001D3396 /* DiscoveryMapRepresentable.swift */; };
 		1776C9632F50FCE800AFC488 /* global_languages.json in Resources */ = {isa = PBXBuildFile; fileRef = 1776C9622F50FCE300AFC488 /* global_languages.json */; };
 		1776C9652F50FD6F00AFC488 /* AppLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1776C9642F50FD6F00AFC488 /* AppLanguage.swift */; };
 		1776C9672F50FD8800AFC488 /* LanguageRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1776C9662F50FD8800AFC488 /* LanguageRepository.swift */; };
@@ -232,6 +236,10 @@
 		172A74C82F357340003EF4DF /* SessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionManager.swift; sourceTree = "<group>"; };
 		176796132F4CF4BC0011EC0E /* CountryAffordabilityCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountryAffordabilityCard.swift; sourceTree = "<group>"; };
 		176968BA2F4E6B3C0011661A /* OAuthPresenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OAuthPresenter.swift; sourceTree = "<group>"; };
+		17744B082F54E366001D3396 /* DiscoveryMapCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryMapCoordinator.swift; sourceTree = "<group>"; };
+		17744B092F54E366001D3396 /* DiscoveryMapRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryMapRenderer.swift; sourceTree = "<group>"; };
+		17744B0A2F54E366001D3396 /* DiscoveryMapRepresentable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryMapRepresentable.swift; sourceTree = "<group>"; };
+		17744B0B2F54E366001D3396 /* DiscoveryMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryMapView.swift; sourceTree = "<group>"; };
 		1776C9622F50FCE300AFC488 /* global_languages.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = global_languages.json; sourceTree = "<group>"; };
 		1776C9642F50FD6F00AFC488 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		1776C9662F50FD8800AFC488 /* LanguageRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageRepository.swift; sourceTree = "<group>"; };
@@ -721,6 +729,7 @@
 		170C22742F479DBA0090BA78 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				17744B0D2F54E366001D3396 /* DiscoveryMap */,
 				17EC41DC2F4BB1DB004B80DA /* ScoreWorldMap */,
 				170C21172F4790E00090BA78 /* ScoreCountryDrawerView.swift */,
 				170C21062F4790E00090BA78 /* FlagWithTooltip.swift */,
@@ -823,6 +832,17 @@
 				17AE40602F50EBC300495208 /* ProfileSettingsDeletionCoordinator.swift */,
 			);
 			path = Settings;
+			sourceTree = "<group>";
+		};
+		17744B0D2F54E366001D3396 /* DiscoveryMap */ = {
+			isa = PBXGroup;
+			children = (
+				17744B082F54E366001D3396 /* DiscoveryMapCoordinator.swift */,
+				17744B092F54E366001D3396 /* DiscoveryMapRenderer.swift */,
+				17744B0A2F54E366001D3396 /* DiscoveryMapRepresentable.swift */,
+				17744B0B2F54E366001D3396 /* DiscoveryMapView.swift */,
+			);
+			path = DiscoveryMap;
 			sourceTree = "<group>";
 		};
 		179439C72F53FCB800993FB2 /* Feedback */ = {
@@ -1076,6 +1096,10 @@
 				17F2E1602F4C3C27009A7E6D /* CountryScoreSection.swift in Sources */,
 				170C21782F4790E00090BA78 /* WhenToGoViewModel.swift in Sources */,
 				176968BB2F4E6B3C0011661A /* OAuthPresenter.swift in Sources */,
+				17744B0E2F54E366001D3396 /* DiscoveryMapView.swift in Sources */,
+				17744B112F54E366001D3396 /* DiscoveryMapRenderer.swift in Sources */,
+				17744B122F54E366001D3396 /* DiscoveryMapCoordinator.swift in Sources */,
+				17744B132F54E366001D3396 /* DiscoveryMapRepresentable.swift in Sources */,
 				170C21792F4790E00090BA78 /* WorldGeoJSONLoader.swift in Sources */,
 				170C217A2F4790E00090BA78 /* WorldMapView.swift in Sources */,
 				170C217B2F4790E00090BA78 /* WrapChips.swift in Sources */,
