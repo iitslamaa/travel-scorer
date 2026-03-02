@@ -16,7 +16,8 @@ struct DiscoveryView: View {
     @State private var showingWeights = false
     @State private var sort: CountrySort = .name
     @State private var sortOrder: SortOrder = .ascending
-    @State private var countries: [Country] = []
+    @State private var countries: [Country] = CountryAPI.loadCachedCountries() ?? []
+    @State private var didRunInitialLoad = false
 
     @MainActor
     private func reloadCountries() async {
@@ -26,6 +27,26 @@ struct DiscoveryView: View {
         }
 
         await profileVM.loadIfNeeded()
+    }
+
+    @MainActor
+    private func loadCountriesWithRetry() async {
+        // Try immediately, then retry a few times in case cache is populated slightly later
+        let delays: [UInt64] = [0, 200_000_000, 500_000_000, 1_000_000_000] // 0s, 0.2s, 0.5s, 1.0s
+
+        for (idx, delay) in delays.enumerated() {
+            if delay > 0 {
+                try? await Task.sleep(nanoseconds: delay)
+            }
+
+            if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
+                countries = cached
+                // Stop once we have data
+                return
+            } else {
+                print("🟡 Discovery initial load: countries still empty (attempt \(idx + 1)/\(delays.count))")
+            }
+        }
     }
 
     var body: some View {
@@ -51,13 +72,16 @@ struct DiscoveryView: View {
             await reloadCountries()
         }
         .task {
-            if countries.isEmpty {
-                if let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
-                    countries = cached
-                }
-            }
+            guard !didRunInitialLoad else { return }
+            didRunInitialLoad = true
 
+            await loadCountriesWithRetry()
             await profileVM.loadIfNeeded()
+
+            // One last assignment after profile loads (some code paths populate country cache during app bring-up)
+            if countries.isEmpty, let cached = CountryAPI.loadCachedCountries(), !cached.isEmpty {
+                countries = cached
+            }
         }
         .navigationTitle("Discover")
         .navigationBarTitleDisplayMode(.inline)
