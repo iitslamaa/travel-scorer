@@ -74,7 +74,7 @@ struct DiscoveryView: View {
             // Map (trailing)
             ToolbarItem(placement: .navigationBarTrailing) {
                 NavigationLink {
-                    ScoreWorldMapView(countries: countries)
+                    DiscoveryMapView(countries: countries)
                 } label: {
                     Image(systemName: "map")
                 }
