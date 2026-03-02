@@ -47,6 +47,7 @@ struct CountryListView: View {
     @EnvironmentObject private var profileVM: ProfileViewModel
 
     @State private var visibleCountries: [Country] = []
+    @State private var selectedCountry: Country?
 
     // Keep a handle to the latest recompute task so we can cancel stale work
     @State private var recomputeTask: Task<Void, Never>?
@@ -102,8 +103,7 @@ struct CountryListView: View {
             }
 
             if components.isEmpty {
-                // Preserve any precomputed score instead of wiping it out
-                updated.score = country.score
+                updated.score = nil
             } else {
                 let totalWeight = components.reduce(0) { $0 + $1.weight }
                 let weightedSum = components.reduce(0) { $0 + ($1.value * $1.weight) }
@@ -161,12 +161,50 @@ struct CountryListView: View {
     }
 
     var body: some View {
-        IndexedCountryListView(
-            countries: visibleCountries,
-            onCountryOpen: {
-                ReviewTriggerService.shared.triggerOnCountryOpenForTesting()
+        NavigationStack {
+            ScrollViewReader { proxy in
+                List {
+                    ForEach(groupedCountries.keys.sorted(), id: \.self) { letter in
+                        Section(header: Text(letter)) {
+                            ForEach(groupedCountries[letter] ?? [], id: \.id) { country in
+                                CountryRow(
+                                    country: country,
+                                    isBucketed: profileVM.viewedBucketListCountries.contains(country.id),
+                                    isVisited: profileVM.viewedTraveledCountries.contains(country.id),
+                                    showConfirm: quickConfirmByCountryId[country.id] != nil,
+                                    onOpen: {
+                                        selectedCountry = nil
+                                        DispatchQueue.main.async {
+                                            selectedCountry = country
+                                        }
+                                    },
+                                    onBucket: {
+                                        Task {
+                                            await profileVM.toggleBucket(country.id)
+                                            flashConfirm(.bucket, for: country.id)
+                                        }
+                                    },
+                                    onVisited: {
+                                        Task {
+                                            await profileVM.toggleTraveled(country.id)
+                                            flashConfirm(.visited, for: country.id)
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                        .id(letter)
+                    }
+                }
+                .listStyle(.plain)
             }
-        )
+            .navigationDestination(item: $selectedCountry) { country in
+                CountryDetailView(country: country)
+            }
+            .onAppear {
+                selectedCountry = nil
+            }
+        }
         .onChange(of: searchText) { _, _ in
             scheduleRecomputeVisible()
         }
@@ -198,9 +236,7 @@ private struct CountryRow: View {
     let onVisited: () -> Void
 
     var body: some View {
-        Button(action: {
-            onOpen()
-        }) {
+        Button(action: onOpen) {
             HStack(spacing: 12) {
                 Text(country.flagEmoji)
                     .font(.largeTitle)
