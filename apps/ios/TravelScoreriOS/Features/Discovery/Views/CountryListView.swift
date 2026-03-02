@@ -47,6 +47,7 @@ struct CountryListView: View {
     @EnvironmentObject private var profileVM: ProfileViewModel
 
     @State private var visibleCountries: [Country] = []
+    @State private var selectedCountry: Country?
 
     // Keep a handle to the latest recompute task so we can cancel stale work
     @State private var recomputeTask: Task<Void, Never>?
@@ -123,89 +124,85 @@ struct CountryListView: View {
         let snapshotSort = sort
         let snapshotSortOrder = sortOrder
 
-        recomputeTask = Task.detached(priority: .userInitiated) {
-            // Filter
-            let filtered: [Country]
-            if snapshotSearch.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                filtered = snapshotCountries
-            } else {
-                filtered = snapshotCountries.filter { $0.name.localizedCaseInsensitiveContains(snapshotSearch) }
+        // Filter
+        let filtered: [Country]
+        if snapshotSearch.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            filtered = snapshotCountries
+        } else {
+            filtered = snapshotCountries.filter { $0.name.localizedCaseInsensitiveContains(snapshotSearch) }
+        }
+
+        // Sort
+        let baseSorted: [Country]
+        switch snapshotSort {
+        case .name:
+            baseSorted = filtered.sorted {
+                $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
             }
+        case .score:
+            // Always sort highest score first
+            baseSorted = filtered.sorted { ($0.score ?? Int.min) > ($1.score ?? Int.min) }
+        }
 
-            // Sort
-            let baseSorted: [Country]
-            switch snapshotSort {
-            case .name:
-                baseSorted = filtered.sorted {
-                    $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending
-                }
-            case .score:
-                // Always sort highest score first
-                baseSorted = filtered.sorted { ($0.score ?? Int.min) > ($1.score ?? Int.min) }
-            }
+        let result: [Country]
 
-            let result: [Country]
-
-            if snapshotSort == .score {
-                // Ignore sortOrder for score; always highest first
+        if snapshotSort == .score {
+            result = baseSorted
+        } else {
+            switch snapshotSortOrder {
+            case .ascending:
                 result = baseSorted
-            } else {
-                switch snapshotSortOrder {
-                case .ascending:
-                    result = baseSorted
-                case .descending:
-                    result = Array(baseSorted.reversed())
-                }
-            }
-
-            // Publish back on main
-            await MainActor.run {
-                // If this task was cancelled, don't apply.
-                if Task.isCancelled { return }
-                self.visibleCountries = result
+            case .descending:
+                result = Array(baseSorted.reversed())
             }
         }
+
+        self.visibleCountries = result
     }
 
     var body: some View {
-        ScrollViewReader { proxy in
-            List {
-                ForEach(groupedCountries.keys.sorted(), id: \.self) { letter in
-                    Section(header: Text(letter)) {
-                        ForEach(groupedCountries[letter] ?? [], id: \.id) { country in
-                            CountryRow(
-                                country: country,
-                                isBucketed: profileVM.viewedBucketListCountries.contains(country.id),
-                                isVisited: profileVM.viewedTraveledCountries.contains(country.id),
-                                showConfirm: quickConfirmByCountryId[country.id] != nil,
-                                onBucket: {
-                                    Task {
-                                        await profileVM.toggleBucket(country.id)
-                                        flashConfirm(.bucket, for: country.id)
+        NavigationStack {
+            ScrollViewReader { proxy in
+                List {
+                    ForEach(groupedCountries.keys.sorted(), id: \.self) { letter in
+                        Section(header: Text(letter)) {
+                            ForEach(groupedCountries[letter] ?? [], id: \.id) { country in
+                                CountryRow(
+                                    country: country,
+                                    isBucketed: profileVM.viewedBucketListCountries.contains(country.id),
+                                    isVisited: profileVM.viewedTraveledCountries.contains(country.id),
+                                    showConfirm: quickConfirmByCountryId[country.id] != nil,
+                                    onOpen: {
+                                        selectedCountry = nil
+                                        DispatchQueue.main.async {
+                                            selectedCountry = country
+                                        }
+                                    },
+                                    onBucket: {
+                                        Task {
+                                            await profileVM.toggleBucket(country.id)
+                                            flashConfirm(.bucket, for: country.id)
+                                        }
+                                    },
+                                    onVisited: {
+                                        Task {
+                                            await profileVM.toggleTraveled(country.id)
+                                            flashConfirm(.visited, for: country.id)
+                                        }
                                     }
-                                },
-                                onVisited: {
-                                    Task {
-                                        await profileVM.toggleTraveled(country.id)
-                                        flashConfirm(.visited, for: country.id)
-                                    }
-                                }
-                            )
+                                )
+                            }
                         }
+                        .id(letter)
                     }
-                    .id(letter)
                 }
+                .listStyle(.plain)
             }
-            .listStyle(.plain)
-            .overlay(alignment: .trailing) {
-                AlphabetIndexView(
-                    letters: groupedCountries.keys.sorted()
-                ) { letter in
-                    withAnimation(.easeInOut) {
-                        proxy.scrollTo(letter, anchor: .top)
-                    }
-                }
-                .padding(.trailing, 4)
+            .navigationDestination(item: $selectedCountry) { country in
+                CountryDetailView(country: country)
+            }
+            .onAppear {
+                selectedCountry = nil
             }
         }
         .onChange(of: searchText) { _, _ in
@@ -234,13 +231,12 @@ private struct CountryRow: View {
     let isBucketed: Bool
     let isVisited: Bool
     let showConfirm: Bool
+    let onOpen: () -> Void
     let onBucket: () -> Void
     let onVisited: () -> Void
 
     var body: some View {
-        NavigationLink {
-            CountryDetailView(country: country)
-        } label: {
+        Button(action: onOpen) {
             HStack(spacing: 12) {
                 Text(country.flagEmoji)
                     .font(.largeTitle)
@@ -285,17 +281,18 @@ private struct CountryRow: View {
                 }
             }
             .padding(.vertical, 6)
-            .swipeActions(edge: .trailing, allowsFullSwipe: false) {
-                Button(action: onBucket) {
-                    Text(isBucketed ? "🪣 Unbucket" : "🪣 Bucket")
-                }
-                .tint(.blue)
-
-                Button(action: onVisited) {
-                    Text(isVisited ? "📝 Unvisit" : "📝 Visited")
-                }
-                .tint(.green)
+        }
+        .buttonStyle(.plain)
+        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+            Button(action: onBucket) {
+                Text(isBucketed ? "🪣 Unbucket" : "🪣 Bucket")
             }
+            .tint(.blue)
+
+            Button(action: onVisited) {
+                Text(isVisited ? "📝 Unvisit" : "📝 Visited")
+            }
+            .tint(.green)
         }
     }
 }
