@@ -207,7 +207,9 @@ private struct CountryRow: View {
     let onVisited: () -> Void
 
     var body: some View {
-        NavigationLink(value: country.id) {
+        NavigationLink {
+            CountryDetailView(country: country)
+        } label: {
             HStack(spacing: 12) {
                 Text(country.flagEmoji)
                     .font(.largeTitle)
